@@ -1,11 +1,12 @@
 import {
   Action,
-  AuthenticatedUser,
   Effect,
   IdentityPermission,
-  IdentityType
+  IdentityType,
+  DynamicOperation,
+  AuthenticatedUser
 } from '@aws/workbench-core-authorization';
-import { JSONValue } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -14,17 +15,12 @@ import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 describe('dynamic authorization identity permission integration tests ', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  let mockUser: AuthenticatedUser;
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    mockUser = {
-      id: 'sampleId',
-      roles: []
-    };
   });
 
   afterAll(async () => {
@@ -42,8 +38,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
             identityId: groupId,
             identityType: 'GROUP'
           }
-        ],
-        authenticatedUser: mockUser
+        ]
       });
       expect(response.data.identityPermissions).toBeDefined();
       expect(response.data.identityPermissions[0].identityId).toBe(groupId);
@@ -59,15 +54,13 @@ describe('dynamic authorization identity permission integration tests ', () => {
             identityId: groupId,
             identityType: 'GROUP'
           }
-        ],
-        authenticatedUser: mockUser
+        ]
       });
       const { identityPermissions } = response.data;
       await expect(
         adminSession.resources.identityPermissions.create(
           {
-            identityPermissions,
-            authenticatedUser: mockUser
+            identityPermissions
           },
           false
         )
@@ -82,8 +75,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
       });
       await expect(
         adminSession.resources.identityPermissions.create({
-          identities,
-          authenticatedUser: mockUser
+          identities
         })
       ).rejects.toThrow(new HttpError(429, {}));
     });
@@ -97,8 +89,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
               identityId: groupId,
               identityType: 'GROUP'
             }
-          ],
-          authenticatedUser: mockUser
+          ]
         })
       ).rejects.toThrow(new HttpError(400, {}));
     });
@@ -112,8 +103,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
     });
     test('get identity permissions by identity', async () => {
       const { data } = await adminSession.resources.identityPermissions.create({
-        identities: [{ identityId: groupId, identityType: 'GROUP' }],
-        authenticatedUser: mockUser
+        identities: [{ identityId: groupId, identityType: 'GROUP' }]
       });
       const { identityPermissions } = data;
       const response = await adminSession.resources.identityPermissions.getByIdentity({
@@ -137,8 +127,6 @@ describe('dynamic authorization identity permission integration tests ', () => {
     let subjectId: string;
     let subjectType: string;
     let effect: Effect;
-    let conditions: Record<string, JSONValue>;
-    let fields: string[];
     let description: string;
 
     let mockCreateIdentityPermission: IdentityPermission;
@@ -157,8 +145,6 @@ describe('dynamic authorization identity permission integration tests ', () => {
       subjectId = randomTextGenerator.getFakeText('sampleSubjectId');
       subjectType = 'sampleSubjectType';
       effect = 'ALLOW';
-      conditions = {};
-      fields = [];
       description = 'sampleDescription';
       mockCreateIdentityPermission = {
         identityId: groupId,
@@ -167,8 +153,6 @@ describe('dynamic authorization identity permission integration tests ', () => {
         subjectType,
         action: 'CREATE',
         effect,
-        conditions,
-        fields,
         description
       };
       mockDeleteIdentityPermission = {
@@ -178,14 +162,11 @@ describe('dynamic authorization identity permission integration tests ', () => {
         subjectType,
         action: 'DELETE',
         effect,
-        conditions,
-        fields,
         description
       };
       const { data: identityPermissionsData } = await adminSession.resources.identityPermissions.create(
         {
-          identityPermissions: [mockCreateIdentityPermission, mockDeleteIdentityPermission],
-          authenticatedUser: mockUser
+          identityPermissions: [mockCreateIdentityPermission, mockDeleteIdentityPermission]
         },
         false
       );
@@ -255,8 +236,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
             identityId: groupId,
             identityType: 'GROUP'
           }
-        ],
-        authenticatedUser: mockUser
+        ]
       });
 
       identityPermissions = response.data.identityPermissions;
@@ -264,8 +244,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
 
     test('delete identity permisions', async () => {
       const { data } = await adminSession.resources.identityPermissions.delete({
-        identityPermissions,
-        authenticatedUser: mockUser
+        identityPermissions
       });
 
       expect(data.identityPermissions).toStrictEqual(identityPermissions);
@@ -275,10 +254,211 @@ describe('dynamic authorization identity permission integration tests ', () => {
       const exceededIdentityPermissions = Array(101).fill(identityPermissions[0]);
       await expect(
         adminSession.resources.identityPermissions.delete({
-          identityPermissions: exceededIdentityPermissions,
-          authenticatedUser: mockUser
+          identityPermissions: exceededIdentityPermissions
         })
       ).rejects.toThrow(new HttpError(429, {}));
+    });
+  });
+
+  describe('isAuthorizedOnSubject', () => {
+    let mockDeleteIdentityPermission: IdentityPermission;
+    let mockReadIdentityPermission: IdentityPermission;
+    let mockWildcardCreateIdentityPermission: IdentityPermission;
+    let parentId: string;
+    let subjectId: string;
+    let subjectType: string;
+    let groupId: string;
+    let randomTextGenerator: RandomTextGenerator;
+    let conditions;
+    let mockAuthenticatedUser: AuthenticatedUser;
+    let user;
+    beforeAll(async () => {
+      user = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: `success+get-user-groups-${uuidv4()}@simulator.amazonses.com`
+      };
+      randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
+      const { data: userData } = await adminSession.resources.users.create(user);
+      const { data: groupData } = await adminSession.resources.groups.create();
+      await adminSession.resources.groups.group(groupData.groupId).addUser({ userId: userData.id });
+      groupId = groupData.groupId;
+      mockAuthenticatedUser = {
+        id: userData.id,
+        roles: [groupId]
+      };
+      subjectId = randomTextGenerator.getFakeText('sampleSubjectId');
+      subjectType = 'sampleSubjectType';
+      parentId = randomTextGenerator.getFakeText('sampleParentId');
+      conditions = {
+        parentId: { $eq: parentId }
+      };
+      mockDeleteIdentityPermission = {
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId,
+        subjectType,
+        action: 'DELETE',
+        effect: 'ALLOW',
+        conditions,
+        description: 'sampleDescription'
+      };
+
+      //mock permission to READ on subject for a specified field
+      mockReadIdentityPermission = {
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId,
+        subjectType,
+        action: 'READ',
+        effect: 'ALLOW',
+        fields: ['sampleField'],
+        conditions,
+        description: 'sampleDescription'
+      };
+
+      mockWildcardCreateIdentityPermission = {
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId: '*',
+        subjectType,
+        action: 'CREATE',
+        effect: 'ALLOW',
+        conditions,
+        description: 'sampleDescription'
+      };
+
+      await adminSession.resources.identityPermissions.create(
+        {
+          identityPermissions: [
+            mockReadIdentityPermission,
+            mockDeleteIdentityPermission,
+            mockWildcardCreateIdentityPermission
+          ]
+        },
+        false
+      );
+    });
+
+    test('is authorized on DELETE on subject with correct permissions', async () => {
+      const dynamicOperation: DynamicOperation = {
+        action: 'DELETE',
+        subject: {
+          subjectId,
+          subjectType,
+          parentId
+        }
+      };
+      const response = await adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+        dynamicOperation,
+        authenticatedUser: mockAuthenticatedUser
+      });
+      expect(response.status).toBe(204);
+    });
+
+    test('is authorized on DELETE on subject with incorrect permissions should throw 403', async () => {
+      //remove parent id should cause an error
+      const dynamicOperation: DynamicOperation = {
+        action: 'DELETE',
+        subject: {
+          subjectId,
+          subjectType
+        }
+      };
+      await expect(
+        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+          dynamicOperation,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new HttpError(403, {}));
+    });
+
+    test('is authorized on READ on subject with correct permissions', async () => {
+      //READ sampleField on subject
+      const dynamicOperation: DynamicOperation = {
+        action: 'READ',
+        subject: {
+          subjectId,
+          subjectType,
+          parentId
+        },
+        field: 'sampleField'
+      };
+      const response = await adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+        dynamicOperation,
+        authenticatedUser: mockAuthenticatedUser
+      });
+      expect(response.status).toBe(204);
+    });
+
+    test('is authorized on READ on subject with incorrect permissions should throw 403', async () => {
+      //READ differentField on subject, user is not authorized to do so
+      const dynamicOperation: DynamicOperation = {
+        action: 'READ',
+        subject: {
+          subjectId,
+          subjectType,
+          parentId
+        },
+        field: 'differentField'
+      };
+      await expect(
+        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+          dynamicOperation,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new HttpError(403, {}));
+    });
+    test('is authorized on DELETE on subject with incorrect permissions should throw 403', async () => {
+      //different parent id should cause an error
+      const dynamicOperation: DynamicOperation = {
+        action: 'DELETE',
+        subject: {
+          subjectId,
+          subjectType,
+          parentId: 'differentParentId'
+        }
+      };
+      await expect(
+        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+          dynamicOperation,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new HttpError(403, {}));
+    });
+
+    test('is authorized on CREATE on subject with correct permissions', async () => {
+      //Can create any subject with the specified subjectType as long as it is under the parentId
+      const dynamicOperation: DynamicOperation = {
+        action: 'CREATE',
+        subject: {
+          subjectId: randomTextGenerator.getFakeText('sampleSubjectId'),
+          subjectType,
+          parentId
+        }
+      };
+      const response = await adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+        dynamicOperation,
+        authenticatedUser: mockAuthenticatedUser
+      });
+      expect(response.status).toBe(204);
+    });
+
+    test('is authorized on CREATE on subject with incorrect permissions should throw 403 ', async () => {
+      //Can not create any subject with the specified subjectType without the correct parentId
+      const dynamicOperation: DynamicOperation = {
+        action: 'CREATE',
+        subject: {
+          subjectId: randomTextGenerator.getFakeText('sampleSubjectId'),
+          subjectType
+        }
+      };
+      await expect(
+        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
+          dynamicOperation,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new HttpError(403, {}));
     });
   });
 });

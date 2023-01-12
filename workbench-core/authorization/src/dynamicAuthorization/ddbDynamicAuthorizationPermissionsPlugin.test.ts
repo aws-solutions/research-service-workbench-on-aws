@@ -142,7 +142,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     sampleSubjectType = 'sampleSubjectType';
     sampleSubjectId = 'sampleSubjectId';
     sampleConditions = {};
-    sampleFields = [];
+    sampleFields = ['sampleField'];
     sampleDescription = 'sampleDescription';
     mockIdentityPermission = {
       action: sampleAction,
@@ -168,7 +168,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       subjectId: { S: sampleSubjectId },
       identity: { S: sampleGroupIdentity },
       conditions: { M: marshall(sampleConditions) },
-      fields: { L: [] },
+      fields: { L: [{ S: 'sampleField' }] },
       description: { S: sampleDescription }
     };
     base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';

@@ -10,6 +10,7 @@ jest.mock('./dataSetMetadataPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
+  CASLAuthorizationPlugin,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse,
   DDBDynamicAuthorizationPermissionsPlugin,
@@ -32,6 +33,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   let ddbService: DynamoDBService;
   let groupManagementPlugin: WBCGroupManagementPlugin;
   let permissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
+  let caslAuthorizationPlugin: CASLAuthorizationPlugin;
   let authzService: DynamicAuthorizationService;
   let plugin: WbcDataSetsAuthorizationPlugin;
   let testMethod: (i: IdentityPermission[]) => PermissionsResponse[];
@@ -170,10 +172,12 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     permissionsPlugin = new DDBDynamicAuthorizationPermissionsPlugin({
       dynamoDBService: ddbService
     });
+    caslAuthorizationPlugin = new CASLAuthorizationPlugin();
     authzService = new DynamicAuthorizationService({
       groupManagementPlugin: groupManagementPlugin,
       dynamicAuthorizationPermissionsPlugin: permissionsPlugin,
-      auditService: audit
+      auditService: audit,
+      authorizationPlugin: caslAuthorizationPlugin
     });
     plugin = new WbcDataSetsAuthorizationPlugin(authzService);
 

@@ -4,6 +4,8 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
+import { Action } from '../action';
+import AuthorizationPlugin from '../authorizationPlugin';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
@@ -32,9 +34,13 @@ import {
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
+import { Identity, IdentityPermission } from './dynamicAuthorizationInputs/identityPermission';
 import { InitRequest, InitResponse } from './dynamicAuthorizationInputs/init';
 import { IsAuthorizedOnRouteRequest } from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
-import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
+import {
+  IsAuthorizedOnSubjectRequest,
+  IsAuthorizedOnSubjectRequestParser
+} from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
 import {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser,
@@ -59,16 +65,19 @@ import { GroupManagementPlugin } from './groupManagementPlugin';
 export class DynamicAuthorizationService {
   private _groupManagementPlugin: GroupManagementPlugin;
   private _dynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
+  private _authorizationPlugin: AuthorizationPlugin;
   private _auditService: AuditService;
 
   public constructor(config: {
     groupManagementPlugin: GroupManagementPlugin;
     dynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
     auditService: AuditService;
+    authorizationPlugin: AuthorizationPlugin;
   }) {
     this._groupManagementPlugin = config.groupManagementPlugin;
     this._dynamicAuthorizationPermissionsPlugin = config.dynamicAuthorizationPermissionsPlugin;
     this._auditService = config.auditService;
+    this._authorizationPlugin = config.authorizationPlugin;
   }
 
   /**
@@ -90,7 +99,59 @@ export class DynamicAuthorizationService {
   public async isAuthorizedOnSubject(
     isAuthorizedOnSubjectRequest: IsAuthorizedOnSubjectRequest
   ): Promise<void> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsAuthorizedOnSubjectRequestParser.parse(isAuthorizedOnSubjectRequest);
+    const { authenticatedUser, dynamicOperation } = validatedRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.isAuthorizedOnSubject.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: validatedRequest
+    };
+    try {
+      const { roles, id } = authenticatedUser;
+      const { subject, action } = dynamicOperation;
+      const { subjectId, subjectType } = subject;
+      //Create group identities
+      const identities: Identity[] = roles.map((groupId) => {
+        return {
+          identityType: 'GROUP',
+          identityId: groupId
+        };
+      });
+      //Add user identity
+      identities.push({
+        identityType: 'USER',
+        identityId: id
+      });
+      const identityPermissionsPromise = this._getAllIdentityPermissionsBySubject({
+        subjectId,
+        subjectType,
+        action,
+        identities
+      });
+      const wildwardIdentityPermissionsPromise = this._getAllIdentityPermissionsBySubject({
+        subjectId: '*',
+        subjectType,
+        action,
+        identities
+      });
+      const [identityPermissions, wildcardIdentityPermissions] = await Promise.all([
+        identityPermissionsPromise,
+        wildwardIdentityPermissionsPromise
+      ]);
+      await this._authorizationPlugin.isAuthorizedOnDynamicOperations(
+        [...identityPermissions, ...wildcardIdentityPermissions],
+        [dynamicOperation]
+      );
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata);
+    } catch (err) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
   }
 
   /**
@@ -436,5 +497,31 @@ export class DynamicAuthorizationService {
     return await this._dynamicAuthorizationPermissionsPlugin.createIdentityPermissions(
       createIdentityPermissionsRequest
     );
+  }
+
+  private async _getAllIdentityPermissionsBySubject(params: {
+    subjectId: string;
+    subjectType: string;
+    action: Action;
+    identities: Identity[];
+  }): Promise<IdentityPermission[]> {
+    const { subjectId, subjectType, action, identities } = params;
+    let paginationToken = undefined;
+    let identityPermissions: IdentityPermission[] = [];
+    //paginate through response
+    do {
+      // get all identity permissions associated to subject filtered on action and identities
+      const response: GetIdentityPermissionsBySubjectResponse =
+        await this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject({
+          subjectId,
+          subjectType,
+          action,
+          identities,
+          paginationToken
+        });
+      paginationToken = response.paginationToken;
+      identityPermissions = identityPermissions.concat(response.data.identityPermissions);
+    } while (paginationToken);
+    return identityPermissions;
   }
 }

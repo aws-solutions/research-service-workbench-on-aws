@@ -145,6 +145,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Routes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Subject'
   }
 ];
 

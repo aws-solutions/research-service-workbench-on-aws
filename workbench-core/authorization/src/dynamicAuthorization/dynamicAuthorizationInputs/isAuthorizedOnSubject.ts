@@ -3,19 +3,23 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '../../authenticatedUser';
-import { DynamicOperation } from './dynamicOperation';
+import { z } from 'zod';
+import { AuthenticatedUserParser } from '../../authenticatedUser';
+import { DynamicOperationParser } from './dynamicOperation';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const IsAuthorizedOnSubjectRequestParser = z.object({
+  /**
+   * {@link AuthenticatedUser}
+   */
+  authenticatedUser: AuthenticatedUserParser,
+  /**
+   * {@link DynamicOperation}
+   */
+  dynamicOperation: DynamicOperationParser
+});
 
 /**
  * Request object for IsAuthorizedOnSubjectRequest
  */
-export interface IsAuthorizedOnSubjectRequest {
-  /**
-   * {@link AuthenticatedUser}
-   */
-  user: AuthenticatedUser;
-  /**
-   * {@link DynamicOperation}
-   */
-  dynamicOperation: DynamicOperation;
-}
+export type IsAuthorizedOnSubjectRequest = z.infer<typeof IsAuthorizedOnSubjectRequestParser>;

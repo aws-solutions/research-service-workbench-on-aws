@@ -8,15 +8,19 @@ import { JSONValue } from '@aws/workbench-core-base';
 import { UserNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
+import AuthorizationPlugin from '../authorizationPlugin';
 import { Effect } from '../effect';
+import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { HTTPMethod } from '../routesMap';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
+import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
 import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
 import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
@@ -36,6 +40,7 @@ describe('DynamicAuthorizationService', () => {
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
+  let mockAuthorizationPlugin: AuthorizationPlugin;
 
   let sampleGroupId: string;
   let sampleGroupType: IdentityType;
@@ -75,6 +80,11 @@ describe('DynamicAuthorizationService', () => {
       getIdentityPermissionsBySubject: jest.fn()
     };
 
+    mockAuthorizationPlugin = {
+      isAuthorized: jest.fn(),
+      isAuthorizedOnDynamicOperations: jest.fn()
+    };
+
     auditService = new AuditService(
       new BaseAuditPlugin({
         write: jest.fn()
@@ -99,7 +109,8 @@ describe('DynamicAuthorizationService', () => {
     dynamicAuthzService = new DynamicAuthorizationService({
       groupManagementPlugin: mockGroupManagementPlugin,
       dynamicAuthorizationPermissionsPlugin: mockDynamicAuthorizationPermissionsPlugin,
-      auditService
+      auditService,
+      authorizationPlugin: mockAuthorizationPlugin
     });
 
     sampleGroupId = 'sampleGroup';
@@ -136,19 +147,119 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('isAuthorizedOnSubject', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.isAuthorizedOnSubject({
-          user: mockUser,
-          dynamicOperation: {
-            action: 'CREATE',
-            subject: {
-              subjectId: '',
-              subjectType: ''
-            }
+    let mockDynamicOperation: DynamicOperation;
+    let params: IsAuthorizedOnSubjectRequest;
+    beforeEach(() => {
+      mockUser = {
+        id: 'sampleId',
+        roles: ['sampleGroupId']
+      };
+      mockDynamicOperation = {
+        action: sampleAction,
+        subject: {
+          subjectType: sampleSubjectType,
+          subjectId: sampleSubjectId
+        }
+      };
+      auditAction = 'isAuthorizedOnSubject';
+      params = {
+        authenticatedUser: mockUser,
+        dynamicOperation: mockDynamicOperation
+      };
+    });
+    test('is authorized on subject', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
           }
         })
-      ).rejects.toThrow(Error);
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      await dynamicAuthzService.isAuthorizedOnSubject(params);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('is authorized on subject, get all paginated results', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      await dynamicAuthzService.isAuthorizedOnSubject(params);
+      expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(3);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('is authorized on subject, get all paginated results, authorizationPlugin throws ForbiddenError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest
+        .fn()
+        .mockRejectedValueOnce(new ForbiddenError());
+      await expect(
+        dynamicAuthzService.isAuthorizedOnSubject({
+          authenticatedUser: mockUser,
+          dynamicOperation: mockDynamicOperation
+        })
+      ).rejects.toThrowError(ForbiddenError);
+
+      expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(3);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ForbiddenError()
+      );
     });
   });
 

@@ -104,7 +104,10 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 export { InitRequest, InitResponse } from './dynamicAuthorization/dynamicAuthorizationInputs/init';
 export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnRoute';
-export { IsAuthorizedOnSubjectRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
+export {
+  IsAuthorizedOnSubjectRequest,
+  IsAuthorizedOnSubjectRequestParser
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
 export {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser,

@@ -280,7 +280,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
    *  "effect": "ALLOW | DENY"
    *  "action" : "<CRUD Action>"
    *  "conditions": {}
-   *  "fields": []
+   *  "fields": ["<fieldValue>"]
    *  "description": "Description of identity"
    * }
    * ```
@@ -293,11 +293,11 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const pk = this._createIdentityPermissionsPartitionKey(subjectType, subjectId);
     const sk = this._createIdentityPermissionsSortKey(action, effect, identityType, identityId);
     const identity = `${identityType}|${identityId}`;
-    const conditions = identityPermission.conditions ?? {};
-    const fields = identityPermission.fields ?? [];
-    const description = identityPermission.description ?? '';
+    const conditions = identityPermission.conditions;
+    const fields = identityPermission.fields;
+    const description = identityPermission.description;
 
-    const item: Record<string, JSONValue> = {
+    const itemWithUndefined: Record<string, JSONValue | undefined> = {
       pk,
       sk,
       action,
@@ -307,6 +307,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
       fields,
       description
     };
+    const item: Record<string, JSONValue> = _.omitBy(itemWithUndefined, _.isNil) as Record<string, JSONValue>;
     return item;
   }
 
@@ -328,8 +329,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const { action, effect, identityType, identityId } = this._decomposeIdentityPermissionsSortKey(
       sk as string
     );
-
-    return {
+    let identityPermission: IdentityPermission = {
       action,
       effect,
       subjectType,
@@ -340,6 +340,8 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
       fields: fields as string[],
       description: description as string
     };
+    identityPermission = _.omitBy(identityPermission, _.isNil) as IdentityPermission;
+    return identityPermission;
   }
 
   private _decomposeIdentityPermissionsPartitionKey(partitionKey: string): {
