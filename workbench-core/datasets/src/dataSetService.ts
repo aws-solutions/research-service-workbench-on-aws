@@ -140,8 +140,7 @@ export class DataSetService {
       source: {
         serviceName: DataSetService.name
       },
-      dataSetId: dataSetId,
-      checkDependency: checkDependency.name
+      dataSetId
     };
     try {
       await checkDependency(dataSetId);

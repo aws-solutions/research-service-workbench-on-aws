@@ -63,7 +63,7 @@ export default class Dataset extends Resource {
       throw new Error('identity type must be "USER" or "GROUP"');
     }
     const response: AxiosResponse = await this._axiosInstance.get(
-      `${this._api}/permissions/${routeId}/${identity}}`
+      `${this._api}/permissions/${routeId}/${identity}`
     );
     return validateAndParse(PermissionsResponseParser, response.data);
   }
@@ -101,6 +101,7 @@ export default class Dataset extends Resource {
     externalEndpointName?: string;
     externalRoleName?: string;
     kmsKeyArn?: string;
+    userId?: string;
   }): Promise<AxiosResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     // note: endpoint will be created as S3 access point which MUST begin with a lower case letter.
@@ -110,7 +111,8 @@ export default class Dataset extends Resource {
     const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/share`, {
       externalEndpointName: endPointName,
       externalRoleName: requestBody.externalRoleName,
-      kmsKeyArn: requestBody.kmsKeyArn
+      kmsKeyArn: requestBody.kmsKeyArn,
+      userId: requestBody.userId
     });
 
     const endPointParams: EndpointCreateParams = {

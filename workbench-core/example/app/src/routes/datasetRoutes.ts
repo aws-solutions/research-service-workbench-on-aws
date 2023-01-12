@@ -89,7 +89,7 @@ export function setUpDSRoutes(
         dataSetId: req.params.datasetId,
         externalEndpointName: req.body.externalEndpointName,
         storageProvider: dataSetStoragePlugin,
-        userId: res.locals.user,
+        userId: req.body.userId ? req.body.userId : res.locals.user.id,
         authenticatedUser: res.locals.user,
         externalRoleName: req.body.externalRoleName
       });
