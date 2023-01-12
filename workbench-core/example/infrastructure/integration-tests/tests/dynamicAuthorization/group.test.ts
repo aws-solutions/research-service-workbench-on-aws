@@ -43,6 +43,39 @@ describe('dynamic authorization group integration tests', () => {
       expect(typeof data.groupId).toBe('string');
     });
 
+    it('recreates deleted group with same group ID', async () => {
+      let retries = 5;
+      const timeout = 3000;
+
+      jest.useRealTimers();
+      jest.setTimeout(retries * timeout);
+      const { data } = await adminSession.resources.groups.create();
+
+      const group = adminSession.resources.groups.group(data.groupId);
+
+      await group.delete();
+
+      function createGroupWithRetry(resolve: () => void, reject: (reason: string) => void): void {
+        async function tryCreateGroup(): Promise<void> {
+          try {
+            await adminSession.resources.groups.create({ groupId: data.groupId });
+            resolve();
+          } catch (ex) {
+            if (--retries === 0) {
+              reject('Failed to re-create new group in specified time');
+            } else {
+              setTimeout(tryCreateGroup, timeout);
+            }
+          }
+        }
+
+        setTimeout(tryCreateGroup, timeout);
+      }
+
+      // There is delay between Cognito deleting the group and allowing to recreate the group with same name
+      await expect(new Promise<void>(createGroupWithRetry)).resolves.not.toThrow();
+    });
+
     it('returns a 400 error when trying to create a group that already exists', async () => {
       const { data } = await adminSession.resources.groups.create();
       await expect(adminSession.resources.groups.create({ groupId: data.groupId })).rejects.toThrow(

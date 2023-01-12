@@ -200,6 +200,9 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       if (currentStatus === 'delete_pending' && newStatus === 'active') {
         throw new ForbiddenError(`Cannot set group '${groupId}' status to active. It is pending delete.`);
       }
+      if (currentStatus === 'deleted' && newStatus === 'delete_pending') {
+        throw new ForbiddenError(`Cannot set group '${groupId}' status to delete_pending. It was deleted.`);
+      }
     } catch (error) {
       if (!isGroupNotFoundError(error)) {
         throw error;

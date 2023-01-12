@@ -530,6 +530,14 @@ describe('WBCGroupManagemntPlugin', () => {
       );
     });
 
+    it('throws ForbiddenError when status tried to go from deleted to delete_pending', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'deleted' } });
+
+      await expect(
+        wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'delete_pending' })
+      ).rejects.toThrow(ForbiddenError);
+    });
+
     it('throws PluginConfigurationError when the ddb table doesnt exist', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new ResourceNotFoundException({ message: '', $metadata: {} }));

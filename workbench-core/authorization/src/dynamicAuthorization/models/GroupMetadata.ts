@@ -6,7 +6,7 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-const GroupStatus = z.enum(['active', 'delete_pending']);
+const GroupStatus = z.enum(['active', 'delete_pending', 'deleted']);
 
 export type GroupStatus = z.infer<typeof GroupStatus>;
 
