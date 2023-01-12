@@ -27,6 +27,7 @@ describe('AccountService', () => {
   let accountMetadata: { [id: string]: string } = {};
   let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let accountService: AccountService;
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
   beforeEach(() => {
     jest.resetModules();
@@ -48,15 +49,21 @@ describe('AccountService', () => {
     accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
 
     accountMetadata = {
+      id: accountId,
+      name: 'fakeAccount',
+      awsAccountId: '123456789012',
+      externalId: 'workbench',
       envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-      accountHandlerRoleArn: 'sampleAccountHandlerRoleArn',
+      hostingAccountHandlerRoleArn: 'sampleHostingAccountHandlerRoleArn',
       vpcId: 'vpc-123',
       subnetId: 'subnet-123',
       encryptionKeyArn: 'sampleEncryptionKeyArn',
       environmentInstanceFiles: '',
       stackName: `${process.env.STACK_NAME!}-hosting-account`,
       status: 'CURRENT',
-      resourceType: 'account'
+      resourceType: 'account',
+      updatedAt: '2023-01-09T23:17:44.806Z',
+      createdAt: '2023-01-09T23:17:44.252Z'
     };
   });
 
@@ -64,75 +71,59 @@ describe('AccountService', () => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
 
-  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
-
   test('create follows create account path as expected', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
     mockDDB.on(QueryCommand).resolves({ Count: 0 });
 
-    accountMetadata.awsAccountId = '123456789012';
-    accountMetadata.externalId = 'workbench';
-
     // OPERATE
-    const response = await accountService.create(accountMetadata);
-
-    // CHECK
-    expect(response).toEqual({
-      ...accountMetadata,
-      id: accountId
+    const response = await accountService.create({
+      name: 'fakeAccount',
+      awsAccountId: accountMetadata.awsAccountId,
+      envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+      hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+      externalId: accountMetadata.externalId,
+      environmentInstanceFiles: accountMetadata.environmentInstanceFiles
     });
+
+    const expectedResponse = { ...accountMetadata };
+    delete expectedResponse.resourceType;
+    // CHECK
+    expect(response).toEqual(expectedResponse);
   });
 
   test('update follows update account path as expected', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
+    const name = 'fakeAccount2';
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall({ ...accountMetadata, name })
+    });
     mockDDB.on(GetItemCommand).resolves({
-      Item: {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        id: { S: 'sampleAccId' },
-        accountId: { S: 'sampleAccId' }
-      }
+      Item: marshall({ ...accountMetadata, name })
     });
 
-    accountMetadata.id = 'sampleAccId';
-    accountMetadata.accountId = 'sampleAccId';
-    accountMetadata.awsAccountId = '123456789012';
-    accountMetadata.externalId = 'workbench';
-
     // OPERATE
-    const response = await accountService.update(accountMetadata);
+    const response = await accountService.update({ name });
 
     // CHECK
-    expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
-  });
-
-  test('update follows update account path as expected without awsAccountId or externalId', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(GetItemCommand).resolves({
-      Item: {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        id: { S: 'sampleAccId' },
-        accountId: { S: 'sampleAccId' }
-      }
-    });
-
-    accountMetadata.id = 'sampleAccId';
-    accountMetadata.accountId = 'sampleAccId';
-
-    // OPERATE
-    const response = await accountService.update(accountMetadata);
-
-    // CHECK
-    expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
+    const expectedResponse = { ...accountMetadata };
+    expectedResponse.name = name;
+    delete expectedResponse.resourceType;
+    expect(response).toEqual(expectedResponse);
   });
 
   test('update throws error when update process finds account with different aws account id', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
+        name: { S: 'fakeAccountName' },
+        envMgmtRoleArn: { S: 'fakeArn' },
+        hostingAccountHandlerRoleArn: { S: 'fakeArn' },
+        externalId: { S: 'fakeExternalId' },
+        stackName: { S: 'fakeStackName' },
+        status: { S: 'CURRENT' },
+        updatedAt: { S: '2023-01-09T19:45:12.397Z' },
+        createdAt: { S: '2023-01-09T19:45:12.397Z' },
         awsAccountId: { S: 'someOtherAwsAccountId' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },
@@ -141,15 +132,15 @@ describe('AccountService', () => {
       }
     });
 
-    accountMetadata.id = 'sampleAccId';
-    accountMetadata.accountId = 'sampleAccId';
-    accountMetadata.awsAccountId = '123456789012';
-    accountMetadata.externalId = 'workbench';
-
     // OPERATE & CHECK
-    await expect(accountService.update(accountMetadata)).rejects.toThrow(
-      'The AWS Account mapped to this accountId is different than the one provided'
-    );
+    await expect(
+      accountService.update({
+        id: 'sampleAccId',
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        externalId: 'workbench'
+      })
+    ).rejects.toThrow('The AWS Account mapped to this accountId is different than the one provided');
   });
 
   test('update throws error when update process cannot find account', async () => {
@@ -173,56 +164,18 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.create(accountMetadata)).rejects.toThrow(
+    await expect(
+      accountService.create({
+        name: 'fakeAccount',
+        awsAccountId: accountMetadata.awsAccountId,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+        externalId: accountMetadata.externalId,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles
+      })
+    ).rejects.toThrow(
       'This AWS Account was found in DDB. Please provide the correct id value in request body'
     );
-  });
-
-  test('create throws error when create has missing aws account ID', async () => {
-    // OPERATE & CHECK
-    await expect(accountService.create(accountMetadata)).rejects.toThrow(
-      'Missing AWS Account ID in request body'
-    );
-  });
-
-  test('create follows create account path as expected', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(QueryCommand).resolves({ Count: 0 });
-
-    accountMetadata.awsAccountId = '123456789012';
-
-    // OPERATE
-    const response = await accountService.create(accountMetadata);
-
-    // CHECK
-    expect(response).toEqual({
-      ...accountMetadata,
-      id: accountId
-    });
-  });
-
-  test('update follows update account path as expected when aws account not provided in metadata', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(GetItemCommand).resolves({
-      Item: {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        id: { S: 'sampleAccId' },
-        accountId: { S: 'sampleAccId' }
-      }
-    });
-
-    const accountMetadata = {
-      id: 'sampleAccId',
-      status: 'CURRENT'
-    };
-
-    // OPERATE
-    const response = await accountService.update(accountMetadata);
-
-    // CHECK
-    expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
   test('getAllAccounts returns no Items attribute', async () => {
