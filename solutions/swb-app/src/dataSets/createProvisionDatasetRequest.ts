@@ -8,6 +8,7 @@
  * with an underlying storage provider. This interface should be implemented for each
  * underlying storage mechanism used for providing DataSets item storage.
  */
+import { DataSetPermission } from './dataSetPermissionParser';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 
 export interface CreateProvisionDatasetRequest {
@@ -56,4 +57,14 @@ export interface CreateProvisionDatasetRequest {
    * for a particular platform, account, etc.
    */
   storageProvider: DataSetStoragePlugin;
+
+  /**
+   * options array of {@link DataSetPermission} for permissions to add during creation.
+   */
+  permissions?: DataSetPermission[];
+
+  authenticatedUser: {
+    id: string;
+    roles: string[];
+  };
 }

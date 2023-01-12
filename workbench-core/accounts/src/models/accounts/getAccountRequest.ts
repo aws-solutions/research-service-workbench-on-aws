@@ -3,14 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// Schema for GetTemplate API
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const AwsAccountTemplateUrlsParser = z
+export const GetAccountRequestParser = z
   .object({
-    externalId: z.string()
+    id: z.string()
   })
   .strict();
 
-export type AwsAccountTemplateUrls = z.infer<typeof AwsAccountTemplateUrlsParser>;
+export type GetAccountRequest = z.infer<typeof GetAccountRequestParser>;
