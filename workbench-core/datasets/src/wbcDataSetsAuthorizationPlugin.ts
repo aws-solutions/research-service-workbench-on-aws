@@ -68,6 +68,11 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     const permissions: PermissionsResponse[] = this._identityPermissionsToPermissionsResponse(
       createdPermission.data.identityPermissions
     );
+
+    if (_.isEmpty(permissions)) {
+      throw new InvalidPermissionError('No permissions found.');
+    }
+
     const permissionsCount = permissions.length;
 
     if (permissionsCount !== 1) {
@@ -105,6 +110,15 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
         `Expected a single permissions response, but got ${permissionsCount}.`
       );
     }
+
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: params.dataSetId,
+          permissions: []
+        }
+      };
+    }
     return permissionsResponse[0];
   }
 
@@ -136,6 +150,15 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
       );
     }
 
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: datasetId,
+          permissions: []
+        },
+        pageToken: identityResponse.paginationToken
+      };
+    }
     permissionsResponse[0].pageToken = identityResponse.paginationToken;
     return permissionsResponse[0];
   }
@@ -151,7 +174,8 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
 
     // validate
     if (_.isEmpty(dataSetIdentityPermissions)) {
-      throw new InvalidPermissionError('No permissions found.');
+      // return the empty array if there is nothing to do.
+      return permissions;
     } else if (
       _.some(
         dataSetIdentityPermissions,

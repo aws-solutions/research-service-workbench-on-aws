@@ -3,9 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { IdentityPermission as Permission } from '@aws/workbench-core-authorization';
+import { IdentityPermission as Permission, IdentityType } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
-import { PermissionsResponse, PermissionsResponseParser } from '@aws/workbench-core-datasets';
+import {
+  DataSetPermission,
+  PermissionsResponse,
+  PermissionsResponseParser
+} from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
@@ -53,7 +57,7 @@ export default class Dataset extends Resource {
     return validateAndParse(PermissionsResponseParser, response.data);
   }
 
-  public async getAccess(identityType: 'GROUP' | 'USER', identity: string): Promise<PermissionsResponse> {
+  public async getAccess(identityType: IdentityType, identity: string): Promise<PermissionsResponse> {
     let routeId: string;
     if (identityType === 'GROUP') {
       routeId = 'roles';
@@ -76,7 +80,7 @@ export default class Dataset extends Resource {
       response.data
     );
 
-    const permissions: Permission[] = permissionsCreated.data.permissions.map((p) => {
+    const permissions: Permission[] = permissionsCreated.data.permissions.map((p: DataSetPermission) => {
       return {
         action: p.accessLevel === 'read-only' ? 'READ' : 'UPDATE',
         effect: 'ALLOW',

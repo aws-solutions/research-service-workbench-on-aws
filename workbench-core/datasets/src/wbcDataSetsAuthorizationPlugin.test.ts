@@ -331,16 +331,29 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
         new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
     });
+
+    it('throws if no permissions are returned from CreateIdentityPermissions', async () => {
+      createPermissionsSpy.mockImplementationOnce(async () => {
+        return {
+          data: {
+            identityPermissions: []
+          }
+        };
+      });
+      await expect(plugin.addAccessPermission(readOnlyAccessPermission)).rejects.toThrowError(
+        new InvalidPermissionError('No permissions found.')
+      );
+    });
   });
 
   describe('_identityPermissionsToPermissionsResponse', () => {
-    it('throws if empty input is given', () => {
-      expect(() => testMethod([])).toThrowError(new InvalidPermissionError('No permissions found.'));
+    it('returns an empty array if no input is given.', () => {
+      expect(() => testMethod([])).toHaveLength(0);
     });
 
-    it('throws if input is undefined', () => {
+    it('returns an empty array if input is undefined', () => {
       //@ts-ignore - to allow checking undefined input
-      expect(() => testMethod()).toThrowError(new InvalidPermissionError('No permissions found.'));
+      expect(() => testMethod()).toHaveLength(0);
     });
 
     it('throws if input contains an action that is not "READ" or "UPDATE"', () => {
@@ -547,6 +560,23 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
         new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
     });
+    it('returns an empty permissionsResponse if no identityPermissiosn are found', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
+        .mockImplementation(async () => {
+          return {
+            data: {
+              identityPermissions: []
+            }
+          };
+        });
+      await expect(plugin.getAccessPermissions(getAccessPermission)).resolves.toMatchObject({
+        data: {
+          dataSetId,
+          permissions: []
+        }
+      });
+    });
   });
 
   describe('removeAccessPermission tests', () => {
@@ -598,6 +628,23 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       await expect(plugin.getAllDataSetAccessPermissions(dataSetId)).rejects.toThrowError(
         new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
+    });
+    it('returns an empty permissionsResponse if no identityPermissiosn are found', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
+        .mockImplementation(async () => {
+          return {
+            data: {
+              identityPermissions: []
+            }
+          };
+        });
+      await expect(plugin.getAllDataSetAccessPermissions(dataSetId)).resolves.toMatchObject({
+        data: {
+          dataSetId,
+          permissions: []
+        }
+      });
     });
   });
 
