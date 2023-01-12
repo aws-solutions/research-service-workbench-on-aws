@@ -16,8 +16,10 @@ export default class Resource {
   protected _api: string = '';
   protected _setup: Setup;
   public id: string;
+  private readonly _session: ClientSession;
 
   public constructor(clientSession: ClientSession, type: string, id: string, parentApi: string) {
+    this._session = clientSession;
     this._axiosInstance = clientSession.getAxiosInstance();
     this._settings = clientSession.getSettings();
     this._setup = clientSession.getSetup();
@@ -42,8 +44,11 @@ export default class Resource {
     return this._axiosInstance.put(this._api, body);
   }
 
-  public async delete(): Promise<void> {
-    await this._axiosInstance.delete(this._api);
+  public async delete(): Promise<AxiosResponse> {
+    const response = await this._axiosInstance.delete(this._api);
+    this._session.removeCleanupTask(`group-${this.id}`);
+
+    return response;
   }
 
   // This method should be overridden by the class extending `resource`

@@ -8,16 +8,14 @@ import { AwsService, resourceTypeToKey, CFNTemplateParameters } from '@aws/workb
 import { EnvironmentType } from '../models/environmentTypes/environmentType';
 import EnvironmentTypeService from '../services/environmentTypeService';
 
-export default class EnvironmentTypeHandler {
+export default class EnvironmentTypeSetup {
   private _mainAccountAwsService: AwsService;
 
   public constructor(mainAccountAwsService: AwsService) {
     this._mainAccountAwsService = mainAccountAwsService;
   }
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
-  public async execute(event: any): Promise<void> {
+  public async run(portfolioName: string): Promise<void> {
     console.log(`Processing Environment Types`);
-    const portfolioName = process.env.SC_PORTFOLIO_NAME!;
     const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog.getPortfolioId(
       portfolioName
     );

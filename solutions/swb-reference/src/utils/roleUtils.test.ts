@@ -13,12 +13,12 @@ describe('Test roleUtilities', () => {
     });
   });
 
-  const VALID_PROJECT_ID = 'PROJ-123';
+  const VALID_PROJECT_ID = 'proj-123';
   const INVALID_PROJECT_ID = 'notValidProject';
 
   describe('getProjectAdminRole', () => {
     test('returns ProjectAdmin Role when given valid ProjectID', () => {
-      expect(getProjectAdminRole(VALID_PROJECT_ID)).toEqual('PROJ-123#ProjectAdmin');
+      expect(getProjectAdminRole(VALID_PROJECT_ID)).toEqual('proj-123#ProjectAdmin');
     });
 
     test('throws InvalidArgumentError when given invalid ProjectID', () => {
@@ -30,7 +30,7 @@ describe('Test roleUtilities', () => {
 
   describe('getResearcherRole', () => {
     test('returns Researcher Role when given valid ProjectID', () => {
-      expect(getResearcherRole(VALID_PROJECT_ID)).toEqual('PROJ-123#Researcher');
+      expect(getResearcherRole(VALID_PROJECT_ID)).toEqual('proj-123#Researcher');
     });
 
     test('throws InvalidArgumentError when given invalid ProjectID', () => {
