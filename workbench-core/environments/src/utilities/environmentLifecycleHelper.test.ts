@@ -84,7 +84,11 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE
-    const response = await helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN');
+    const response = await helper.getDatasetsToMount(datasetIds, envMetadata, [
+      'sampleKeyARN1',
+      'sampleKeyARN2',
+      'sampleKeyARN3'
+    ]);
 
     // CHECK
     await expect(response).toEqual({ iamPolicyDocument: '{}', s3Mounts: '[]' });
@@ -157,7 +161,7 @@ describe('EnvironmentLifecycleHelper', () => {
 
     // OPERATE & CHECK
     await expect(
-      helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN')
+      helper.getDatasetsToMount(datasetIds, envMetadata, ['sampleKeyARN1', 'sampleKeyARN2', 'sampleKeyARN3'])
     ).resolves.not.toThrowError();
   });
 

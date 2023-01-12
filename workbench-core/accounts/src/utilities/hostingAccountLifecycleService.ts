@@ -637,7 +637,7 @@ export default class HostingAccountLifecycleService {
 
     // Update main account encryption key policy
     await Promise.all(
-      mainAcctEncryptionArnList.map(async (mainAcctEncryptionArn) => {
+      _.map(mainAcctEncryptionArnList, async (mainAcctEncryptionArn) => {
         await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, awsAccountId);
       })
     );

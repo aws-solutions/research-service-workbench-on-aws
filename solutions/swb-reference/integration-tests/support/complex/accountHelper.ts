@@ -81,28 +81,34 @@ export class AccountHelper {
   }
 
   public async removeAccountFromKeyPolicy(awsAccountId: string): Promise<void> {
-    const mainAcctEncryptionArn = this._settings.get('MainAccountEncryptionKeyOutput');
-    const keyId = mainAcctEncryptionArn.split('/').pop()!;
-    const keyPolicyResponse = await this._awsSdk.clients.kms.getKeyPolicy({
-      KeyId: keyId,
-      PolicyName: 'default'
-    });
-    let keyPolicy = PolicyDocument.fromJson(JSON.parse(keyPolicyResponse.Policy!));
+    const mainAcctS3ArtifactEncryptionArn = this._settings.get('MainAccountS3ArtifactEncryptionKeyOutput');
+    const mainAcctS3DatasetsEncryptionArn = this._settings.get('MainAccountS3DatasetsEncryptionKeyOutput');
+    const mainAcctEncryptionArnList = [mainAcctS3ArtifactEncryptionArn, mainAcctS3DatasetsEncryptionArn];
+    await Promise.all(
+      _.map(mainAcctEncryptionArnList, async (mainAcctEncryptionArn) => {
+        const keyId = mainAcctEncryptionArn.split('/').pop()!;
+        const keyPolicyResponse = await this._awsSdk.clients.kms.getKeyPolicy({
+          KeyId: keyId,
+          PolicyName: 'default'
+        });
+        let keyPolicy = PolicyDocument.fromJson(JSON.parse(keyPolicyResponse.Policy!));
 
-    keyPolicy = IamHelper.removePrincipalFromStatement(
-      keyPolicy,
-      'main-key-share-statement',
-      `arn:aws:iam::${awsAccountId}:root`
+        keyPolicy = IamHelper.removePrincipalFromStatement(
+          keyPolicy,
+          'main-key-share-statement',
+          `arn:aws:iam::${awsAccountId}:root`
+        );
+
+        const putPolicyParams = {
+          KeyId: keyId,
+          PolicyName: 'default',
+          Policy: JSON.stringify(keyPolicy.toJSON())
+        };
+
+        // Update key policy
+        await this._awsSdk.clients.kms.putKeyPolicy(putPolicyParams);
+      })
     );
-
-    const putPolicyParams = {
-      KeyId: keyId,
-      PolicyName: 'default',
-      Policy: JSON.stringify(keyPolicy.toJSON())
-    };
-
-    // Update key policy
-    await this._awsSdk.clients.kms.putKeyPolicy(putPolicyParams);
   }
 
   public async removeAccountFromBucketPolicy(awsAccountId: string): Promise<void> {
