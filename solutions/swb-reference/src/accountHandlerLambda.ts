@@ -5,7 +5,6 @@
 
 import { AccountHandler, AccountService, HostingAccountLifecycleService } from '@aws/workbench-core-accounts';
 import { AwsService } from '@aws/workbench-core-base';
-import { EnvironmentTypeHandler } from '@aws/workbench-core-environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
@@ -26,7 +25,5 @@ export async function handler(event: any) {
     accountService,
     hostingAccountLifecycleService
   );
-  const envTypeHandler = new EnvironmentTypeHandler(mainAccountAwsService);
   await accountHandler.execute(event);
-  await envTypeHandler.execute(event);
 }

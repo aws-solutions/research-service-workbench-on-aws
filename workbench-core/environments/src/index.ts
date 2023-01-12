@@ -10,7 +10,6 @@ import {
   ENVIRONMENT_TYPE_STATUS
 } from './constants/environmentTypeStatus';
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
-import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
 import EnvironmentConnectionLinkPlaceholder from './models/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './models/environmentConnectionService';
@@ -44,6 +43,7 @@ import {
 import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import AuthorizationSetup from './postDeployment/authorizationSetup';
 import CognitoSetup from './postDeployment/cognitoSetup';
+import EnvironmentTypeSetup from './postDeployment/environmentTypeSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import { Environment, EnvironmentService } from './services/environmentService';
@@ -74,7 +74,7 @@ export {
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
   EnvironmentConnectionLinkPlaceholder,
-  EnvironmentTypeHandler,
+  EnvironmentTypeSetup,
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser,
   DeleteEnvironmentTypeConfigRequestParser,

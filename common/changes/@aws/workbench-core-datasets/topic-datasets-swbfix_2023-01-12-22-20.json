@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "add a group fallback to AddExternalEndpointForUser",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

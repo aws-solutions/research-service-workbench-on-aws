@@ -158,7 +158,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 **Retrieve Environment Type**
 
 In POSTMAN, use the `envType` => `List envTypes` request to retrieve the `id` property for the environment type.
-If there aren't any environment types displaying in the response wait for account handler to run. It runs once every 5 minutes.
+If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
 Once the account handler finishes, running the `List envTypes` request in postman should return a json with the following format
 ```json
 {

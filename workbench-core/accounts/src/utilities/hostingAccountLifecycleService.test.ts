@@ -37,7 +37,8 @@ import {
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { SdkStream } from '@aws-sdk/types';
-import { AwsService } from '@aws/workbench-core-base';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
@@ -50,6 +51,7 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
+  let accountMetadata = {};
 
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -77,6 +79,24 @@ describe('HostingAccountLifecycleService', () => {
       mainAccountAwsService,
       accountService
     );
+
+    accountMetadata = {
+      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      name: 'fakeAccount',
+      awsAccountId: '123456789012',
+      externalId: 'workbench',
+      envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+      hostingAccountHandlerRoleArn: 'sampleHostingAccountHandlerRoleArn',
+      vpcId: 'vpc-123',
+      subnetId: 'subnet-123',
+      encryptionKeyArn: 'sampleEncryptionKeyArn',
+      environmentInstanceFiles: '',
+      stackName: `${process.env.STACK_NAME!}-hosting-account`,
+      status: 'CURRENT',
+      resourceType: 'account',
+      updatedAt: '2023-01-09T23:17:44.806Z',
+      createdAt: '2023-01-09T23:17:44.252Z'
+    };
   });
 
   afterAll(() => {
@@ -141,14 +161,8 @@ describe('HostingAccountLifecycleService', () => {
     mockCloudformationOutputs(cfnMock);
 
     const mockDDB = mockClient(DynamoDBClient);
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(GetItemCommand).resolves({
-      Item: {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        accountId: { S: 'abc-xyz' }
-      }
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
     });
 
     await expect(
@@ -167,7 +181,9 @@ describe('HostingAccountLifecycleService', () => {
     mockCloudformationOutputs(cfnMock);
 
     const mockDDB = mockClient(DynamoDBClient);
-    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
     mockDDB.on(QueryCommand).resolves({
       Count: 0,
       Items: []
@@ -319,6 +335,11 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     hostingAccountLifecycleService.cloneRole = jest.fn();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
 
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
@@ -704,8 +725,8 @@ describe('HostingAccountLifecycleService', () => {
   });
 
   test('buildTemplateURLForAccount basic unit test', async () => {
-    const sampleExternalId = 'sample';
     const region = process.env.AWS_REGION!;
+    const externalId = 'exampleExternalId';
 
     hostingAccountLifecycleService['_aws'].clients.s3 = new S3({
       region: region,
@@ -725,14 +746,15 @@ describe('HostingAccountLifecycleService', () => {
         }
       );
 
-    const expectedCreateUrl =
-      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*';
+    const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
     const expectedUpdateUrl =
       'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
 
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
-    const actual = await hostingAccountLifecycleService.buildTemplateUrlsForAccount(sampleExternalId);
+    const actual = await hostingAccountLifecycleService.buildTemplateUrlsForAccount({
+      externalId
+    });
 
     expect(actual.createUrl).toEqual(expectedCreateUrl);
     expect(actual.updateUrl).toEqual(expectedUpdateUrl);

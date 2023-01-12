@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "update getAccessPermissionsParser to match datasets version",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
