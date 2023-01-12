@@ -3,9 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { IdentityPermission as Permission } from '@aws/workbench-core-authorization';
+import { IdentityPermission as Permission, IdentityType } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
-import { PermissionsResponse, PermissionsResponseParser } from '@aws/workbench-core-datasets';
+import {
+  DataSetPermission,
+  PermissionsResponse,
+  PermissionsResponseParser
+} from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
@@ -48,6 +52,26 @@ export default class Dataset extends Resource {
     return new Endpoint(params);
   }
 
+  public async getAllAccess(): Promise<PermissionsResponse> {
+    const response: AxiosResponse = await this._axiosInstance.get(`${this._api}/permissions`);
+    return validateAndParse(PermissionsResponseParser, response.data);
+  }
+
+  public async getAccess(identityType: IdentityType, identity: string): Promise<PermissionsResponse> {
+    let routeId: string;
+    if (identityType === 'GROUP') {
+      routeId = 'roles';
+    } else if (identityType === 'USER') {
+      routeId = 'users';
+    } else {
+      throw new Error('identity type must be "USER" or "GROUP"');
+    }
+    const response: AxiosResponse = await this._axiosInstance.get(
+      `${this._api}/permissions/${routeId}/${identity}`
+    );
+    return validateAndParse(PermissionsResponseParser, response.data);
+  }
+
   public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
@@ -56,7 +80,7 @@ export default class Dataset extends Resource {
       response.data
     );
 
-    const permissions: Permission[] = permissionsCreated.data.permissions.map((p) => {
+    const permissions: Permission[] = permissionsCreated.data.permissions.map((p: DataSetPermission) => {
       return {
         action: p.accessLevel === 'read-only' ? 'READ' : 'UPDATE',
         effect: 'ALLOW',
@@ -81,6 +105,7 @@ export default class Dataset extends Resource {
     externalEndpointName?: string;
     externalRoleName?: string;
     kmsKeyArn?: string;
+    userId?: string;
   }): Promise<AxiosResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     // note: endpoint will be created as S3 access point which MUST begin with a lower case letter.
@@ -90,7 +115,8 @@ export default class Dataset extends Resource {
     const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/share`, {
       externalEndpointName: endPointName,
       externalRoleName: requestBody.externalRoleName,
-      kmsKeyArn: requestBody.kmsKeyArn
+      kmsKeyArn: requestBody.kmsKeyArn,
+      userId: requestBody.userId
     });
 
     const endPointParams: EndpointCreateParams = {
