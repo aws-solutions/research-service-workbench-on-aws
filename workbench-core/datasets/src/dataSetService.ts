@@ -77,6 +77,20 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(provisioned);
+
+      if (response.id) {
+        if (_.isEmpty(!request.permissions)) {
+          await this._authzPlugin.addAccessPermission({
+            authenticatedUser: request.authenticatedUser,
+            dataSetId: response.id,
+            permission: {
+              identity: request.authenticatedUser.id,
+              identityType: 'USER',
+              accessLevel: 'read-only'
+            }
+          });
+        }
+      }
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
