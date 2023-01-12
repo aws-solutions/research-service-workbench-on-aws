@@ -9,8 +9,10 @@ import { z } from 'zod';
 export const CreateExternalEndpointParser = z
   .object({
     externalEndpointName: z.string(),
-    /** If included, will create an endpoint for the group's ID, otherwise will create an endpoint for the caller of the API */
+    /** One of `groupId` and `userId` must be defined, but not both */
     groupId: z.string().optional(),
+    /** One of `groupId` and `userId` must be defined, but not both */
+    userId: z.string().optional(),
     externalRoleName: z.string().optional(),
     kmsKeyArn: z.string().optional(),
     vpcId: z.string().optional()

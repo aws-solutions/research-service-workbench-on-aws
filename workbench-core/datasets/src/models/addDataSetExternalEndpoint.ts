@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser, IdentityType } from '@aws/workbench-core-authorization';
 import { DataSetsStoragePlugin } from '../dataSetsStoragePlugin';
 import { DataSetMountObject } from './dataSetMountObject';
 
@@ -14,8 +14,10 @@ export interface AddDataSetExternalEndpointBaseRequest {
   externalEndpointName: string;
   /** an instance of {@link DataSetsStoragePlugin} initialized with permissions to modify the target DataSet's underlying storage */
   storageProvider: DataSetsStoragePlugin;
-  /** the subject to create the endpoint for */
-  subject: string;
+  /** the identity to create the endpoint for */
+  identity: string;
+  /** the identityType to create the endpoint for */
+  identityType: IdentityType;
   /** the user performing the action */
   authenticatedUser: AuthenticatedUser;
   /** a role which will interact with the endpoint */
@@ -27,12 +29,12 @@ export interface AddDataSetExternalEndpointBaseRequest {
 }
 
 export interface AddDataSetExternalEndpointForUserRequest
-  extends Omit<AddDataSetExternalEndpointBaseRequest, 'subject'> {
+  extends Omit<AddDataSetExternalEndpointBaseRequest, 'identity' | 'identityType'> {
   userId: string;
 }
 
 export interface AddDataSetExternalEndpointForGroupRequest
-  extends Omit<AddDataSetExternalEndpointBaseRequest, 'subject'> {
+  extends Omit<AddDataSetExternalEndpointBaseRequest, 'identity' | 'identityType'> {
   groupId: string;
 }
 

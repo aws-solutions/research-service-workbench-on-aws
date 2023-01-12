@@ -3,9 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface GetAccessPermissionRequest {
+import { z } from 'zod';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const GetAccessPermissionRequestParser = z.object({
   /** the ID of the dataset */
-  dataSetId: string;
+  dataSetId: z.string(),
   /** the user or group for which permissions are sought */
-  subject: string;
-}
+  identity: z.string(),
+  /** the type of identity - user or group */
+  identityType: z.string()
+});
+
+export type GetAccessPermissionRequest = z.infer<typeof GetAccessPermissionRequestParser>;

@@ -21,7 +21,8 @@ describe('multiStep dataset integration test', () => {
     await setup.cleanup();
   });
 
-  test('Environment provisioning with dataset', async () => {
+  // TODO unskip once authz group management has been implemented. Need to add permission for group `${settings.get('projectId')}#Reasercher` to access dataset
+  test.skip('Environment provisioning with dataset', async () => {
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const datasetName = randomTextGenerator.getFakeText('env-DS-test');
 
