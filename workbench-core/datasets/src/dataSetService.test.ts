@@ -789,11 +789,11 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it('returns an array of known StorageLocations.', async () => {
-      await expect(service.listStorageLocations()).resolves.toEqual([
+      await expect(service.listStorageLocations({ id: 'sampleUserId', roles: ['Admin'] })).resolves.toEqual([
         {
           name: mockDataSetStorageName,
           awsAccountId: mockAwsAccountId,
@@ -809,7 +809,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -817,7 +817,10 @@ describe('DataSetService', () => {
       const ttlSeconds = 3600;
 
       await expect(
-        service.getPresignedSinglePartUploadUrl(mockDataSetId, ttlSeconds, plugin)
+        service.getPresignedSinglePartUploadUrl(mockDataSetId, 'sampleFileName', ttlSeconds, plugin, {
+          id: 'sampleUserId',
+          roles: ['Admin']
+        })
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
   });

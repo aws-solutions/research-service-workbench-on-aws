@@ -593,32 +593,6 @@ export class DataSetService {
     }
   }
 
-  /**
-   * Create a presigned URL for a signle-part file upload
-   * @param datasetId - the ID of the Dataset.
-   * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
-   * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
-   * @returns the presigned URL
-   */
-  public async getPresignedSinglePartUploadUrl(
-    datasetId: string,
-    timeToLiveSeconds: number,
-    storageProvider: DataSetsStoragePlugin
-  ): Promise<string> {
-    const dataset = await this.getDataSet(datasetId);
-
-    return await storageProvider.createPresignedUploadUrl(dataset, timeToLiveSeconds);
-  }
-
-  /**
-   * Gets a list of {@link StorageLocation}s being used by existing datasets.
-   *
-   * @returns - a list of {@link StorageLocation}s
-   */
-  public async listStorageLocations(): Promise<StorageLocation[]> {
-    return await this._dbProvider.listStorageLocations();
-  }
-
   private _generateMountObject(
     dataSetName: string,
     endPointURL: string,

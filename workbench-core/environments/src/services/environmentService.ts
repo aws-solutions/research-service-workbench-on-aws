@@ -422,12 +422,6 @@ export class EnvironmentService {
     metadata = batchGetResult.Responses![this._dynamoDBService.getTableName()].map((item) => {
       return item as unknown as MetaData;
     });
-    const dsIdsNotFound = params.datasetIds.filter((id) => {
-      return !validDatasetIds.includes(id);
-    });
-    if (dsIdsNotFound.length > 0) {
-      throw Boom.badRequest(`datasetIds ${dsIdsNotFound} do not exist`);
-    }
 
     // Check all expected metadata exist
     const envTypeConfig = metadata.find((item) => {

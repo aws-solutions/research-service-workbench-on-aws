@@ -4,7 +4,7 @@
  */
 
 import { Button, ButtonProps, FormField, SpaceBetween } from '@cloudscape-design/components';
-import React, { ChangeEvent, ForwardedRef, useCallback, useMemo, useRef } from 'react';
+import React, { ChangeEvent, ForwardedRef, forwardRef, useCallback, useMemo, useRef } from 'react';
 
 import { ChangeDetail, DismissDetail, FileMetadata } from './models/FileUpload';
 
@@ -195,5 +195,5 @@ const FileUploadComponent = (
 };
 
 // eslint-disable-next-line @rushstack/typedef-var
-const FileUpload = React.forwardRef(FileUploadComponent);
+const FileUpload = forwardRef(FileUploadComponent);
 export default FileUpload;
