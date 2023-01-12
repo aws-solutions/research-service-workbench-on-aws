@@ -568,7 +568,7 @@ export class EnvironmentService {
       limit: 1
     };
 
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    const response = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     return response.data.length > 0;
   }

@@ -3,30 +3,60 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { QueryParameterFilter, FilterRequest, SortRequest } from '@aws/workbench-core-base';
+import { QueryStringParamFilterParser } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
-export interface ListProjectsRequest {
-  user: AuthenticatedUser;
-  pageSize?: number;
-  paginationToken?: string;
-  filter?: ProjectFilter;
-  sort?: ProjectSort;
-}
+// eslint-disable-next-line @rushstack/typedef-var
+export const ListProjectsRequestParser = z
+  .object({
+    userId: z.string(),
+    pageSize: z
+      .string()
+      .transform((pageSizeString, ctx) => {
+        const pageSize = parseInt(pageSizeString);
+        if (isNaN(pageSize)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Must be a number'
+          });
 
-export interface ProjectFilter extends FilterRequest {
-  createdAt?: QueryParameterFilter<string>;
-  dependency?: QueryParameterFilter<string>;
-  name?: QueryParameterFilter<string>;
-  status?: QueryParameterFilter<string>;
-}
+          return z.NEVER;
+        }
+        if (pageSize < 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Must be 0 or larger'
+          });
 
-export interface ProjectSort extends SortRequest {
-  createdAt?: 'desc' | 'asc';
-  dependency?: 'desc' | 'asc';
-  status?: 'desc' | 'asc';
-  name?: 'desc' | 'asc';
-}
+          return z.NEVER;
+        }
+
+        return parseInt(pageSizeString);
+      })
+      .optional(),
+    paginationToken: z.string().optional(),
+    filter: z
+      .object({
+        createdAt: QueryStringParamFilterParser.optional(),
+        dependency: QueryStringParamFilterParser.optional(),
+        name: QueryStringParamFilterParser.optional(),
+        status: QueryStringParamFilterParser.optional()
+      })
+      .strict()
+      .optional(),
+    sort: z
+      .object({
+        createdAt: z.enum(['asc', 'desc']).optional(),
+        dependency: z.enum(['asc', 'desc']).optional(),
+        name: z.enum(['asc', 'desc']).optional(),
+        status: z.enum(['asc', 'desc']).optional()
+      })
+      .strict()
+      .optional()
+  })
+  .strict();
+
+export type ListProjectsRequest = z.infer<typeof ListProjectsRequestParser>;
 
 export const listProjectGSINames: string[] = [
   'getResourceByCreatedAt',

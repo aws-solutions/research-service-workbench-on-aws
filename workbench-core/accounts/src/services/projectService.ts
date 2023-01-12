@@ -90,7 +90,7 @@ export default class ProjectService {
     validateSingleSortAndFilter(filter, sort);
 
     // Get user groups--TODO implement after dynamic AuthZ
-    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
+    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.userId);
     const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
 
     // If no group membership, return
@@ -160,24 +160,6 @@ export default class ProjectService {
     }
     // build page and pagination token
     return this._buildPageAndPaginationTokenAfterGetItems(paginationToken, projectsOnPage, pageSize);
-  }
-
-  /**
-   * Check whether a CostCenter have any projects associated with it
-   * @param costCenterId - id of CostCenter we want to check
-   * @returns Whether a CostCenter have any projects associated with it
-   */
-  public async doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
-    const queryParams: QueryParams = {
-      index: 'getResourceByDependency',
-      key: { name: 'resourceType', value: 'project' },
-      sortKey: 'dependency',
-      eq: { S: costCenterId },
-      limit: 1
-    };
-
-    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-    return associatedProjResponse.data.length > 0;
   }
 
   /**
@@ -254,11 +236,12 @@ export default class ProjectService {
       accountId: costCenter.accountId
     };
     try {
-      await this._aws.helpers.ddb
-        .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
+      await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
+        params: {
           item: this._mapToDDBItemFromProject(newProject)
-        })
-        .execute();
+        }
+      });
     } catch (e) {
       console.error('Failed to create project', e);
       throw Boom.internal('Failed to create project');
@@ -452,13 +435,31 @@ export default class ProjectService {
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const costCenterService = new CostCenterService({ TABLE_NAME: this._tableName });
+    const costCenterService = new CostCenterService(this._aws.helpers.ddb);
 
     try {
       return costCenterService.getCostCenter(costCenterId);
     } catch (e) {
       throw Boom.badRequest(`Could not find cost center ${costCenterId}`);
     }
+  }
+
+  /**
+   * Check whether a CostCenter have any projects associated with it
+   * @param costCenterId - id of CostCenter we want to check
+   * @returns Whether a CostCenter have any projects associated with it
+   */
+  public async doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'project' },
+      sortKey: 'dependency',
+      eq: { S: costCenterId },
+      limit: 1
+    };
+
+    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    return associatedProjResponse.data.length > 0;
   }
 
   // TODO--implement after dynamic AuthZ

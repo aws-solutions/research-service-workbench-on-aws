@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryParameterFilter } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
-import { ProjectFilter, ProjectSort } from '../models/listProjectsRequest';
+import { FilterRequest, QueryStringParamFilter, SortRequest } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
+import _ from 'lodash';
 import { Project } from '../models/projects/project';
 
 /**
@@ -16,7 +16,7 @@ import { Project } from '../models/projects/project';
  * @param projects - list of {@link Project} objects to sort
  * @returns a list of {@link Project} objects after sort
  */
-export function manualSortProjects(sort: ProjectSort, projects: Project[]): Project[] {
+export function manualSortProjects(sort: SortRequest, projects: Project[]): Project[] {
   // if no sort attribute, return original list
   if (!sort || Object.keys(sort).length === 0) {
     return projects;
@@ -60,7 +60,7 @@ function order(sortKey: string, selectedDirection: string, project1: Project, pr
   }
 }
 
-export function manualFilterProjects(filter: ProjectFilter, projects: Project[]): Project[] {
+export function manualFilterProjects(filter: FilterRequest, projects: Project[]): Project[] {
   // if no filter attribute, return original list
   if (!filter || Object.keys(filter).length === 0) {
     return projects;
@@ -73,8 +73,8 @@ export function manualFilterProjects(filter: ProjectFilter, projects: Project[])
 
   // get filter attribute, operator, and value
   const filterKey = Object.keys(filter)[0];
-  const filterValue = Object.values(filter)[0] as QueryParameterFilter<string>;
-  if (filterValue === undefined) {
+  const filterValue = Object.values(filter)[0] as QueryStringParamFilter;
+  if (filterValue === undefined || Object.values(filterValue)[0] === undefined) {
     throw Boom.badRequest('Filter contains invalid format');
   }
   const selectedQualifier = Object.keys(filterValue)[0];
@@ -91,7 +91,7 @@ export function manualFilterProjects(filter: ProjectFilter, projects: Project[])
 function compare(
   selectedFilter: string,
   selectedQualifier: string,
-  filterValue: QueryParameterFilter<string>,
+  filterValue: QueryStringParamFilter,
   project: Project
 ): boolean {
   const selectedValue = Object.values(filterValue)[0];
@@ -113,11 +113,17 @@ function compare(
     case 'gte':
       return projectValue >= selectedValue;
     case 'between':
-      if (!(selectedValue.value1 && selectedValue.value2)) {
+      if (!_.isObject(selectedValue)) {
+        throw Boom.badRequest('Need to pass object for between operation');
+      }
+      if (_.isObject(selectedValue) && !(selectedValue.value1 && selectedValue.value2)) {
         throw Boom.badRequest('Need two values for between operation');
       }
       return projectValue >= selectedValue.value1 && projectValue <= selectedValue.value2;
     case 'begins':
+      if (!_.isString(selectedValue)) {
+        throw Boom.badRequest('Need to pass string for begins operation');
+      }
       return selectedValue.startsWith(selectedValue);
     default:
       throw Boom.badRequest('You supplied an invalid comparison. Please try again');
