@@ -6,6 +6,7 @@
 import { AddRemoveAccessPermissionRequest } from './addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
 import { DataSet } from './dataSet';
+import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpointResponseParser';
 import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
@@ -16,7 +17,9 @@ export interface DataSetPlugin {
 
   provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet>;
   importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet>;
-  addDataSetExternalEndpoint(request: DataSetExternalEndpointRequest): Promise<Record<string, string>>;
+  addDataSetExternalEndpoint(
+    request: DataSetExternalEndpointRequest
+  ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string): Promise<DataSet>;
   listDataSets(): Promise<DataSet[]>;
 

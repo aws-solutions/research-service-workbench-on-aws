@@ -5,6 +5,7 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { RetryError } from '../errors/retryError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -32,12 +33,18 @@ import {
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
+import { IdentityPermission } from './dynamicAuthorizationInputs/identityPermission';
 import { InitRequest, InitResponse } from './dynamicAuthorizationInputs/init';
 import { IsAuthorizedOnRouteRequest } from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
 import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
-import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './dynamicAuthorizationInputs/isRouteIgnored';
+import {
+  IsRouteIgnoredRequest,
+  IsRouteIgnoredRequestParser,
+  IsRouteIgnoredResponse
+} from './dynamicAuthorizationInputs/isRouteIgnored';
 import {
   IsRouteProtectedRequest,
+  IsRouteProtectedRequestParser,
   IsRouteProtectedResponse
 } from './dynamicAuthorizationInputs/isRouteProtected';
 import {
@@ -95,7 +102,8 @@ export class DynamicAuthorizationService {
    * @returns - {@link IsRouteIgnoredResponse}
    */
   public async isRouteIgnored(isRouteIgnoredRequest: IsRouteIgnoredRequest): Promise<IsRouteIgnoredResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsRouteIgnoredRequestParser.parse(isRouteIgnoredRequest);
+    return this._dynamicAuthorizationPermissionsPlugin.isRouteIgnored(validatedRequest);
   }
   /**
    * Checks if a route is protected
@@ -106,7 +114,8 @@ export class DynamicAuthorizationService {
   public async isRouteProtected(
     isRouteProtectedRequest: IsRouteProtectedRequest
   ): Promise<IsRouteProtectedResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsRouteProtectedRequestParser.parse(isRouteProtectedRequest);
+    return this._dynamicAuthorizationPermissionsPlugin.isRouteProtected(validatedRequest);
   }
   /**
    * Checks whether a {@link AuthenticatedUser} is authorized on a route
@@ -161,9 +170,65 @@ export class DynamicAuthorizationService {
    * @returns - {@link DeleteGroupResponse}
    */
   public async deleteGroup(deleteGroupRequest: DeleteGroupRequest): Promise<DeleteGroupResponse> {
-    throw new Error('Not implemented');
+    const { authenticatedUser, groupId } = deleteGroupRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.deleteGroup.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: deleteGroupRequest
+    };
 
-    // TODO audit
+    let identityPermissions: IdentityPermission[];
+
+    try {
+      const { data } = await this.getIdentityPermissionsByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP'
+      });
+
+      identityPermissions = data.identityPermissions;
+
+      await this._groupManagementPlugin.setGroupStatus({
+        groupId,
+        status: 'delete_pending'
+      });
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, error);
+
+      throw error;
+    }
+
+    if (identityPermissions.length > 0) {
+      try {
+        await this.deleteIdentityPermissions({
+          authenticatedUser,
+          identityPermissions
+        });
+      } catch (error) {
+        metadata.statusCode = 400;
+        await this._auditService.write(metadata, error);
+        throw new RetryError(error.message);
+      }
+    }
+
+    try {
+      const response = await this._groupManagementPlugin.deleteGroup(deleteGroupRequest);
+
+      // ToDo: Remove delete_pending status information
+
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, error);
+
+      throw error;
+    }
   }
 
   /**

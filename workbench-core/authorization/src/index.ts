@@ -11,7 +11,13 @@ export { default as CASLAuthorizationPlugin } from './caslAuthorizationPlugin';
 export { default as Permission, PermissionsMap } from './permission';
 export { Effect } from './effect';
 export { Action } from './action';
-export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
+export {
+  default as RoutesMap,
+  HTTPMethod,
+  RoutesIgnored,
+  MethodToOperations,
+  DynamicRoutesMap
+} from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
 export { AuthenticatedUser } from './authenticatedUser';
@@ -66,6 +72,7 @@ export {
 export { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';
 export {
   GetDynamicOperationsByRouteRequest,
+  GetDynamicOperationsByRouteRequestParser,
   GetDynamicOperationsByRouteResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/getDynamicOperationsByRoute';
 export {
@@ -101,10 +108,12 @@ export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/dynamicAuthor
 export { IsAuthorizedOnSubjectRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
 export {
   IsRouteIgnoredRequest,
+  IsRouteIgnoredRequestParser,
   IsRouteIgnoredResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/isRouteIgnored';
 export {
   IsRouteProtectedRequest,
+  IsRouteProtectedRequestParser,
   IsRouteProtectedResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/isRouteProtected';
 export {

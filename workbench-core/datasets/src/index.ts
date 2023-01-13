@@ -17,17 +17,27 @@ export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRe
 export { DataSet } from './dataSet';
 export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+export { DataSetService } from './dataSetService';
+export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
-export { DataSetService } from './dataSetService';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExistsError';
+export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
+export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
+export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorizedError';
+export {
+  AddDataSetExternalEndpointForUserRequest as AddDataSetExternalEndpointRequest,
+  AddDataSetExternalEndpointResponse
+} from './models/addDataSetExternalEndpoint';
+export {
+  AddStorageExternalEndpointRequest,
+  AddStorageExternalEndpointResponse
+} from './models/addStorageExternalEndpoint';
 export { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 export { GetDataSetMountPointRequest } from './models/getDataSetMountPointRequest';
-export { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
-export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
 export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';

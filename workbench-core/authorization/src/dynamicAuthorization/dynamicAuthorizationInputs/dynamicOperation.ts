@@ -14,19 +14,15 @@ export interface DynamicOperation {
    */
   action: Action;
   /**
-   * The subject type that the {@link Action} acts on.
+   * The subject that the {@link Action} acts on.
    */
-  subjectType: string;
-  /**
-   * subject id associated to the subject being operated on
-   */
-  subjectId: string;
+  subject: {
+    [key: string]: string;
+    subjectType: string;
+    subjectId: string;
+  };
   /**
    * The field a {@link User} wants access to.
    */
   field?: string;
-  /**
-   * Attributes associated to the subject
-   */
-  subjectAttributes?: Record<string, unknown>;
 }

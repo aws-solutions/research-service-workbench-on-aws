@@ -3,7 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { uuidWithLowercasePrefixRegExp, validateAndParse } from '@aws/workbench-core-base';
+import {
+  uuidRegExpAsString,
+  uuidWithLowercasePrefixRegExp,
+  validateAndParse
+} from '@aws/workbench-core-base';
 import {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleSchema,
@@ -22,7 +26,7 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { dataSetPrefix, endPointPrefix } from '../configs/constants';
+import { dataSetPrefix, endPointPrefix, groupIdRegExAsString } from '../configs/constants';
 import {
   AddRemoveAccessPermissionRequest,
   AddRemoveAccessPermissionParser
@@ -81,13 +85,14 @@ export function setUpDSRoutes(
         throw Boom.badRequest('datasetid request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
-      await dataSetService.addDataSetExternalEndpoint(
-        req.params.datasetId,
-        req.body.externalEndpointName,
-        dataSetStoragePlugin,
-        res.locals.user,
-        req.body.externalRoleName
-      );
+      await dataSetService.addDataSetExternalEndpointForUser({
+        dataSetId: req.params.datasetId,
+        externalEndpointName: req.body.externalEndpointName,
+        storageProvider: dataSetStoragePlugin,
+        userId: req.body.userId ? req.body.userId : res.locals.user.id,
+        authenticatedUser: res.locals.user,
+        externalRoleName: req.body.externalRoleName
+      });
       res.status(201).send();
     })
   );
@@ -241,6 +246,83 @@ export function setUpDSRoutes(
           ...validatedRequest
         });
         res.status(201).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      try {
+        const response = await dataSetService.getAllDataSetAccessPermissions(
+          req.params.datasetId,
+          res.locals.user
+        );
+        res.status(200).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/datasets/:datasetId/permissions/roles/:roleId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      if (req.params.roleId.match(groupIdRegExAsString) === null) {
+        throw Boom.badRequest('groupId must be in the form of a uuid.');
+      }
+      try {
+        const response = await dataSetService.getDataSetAccessPermissions(
+          {
+            dataSetId: req.params.datasetId,
+            identityType: 'GROUP',
+            identity: req.params.roleId
+          },
+          res.locals.user
+        );
+        res.status(200).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/datasets/:datasetId/permissions/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      if (req.params.userId.match(uuidRegExpAsString) === null) {
+        throw Boom.badRequest('userId must be in the form of a uuid.');
+      }
+      try {
+        const response = await dataSetService.getDataSetAccessPermissions(
+          {
+            dataSetId: req.params.datasetId,
+            identityType: 'USER',
+            identity: req.params.userId
+          },
+          res.locals.user
+        );
+        res.status(200).send(response);
       } catch (error) {
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);

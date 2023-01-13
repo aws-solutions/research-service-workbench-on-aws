@@ -6,6 +6,7 @@
 import {
   AddRemoveAccessPermissionRequest,
   DataSet,
+  DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
@@ -26,9 +27,9 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   CreateProvisionDatasetRequest,
   DataSetMetadataPlugin,
+  DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
-import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
@@ -62,16 +63,12 @@ export class DataSetService implements DataSetPlugin {
 
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
-  ): Promise<Record<string, string>> {
-    return this._workbenchDataSetService.addDataSetExternalEndpoint(
-      request.dataSetId,
-      request.externalEndpointName,
-      this.storagePlugin,
-      { id: '', roles: [] },
-      request.externalRoleName,
-      request.kmsKeyArn,
-      request.vpcId
-    );
+  ): Promise<DataSetAddExternalEndpointResponse> {
+    return this._workbenchDataSetService.addDataSetExternalEndpointForUser({
+      ...request,
+      userId: request.groupId,
+      storageProvider: this.storagePlugin
+    });
   }
 
   public getDataSet(dataSetId: string): Promise<DataSet> {
@@ -107,6 +104,14 @@ export class DataSetService implements DataSetPlugin {
       [projectAdmin],
       ['READ', 'UPDATE']
     );
+
+    if (dataset.id && request.permissions && request.permissions.length) {
+      await this._workbenchDataSetService.addDataSetAccessPermissions({
+        authenticatedUser: request.authenticatedUser,
+        permission: request.permissions[0],
+        dataSetId: dataset.id
+      });
+    }
 
     return dataset;
   }
