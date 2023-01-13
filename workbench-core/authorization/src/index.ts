@@ -93,6 +93,7 @@ export {
 export {
   Identity,
   IdentityPermission,
+  IdentityPermissionParser,
   IdentityType
 } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 export { InitRequest, InitResponse } from './dynamicAuthorization/dynamicAuthorizationInputs/init';

@@ -110,7 +110,8 @@ const apiRouteConfig: ApiRouteConfig = {
     logger,
     new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
     new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
-    new DatabaseService()
+    new DatabaseService(),
+    dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,

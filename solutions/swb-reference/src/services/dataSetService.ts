@@ -14,7 +14,14 @@ import {
   PermissionsResponseParser
 } from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import {
+  Action,
+  AuthenticatedUser,
+  CreateIdentityPermissionsRequestParser,
+  DynamicAuthorizationService,
+  IdentityPermission
+} from '@aws/workbench-core-authorization';
+import { IdentityPermissionParser } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   CreateProvisionDatasetRequest,
@@ -85,18 +92,20 @@ export class DataSetService implements DataSetPlugin {
     const projectId = dataset.owner!;
     const projectAdmin = `${projectId}#PA`;
 
-    await this._addAuthZCRUDPermissionsForDataset(
+    await this._addAuthZPermissionsForDataset(
+      request.authenticatedUser,
       'DATASET',
       dataset.id!,
       [projectAdmin],
-      ['read', 'update', 'delete']
+      ['READ', 'UPDATE', 'DELETE']
     );
 
-    await this._addAuthZCRUDPermissionsForDataset(
+    await this._addAuthZPermissionsForDataset(
+      request.authenticatedUser,
       'DATASET_ACCESS_LEVELS',
       `${projectId}-${dataset.id!}`,
       [projectAdmin],
-      ['read', 'update']
+      ['READ', 'UPDATE']
     );
 
     return dataset;
@@ -133,15 +142,16 @@ export class DataSetService implements DataSetPlugin {
     addAccessPermissionRequest: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
     const datasetId = addAccessPermissionRequest.dataSetId;
-    const projectId = addAccessPermissionRequest.permission.subject;
+    const projectId = addAccessPermissionRequest.permission.identity;
     const projectAdmin = `${projectId}#PA`;
     const projectResearcher = `${projectId}#Researcher`;
 
     await this._addAuthZPermissionsForDataset(
+      addAccessPermissionRequest.authenticatedUser,
       'DATASET',
       datasetId,
       [projectAdmin, projectResearcher],
-      ['read']
+      ['READ']
     );
 
     const response = await this.addAccessPermission(addAccessPermissionRequest);
@@ -170,9 +180,39 @@ export class DataSetService implements DataSetPlugin {
   }
 
   private async _addAuthZPermissionsForDataset(
+    authenticatedUser: AuthenticatedUser,
     subject: string,
     subjectId: string,
     roles: string[],
-    actions: string[]
-  ): Promise<void> {}
+    actions: Action[]
+  ): Promise<void> {
+    const partialIdentityPermission = {
+      action: undefined,
+      effect: 'ALLOW',
+      identityId: undefined,
+      identityType: 'USER',
+      subjectId: subjectId,
+      subjectType: subject
+    };
+
+    const identityPermissions: IdentityPermission[] = [];
+
+    for (const role of roles) {
+      for (const action of actions) {
+        const identityPermission = IdentityPermissionParser.parse({
+          ...partialIdentityPermission,
+          identityId: role,
+          action
+        });
+        identityPermissions.push(identityPermission);
+      }
+    }
+
+    const createRequest = CreateIdentityPermissionsRequestParser.parse({
+      authenticatedUser,
+      identityPermissions
+    });
+
+    await this._dynamicAuthService.createIdentityPermissions(createRequest);
+  }
 }
