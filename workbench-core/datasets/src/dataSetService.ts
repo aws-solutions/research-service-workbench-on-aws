@@ -12,7 +12,7 @@ import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
-import { NotAuthorizedError } from './errors/notAuthorizedError';
+// import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { ExternalEndpoint } from './externalEndpoint';
 import {
   AddDataSetExternalEndpointForUserRequest,
@@ -346,7 +346,7 @@ export class DataSetService {
         identity: userId,
         identityType: 'USER'
       });
-      // TODO: Remove if-block after AddExternalEndpontforGroup is complete.
+      // TODO: Remove if-block after AddExternalEndpontforGroup is complete and add commented out code back in, line 358 - 362
       if (!permissionsData.permissions.length) {
         const permissionResponse = await this._authzPlugin.getAccessPermissions({
           dataSetId,
@@ -355,11 +355,11 @@ export class DataSetService {
         });
         permissionsData = permissionResponse.data;
       }
-      if (!permissionsData.permissions.length) {
-        throw new NotAuthorizedError(
-          `User "${userId}" does not have permission to access dataset "${dataSetId}.`
-        );
-      }
+      // if (!permissionsData.permissions.length) {
+      //   throw new NotAuthorizedError(
+      //     `User "${userId}" does not have permission to access dataset "${dataSetId}.`
+      //   );
+      // }
 
       const readOnly = permissionsData.permissions.some(({ accessLevel }) => accessLevel === 'read-only');
 
