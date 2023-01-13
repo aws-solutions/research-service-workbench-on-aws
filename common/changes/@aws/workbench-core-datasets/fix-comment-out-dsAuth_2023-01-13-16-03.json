@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "temporarily comment out DS auth",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}
