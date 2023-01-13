@@ -39,6 +39,11 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'READ',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
     subject: 'Storage'
   },
   {

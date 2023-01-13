@@ -5,20 +5,21 @@
 
 // AWS Account management
 import {
-  CreateAccountSchema,
-  AwsAccountTemplateUrlsParser,
-  UpdateAccountSchema,
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
   HostingAccountService,
-  CreateAccountData,
-  UpdateAccountData,
+  CreateAccountRequestParser,
   ListAccountRequest,
-  ListAccountsRequestParser
+  ListAccountsRequestParser,
+  CreateAccountRequest,
+  UpdateAccountRequest,
+  UpdateAccountRequestParser,
+  GetAccountRequest,
+  GetAccountRequestParser
 } from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
-import { escape } from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult, validateAndParse } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
   router.get(
@@ -32,32 +33,30 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.get(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(await hostingAccountService.get(req.params.id));
+      const validatedRequest = validateAndParse<GetAccountRequest>(GetAccountRequestParser, {
+        id: req.params.id
+      });
+      res.send(await hostingAccountService.get(validatedRequest));
     })
   );
 
   router.post(
     '/awsAccountTemplateUrls',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = AwsAccountTemplateUrlsParser.parse(req.body);
-      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest.externalId));
+      const validatedRequest = validateAndParse<AwsAccountTemplateUrlsRequest>(
+        AwsAccountTemplateUrlsRequestParser,
+        req.body
+      );
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest));
     })
   );
 
   router.post(
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateAccountSchema));
-      const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
-      const createAccountMetadata: CreateAccountData = {
-        name: escape(name),
-        awsAccountId: escape(awsAccountId),
-        envMgmtRoleArn: escape(envMgmtRoleArn),
-        hostingAccountHandlerRoleArn: escape(hostingAccountHandlerRoleArn),
-        externalId: escape(externalId)
-      };
+      const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
 
-      const createdAccount = await hostingAccountService.create(createAccountMetadata);
+      const createdAccount = await hostingAccountService.create(validatedRequest);
       res.status(201).send(createdAccount);
     })
   );
@@ -65,14 +64,12 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.patch(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateAccountSchema));
-      const { name } = req.body;
-      const updateAccountMetadata: UpdateAccountData = {
-        id: escape(req.params.id),
-        name: name!! ? escape(name) : undefined
-      };
+      const validatedRequest = validateAndParse<UpdateAccountRequest>(UpdateAccountRequestParser, {
+        id: req.params.id,
+        ...req.body
+      });
 
-      const updatedAccount = await hostingAccountService.update(updateAccountMetadata);
+      const updatedAccount = await hostingAccountService.update(validatedRequest);
       res.send(updatedAccount);
     })
   );
