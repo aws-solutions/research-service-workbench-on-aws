@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "pass mainaccount keys to env provisioning",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}
