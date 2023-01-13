@@ -47,7 +47,7 @@ describe('awsAccounts create negative tests', () => {
               statusCode: 400,
               error: 'Bad Request',
               message:
-                "requires property 'awsAccountId'. requires property 'envMgmtRoleArn'. requires property 'hostingAccountHandlerRoleArn'. requires property 'name'. requires property 'externalId'"
+                'name: Required. awsAccountId: Required. envMgmtRoleArn: Required. hostingAccountHandlerRoleArn: Required. externalId: Required'
             })
           );
         }
