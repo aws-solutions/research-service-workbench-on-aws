@@ -134,29 +134,29 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async addAccessForProject(
-    addAccessPermissionRequest: AddRemoveAccessPermissionRequest
+    permissionRequest: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
-    const datasetId = addAccessPermissionRequest.dataSetId;
-    const projectId = addAccessPermissionRequest.permission.identity;
+    const datasetId = permissionRequest.dataSetId;
+    const projectId = permissionRequest.permission.identity;
     const projectAdmin = `${projectId}#PA`;
     const projectResearcher = `${projectId}#Researcher`;
 
     await this._addAuthZPermissionsForDataset(
-      addAccessPermissionRequest.authenticatedUser,
+      permissionRequest.authenticatedUser,
       'DATASET',
       datasetId,
       [projectAdmin, projectResearcher],
       ['READ']
     );
 
-    const response = await this.addAccessPermission(addAccessPermissionRequest);
+    const response = await this.addAccessPermission(permissionRequest);
 
     const dataset: Associable = {
       type: resourceTypeToKey.dataset,
-      id: addAccessPermissionRequest.dataSetId,
+      id: permissionRequest.dataSetId,
       data: {
         id: projectId,
-        permission: addAccessPermissionRequest.permission.accessLevel
+        permission: permissionRequest.permission.accessLevel
       }
     };
 
@@ -164,8 +164,8 @@ export class DataSetService implements DataSetPlugin {
       type: resourceTypeToKey.project,
       id: projectId,
       data: {
-        id: addAccessPermissionRequest.dataSetId,
-        permission: addAccessPermissionRequest.permission.accessLevel
+        id: permissionRequest.dataSetId,
+        permission: permissionRequest.permission.accessLevel
       }
     };
 
