@@ -16,18 +16,22 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { ProjectAccessRequestParser } from './dataSets/projectAccessRequestParser';
 import { generateRouter } from './generateRouter';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { AuthenticatedUser, AuthenticatedUserParser } from './users/authenticatedUser';
 
 export {
   generateRouter,
   AddRemoveAccessPermissionRequest,
   ApiRouteConfig,
   ApiRoute,
+  AuthenticatedUserParser,
+  AuthenticatedUser,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetAddExternalEndpointResponse,
@@ -41,5 +45,6 @@ export {
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
-  ProjectEnvTypeConfigPlugin
+  ProjectEnvTypeConfigPlugin,
+  ProjectAccessRequestParser
 };

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddRemoveAccessPermissionRequest } from './addRemoveAccessPermissionRequest';
+import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
 import { DataSet } from './dataSet';
 import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpointResponseParser';
@@ -11,6 +11,7 @@ import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
 import { PermissionsResponse } from './permissionsResponseParser';
+import { ProjectAccessRequest } from './projectAccessRequestParser';
 
 export interface DataSetPlugin {
   storagePlugin: DataSetStoragePlugin;
@@ -29,7 +30,5 @@ export interface DataSetPlugin {
   getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
   removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
 
-  addAccessForProject(
-    addAccessPermissionRequest: AddRemoveAccessPermissionRequest
-  ): Promise<PermissionsResponse>;
+  addAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse>;
 }

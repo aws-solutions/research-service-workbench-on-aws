@@ -6,16 +6,13 @@
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import {
-  AddRemoveAccessPermissionRequest,
-  AddRemoveAccessPermissionRequestParser
-} from './dataSets/addRemoveAccessPermissionRequest';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
   CreateExternalEndpointRequest,
   CreateExternalEndpointRequestParser
 } from './dataSets/createExternalEndpointRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { ProjectAccessRequest, ProjectAccessRequestParser } from './dataSets/projectAccessRequestParser';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 
@@ -106,16 +103,13 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.put(
     '/projects/:projectId/datasets/:datasetId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
-        AddRemoveAccessPermissionRequestParser,
-        {
-          dataSetId: req.params.datasetId,
-          permission: {
-            subject: req.params.projectId,
-            accessLevel: req.body.accessLevel
-          }
-        }
-      );
+      const validatedRequest = validateAndParse<ProjectAccessRequest>(ProjectAccessRequestParser, {
+        authenticatedUser: res.locals.user,
+        projectId: req.params.projectId,
+        dataSetId: req.params.datasetId,
+        accessLevel: req.body.accessLevel
+      });
+
       await dataSetService.addAccessForProject(validatedRequest);
 
       res.status(204).send();

@@ -1,10 +1,10 @@
 import {
-  AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetStoragePlugin,
   PermissionsResponse
 } from '@aws/swb-app';
+import { ProjectAccessRequest } from '@aws/swb-app/lib/dataSets/projectAccessRequestParser';
 import {
   Action,
   AuthenticatedUser,
@@ -15,11 +15,12 @@ import {
   IdentityPermission,
   IdentityType
 } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
+  AddRemoveAccessPermissionRequest,
   DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
+import { SwbAuthZSubject } from '../constants';
 import { MockDatabaseService } from '../mocks/mockDatabaseService';
 import { DataSetService } from './dataSetService';
 
@@ -104,10 +105,10 @@ describe('DataSetService', () => {
       describe('Project Admin', () => {
         describe('for DATASET', () => {
           beforeEach(() => {
-            identityId = 'projectId#PA';
-            identityType = 'USER';
+            identityId = 'projectId#ProjectAdmin';
+            identityType = 'GROUP';
             subjectId = 'dataSetId';
-            subjectType = 'DATASET';
+            subjectType = SwbAuthZSubject.SWB_DATASET;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE', 'DELETE'];
 
@@ -135,10 +136,10 @@ describe('DataSetService', () => {
 
         describe('for DATASET_ACCESS_LEVELS', () => {
           beforeEach(() => {
-            identityId = 'projectId#PA';
-            identityType = 'USER';
+            identityId = 'projectId#ProjectAdmin';
+            identityType = 'GROUP';
             subjectId = 'projectId-dataSetId';
-            subjectType = 'DATASET_ACCESS_LEVELS';
+            subjectType = SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE'];
 
@@ -168,7 +169,7 @@ describe('DataSetService', () => {
   });
 
   describe('addAccessForProject', () => {
-    let addAccessPermissionRequest: AddRemoveAccessPermissionRequest;
+    let projectAccessRequest: ProjectAccessRequest;
     let dataSetId: string;
     let projectId: string;
     let accessLevel: 'read-only' | 'read-write';
@@ -178,14 +179,11 @@ describe('DataSetService', () => {
       projectId = 'projectId';
       accessLevel = 'read-write';
 
-      addAccessPermissionRequest = {
+      projectAccessRequest = {
         authenticatedUser: mockUser,
         dataSetId,
-        permission: {
-          identity: projectId,
-          identityType: 'GROUP',
-          accessLevel
-        }
+        projectId,
+        accessLevel
       };
 
       mockDynamicAuthService.createIdentityPermissions = jest.fn(
@@ -203,7 +201,7 @@ describe('DataSetService', () => {
           dataSetId,
           permissions: {
             accessLevel: accessLevel,
-            identity: projectId,
+            identity: 'projectId',
             identityType: 'GROUP'
           }
         }
@@ -213,26 +211,35 @@ describe('DataSetService', () => {
     });
 
     test('pass the request through to the datasets auth plugin', async () => {
-      await dataSetService.addAccessForProject(addAccessPermissionRequest);
-      expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(addAccessPermissionRequest);
+      await dataSetService.addAccessForProject(projectAccessRequest);
+      const permissionRequest: AddRemoveAccessPermissionRequest = {
+        authenticatedUser: projectAccessRequest.authenticatedUser,
+        dataSetId: projectAccessRequest.dataSetId,
+        permission: {
+          identity: 'projectId#ProjectAdmin',
+          identityType: 'GROUP',
+          accessLevel: projectAccessRequest.accessLevel
+        }
+      };
+      expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
     });
 
     describe('when building the relationship between the Project and Dataset', () => {
       describe('it adds entries for', () => {
         test('Project with Dataset', async () => {
-          await dataSetService.addAccessForProject(addAccessPermissionRequest);
+          await dataSetService.addAccessForProject(projectAccessRequest);
 
           const associations = await mockDatabaseService.getAssociations(
-            resourceTypeToKey.project,
+            SwbAuthZSubject.SWB_PROJECT,
             projectId
           );
 
           expect(associations).toEqual([
             {
-              type: 'DATASET',
+              type: SwbAuthZSubject.SWB_DATASET,
               id: dataSetId,
               data: {
-                id: projectId,
+                id: 'projectId',
                 permission: accessLevel
               }
             }
@@ -240,16 +247,16 @@ describe('DataSetService', () => {
         });
 
         test('Dataset with Project', async () => {
-          await dataSetService.addAccessForProject(addAccessPermissionRequest);
+          await dataSetService.addAccessForProject(projectAccessRequest);
 
           const associations = await mockDatabaseService.getAssociations(
-            resourceTypeToKey.dataset,
+            SwbAuthZSubject.SWB_DATASET,
             dataSetId
           );
 
           expect(associations).toEqual([
             {
-              type: 'PROJ',
+              type: SwbAuthZSubject.SWB_PROJECT,
               id: projectId,
               data: {
                 id: dataSetId,
@@ -263,25 +270,25 @@ describe('DataSetService', () => {
 
     describe('when updating AuthZ permission for the Dataset', () => {
       test('READ access is requested for the Project Admin and the Project Researcher', async () => {
-        await dataSetService.addAccessForProject(addAccessPermissionRequest);
+        await dataSetService.addAccessForProject(projectAccessRequest);
         expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
           authenticatedUser: mockUser,
           identityPermissions: [
             {
               action: 'READ',
               effect: 'ALLOW',
-              identityId: 'projectId#PA',
-              identityType: 'USER',
+              identityId: 'projectId#ProjectAdmin',
+              identityType: 'GROUP',
               subjectId: 'dataSetId',
-              subjectType: 'DATASET'
+              subjectType: SwbAuthZSubject.SWB_DATASET
             },
             {
               action: 'READ',
               effect: 'ALLOW',
               identityId: 'projectId#Researcher',
-              identityType: 'USER',
+              identityType: 'GROUP',
               subjectId: 'dataSetId',
-              subjectType: 'DATASET'
+              subjectType: SwbAuthZSubject.SWB_DATASET
             }
           ]
         });

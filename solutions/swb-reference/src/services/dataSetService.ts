@@ -4,7 +4,6 @@
  */
 
 import {
-  AddRemoveAccessPermissionRequest,
   DataSet,
   DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
@@ -14,6 +13,7 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
+import { ProjectAccessRequest } from '@aws/swb-app/lib/dataSets/projectAccessRequestParser';
 import {
   Action,
   AuthenticatedUser,
@@ -22,12 +22,14 @@ import {
   IdentityPermission
 } from '@aws/workbench-core-authorization';
 import { IdentityPermissionParser } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
+  AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
   DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
+import { SwbAuthZSubject } from '../constants';
+import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
 export class DataSetService implements DataSetPlugin {
@@ -77,11 +79,11 @@ export class DataSetService implements DataSetPlugin {
     //add permissions in AuthZ for user to read, write, update, delete, and update read/write permissions
     const dataset = await this._workbenchDataSetService.provisionDataSet(request);
     const projectId = dataset.owner!;
-    const projectAdmin = `${projectId}#PA`;
+    const projectAdmin = getProjectAdminRole(projectId);
 
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
-      'DATASET',
+      SwbAuthZSubject.SWB_DATASET,
       dataset.id!,
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
@@ -89,7 +91,7 @@ export class DataSetService implements DataSetPlugin {
 
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
-      'DATASET_ACCESS_LEVELS',
+      SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
       `${projectId}-${dataset.id!}`,
       [projectAdmin],
       ['READ', 'UPDATE']
@@ -133,39 +135,45 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async addAccessForProject(
-    permissionRequest: AddRemoveAccessPermissionRequest
-  ): Promise<PermissionsResponse> {
-    const datasetId = permissionRequest.dataSetId;
-    const projectId = permissionRequest.permission.identity;
-    const projectAdmin = `${projectId}#PA`;
-    const projectResearcher = `${projectId}#Researcher`;
+  public async addAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse> {
+    const projectAdmin = getProjectAdminRole(request.projectId);
+    const projectResearcher = getResearcherRole(request.projectId);
 
     await this._addAuthZPermissionsForDataset(
-      permissionRequest.authenticatedUser,
-      'DATASET',
-      datasetId,
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      request.dataSetId,
       [projectAdmin, projectResearcher],
       ['READ']
     );
 
+    const permissionRequest: AddRemoveAccessPermissionRequest = {
+      authenticatedUser: request.authenticatedUser,
+      dataSetId: request.dataSetId,
+      permission: {
+        identity: projectAdmin,
+        identityType: 'GROUP',
+        accessLevel: request.accessLevel
+      }
+    };
+
     const response = await this.addAccessPermission(permissionRequest);
 
     const dataset: Associable = {
-      type: resourceTypeToKey.dataset,
-      id: permissionRequest.dataSetId,
+      type: SwbAuthZSubject.SWB_DATASET,
+      id: request.dataSetId,
       data: {
-        id: projectId,
-        permission: permissionRequest.permission.accessLevel
+        id: request.projectId,
+        permission: request.accessLevel
       }
     };
 
     const project: Associable = {
-      type: resourceTypeToKey.project,
-      id: projectId,
+      type: SwbAuthZSubject.SWB_PROJECT,
+      id: request.projectId,
       data: {
-        id: permissionRequest.dataSetId,
-        permission: permissionRequest.permission.accessLevel
+        id: request.dataSetId,
+        permission: request.accessLevel
       }
     };
 
@@ -185,7 +193,7 @@ export class DataSetService implements DataSetPlugin {
       action: undefined,
       effect: 'ALLOW',
       identityId: undefined,
-      identityType: 'USER',
+      identityType: 'GROUP',
       subjectId: subjectId,
       subjectType: subject
     };
