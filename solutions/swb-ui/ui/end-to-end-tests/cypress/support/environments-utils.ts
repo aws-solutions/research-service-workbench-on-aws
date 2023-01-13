@@ -18,7 +18,8 @@ export const createEnvironment = (environmentData: CreateEnvironmentForm): void 
   selectItemCard('EnvTypeCards', environmentData.EnvironmentType);
   cy.get(`[data-testid="environmentName"] input`).type(environmentData.Name);
   selectItemDropDown('environmentProject', [environmentData.Project]);
-  if (environmentData.Studies?.length) selectItemDropDown('environmentStudies', environmentData.Studies);
+  if (environmentData.Studies?.length)
+    selectItemDropDown('environmentStudies', environmentData.Studies, true);
   selectItemCard('EnvTypeConfigCards', environmentData.EnvironmentTypeConfig);
   cy.get(`[data-testid="environmentDescription"]`).type(environmentData.Name);
   cy.get('[data-testid="environmentCreateSubmit"]').should('be.enabled');

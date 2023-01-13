@@ -21,6 +21,7 @@ import {
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 import { DataSetMountObject } from './models/dataSetMountObject';
+import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './storageLocation';
 
@@ -139,8 +140,7 @@ export class DataSetService {
       source: {
         serviceName: DataSetService.name
       },
-      dataSetId: dataSetId,
-      checkDependency: checkDependency.name
+      dataSetId
     };
     try {
       await checkDependency(dataSetId);
@@ -581,6 +581,69 @@ export class DataSetService {
       // this will throw if the dataset is not found.
       await this.getDataSet(params.dataSetId, params.authenticatedUser);
       const response: PermissionsResponse = await this._authzPlugin.addAccessPermission(params);
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      await this._audit.write(metadata, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get current access permissions for a particular identity on the given dataset.
+   *
+   * @param params - a {@link GetAccessPermissionsRequest} indicating the dataset and identity for which the
+   * permissions should be obtained.
+   * @param authenticatedUser - the 'id' of the user and that user's roles
+   * @returns a {@link PermissionsResponse} object containing the permissions found
+   */
+  public async getDataSetAccessPermissions(
+    params: GetAccessPermissionRequest,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse> {
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.getAllDataSetAccessPermissions.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      params
+    };
+    try {
+      await this.getDataSet(params.dataSetId, authenticatedUser);
+      const response = await this._authzPlugin.getAccessPermissions(params);
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      await this._audit.write(metadata, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all access permissions (read-only or read-write) associated with the dataset.
+   *
+   * @param dataSetId - the id of the dataset for which permmissions are to be obtained.
+   * @param authenticatedUser - the 'id' of the user and that user's roles.
+   * @param pageToken - a token from a pervious query to continue recieving results.
+   * @returns a {@link PermissionsResponse} object containing the permissions found.
+   */
+  public async getAllDataSetAccessPermissions(
+    dataSetId: string,
+    authenticatedUser: { id: string; roles: string[] },
+    pageToken?: string
+  ): Promise<PermissionsResponse> {
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.getAllDataSetAccessPermissions.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      dataSetId
+    };
+    try {
+      await this.getDataSet(dataSetId, authenticatedUser);
+      const response = await this._authzPlugin.getAllDataSetAccessPermissions(dataSetId, pageToken);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
