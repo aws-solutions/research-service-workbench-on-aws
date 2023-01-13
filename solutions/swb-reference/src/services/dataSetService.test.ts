@@ -206,7 +206,7 @@ describe('DataSetService', () => {
           dataSetId,
           permissions: {
             accessLevel: accessLevel,
-            identity: 'projectId',
+            identity: 'projectId#ProjectAdmin',
             identityType: 'GROUP'
           }
         }
