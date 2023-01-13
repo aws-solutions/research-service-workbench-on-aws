@@ -137,8 +137,8 @@ describe('HostingAccountLifecycleService', () => {
               OutputValue: artifactBucketArnCfn
             },
             {
-              OutputKey: process.env.S3_ARTIFACTS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
-              OutputValue: 'arn:aws:kms:::key/123-123-123'
+              OutputKey: process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
+              OutputValue: 'arn:aws:kms:::key/321-321-321'
             },
             {
               OutputKey: process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
