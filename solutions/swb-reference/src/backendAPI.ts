@@ -19,8 +19,9 @@ import {
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
-  S3DataSetStoragePlugin,
+  DataSetService as WorkbenchDataSetService,
   DdbDataSetMetadataPlugin,
+  S3DataSetStoragePlugin,
   WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import {
@@ -108,9 +109,12 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
-    logger,
-    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+    new WorkbenchDataSetService(
+      new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
+      logger,
+      new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+      new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+    ),
     new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
     new DatabaseService(),
     dynamicAuthorizationService

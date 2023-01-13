@@ -14,7 +14,6 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
-import { AuditService } from '@aws/workbench-core-audit';
 import {
   Action,
   AuthenticatedUser,
@@ -26,11 +25,9 @@ import { IdentityPermissionParser } from '@aws/workbench-core-authorization/lib/
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   CreateProvisionDatasetRequest,
-  DataSetMetadataPlugin,
   DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
-import { LoggingService } from '@aws/workbench-core-logging';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
 export class DataSetService implements DataSetPlugin {
@@ -42,19 +39,12 @@ export class DataSetService implements DataSetPlugin {
 
   public constructor(
     dataSetStoragePlugin: DataSetStoragePlugin,
-    auditService: AuditService,
-    loggingService: LoggingService,
-    dataSetMetadataPlugin: DataSetMetadataPlugin,
+    workbenchDataSetService: WorkbenchDataSetService,
     dataSetAuthService: DataSetsAuthorizationPlugin,
     databaseService: DatabaseServicePlugin,
     dynamicAuthService: DynamicAuthorizationService
   ) {
-    this._workbenchDataSetService = new WorkbenchDataSetService(
-      auditService,
-      loggingService,
-      dataSetMetadataPlugin,
-      dataSetAuthService
-    );
+    this._workbenchDataSetService = workbenchDataSetService;
     this.storagePlugin = dataSetStoragePlugin;
     this._dataSetsAuthService = dataSetAuthService;
     this._databaseService = databaseService;

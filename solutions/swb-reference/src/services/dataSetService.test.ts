@@ -1,14 +1,25 @@
-import { AddRemoveAccessPermissionRequest, DataSetStoragePlugin, PermissionsResponse } from '@aws/swb-app';
-import { AuditService } from '@aws/workbench-core-audit';
 import {
+  AddRemoveAccessPermissionRequest,
+  CreateProvisionDatasetRequest,
+  DataSet,
+  DataSetStoragePlugin,
+  PermissionsResponse
+} from '@aws/swb-app';
+import {
+  Action,
   AuthenticatedUser,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse,
-  DynamicAuthorizationService
+  DynamicAuthorizationService,
+  Effect,
+  IdentityPermission,
+  IdentityType
 } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { DataSetMetadataPlugin, DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets';
-import { LoggingService } from '@aws/workbench-core-logging';
+import {
+  DataSetsAuthorizationPlugin,
+  DataSetService as WorkbenchDataSetService
+} from '@aws/workbench-core-datasets';
 import { MockDatabaseService } from '../mocks/mockDatabaseService';
 import { DataSetService } from './dataSetService';
 
@@ -16,31 +27,144 @@ describe('DataSetService', () => {
   let dataSetService: DataSetService;
 
   let mockStoragePlugin: DataSetStoragePlugin;
-  let mockAuditService: AuditService;
-  let mockLoggerService: LoggingService;
-  let mockDataSetMetadataPlugin: DataSetMetadataPlugin;
+  let mockWorkbenchDataSetService: WorkbenchDataSetService;
   let mockDataSetsAuthPlugin: DataSetsAuthorizationPlugin;
   let mockDatabaseService: MockDatabaseService;
   let mockDynamicAuthService: DynamicAuthorizationService;
+  let mockUser: AuthenticatedUser;
 
   beforeEach(() => {
     mockStoragePlugin = {} as DataSetStoragePlugin;
-    mockAuditService = {} as AuditService;
-    mockLoggerService = {} as LoggingService;
-    mockDataSetMetadataPlugin = {} as DataSetMetadataPlugin;
+    mockWorkbenchDataSetService = {} as WorkbenchDataSetService;
     mockDataSetsAuthPlugin = {} as DataSetsAuthorizationPlugin;
     mockDatabaseService = new MockDatabaseService();
     mockDynamicAuthService = {} as DynamicAuthorizationService;
 
+    mockUser = {
+      id: 'sampleId',
+      roles: []
+    };
+
     dataSetService = new DataSetService(
       mockStoragePlugin,
-      mockAuditService,
-      mockLoggerService,
-      mockDataSetMetadataPlugin,
+      mockWorkbenchDataSetService,
       mockDataSetsAuthPlugin,
       mockDatabaseService,
       mockDynamicAuthService
     );
+
+    const mockDataSet: DataSet = {
+      id: 'dataSetId',
+      owner: 'projectId',
+      name: 'mockDataSet',
+      path: 'path',
+      storageName: 'storageName',
+      storageType: 'storageType'
+    };
+    mockWorkbenchDataSetService.provisionDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
+
+    mockDynamicAuthService.createIdentityPermissions = jest.fn();
+    mockWorkbenchDataSetService.addDataSetAccessPermissions = jest.fn();
+  });
+
+  describe('provisionDataSet', () => {
+    let identityPermissions: IdentityPermission[];
+    let identityId: string;
+    let identityType: IdentityType;
+    let subjectId: string;
+    let subjectType: string;
+    let effect: Effect;
+    let actions: Action[];
+
+    describe('requests permissions for', () => {
+      let createDatasetRequest: CreateProvisionDatasetRequest;
+
+      beforeEach(() => {
+        createDatasetRequest = {
+          authenticatedUser: mockUser,
+          awsAccountId: '',
+          description: '',
+          name: '',
+          owner: '',
+          path: '',
+          permissions: [
+            {
+              identity: 'projectId-datasetId',
+              identityType: 'GROUP',
+              accessLevel: 'read-write'
+            }
+          ],
+          region: '',
+          storageName: '',
+          storageProvider: mockStoragePlugin,
+          type: ''
+        };
+      });
+
+      describe('Project Admin', () => {
+        describe('for DATASET', () => {
+          beforeEach(() => {
+            identityId = 'projectId#PA';
+            identityType = 'USER';
+            subjectId = 'dataSetId';
+            subjectType = 'DATASET';
+            effect = 'ALLOW';
+            actions = ['READ', 'UPDATE', 'DELETE'];
+
+            identityPermissions = actions.map((action: Action) => {
+              return {
+                action: action,
+                effect: effect,
+                identityId: identityId,
+                identityType: identityType,
+                subjectId: subjectId,
+                subjectType: subjectType
+              };
+            });
+          });
+
+          test('from the AuthZ service', async () => {
+            await dataSetService.provisionDataSet(createDatasetRequest);
+
+            expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
+              authenticatedUser: mockUser,
+              identityPermissions: identityPermissions
+            });
+          });
+        });
+
+        describe('for DATASET_ACCESS_LEVELS', () => {
+          beforeEach(() => {
+            identityId = 'projectId#PA';
+            identityType = 'USER';
+            subjectId = 'projectId-dataSetId';
+            subjectType = 'DATASET_ACCESS_LEVELS';
+            effect = 'ALLOW';
+            actions = ['READ', 'UPDATE'];
+
+            identityPermissions = actions.map((action: Action) => {
+              return {
+                action: action,
+                effect: effect,
+                identityId: identityId,
+                identityType: identityType,
+                subjectId: subjectId,
+                subjectType: subjectType
+              };
+            });
+          });
+
+          test('from the AuthZ service', async () => {
+            await dataSetService.provisionDataSet(createDatasetRequest);
+
+            expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
+              authenticatedUser: mockUser,
+              identityPermissions: identityPermissions
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('addAccessForProject', () => {
@@ -48,16 +172,11 @@ describe('DataSetService', () => {
     let dataSetId: string;
     let projectId: string;
     let accessLevel: 'read-only' | 'read-write';
-    let mockUser: AuthenticatedUser;
 
     beforeEach(() => {
       dataSetId = 'dataSetId';
       projectId = 'projectId';
       accessLevel = 'read-write';
-      mockUser = {
-        id: 'sampleId',
-        roles: []
-      };
 
       addAccessPermissionRequest = {
         authenticatedUser: mockUser,
@@ -65,7 +184,7 @@ describe('DataSetService', () => {
         permission: {
           identity: projectId,
           identityType: 'GROUP',
-          accessLevel: accessLevel
+          accessLevel
         }
       };
 
