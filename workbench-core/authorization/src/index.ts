@@ -127,7 +127,16 @@ export {
   SetGroupStatusRequest,
   SetGroupStatusResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/setGroupStatus';
-export { GroupMetadata, GroupMetadataParser, GroupStatus } from './dynamicAuthorization/models/GroupMetadata';
+export {
+  GetGroupMetadata,
+  GetGroupMetadataParser,
+  GetGroupStatus
+} from './dynamicAuthorization/models/GetGroupMetadata';
+export {
+  SetGroupMetadata,
+  SetGroupMetadataParser,
+  SetGroupStatus
+} from './dynamicAuthorization/models/SetGroupMetadata';
 
 // re-export userManagement package errors that are thrown
 export {

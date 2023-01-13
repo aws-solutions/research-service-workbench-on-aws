@@ -37,7 +37,7 @@ import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroup
 import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
 import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
-import { GroupStatus } from './models/GroupMetadata';
+import { GetGroupStatus } from './models/GetGroupMetadata';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
 
 describe('WBCGroupManagemntPlugin', () => {
@@ -46,7 +46,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   let groupId: string;
   let userId: string;
-  let status: GroupStatus;
+  let status: GetGroupStatus;
   let mockUser: AuthenticatedUser;
 
   let wbcGroupManagementPlugin: WBCGroupManagementPlugin;
@@ -530,12 +530,12 @@ describe('WBCGroupManagemntPlugin', () => {
       );
     });
 
-    it('throws ForbiddenError when status tried to go from deleted to delete_pending', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'deleted' } });
+    it('throws ForbiddenError when status tried to go from active to deleted', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'active' } });
 
-      await expect(
-        wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'delete_pending' })
-      ).rejects.toThrow(ForbiddenError);
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'deleted' })).rejects.toThrow(
+        ForbiddenError
+      );
     });
 
     it('throws PluginConfigurationError when the ddb table doesnt exist', async () => {
