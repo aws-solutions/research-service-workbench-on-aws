@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { z } from 'zod';
+import { DataSetPermissionParser } from './dataSetPermissionParser';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateDataSetRequestParser = z.object({
@@ -12,7 +13,8 @@ export const CreateDataSetRequestParser = z.object({
   awsAccountId: z.string(),
   region: z.string(),
   type: z.string(),
-  owner: z.string()
+  owner: z.string(),
+  permissions: z.optional(z.array(DataSetPermissionParser))
 });
 
 export type CreateDataSetRequest = z.infer<typeof CreateDataSetRequestParser>;
