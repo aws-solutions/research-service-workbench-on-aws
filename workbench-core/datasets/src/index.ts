@@ -3,31 +3,35 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import AddDatasetPermissionsToRoleSchema from './schemas/addDatasetPermissionsToRoleSchema';
-import CreateDataSetSchema from './schemas/createDataSet';
-import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
-import CreatePresignedSinglePartFileUploadUrl from './schemas/createPresignedSinglePartFileUploadUrl';
-import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExternalBucketRoleSchema';
+export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
+export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+export { DataSetService } from './dataSetService';
+export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
+export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
+export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
+export { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
+// errors
+export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+export { EndpointExistsError, isEndpointExistsError } from './errors/endpointExistsError';
+export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
+export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
+export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorizedError';
+export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
+export { DataSetExistsError, isDataSetExistsError } from './errors/dataSetExistsError';
+export { EndpointNotFoundError, isEndpointNotFoundError } from './errors/endpointNotFoundError';
+export { InvalidEndpointError, isInvalidEndpointError } from './errors/invalidEndpointError';
+
+// models
 export {
   AddRemoveAccessPermissionRequest,
   AddRemoveAccessPermissionParser
 } from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
-export { DataSet } from './dataSet';
-export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
-export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
-export { DataSetService } from './dataSetService';
+export { DataSet, DataSetParser, DataSetArrayParser, CreateDataSet } from './models/dataSet';
 export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
-export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
-export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
-export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExistsError';
-export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
-export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
-export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorizedError';
 export {
   AddDataSetExternalEndpointForUserRequest as AddDataSetExternalEndpointRequest,
   AddDataSetExternalEndpointResponse
@@ -37,21 +41,18 @@ export {
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
 export { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
-export { GetDataSetMountPointRequest } from './models/getDataSetMountPointRequest';
-export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
-export { ExternalEndpoint } from './externalEndpoint';
-export { IamHelper } from './awsUtilities/iamHelper';
-export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
-export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
+export { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
 export {
-  AddDatasetPermissionsToRoleSchema,
-  CreateDataSetSchema,
-  CreateExternalEndpointSchema,
-  CreatePresignedSinglePartFileUploadUrl,
-  CreateRegisterExternalBucketRoleSchema
-};
-export { StorageLocation } from './storageLocation';
-export { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
+  ExternalEndpoint,
+  ExternalEndpointParser,
+  CreateExternalEndpoint,
+  ExternalEndpointArrayParser
+} from './models/externalEndpoint';
+export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
+export { StorageLocation } from './models/storageLocation';
+
+// utilities
+export { IamHelper } from './awsUtilities/iamHelper';
 export {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleRequest,
@@ -62,3 +63,10 @@ export {
   CreateRegisterExternalBucketRoleRequest,
   CreateRegisterExternalBucketRoleResponse
 } from './awsUtilities/createRegisterExternalBucketRole';
+
+// schema
+export { default as AddDatasetPermissionsToRoleSchema } from './schemas/addDatasetPermissionsToRoleSchema';
+export { default as CreateDataSetSchema } from './schemas/createDataSet';
+export { default as CreateExternalEndpointSchema } from './schemas/createExternalEndpoint';
+export { default as CreatePresignedSinglePartFileUploadUrl } from './schemas/createPresignedSinglePartFileUploadUrl';
+export { default as CreateRegisterExternalBucketRoleSchema } from './schemas/createRegisterExternalBucketRoleSchema';

@@ -25,12 +25,12 @@ import {
 } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
-import { DataSet } from './dataSet';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 
 /**

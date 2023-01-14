@@ -7,23 +7,27 @@ import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
-import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
-import { ExternalEndpoint } from './externalEndpoint';
 import {
   AddDataSetExternalEndpointForUserRequest,
   AddDataSetExternalEndpointResponse
 } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
+import { CreateDataSet, DataSet } from './models/dataSet';
 import { DataSetMountObject } from './models/dataSetMountObject';
+import { DataSetPermission } from './models/dataSetPermission';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
+import { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
 import { PermissionsResponse } from './models/permissionsResponse';
-import { StorageLocation } from './storageLocation';
+import { StorageLocation } from './models/storageLocation';
 
 export class DataSetService {
   private _audit: AuditService;
@@ -73,7 +77,7 @@ export class DataSetService {
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
 
-      const provisioned: DataSet = {
+      const provisioned: CreateDataSet = {
         ...dataSet,
         storageType: storageProvider.getStorageType()
       };
@@ -90,7 +94,7 @@ export class DataSetService {
    * Imports an existing storage location into the solution as a DataSet.
    * @param request - {@link CreateProvisionDatasetRequest}
    *
-   * @returns the DataSet object which is stored in teh backing datastore.
+   * @returns the DataSet object which is stored in the backing datastore.
    */
   public async importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
     const metadata: Metadata = {
@@ -106,7 +110,7 @@ export class DataSetService {
 
       await storageProvider.importStorage(dataSet.storageName, dataSet.path);
 
-      const imported: DataSet = {
+      const imported: CreateDataSet = {
         ...dataSet,
         storageType: storageProvider.getStorageType()
       };
@@ -166,18 +170,16 @@ export class DataSetService {
    *
    * @returns a {@link DataSetMountObject}
    *
-   * @throws {@link NotAuthorizedError} - subject doesnt have permission to access the dataset
-   * // TODO more throws
+   * @throws {@link NotAuthorizedError} - identity doesnt have permission to access either the dataset or the endpoint
+   * @throws {@link DataSetNotFoundError} - the dataset does not exist
+   * @throws {@link EndpointNotFoundError} - the endpoint does not exist
+   * @throws {@link InvalidEndpointError} - the endpoint does not have an alias associated with it
    */
   public async getDataSetMountObject(
-    dataSetId: string,
-    endPointId: string,
-    subject: string,
-    authenticatedUser: {
-      id: string;
-      roles: string[];
-    }
-  ): Promise<DataSetMountObject> {
+    request: GetDataSetMountPointRequest
+  ): Promise<GetDataSetMountPointResponse> {
+    const { authenticatedUser, dataSetId, endPointId, identity, identityType } = request;
+
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.getDataSetMountObject.name,
@@ -188,22 +190,47 @@ export class DataSetService {
       endPointid: endPointId
     };
     try {
-      const readOnly = await this._arePermissionsReadOnly(dataSetId, subject);
+      await this.getDataSet(dataSetId, authenticatedUser);
 
-      const targetDS: DataSet = await this.getDataSet(dataSetId, authenticatedUser);
-
-      if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
-        throw new EndpointNotFoundError(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
+      const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
+        dataSetId,
+        identity,
+        identityType
+      });
+      if (!permissionsData.permissions.length) {
+        throw new NotAuthorizedError(
+          `${identityType} "${identity}" does not have permission to access dataSet "${dataSetId}.`
+        );
+      }
 
       const endPoint = await this.getExternalEndPoint(dataSetId, endPointId, authenticatedUser);
-      if (!endPoint.endPointAlias || !endPoint.id) throw Boom.notFound('Endpoint has missing information');
+      if (!endPoint.endPointAlias) {
+        throw new InvalidEndpointError(
+          `Endpoint "${endPointId}" does not have an "endPointAlias" associated with it.`
+        );
+      }
 
-      const response = this._generateMountObject(
-        endPoint.dataSetName,
-        endPoint.endPointAlias!,
-        endPoint.path,
-        endPoint.id!
+      const hasEndPointPermission = permissionsData.permissions.some(
+        ({ accessLevel }) => accessLevel === endPoint.accessLevel
       );
+
+      if (!hasEndPointPermission) {
+        throw new NotAuthorizedError(
+          `${identityType} "${identity}" does not have permission to access endpoint "${endPointId}.`
+        );
+      }
+
+      const response = {
+        data: {
+          mountObject: this._generateMountObject(
+            endPoint.dataSetName,
+            endPoint.endPointAlias!,
+            endPoint.path,
+            endPoint.id!
+          )
+        }
+      };
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -347,7 +374,19 @@ export class DataSetService {
     };
 
     try {
-      const readOnly = await this._arePermissionsReadOnly(dataSetId, userId);
+      const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
+        dataSetId,
+        identity: userId,
+        identityType: 'USER'
+      });
+
+      if (!permissionsData.permissions.length) {
+        throw new NotAuthorizedError(
+          `User "${userId}" does not have permission to access dataset "${dataSetId}.`
+        );
+      }
+
+      const endpointAccessLevel = this._getMinimumAccessLevel(permissionsData.permissions);
 
       const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
 
@@ -359,19 +398,20 @@ export class DataSetService {
         path: targetDS.path,
         externalEndpointName,
         ownerAccountId: targetDS.awsAccountId!,
-        accessLevel: readOnly ? 'read-only' : 'read-write',
+        accessLevel: endpointAccessLevel,
         externalRoleName,
         kmsKeyArn,
         vpcId
       });
 
-      const endPointParam: ExternalEndpoint = {
+      const endPointParam: CreateExternalEndpoint = {
         name: externalEndpointName,
         dataSetId: targetDS.id!,
         dataSetName: targetDS.name,
         path: targetDS.path,
         endPointUrl: connectionsData.connections.endPointUrl,
-        endPointAlias: connectionsData.connections.endPointAlias
+        endPointAlias: connectionsData.connections.endPointAlias,
+        accessLevel: endpointAccessLevel
       };
 
       if (externalRoleName) {
@@ -666,17 +706,13 @@ export class DataSetService {
     };
   }
 
-  private async _arePermissionsReadOnly(dataSetId: string, subject: string): Promise<boolean> {
-    const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
-      dataSetId,
-      subject
-    });
-    if (!permissionsData.permissions.length) {
-      throw new NotAuthorizedError(
-        `Subject "${subject}" does not have permission to access dataset "${dataSetId}.`
-      );
+  private _getMinimumAccessLevel(permissions: DataSetPermission[]): DataSetsAccessLevel {
+    if (permissions.some(({ accessLevel }) => accessLevel === 'read-only')) {
+      return 'read-only';
     }
-
-    return permissionsData.permissions.some(({ accessLevel }) => accessLevel === 'read-only');
+    if (permissions.some(({ accessLevel }) => accessLevel === 'read-write')) {
+      return 'read-write';
+    }
+    throw new NotAuthorizedError('No permissions exist');
   }
 }

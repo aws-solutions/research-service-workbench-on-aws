@@ -1101,7 +1101,7 @@ describe('S3DataSetStoragePlugin', () => {
       const fileName = 'test.txt';
 
       const url = await plugin.createPresignedUploadUrl(
-        { name: path, storageName: name, path, storageType: 'S3' },
+        { id: 'fake', createdAt: 'fake', name: path, storageName: name, path, storageType: 'S3' },
         fileName,
         ttl
       );

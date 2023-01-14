@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet } from './dataSet';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
 
 export interface EndpointConnectionStrings {
   /**
