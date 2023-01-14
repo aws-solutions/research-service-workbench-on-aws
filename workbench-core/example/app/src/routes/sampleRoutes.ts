@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Router, Request, Response } from 'express';
 import { DynamicAuthorizationService } from '../../../../authorization/lib';
 import { wrapAuth } from '../utilities/authWrapper';
