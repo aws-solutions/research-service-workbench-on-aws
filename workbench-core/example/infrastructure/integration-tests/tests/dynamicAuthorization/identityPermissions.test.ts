@@ -259,6 +259,74 @@ describe('dynamic authorization identity permission integration tests ', () => {
       ).rejects.toThrow(new HttpError(429, {}));
     });
   });
+  describe('isAuthorizedOnRoute', () => {
+    let mockIdentityPermissions: IdentityPermission[];
+    let subjectType: string;
+    let subjectId: string;
+    let parentId: string;
+    let randomTextGenerator: RandomTextGenerator;
+    let newAdminSession: ClientSession;
+    let groupId: string;
+    beforeAll(async () => {
+      const { data } = await adminSession.resources.groups.create();
+      groupId = data.groupId;
+      randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
+      randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
+      subjectType = 'sampleResource';
+      subjectId = randomTextGenerator.getFakeText('sampleSubjectId');
+      parentId = randomTextGenerator.getFakeText('sampleParentId');
+      mockIdentityPermissions = [
+        {
+          subjectType,
+          subjectId,
+          identityId: groupId,
+          identityType: 'GROUP',
+          action: 'UPDATE',
+          effect: 'ALLOW',
+          conditions: {
+            parentId: { $eq: parentId }
+          }
+        },
+        {
+          subjectType,
+          subjectId: '*',
+          identityId: groupId,
+          identityType: 'GROUP',
+          action: 'READ',
+          effect: 'ALLOW',
+          conditions: {
+            parentId: { $eq: parentId }
+          }
+        }
+      ];
+      await adminSession.resources.identityPermissions.create(
+        {
+          identityPermissions: mockIdentityPermissions
+        },
+        false
+      );
+      await adminSession.resources.groups
+        .group(groupId)
+        .addUser({ userId: adminSession.getSettings().get('rootUserId') });
+      newAdminSession = await setup.getDefaultAdminSession(true);
+    });
+    //These routes are defined in dynamicRouteConfig and sampleRoutes
+    test('is authorized on to PUT /parentResource/:parentId/resource/:resourceId with correct permissions', async () => {
+      const response = await newAdminSession
+        .getAxiosInstance()
+        .put(`/parentResource/${parentId}/resource/${subjectId}`);
+      expect(response.status).toBe(200);
+    });
+    test('is authorized on to GET /listResources/:parentId with correct permissions', async () => {
+      const response = await newAdminSession.getAxiosInstance().get(`/listResources/${parentId}`);
+      expect(response.status).toBe(200);
+    });
+    test('is authorized on to GET /listAllResources with incorrect permissions should recieve 403', async () => {
+      await expect(newAdminSession.getAxiosInstance().get('/listAllResources')).rejects.toThrowError(
+        new HttpError(403, {})
+      );
+    });
+  });
 
   describe('isAuthorizedOnSubject', () => {
     let mockDeleteIdentityPermission: IdentityPermission;

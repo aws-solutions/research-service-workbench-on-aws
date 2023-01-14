@@ -4,10 +4,13 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
+import _ from 'lodash';
 import { Action } from '../action';
 import AuthorizationPlugin from '../authorizationPlugin';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { ParamNotFoundError } from '../errors/paramNotFoundError';
 import { RetryError } from '../errors/retryError';
+import { RouteNotSecuredError } from '../errors/routeNotSecuredError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -36,8 +39,10 @@ import {
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { Identity, IdentityPermission } from './dynamicAuthorizationInputs/identityPermission';
-import { InitRequest, InitResponse } from './dynamicAuthorizationInputs/init';
-import { IsAuthorizedOnRouteRequest } from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
+import {
+  IsAuthorizedOnRouteRequest,
+  IsAuthorizedOnRouteRequestParser
+} from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
 import {
   IsAuthorizedOnSubjectRequest,
   IsAuthorizedOnSubjectRequestParser
@@ -64,6 +69,8 @@ import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPer
 import { GroupManagementPlugin } from './groupManagementPlugin';
 
 export class DynamicAuthorizationService {
+  private readonly _wildcardSubjectId: string = '*';
+
   private _groupManagementPlugin: GroupManagementPlugin;
   private _dynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   private _authorizationPlugin: AuthorizationPlugin;
@@ -79,16 +86,6 @@ export class DynamicAuthorizationService {
     this._dynamicAuthorizationPermissionsPlugin = config.dynamicAuthorizationPermissionsPlugin;
     this._auditService = config.auditService;
     this._authorizationPlugin = config.authorizationPlugin;
-  }
-
-  /**
-   * Initialize Dynamic Authorization Service
-   * @param initRequest - {@link InitRequest}
-   *
-   * @returns - {@link InitResponse}
-   */
-  public async init(initRequest: InitRequest): Promise<InitResponse> {
-    throw new Error('Not implemented');
   }
 
   /**
@@ -132,18 +129,21 @@ export class DynamicAuthorizationService {
         action,
         identities
       });
-      const wildwardIdentityPermissionsPromise = this._getAllIdentityPermissionsBySubject({
-        subjectId: '*',
-        subjectType,
-        action,
-        identities
-      });
-      const [identityPermissions, wildcardIdentityPermissions] = await Promise.all([
-        identityPermissionsPromise,
-        wildwardIdentityPermissionsPromise
-      ]);
+      const identityPermissionsPromises = [identityPermissionsPromise];
+      if (subjectId !== this._wildcardSubjectId) {
+        const wildcardIdentityPermissionsPromise = this._getAllIdentityPermissionsBySubject({
+          subjectId: this._wildcardSubjectId,
+          subjectType,
+          action,
+          identities
+        });
+        identityPermissionsPromises.push(wildcardIdentityPermissionsPromise);
+      }
+      const [identityPermissions, wildcardIdentityPermissions] = await Promise.all(
+        identityPermissionsPromises
+      );
       await this._authorizationPlugin.isAuthorizedOnDynamicOperations(
-        [...identityPermissions, ...wildcardIdentityPermissions],
+        [...identityPermissions, ...(wildcardIdentityPermissions ?? [])],
         [dynamicOperation]
       );
       metadata.statusCode = 200;
@@ -185,7 +185,52 @@ export class DynamicAuthorizationService {
    *
    */
   public async isAuthorizedOnRoute(isAuthorizedOnRouteRequest: IsAuthorizedOnRouteRequest): Promise<void> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsAuthorizedOnRouteRequestParser.parse(isAuthorizedOnRouteRequest);
+    const { authenticatedUser, route, method, params } = validatedRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.isAuthorizedOnRoute.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: validatedRequest
+    };
+    try {
+      if ((await this.isRouteIgnored({ route, method })).data.routeIgnored) {
+        metadata.statusCode = 200;
+        await this._auditService.write(metadata);
+        return;
+      }
+      if (!(await this.isRouteProtected({ route, method })).data.routeProtected)
+        throw new RouteNotSecuredError('Route is not secured');
+      const { data: dynamicOperationsData } =
+        await this._dynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute({ route, method });
+      const dynamicOperations = _.cloneDeep(dynamicOperationsData.dynamicOperations);
+      // Inject subject's variable based params
+      const paramRegex = /\${([^{]+)}/g;
+      dynamicOperations.forEach((dynamicOperation) => {
+        Object.entries(dynamicOperation.subject).forEach(([subjectKey, subjectValue]) => {
+          _.set(
+            dynamicOperation.subject,
+            subjectKey,
+            subjectValue.replace(paramRegex, (ignore, key) => {
+              const response = _.get(params, key);
+              if (!response) throw new ParamNotFoundError('Missing parameter');
+              return response;
+            })
+          );
+        });
+      });
+      for (const dynamicOperation of dynamicOperations) {
+        await this.isAuthorizedOnSubject({ authenticatedUser, dynamicOperation });
+      }
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata);
+    } catch (err) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
   }
 
   /**

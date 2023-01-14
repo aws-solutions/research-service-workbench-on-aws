@@ -62,6 +62,10 @@ export default class IdentityPermissions extends CollectionResource {
     return this._axiosInstance.get(`${this._parentApi}/authorize/subject`, { params: bodyParams });
   }
 
+  public async isAuthorizedOnRoute(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/authorize/route`, { params: bodyParams });
+  }
+
   protected _buildDefaults(resource: CreateRequest): CreateResponse {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
 

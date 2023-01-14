@@ -57,7 +57,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
 
     try {
       const { data } = await this.getGroupStatus(request);
-      if (data.status === 'delete_pending') {
+      if (data.status === 'delete_pending' || data.status === 'active') {
         throw new GroupAlreadyExistsError(`Group '${groupId}' already exists.`);
       }
     } catch (error) {
@@ -73,7 +73,9 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       return { data: { groupId } };
     } catch (error) {
       if (isRoleAlreadyExistsError(error)) {
-        throw new GroupAlreadyExistsError(error.message);
+        //Do not throw error, group can already exist but not exist in Dynamic Authz
+        await this.setGroupStatus({ groupId, status: 'active' });
+        return { data: { groupId } };
       }
       throw error;
     }

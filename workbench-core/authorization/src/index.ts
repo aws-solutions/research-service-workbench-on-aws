@@ -14,6 +14,7 @@ export { Action } from './action';
 export {
   default as RoutesMap,
   HTTPMethod,
+  HTTPMethodParser,
   RoutesIgnored,
   MethodToOperations,
   DynamicRoutesMap

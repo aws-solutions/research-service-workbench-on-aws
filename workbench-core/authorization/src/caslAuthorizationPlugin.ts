@@ -77,7 +77,6 @@ export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
    */
   private _defineAbilitiesForIdentityPermissions(identityPermissions: IdentityPermission[]): Ability {
     const { can, cannot, rules } = new AbilityBuilder(Ability);
-
     identityPermissions.forEach((identityPermission) => {
       const conditions = {
         ...(identityPermission.conditions ?? {}),

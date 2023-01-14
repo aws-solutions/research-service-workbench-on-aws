@@ -102,10 +102,26 @@ describe('WBCGroupManagemntPlugin', () => {
       expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
     });
 
+    it('succesfully create a group even when userManagementPlugin throws RoleAlreadyExistsError', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
+      wbcGroupManagementPlugin.setGroupStatus = jest.fn();
+      const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
+      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
+    });
+
     it('throws GroupAlreadyExistsError when the group is pending delete', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest
         .fn()
         .mockReturnValue({ data: { status: 'delete_pending' } });
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+
+    it('throws GroupAlreadyExistsError when the group is active', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockReturnValue({ data: { status: 'active' } });
 
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
@@ -128,15 +144,6 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(PluginConfigurationError);
-    });
-
-    it('throws GroupAlreadyExistsError when the group already exists', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
-      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
-
-      await expect(
-        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(GroupAlreadyExistsError);
     });
 
     it('throws TooManyRequestsError when the request is rate limited', async () => {

@@ -1410,6 +1410,7 @@ importers:
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.29.1
+      aws-jwt-verify: ^3.0.0
       axios: ^0.27.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
@@ -1451,6 +1452,7 @@ importers:
       '@aws/workbench-core-infrastructure': link:../../infrastructure
       '@aws/workbench-core-user-management': link:../../user-management
       aws-cdk-lib: 2.29.1_constructs@10.1.25
+      aws-jwt-verify: 3.3.0
       constructs: 10.1.25
       cookie-parser: 1.4.6
       csrf: 3.1.0
