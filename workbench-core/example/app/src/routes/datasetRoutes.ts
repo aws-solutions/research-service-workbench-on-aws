@@ -334,21 +334,60 @@ export function setUpDSRoutes(
 
   // remove dataset access permission
   router.delete(
-    '/datasets/:datasetId/permissions',
+    '/datasets/:datasetId/permissions/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('datasetid request parameter is invalid');
       }
-      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
-        AddRemoveAccessPermissionParser,
-        req.body
-      );
+      if (req.params.userId.match(uuidRegExpAsString) === null) {
+        throw Boom.badRequest('userId must be in the form of a uuid.');
+      }
+      if (req.body.accessLevel !== 'read-write' && req.body.accessLevel !== 'read-only') {
+        throw Boom.badRequest("accessLevel must be 'read-only' or 'read-write'.");
+      }
       let response: PermissionsResponse;
       try {
         response = await dataSetService.removeDataSetAccessPermissions({
           authenticatedUser: res.locals.user,
           dataSetId: req.params.datasetId,
-          ...validatedRequest
+          permission: {
+            identity: req.params.userId,
+            identityType: 'USER',
+            accessLevel: req.body.accessLevel
+          }
+        });
+        res.status(200).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.delete(
+    '/datasets/:datasetId/permissions/roles/:roleId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      if (req.params.roleId.match(groupIdRegExAsString) === null) {
+        throw Boom.badRequest('groupId must be in the form of a uuid.');
+      }
+      if (req.body.accessLevel !== 'read-write' && req.body.accessLevel !== 'read-only') {
+        throw Boom.badRequest("accessLevel must be 'read-only' or 'read-write'.");
+      }
+      let response: PermissionsResponse;
+      try {
+        response = await dataSetService.removeDataSetAccessPermissions({
+          authenticatedUser: res.locals.user,
+          dataSetId: req.params.datasetId,
+          permission: {
+            identity: req.params.roleId,
+            identityType: 'GROUP',
+            accessLevel: req.body.accessLevel
+          }
         });
         res.status(200).send(response);
       } catch (error) {

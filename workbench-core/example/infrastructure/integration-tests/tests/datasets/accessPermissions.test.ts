@@ -413,28 +413,6 @@ describe('DataSets access permissions integration tests', () => {
         }
       });
     });
-    it('throws if "identityType" is not "GROUP" or "USER"', async () => {
-      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
-      const dataSetId: string = createDataSetResponse.data.id;
-      const createGroupResponse = await adminSession.resources.groups.create({}, true);
-      const { groupId } = createGroupResponse.data;
-      await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
-        permission: {
-          identityType: 'GROUP',
-          identity: groupId,
-          accessLevel: 'read-only'
-        }
-      });
-      await expect(
-        (adminSession.resources.datasets.children.get(dataSetId) as Dataset).removeAccess({
-          permission: {
-            identityType: mockBadValue,
-            identity: groupId,
-            accessLevel: 'read-only'
-          }
-        })
-      ).rejects.toThrow(new HttpError(400, {}));
-    });
     it('throws if "accessLevel" is not "read-only" or "read-write"', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;

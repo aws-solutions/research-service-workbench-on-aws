@@ -95,13 +95,11 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     params: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
     const identityPermissions: IdentityPermission[] = this._dataSetPermissionToIdentityPermissions(params);
-
     const removedPermissions: DeleteIdentityPermissionsResponse =
       await this._authorizer.deleteIdentityPermissions({
         authenticatedUser: params.authenticatedUser,
         identityPermissions
       });
-
     const permissions: PermissionsResponse[] = this._identityPermissionsToPermissionsResponse(
       removedPermissions.data.identityPermissions
     );
@@ -130,7 +128,6 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
       (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
     );
     const permissionsResponse = this._identityPermissionsToPermissionsResponse(identityPermissions);
-
     const permissionsCount = permissionsResponse.length;
     if (permissionsCount > 1) {
       throw new InvalidPermissionError(
@@ -182,7 +179,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
         identityId: dataSetPermission.permission.identity,
         action: 'READ',
         effect: permissionsEffect,
-        subjectType: 'DataSet',
+        subjectType: dataSetSubjectType,
         subjectId: dataSetPermission.dataSetId,
         description: `'${dataSetPermission.permission.accessLevel}' access on DataSet '${dataSetPermission.dataSetId}'`
       }
@@ -193,7 +190,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
         identityId: dataSetPermission.permission.identity,
         action: 'UPDATE',
         effect: permissionsEffect,
-        subjectType: 'DataSet',
+        subjectType: dataSetSubjectType,
         subjectId: dataSetPermission.dataSetId,
         description: "'read-write' access on DataSet '${params.dataSetId}'"
       });
