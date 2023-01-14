@@ -1284,7 +1284,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+              "raw": "{\n    \"name\": \"\",\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1292,7 +1292,7 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/awsAccounts?Authorization={{ACCESS_TOKEN}}",
+              "raw": "{{API_URL}}/awsAccounts",
               "host": ["{{API_URL}}"],
               "path": ["awsAccounts"]
             }
@@ -1355,9 +1355,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/awsAccount/:accountId",
+              "raw": "{{API_URL}}/awsAccounts/:accountId",
               "host": ["{{API_URL}}"],
-              "path": ["awsAccount", ":accountId"],
+              "path": ["awsAccounts", ":accountId"],
               "variable": [
                 {
                   "key": "accountId",
