@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { Permission } from '@aws/workbench-core-authorization';
 import {
   uuidRegExpAsString,
   uuidWithLowercasePrefixRegExp,
@@ -345,9 +346,8 @@ export function setUpDSRoutes(
       if (req.body.accessLevel !== 'read-write' && req.body.accessLevel !== 'read-only') {
         throw Boom.badRequest("accessLevel must be 'read-only' or 'read-write'.");
       }
-      let response: PermissionsResponse;
       try {
-        response = await dataSetService.removeDataSetAccessPermissions({
+        const response: PermissionsResponse = await dataSetService.removeDataSetAccessPermissions({
           authenticatedUser: res.locals.user,
           dataSetId: req.params.datasetId,
           permission: {
