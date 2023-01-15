@@ -30,7 +30,9 @@ import {
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
-  MAX_API_PAGE_SIZE
+  MAX_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
 } from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
@@ -91,5 +93,7 @@ export {
   DynamoDBService,
   SecretsService,
   RelationshipDDBItemParser,
-  RelationshipDDBItem
+  RelationshipDDBItem,
+  toPaginationToken,
+  fromPaginationToken
 };
