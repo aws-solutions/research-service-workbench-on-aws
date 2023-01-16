@@ -70,7 +70,7 @@ export default class EnvironmentTypeConfigService {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<EnvironmentTypeConfig> {
-    const item = await this._dynamoDbService.getItem(this._buildEnvTypeConfigPkSk(envTypeConfigId));
+    const item = await this._dynamoDbService.getItem({ key: this._buildEnvTypeConfigPkSk(envTypeConfigId) });
     if (item === undefined || (item.dependency as string) !== envTypeId) {
       throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
     } else {

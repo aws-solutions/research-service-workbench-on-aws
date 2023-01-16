@@ -234,17 +234,24 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'Project'
       }
-    ]
-  },
-  [`/projects/${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]: {
-    GET: [
+    ],
+    POST: [
       {
-        action: 'READ',
-        subject: 'ProjectEnvironmentTypeConfig'
+        action: 'CREATE',
+        subject: 'Project'
       }
     ]
   },
-  [`/projects/${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
     {
       PUT: [
         {
@@ -259,6 +266,28 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Project'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'Project'
+      }
+    ]
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'DELETE',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {
