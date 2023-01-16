@@ -53,7 +53,7 @@ describe('DynamoDBService', () => {
       // BUILD
       const key = { pk: 'samplePK', sk: 'sampleSK' };
       // OPERATE
-      const result = await dbService.getItem(key);
+      const result = await dbService.getItem({ key });
       // CHECK
       expect(result).toEqual(unmarshalledData);
     });
@@ -413,6 +413,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toEqual(expectedParams);
     });
   });
+
+  describe('getItem', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(GetItemCommand).resolves({
+        Item: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.getItem({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual(unmarshalledAttributes);
+    });
+  });
+
   describe('getter', () => {
     // Get Item
     test('single get should populate params with no optional params', async () => {
