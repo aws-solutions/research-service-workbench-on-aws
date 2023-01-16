@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Permission } from '@aws/workbench-core-authorization';
 import {
   uuidRegExpAsString,
   uuidWithLowercasePrefixRegExp,
