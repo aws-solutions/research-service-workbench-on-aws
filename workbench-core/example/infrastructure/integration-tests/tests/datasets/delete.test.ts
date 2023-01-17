@@ -26,7 +26,7 @@ describe('datasets delete integration test', () => {
     user = {
       firstName: 'Test',
       lastName: 'User',
-      email: `success+create-user-${uuidv4()}@simulator.amazonses.com`
+      email: `success+delete-dataset-${uuidv4()}@simulator.amazonses.com`
     };
     const userData = await adminSession.resources.users.create(user);
     userId = userData.data.id;

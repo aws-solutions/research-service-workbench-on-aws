@@ -22,6 +22,8 @@ export interface DataSetMetadataPlugin {
    * @param id - the ID of the DataSet for which to get the metadata.
    *
    * @returns the metadata associated with the overall DataSet.
+   *
+   * @throws {@link DataSetNotFoundError} - the dataset doesnt exist
    */
   getDataSetMetadata(id: string): Promise<DataSet>;
 
@@ -81,6 +83,8 @@ export interface DataSetMetadataPlugin {
    * @param endPoint - the details of the endpoint to add.
    *
    * @returns the details of the endpoint added.
+   *
+   * @throws {@link EndpointExistsError} - the endpoint already exists
    */
   addExternalEndpoint(endPoint: CreateExternalEndpoint): Promise<ExternalEndpoint>;
 

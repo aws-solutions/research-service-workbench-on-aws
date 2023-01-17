@@ -13,6 +13,7 @@ export { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin
 
 // errors
 export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+export { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
 export { EndpointExistsError, isEndpointExistsError } from './errors/endpointExistsError';
 export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
 export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
@@ -20,6 +21,7 @@ export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorized
 export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
 export { DataSetExistsError, isDataSetExistsError } from './errors/dataSetExistsError';
 export { EndpointNotFoundError, isEndpointNotFoundError } from './errors/endpointNotFoundError';
+export { InvalidArnError, isInvalidArnError } from './errors/invalidArnError';
 export { InvalidEndpointError, isInvalidEndpointError } from './errors/invalidEndpointError';
 
 // models

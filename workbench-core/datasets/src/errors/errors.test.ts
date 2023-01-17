@@ -5,8 +5,10 @@
 
 import { DataSetExistsError, isDataSetExistsError } from './dataSetExistsError';
 import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
+import { DataSetNotFoundError, isDataSetNotFoundError } from './dataSetNotFoundError';
 import { EndpointExistsError, isEndpointExistsError } from './endpointExistsError';
 import { EndpointNotFoundError, isEndpointNotFoundError } from './endpointNotFoundError';
+import { InvalidArnError, isInvalidArnError } from './invalidArnError';
 import { InvalidEndpointError, isInvalidEndpointError } from './invalidEndpointError';
 import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleError';
 import { InvalidPermissionError, isInvalidPermissionError } from './invalidPermissionError';
@@ -93,7 +95,26 @@ describe('custom error tests', () => {
 
     expect(isInvalidEndpointError(invalidEndpointError)).toBe(true);
   });
+
   test('not InvalidEndpointError', () => {
     expect(isInvalidEndpointError(error)).toBe(false);
+  });
+
+  test('DataSetNotFoundError', () => {
+    const dataSetNotFoundError = new DataSetNotFoundError();
+
+    expect(isDataSetNotFoundError(dataSetNotFoundError)).toBe(true);
+  });
+  test('not DataSetNotFoundError', () => {
+    expect(isDataSetNotFoundError(error)).toBe(false);
+  });
+
+  test('InvalidArnError', () => {
+    const invalidArnError = new InvalidArnError();
+
+    expect(isInvalidArnError(invalidArnError)).toBe(true);
+  });
+  test('not InvalidArnError', () => {
+    expect(isInvalidArnError(error)).toBe(false);
   });
 });

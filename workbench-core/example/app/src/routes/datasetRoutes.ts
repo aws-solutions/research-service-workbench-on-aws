@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import {
   uuidRegExpAsString,
   uuidWithLowercasePrefixRegExp,
@@ -12,14 +13,16 @@ import {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleSchema,
   CreateDataSetSchema,
-  CreateExternalEndpointSchema,
   createRegisterExternalBucketRole,
   CreateRegisterExternalBucketRoleSchema,
-  CreatePresignedSinglePartFileUploadUrl,
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError,
+  isDataSetNotFoundError,
+  isInvalidArnError,
   isInvalidIamRoleError,
+  isNotAuthorizedError,
+  isEndpointExistsError,
   isInvalidPermissionError,
   PermissionsResponse
 } from '@aws/workbench-core-datasets';
@@ -31,6 +34,14 @@ import {
   AddRemoveAccessPermissionRequest,
   AddRemoveAccessPermissionParser
 } from '../models/datasets/addRemoveAccessPermission';
+import {
+  CreateExternalEndpoint,
+  CreateExternalEndpointParser
+} from '../models/datasets/createExternalEndpoint';
+import {
+  CreatePresignedSinglePartFileUploadUrl,
+  CreatePresignedSinglePartFileUploadUrlParser
+} from '../models/datasets/createPresignedFileUpload.ts';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -81,19 +92,57 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:datasetId/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('datasetid request parameter is invalid');
+      try {
+        const validatedRequest = validateAndParse<CreateExternalEndpoint>(
+          CreateExternalEndpointParser,
+          req.body
+        );
+        const authenticatedUser = validateAndParse<AuthenticatedUser>(
+          AuthenticatedUserParser,
+          res.locals.user
+        );
+
+        const { userId, groupId } = validatedRequest;
+
+        if (!userId && !groupId) {
+          throw Boom.badRequest('Request body must have either "userId" or "groupId" defined.');
+        }
+
+        if (userId && groupId) {
+          throw Boom.badRequest('Request body must not have both "userId" and "groupId" defined.');
+        }
+
+        if (groupId) {
+          const { data } = await dataSetService.addDataSetExternalEndpointForGroup({
+            ...validatedRequest,
+            dataSetId: req.params.datasetId,
+            storageProvider: dataSetStoragePlugin,
+            groupId,
+            authenticatedUser
+          });
+          return res.status(201).send(data);
+        }
+
+        const { data } = await dataSetService.addDataSetExternalEndpointForUser({
+          ...validatedRequest,
+          dataSetId: req.params.datasetId,
+          storageProvider: dataSetStoragePlugin,
+          userId: userId!,
+          authenticatedUser
+        });
+        res.status(201).send(data);
+      } catch (error) {
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isNotAuthorizedError(error)) {
+          throw Boom.forbidden(error.message);
+        }
+        if (isEndpointExistsError(error) || isInvalidArnError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
       }
-      processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
-      await dataSetService.addDataSetExternalEndpointForUser({
-        dataSetId: req.params.datasetId,
-        externalEndpointName: req.body.externalEndpointName,
-        storageProvider: dataSetStoragePlugin,
-        userId: req.body.userId ? req.body.userId : res.locals.user.id,
-        authenticatedUser: res.locals.user,
-        externalRoleName: req.body.externalRoleName
-      });
-      res.status(201).send();
     })
   );
 
@@ -122,19 +171,26 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:datasetId/presignedUpload',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('datasetId request parameter is invalid');
-      }
-      processValidatorResult(validate(req.body, CreatePresignedSinglePartFileUploadUrl));
+      try {
+        const validatedRequest = validateAndParse<CreatePresignedSinglePartFileUploadUrl>(
+          CreatePresignedSinglePartFileUploadUrlParser,
+          req.body
+        );
 
-      const url = await dataSetService.getPresignedSinglePartUploadUrl(
-        req.params.datasetId,
-        req.body.fileName,
-        timeToLiveSeconds,
-        dataSetStoragePlugin,
-        res.locals.user
-      );
-      res.status(200).send({ url });
+        const url = await dataSetService.getPresignedSinglePartUploadUrl(
+          req.params.datasetId,
+          validatedRequest.fileName,
+          timeToLiveSeconds,
+          dataSetStoragePlugin,
+          res.locals.user
+        );
+        res.status(200).send({ url });
+      } catch (error) {
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        throw error;
+      }
     })
   );
 
@@ -151,11 +207,15 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('datasetId request parameter is invalid');
+      try {
+        const ds = await dataSetService.getDataSet(req.params.datasetId, res.locals.user);
+        res.status(200).send(ds);
+      } catch (error) {
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        throw error;
       }
-      const ds = await dataSetService.getDataSet(req.params.datasetId, res.locals.user);
-      res.send(ds);
     })
   );
 
@@ -172,15 +232,14 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('datasetId request parameter is invalid');
-      }
-
       try {
         await dataSetService.removeDataSet(req.params.datasetId, () => Promise.resolve(), res.locals.user);
       } catch (error) {
         if (isDataSetHasEndpointError(error)) {
           throw Boom.badRequest(error.message);
+        }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }
@@ -250,6 +309,9 @@ export function setUpDSRoutes(
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
         }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })
@@ -270,6 +332,9 @@ export function setUpDSRoutes(
       } catch (error) {
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
+        }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }
@@ -299,6 +364,9 @@ export function setUpDSRoutes(
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
         }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })
@@ -326,6 +394,9 @@ export function setUpDSRoutes(
       } catch (error) {
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
+        }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }

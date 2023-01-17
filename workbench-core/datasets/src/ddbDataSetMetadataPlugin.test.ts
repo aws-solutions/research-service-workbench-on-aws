@@ -139,7 +139,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
     });
 
-    it('throws not found when an undefined DataSet item is returned.', async () => {
+    it('throws DataSetNotFoundError when an undefined DataSet item is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: undefined
       });
@@ -147,7 +147,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
     });
 
-    it('throws not found when no DB response is returned.', async () => {
+    it('throws DataSetNotFoundError when no DB response is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({});
 
       await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
