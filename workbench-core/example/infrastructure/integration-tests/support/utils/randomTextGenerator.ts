@@ -13,7 +13,7 @@ export default class RandomTextGenerator {
   }
 
   private _getRandomNumberAsString(): string {
-    const num = Math.round(Math.random() * 1000) + 1;
+    const num = Math.round(Math.random() * 1000000000) + 1;
     return num.toString();
   }
 }
