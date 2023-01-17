@@ -15,6 +15,8 @@ interface Setting {
   terminatedEnvId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
+  costCenterId: string;
+  projectName: string;
 
   // Main CFN template outputs
   cognitoUserPoolClientId: string;

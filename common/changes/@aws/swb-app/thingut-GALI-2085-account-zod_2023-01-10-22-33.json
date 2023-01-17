@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "updated to use Zod parser for account APIs",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

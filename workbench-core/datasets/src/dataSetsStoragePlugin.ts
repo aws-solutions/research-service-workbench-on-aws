@@ -61,6 +61,9 @@ export interface DataSetsStoragePlugin {
    * @param request - a {@link AddStorageExternalEndpointRequest} object
    *
    * @returns a {@link AddStorageExternalEndpointResponse} object
+   *
+   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(
     request: AddStorageExternalEndpointRequest
@@ -85,6 +88,8 @@ export interface DataSetsStoragePlugin {
    * @param endPointUrl - a URL which can be used to reach the endpoint.
    * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
+   * @throws {@link InvalidArnError} - the externalRoleName parameter is invalid
+   * @throws {@link InvalidArnError} - the endPointUrl parameter is invalid
    */
   addRoleToExternalEndpoint(
     name: string,

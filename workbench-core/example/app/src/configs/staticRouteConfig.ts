@@ -72,8 +72,44 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'DatasetAccess'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetAccess'
+      }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/users/${uuidRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'DatasetAccess'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'DatasetAccess'
+        }
+      ]
+    },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/roles/${groupIDRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'DatasetAccess'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'DatasetAccess'
+        }
+      ]
+    },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
     POST: [
       {
