@@ -121,7 +121,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       createdAt: new Date().toISOString()
     };
 
-    await this._storeEndPointToDdb(createdEndpoint);
+    await this._storeEndpointToDdb(createdEndpoint);
 
     return createdEndpoint;
   }
@@ -142,7 +142,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   public async updateExternalEndpoint(endpoint: ExternalEndpoint): Promise<ExternalEndpoint> {
-    await this._storeEndPointToDdb(endpoint);
+    await this._storeEndpointToDdb(endpoint);
     return endpoint;
   }
 
@@ -167,7 +167,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (endpoints.some((ep) => ep.name === endpoint.name))
       throw new EndpointExistsError(
-        `Cannot create the EndPoint. EndPoint with name '${endpoint.name}' already exists on DataSet '${targetDS.name}'.`
+        `Cannot create the Endpoint. Endpoint with name '${endpoint.name}' already exists on DataSet '${targetDS.name}'.`
       );
   }
 
@@ -187,7 +187,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
   }
 
-  private async _storeEndPointToDdb(endpoint: ExternalEndpoint): Promise<void> {
+  private async _storeEndpointToDdb(endpoint: ExternalEndpoint): Promise<void> {
     const endpointKey = {
       pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
       sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)

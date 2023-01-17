@@ -712,11 +712,11 @@ export class DataSetService {
       );
     }
 
-    const accessLevel = this._getMinimumAccessLevel(permissionsData.permissions);
-
     if (targetDS.externalEndpoints?.find((ep) => ep === externalEndpointName)) {
       throw new EndpointExistsError(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
     }
+
+    const accessLevel = this._getMinimumAccessLevel(permissionsData.permissions);
 
     const { data: connectionsData } = await storageProvider.addExternalEndpoint({
       name: targetDS.storageName,
@@ -753,13 +753,16 @@ export class DataSetService {
 
     await this._dbProvider.updateDataSet(targetDS);
 
-    const mountObject = this._generateMountObject(
-      endPoint.dataSetName,
-      endPoint.endPointAlias!,
-      endPoint.path,
-      endPoint.id!
-    );
-    return { data: { mountObject } };
+    return {
+      data: {
+        mountObject: this._generateMountObject(
+          endPoint.dataSetName,
+          endPoint.endPointAlias!,
+          endPoint.path,
+          endPoint.id
+        )
+      }
+    };
   }
 
   private _getMinimumAccessLevel(permissions: DataSetPermission[]): DataSetsAccessLevel {
