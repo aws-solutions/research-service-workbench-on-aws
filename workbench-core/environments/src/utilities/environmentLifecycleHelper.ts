@@ -232,12 +232,11 @@ export default class EnvironmentLifecycleHelper {
         const datasetEndPointName = `${dataSetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
         const {
           data: { mountObject }
-        } = await this.dataSetService.addDataSetExternalEndpointForUser({
-          // TODO use ForGroup version when implemented
+        } = await this.dataSetService.addDataSetExternalEndpointForGroup({
           dataSetId,
           externalEndpointName: datasetEndPointName,
           storageProvider: new S3DataSetStoragePlugin(this.aws),
-          userId: `${envMetadata.projectId}#Researcher`,
+          groupId: `${envMetadata.projectId}#Researcher`,
           authenticatedUser: { id: '', roles: [] }
         });
 

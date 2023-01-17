@@ -20,6 +20,7 @@
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
+    "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
