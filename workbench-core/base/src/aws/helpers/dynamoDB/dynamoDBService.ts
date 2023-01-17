@@ -5,6 +5,7 @@
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
+import GetItemParams from '../../../interfaces/getItemParams';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
 import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
@@ -102,6 +103,23 @@ export default class DynamoDBService {
   }
 
   /**
+   * Gets a single item from the DynamoDB table.
+   *
+   * @param params - {@link GetItemParams} object of properties to generate a get item request
+   * @returns Promise of a string, {@link JSONValue} paired object
+   *
+   * @example Use this to get a single item from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.getItem({key: 'pk'});
+   * ```
+   */
+  public async getItem(params: GetItemParams): Promise<Record<string, JSONValue>> {
+    const result = (await this.get(params.key, params.params).execute()) as GetItemCommandOutput;
+
+    return result.Item as unknown as Record<string, JSONValue>;
+  }
+
+  /**
    * Creates a Getter to do single get item or batch get item operations on a DynamoDB table.
    *
    * @param key - single object of key to get for single get item or list of objects of keys to get for batch get item
@@ -145,32 +163,6 @@ export default class DynamoDBService {
       }
     }
     return getter;
-  }
-
-  /**
-   * retrieves item from DynamoDB table.
-   *
-   * @param key - single object of key to get for single get item
-   * @param params - optional object of optional properties to generate a get item request
-   * @returns Promise\<Record\<string,JSONValue\>\>
-   *
-   * @example Use this method to retrieve an item from ddb by Id
-   * ```ts
-   * const item = await dynamoDBService.getItem({'pk': 'pk', 'sk': 'sk'}, {projection: 'valueIWant'});
-   * ```
-   */
-  public async getItem(
-    key: Record<string, unknown>,
-    params?: {
-      strong?: boolean;
-      names?: { [key: string]: string };
-      projection?: string | string[];
-      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-    }
-  ): Promise<Record<string, JSONValue>> {
-    const response = await this.get(key, params).execute();
-    const item = (response as GetItemCommandOutput).Item;
-    return item as unknown as Record<string, JSONValue>;
   }
 
   /**

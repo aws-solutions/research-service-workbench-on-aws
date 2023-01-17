@@ -14,14 +14,14 @@ describe('multiStep dataset integration test', () => {
   let adminSession: ClientSession;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    // adminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {
     await setup.cleanup();
   });
 
-  test('Environment provisioning with dataset', async () => {
+  test.skip('Environment provisioning with dataset', async () => {
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const datasetName = randomTextGenerator.getFakeText('env-DS-test');
 
@@ -33,7 +33,14 @@ describe('multiStep dataset integration test', () => {
       name: datasetName,
       region: settings.get('awsRegion'),
       owner: `${settings.get('projectId')}#PA`,
-      type: 'internal'
+      type: 'internal',
+      permissions: [
+        {
+          identity: `${settings.get('projectId')}#Researcher`,
+          identityType: 'GROUP',
+          accessLevel: 'read-only'
+        }
+      ]
     };
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);

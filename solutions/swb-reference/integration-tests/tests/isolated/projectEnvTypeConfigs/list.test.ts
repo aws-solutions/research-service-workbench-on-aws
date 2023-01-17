@@ -12,7 +12,7 @@ describe('list environment type configs associated to project', () => {
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const projectId = setup.getSettings().get('projectId');
-  const nonExistentProjectId = '12345678-1234-1234-1234-123456789012';
+  const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
   const nonExistentEnvTypeId = 'et-prod-1234567890123,pa-1234567890123';
 
   beforeEach(() => {
