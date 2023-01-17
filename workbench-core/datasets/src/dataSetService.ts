@@ -5,7 +5,6 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
-import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
@@ -322,18 +321,15 @@ export class DataSetService {
       const targetDS: DataSet = await this.getDataSet(dataSetId, authenticatedUser);
       const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId, authenticatedUser);
 
-      if (
-        !targetDS.externalEndpoints ||
-        !_.find(targetDS.externalEndpoints, (ep) => ep === targetEndpoint.name)
-      ) {
+      if (!targetDS.externalEndpoints?.find((endpoint) => endpoint === targetEndpoint.name)) {
         return;
       }
 
       await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
 
-      targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
-        return endpoint === targetEndpoint.name;
-      });
+      targetDS.externalEndpoints = targetDS.externalEndpoints.filter(
+        (endpoint) => endpoint !== targetEndpoint.name
+      );
 
       await this._dbProvider.updateDataSet(targetDS);
       await this._audit.write(metadata);
@@ -459,7 +455,7 @@ export class DataSetService {
       );
 
       endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
-      if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) {
+      if (endPointDetails.allowedRoles.find((r) => r === externalRoleArn)) {
         return;
       }
 
@@ -718,7 +714,7 @@ export class DataSetService {
 
     const accessLevel = this._getMinimumAccessLevel(permissionsData.permissions);
 
-    if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName)) {
+    if (targetDS.externalEndpoints?.find((ep) => ep === externalEndpointName)) {
       throw new EndpointExistsError(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
     }
 
