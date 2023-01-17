@@ -15,14 +15,14 @@ function getITAdminRole(): string {
 }
 
 function getProjectAdminRole(projectId: string): string {
-  if (!projectId.startsWith(resourceTypeToKey.project)) {
+  if (!projectId.startsWith(resourceTypeToKey.project.toLowerCase())) {
     throw new InvalidArgumentError();
   }
   return `${projectId}#${PROJECT_ADMIN}`;
 }
 
 function getResearcherRole(projectId: string): string {
-  if (!projectId.startsWith(resourceTypeToKey.project)) {
+  if (!projectId.startsWith(resourceTypeToKey.project.toLowerCase())) {
     throw new InvalidArgumentError();
   }
   return `${projectId}#${RESEARCHER}`;

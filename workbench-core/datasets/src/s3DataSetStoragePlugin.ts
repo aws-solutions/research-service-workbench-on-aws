@@ -26,7 +26,14 @@ import {
 import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
 import { DataSet } from './dataSet';
-import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
+import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
+import { EndPointExistsError } from './errors/endPointExistsError';
+import { InvalidArnError } from './errors/invalidArnError';
+import {
+  AddStorageExternalEndpointRequest,
+  AddStorageExternalEndpointResponse
+} from './models/addStorageExternalEndpoint';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 
 /**
  * An implementation of the {@link DataSetStoragePlugin} to support DataSets stored in an S3 Bucket.
@@ -87,20 +94,28 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
    * @param externalEndpointName - the name of the access pont to create.
    * @param ownerAccountId - the owning AWS account for the bucket.
+   * @param accessLevel - the {@link DataSetsAccessLevel} to give to the access point.
    * @param externalRoleName - an optional role which will be given access to the files under the prefix.
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
    * @param vpcId - an optional ID of the VPC interacting with the endpoint.
    * @returns the S3 URL and the alias which can be used to access the endpoint.
+   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   public async addExternalEndpoint(
-    name: string,
-    path: string,
-    externalEndpointName: string,
-    ownerAccountId: string,
-    externalRoleName?: string,
-    kmsKeyArn?: string,
-    vpcId?: string
-  ): Promise<EndpointConnectionStrings> {
+    request: AddStorageExternalEndpointRequest
+  ): Promise<AddStorageExternalEndpointResponse> {
+    const {
+      name,
+      externalEndpointName,
+      ownerAccountId,
+      vpcId,
+      externalRoleName,
+      path,
+      accessLevel,
+      kmsKeyArn
+    } = request;
+
     const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
       name,
       externalEndpointName,
@@ -110,18 +125,22 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     await this._configureBucketPolicy(name, response.endPointArn);
 
     if (externalRoleName) {
-      await this._configureAccessPointPolicy(
-        name,
-        path,
-        externalEndpointName,
-        response.endPointArn,
-        externalRoleName
-      );
+      await this._configureAccessPointPolicy({
+        dataSetPrefix: path,
+        accessPointName: externalEndpointName,
+        accessPointArn: response.endPointArn,
+        externalRoleArn: externalRoleName,
+        accessLevel
+      });
       if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
     }
     return {
-      endPointUrl: `s3://${response.endPointArn}`,
-      endPointAlias: response.endPointAlias
+      data: {
+        connections: {
+          endPointUrl: `s3://${response.endPointArn}`,
+          endPointAlias: response.endPointAlias
+        }
+      }
     };
   }
 
@@ -135,7 +154,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   ): Promise<void> {
     // TODO: either throw error if not formatted correctly or support all S3 URL types https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
     const endPointArn: string = endPointUrl.replace('s3://', '');
-    await this._configureAccessPointPolicy(name, path, externalEndpointName, endPointArn, externalRoleName);
+    await this._configureAccessPointPolicy({
+      dataSetPrefix: path,
+      accessPointName: externalEndpointName,
+      accessPointArn: endPointArn,
+      externalRoleArn: externalRoleName
+    });
 
     if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
   }
@@ -190,13 +214,20 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     if (vpcId) {
       accessPointConfig.VpcConfiguration = { VpcId: vpcId };
     }
-    const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
-      accessPointConfig
-    );
-    return {
-      endPointArn: response.AccessPointArn!,
-      endPointAlias: response.Alias
-    };
+    try {
+      const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
+        accessPointConfig
+      );
+      return {
+        endPointArn: response.AccessPointArn!,
+        endPointAlias: response.Alias
+      };
+    } catch (error) {
+      if (error.name === 'AccessPointAlreadyOwnedByYou') {
+        throw new EndPointExistsError(error.message);
+      }
+      throw error;
+    }
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {
@@ -249,13 +280,15 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
-  private async _configureAccessPointPolicy(
-    name: string,
-    dataSetPrefix: string,
-    accessPointName: string,
-    accessPointArn: string,
-    externalRoleArn: string
-  ): Promise<void> {
+  private async _configureAccessPointPolicy(config: {
+    dataSetPrefix: string;
+    accessPointName: string;
+    accessPointArn: string;
+    externalRoleArn: string;
+    accessLevel?: DataSetsAccessLevel;
+  }): Promise<void> {
+    const { externalRoleArn, accessPointArn, dataSetPrefix, accessLevel, accessPointName } = config;
+
     const listBucketPolicyStatement = PolicyStatement.fromJson(
       JSON.parse(`
     {
@@ -281,11 +314,15 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       "Principal": {
         "AWS":"${externalRoleArn}"
       },
-      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Action": "s3:GetObject",
       "Resource": "${accessPointArn}/object/${dataSetPrefix}/*"
     }
     `)
     );
+
+    if (accessLevel !== 'read-only') {
+      getPutBucketPolicyStatement.addActions('s3:PutObject');
+    }
 
     const accountId: string = this._awsAccountIdFromArn(accessPointArn);
     const getPolicyParams: GetAccessPointPolicyCommandInput = {
@@ -404,11 +441,13 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _awsAccountIdFromArn(arn: string): string {
     const arnParts = arn.split(':');
     if (arnParts.length < 6) {
-      throw new Error("Expected an arn with at least six ':' separated values.");
+      throw new InvalidArnError("Expected an arn with at least six ':' separated values.");
     }
 
     if (!arnParts[4] || arnParts[4] === '') {
-      throw new Error('Expected an arn with an AWS AccountID however AWS AccountID field is empty.');
+      throw new InvalidArnError(
+        'Expected an arn with an AWS AccountID however AWS AccountID field is empty.'
+      );
     }
 
     return arnParts[4];

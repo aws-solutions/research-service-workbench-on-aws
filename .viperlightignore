@@ -16,11 +16,11 @@ lib
 #SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
 solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:168
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:172
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:228
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:232
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:271
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:275
 # email: 'john@doe.com' is not real email
 workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 # email: 'sample.user@amazon.com' is not real email
@@ -34,13 +34,15 @@ workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.te
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
 workbench-core/example/infrastructure/integration-tests/tests/users/getUserRoles.test.ts:29
 # Fake emails for DynamicAuthorizationService integ tests
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:90
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:122
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:147
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:199
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:241
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:91
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:123
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:148
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:200
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:242
 # Fake email for DataSetsService integration tests
-workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:29
+workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:30
+workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:29
+workbench-core/example/infrastructure/integration-tests/tests/datasets/create.test.ts:48
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
 workbench-core/example/infrastructure/scripts/setupCognito.sh:44

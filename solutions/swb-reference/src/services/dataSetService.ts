@@ -6,6 +6,7 @@
 import {
   AddRemoveAccessPermissionRequest,
   DataSet,
+  DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
@@ -17,9 +18,9 @@ import { AuditService } from '@aws/workbench-core-audit';
 import {
   CreateProvisionDatasetRequest,
   DataSetMetadataPlugin,
+  DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
-import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import { LoggingService } from '@aws/workbench-core-logging';
 
 export class DataSetService implements DataSetPlugin {
@@ -46,16 +47,11 @@ export class DataSetService implements DataSetPlugin {
 
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
-  ): Promise<Record<string, string>> {
-    return this._workbenchDataSetService.addDataSetExternalEndpoint(
-      request.dataSetId,
-      request.externalEndpointName,
-      this.storagePlugin,
-      { id: '', roles: [] },
-      request.externalRoleName,
-      request.kmsKeyArn,
-      request.vpcId
-    );
+  ): Promise<DataSetAddExternalEndpointResponse> {
+    return this._workbenchDataSetService.addDataSetExternalEndpointForGroup({
+      ...request,
+      storageProvider: this.storagePlugin
+    });
   }
 
   public getDataSet(dataSetId: string): Promise<DataSet> {
@@ -70,8 +66,17 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
   }
 
-  public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    return this._workbenchDataSetService.provisionDataSet(request);
+  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const response = await this._workbenchDataSetService.provisionDataSet(request);
+    // TODO: remove once addAccessPermissions on ProvisionDataSet is complete.
+    if (response.id && request.permissions && request.permissions.length) {
+      await this._workbenchDataSetService.addDataSetAccessPermissions({
+        authenticatedUser: request.authenticatedUser,
+        permission: request.permissions[0],
+        dataSetId: response.id
+      });
+    }
+    return response;
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {

@@ -29,7 +29,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
         owner: validatedRequest.owner,
-        type: validatedRequest.type
+        type: validatedRequest.type,
+        permissions: validatedRequest.permissions,
+        authenticatedUser: res.locals.user
       });
 
       res.status(201).send(dataSet);
@@ -49,7 +51,8 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
         owner: validatedRequest.owner,
-        type: validatedRequest.type
+        type: validatedRequest.type,
+        authenticatedUser: res.locals.user
       });
       res.status(201).send(dataSet);
     })
@@ -67,11 +70,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         CreateExternalEndpointRequestParser
       );
       await dataSetService.addDataSetExternalEndpoint({
+        ...validatedRequest,
         dataSetId: req.params.id,
-        externalEndpointName: validatedRequest.externalEndpointName,
-        externalRoleName: validatedRequest.externalRoleName,
-        kmsKeyArn: validatedRequest.kmsKeyArn,
-        vpcId: validatedRequest.vpcId
+        authenticatedUser: res.locals.user
       });
       res.status(201).send();
     })

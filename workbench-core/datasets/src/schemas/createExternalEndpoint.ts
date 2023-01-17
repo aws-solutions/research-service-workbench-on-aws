@@ -12,7 +12,8 @@ const CreateExternalEndpointSchema: Schema = {
   properties: {
     externalEndpointName: { type: 'string' },
     externalRoleName: { type: 'string' },
-    kmsKeyArn: { type: 'string' }
+    kmsKeyArn: { type: 'string' },
+    userId: { type: 'string' }
   },
   additionalProperties: false,
   required: ['externalEndpointName']

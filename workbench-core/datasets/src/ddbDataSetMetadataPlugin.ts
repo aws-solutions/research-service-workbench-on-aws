@@ -9,6 +9,8 @@ import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
+import { EndPointExistsError } from './errors/endPointExistsError';
 import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
@@ -55,7 +57,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       })
       .execute()) as GetItemCommandOutput;
 
-    if (!response || !response.Item) throw Boom.notFound(`Could not find DataSet '${id}'.`);
+    if (!response || !response.Item) throw new DataSetNotFoundError(`Could not find DataSet '${id}'.`);
     return response.Item as unknown as DataSet;
   }
 
@@ -142,12 +144,13 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
-    if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
+    if (!_.isUndefined(endPoint.id))
+      throw new EndPointExistsError("Cannot create the Endpoint. 'Id' already exists.");
     const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
     const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id!);
 
     if (_.find(endPoints, (ep) => ep.name === endPoint.name))
-      throw new Error(
+      throw new EndPointExistsError(
         `Cannot create the EndPoint. EndPoint with name '${endPoint.name}' already exists on DataSet '${targetDS.name}'.`
       );
   }

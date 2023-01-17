@@ -2,15 +2,15 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-// Schema for GetTemplate API
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const AwsAccountTemplateUrlsParser = z
+export const CreateProjectRequestParser = z
   .object({
-    externalId: z.string()
+    name: z.string(),
+    description: z.string(),
+    costCenterId: z.string()
   })
   .strict();
 
-export type AwsAccountTemplateUrls = z.infer<typeof AwsAccountTemplateUrlsParser>;
+export type CreateProjectRequest = z.infer<typeof CreateProjectRequestParser>;

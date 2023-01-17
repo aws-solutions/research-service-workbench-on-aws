@@ -39,7 +39,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<void> {
-    await this._projectService.getProject(projectId);
+    await this._projectService.getProject({ projectId });
     await this._envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     const composedId = `${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
     await this._metadataService.updateRelationship(
@@ -55,7 +55,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<void> {
-    await this._projectService.getProject(projectId);
+    await this._projectService.getProject({ projectId });
     await this._envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     const composedId = `${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
     await this._metadataService.deleteRelationships(
@@ -70,7 +70,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     request: ListProjectEnvTypeConfigsRequest
   ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }> {
     const { projectId, envTypeId, ...pagionationParams } = request;
-    await this._projectService.getProject(projectId);
+    await this._projectService.getProject({ projectId });
     await this._envTypeService.getEnvironmentType(envTypeId);
     const composedType = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}`;
     const relationshipIds = await this._metadataService.listDependentMetadata<RelationshipDDBItem>(
