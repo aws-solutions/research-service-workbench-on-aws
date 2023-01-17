@@ -431,6 +431,9 @@ export function setUpDSRoutes(
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
         }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })
@@ -448,9 +451,8 @@ export function setUpDSRoutes(
       if (req.body.accessLevel !== 'read-write' && req.body.accessLevel !== 'read-only') {
         throw Boom.badRequest("accessLevel must be 'read-only' or 'read-write'.");
       }
-      let response: PermissionsResponse;
       try {
-        response = await dataSetService.removeDataSetAccessPermissions({
+        const response: PermissionsResponse = await dataSetService.removeDataSetAccessPermissions({
           authenticatedUser: res.locals.user,
           dataSetId: req.params.datasetId,
           permission: {
@@ -463,6 +465,9 @@ export function setUpDSRoutes(
       } catch (error) {
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
+        }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }
