@@ -24,6 +24,7 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { DataSet } from './dataSet';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
+import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { ExternalEndpoint } from './externalEndpoint';
 
 describe('DdbDataSetMetadataPlugin', () => {
@@ -53,6 +54,8 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   beforeEach(() => {
     jest.resetModules();
+    expect.hasAssertions();
+
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
@@ -128,36 +131,18 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
     });
 
-    it('throws not found when an undefined DataSet item is returned.', async () => {
+    it('throws DataSetNotFoundError when an undefined DataSet item is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: undefined
       });
-      let response;
 
-      try {
-        response = await plugin.getDataSetMetadata(mockDataSetId);
-        expect.hasAssertions();
-      } catch (err) {
-        response = err;
-      }
-
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
+      await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
     });
 
-    it('throws not found when no DB response is returned.', async () => {
+    it('throws DataSetNotFoundError when no DB response is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({});
-      let response;
 
-      try {
-        response = await plugin.getDataSetMetadata(mockDataSetId);
-        expect.hasAssertions();
-      } catch (err) {
-        response = err;
-      }
-
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
+      await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
     });
   });
 

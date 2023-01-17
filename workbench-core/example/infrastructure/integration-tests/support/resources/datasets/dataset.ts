@@ -23,7 +23,6 @@ export default class Dataset extends Resource {
   private _children: Map<string, Endpoint>;
   private _permissions: Map<string, IdentityPermission>;
   private _clientSession: ClientSession;
-  public id: string;
   public storageName: string;
   public storagePath: string;
 
@@ -32,8 +31,6 @@ export default class Dataset extends Resource {
     this._awsAccountId = params.awsAccountId;
     this.storageName = params.storageName;
     this.storagePath = params.storagePath;
-    this.id = params.id;
-    this._api = `datasets/${params.id}`;
     this._clientSession = params.clientSession;
     this._children = new Map<string, Endpoint>();
     this._permissions = new Map<string, IdentityPermission>();
@@ -124,12 +121,16 @@ export default class Dataset extends Resource {
     return permissionsDeleted;
   }
 
-  public async share(requestBody: {
-    externalEndpointName?: string;
-    externalRoleName?: string;
-    kmsKeyArn?: string;
-    userId?: string;
-  }): Promise<AxiosResponse> {
+  public async share(
+    requestBody: {
+      externalEndpointName?: string;
+      externalRoleName?: string;
+      kmsKeyArn?: string;
+      vpcId?: string;
+      groupId?: string;
+      userId?: string;
+    } = {}
+  ): Promise<AxiosResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     // note: endpoint will be created as S3 access point which MUST begin with a lower case letter.
     const endPointName =
@@ -139,13 +140,15 @@ export default class Dataset extends Resource {
       externalEndpointName: endPointName,
       externalRoleName: requestBody.externalRoleName,
       kmsKeyArn: requestBody.kmsKeyArn,
+      vpcId: requestBody.vpcId,
+      groupId: requestBody.groupId,
       userId: requestBody.userId
     });
 
     const endPointParams: EndpointCreateParams = {
-      id: response.data.id,
+      id: response.data.endpointId,
       clientSession: this._clientSession,
-      parentApi: 'datasets',
+      parentApi: this._api,
       awsAccountId: this._awsAccountId,
       externalEndpointName: endPointName
     };

@@ -42,6 +42,7 @@ workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorizati
 # Fake email for DataSetsService integration tests
 workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:30
 workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:29
+workbench-core/example/infrastructure/integration-tests/tests/datasets/create.test.ts:48
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
 workbench-core/example/infrastructure/scripts/setupCognito.sh:44

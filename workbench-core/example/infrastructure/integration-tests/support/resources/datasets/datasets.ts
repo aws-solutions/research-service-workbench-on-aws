@@ -19,7 +19,7 @@ export default class Datasets extends CollectionResource {
   }
 
   public dataset(params: Omit<DataSetCreateParams, 'clientSession' | 'parentApi'>): Dataset {
-    return new Dataset({ ...params, clientSession: this._clientSession, parentApi: this._parentApi });
+    return new Dataset({ ...params, clientSession: this._clientSession, parentApi: this._api });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
