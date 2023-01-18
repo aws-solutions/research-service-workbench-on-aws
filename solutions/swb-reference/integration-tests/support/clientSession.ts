@@ -5,7 +5,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import Csrf from 'csrf';
 import _ from 'lodash';
-import * as Qs from 'qs';
+import { stringify } from 'qs';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
 import HttpError from './utils/HttpError';
@@ -48,7 +48,7 @@ export default class ClientSession {
 
     this._axiosInstance.interceptors.request.use((config) => {
       config.paramsSerializer = (params) => {
-        return Qs.stringify(params);
+        return stringify(params);
       };
 
       return config;
