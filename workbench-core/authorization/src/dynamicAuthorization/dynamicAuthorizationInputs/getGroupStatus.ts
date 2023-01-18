@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GroupStatus } from '../models/GroupMetadata';
+import { GetGroupStatus } from '../models/GetGroupMetadata';
 
 /**
  * Request object for GetGroupStatus
@@ -25,6 +25,6 @@ export interface GetGroupStatusResponse {
     /**
      * The group {@link GroupStatus}
      */
-    status: GroupStatus;
+    status: GetGroupStatus;
   };
 }
