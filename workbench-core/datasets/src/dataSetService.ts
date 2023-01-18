@@ -24,6 +24,7 @@ import {
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 import { DataSetMountObject } from './models/dataSetMountObject';
+import { DataSetPermission } from './models/dataSetPermission';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './storageLocation';
@@ -81,7 +82,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(provisioned);
-      await this._updateNewDataSetPermissions(response, request);
+      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -115,7 +116,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(imported);
-      await this._updateNewDataSetPermissions(response, request);
+      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -772,7 +773,7 @@ export class DataSetService {
   private async _updateNewDataSetPermissions(
     dataset: DataSet,
     request: CreateProvisionDatasetRequest
-  ): Promise<void> {
+  ): Promise<DataSetPermission[]> {
     if (dataset.id) {
       const permissions = _.isEmpty(request.permissions) ? [] : request.permissions!;
       if (
@@ -784,11 +785,15 @@ export class DataSetService {
           accessLevel: 'read-only'
         });
       }
-      await this._authzPlugin.addAccessPermission({
+      const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
         authenticatedUser: request.authenticatedUser,
         dataSetId: dataset.id,
         permission: permissions
       });
+
+      return response.data.permissions;
     }
+
+    return [];
   }
 }
