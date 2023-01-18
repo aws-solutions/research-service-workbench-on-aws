@@ -81,20 +81,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(provisioned);
-
-      if (response.id) {
-        if (_.isEmpty(!request.permissions)) {
-          await this._authzPlugin.addAccessPermission({
-            authenticatedUser: request.authenticatedUser,
-            dataSetId: response.id,
-            permission: {
-              identity: request.authenticatedUser.id,
-              identityType: 'USER',
-              accessLevel: 'read-only'
-            }
-          });
-        }
-      }
+      await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -128,6 +115,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(imported);
+      await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -309,15 +297,15 @@ export class DataSetService {
 
       if (
         !targetDS.externalEndpoints ||
-        !_.find(targetDS.externalEndpoints, (ep) => ep === targetEndpoint.name)
+        !_.find(targetDS.externalEndpoints, (ep) => ep === targetEndpoint.id)
       ) {
         return;
       }
 
       await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
 
-      targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
-        return endpoint === targetEndpoint.name;
+      targetDS.externalEndpoints = _.filter(targetDS.externalEndpoints, (endpoint) => {
+        return endpoint !== targetEndpoint.id;
       });
 
       await this._dbProvider.updateDataSet(targetDS);
@@ -779,5 +767,28 @@ export class DataSetService {
       endPoint.id!
     );
     return { data: { mountObject } };
+  }
+
+  private async _updateNewDataSetPermissions(
+    dataset: DataSet,
+    request: CreateProvisionDatasetRequest
+  ): Promise<void> {
+    if (dataset.id) {
+      const permissions = _.isEmpty(request.permissions) ? [] : request.permissions!;
+      if (
+        !_.some(permissions, (p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')
+      ) {
+        permissions.push({
+          identity: request.authenticatedUser.id,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        });
+      }
+      await this._authzPlugin.addAccessPermission({
+        authenticatedUser: request.authenticatedUser,
+        dataSetId: dataset.id,
+        permission: permissions
+      });
+    }
   }
 }

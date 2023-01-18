@@ -18,11 +18,11 @@ import {
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
-import * as Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndPointExistsError } from './errors/endPointExistsError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { AddDataSetExternalEndpointResponse } from './models/addDataSetExternalEndpoint';
@@ -153,7 +153,7 @@ describe('DataSetService', () => {
             externalEndpoints: [mockExistingEndpointName]
           };
         } else if (id === mockInvalidId) {
-          throw Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`);
+          throw new DataSetNotFoundError(`Could not find DataSet '${mockInvalidId}'.`);
         }
         return {
           id: mockDataSetId,
@@ -357,6 +357,136 @@ describe('DataSetService', () => {
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(s3Plugin.createStorage).toBeCalledTimes(1);
     });
+    it('can add the authenticated user as read-only if there are no other permissions requested.', async () => {
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [
+          {
+            identity: mockAuthenticatedUser.id,
+            identityType: 'USER',
+            accessLevel: 'read-only'
+          }
+        ]
+      });
+    });
+    it('does not add the authenticated user twice if included in the permissions request.', async () => {
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          permissions: [
+            {
+              identity: mockAuthenticatedUser.id,
+              identityType: 'USER',
+              accessLevel: 'read-write'
+            }
+          ]
+        })
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [
+          {
+            identity: mockAuthenticatedUser.id,
+            identityType: 'USER',
+            accessLevel: 'read-write'
+          }
+        ]
+      });
+    });
+    it('can add the authenticated user as read-only if there are other permissions requested.', async () => {
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          permissions: [
+            {
+              identity: mockGroupId,
+              identityType: 'GROUP',
+              accessLevel: 'read-write'
+            }
+          ]
+        })
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [
+          {
+            identity: mockGroupId,
+            identityType: 'GROUP',
+            accessLevel: 'read-write'
+          },
+          {
+            identity: mockAuthenticatedUser.id,
+            identityType: 'USER',
+            accessLevel: 'read-only'
+          }
+        ]
+      });
+    });
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new Error('intentional test error'));
+      expect(audit.write).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('importDataset', () => {
@@ -381,6 +511,62 @@ describe('DataSetService', () => {
       });
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(s3Plugin.importStorage).toBeCalledTimes(1);
+    });
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrowError(new Error('intentional test error'));
+      expect(audit.write).toHaveBeenCalledTimes(1);
+    });
+    it('does not add the authenticated user twice if included in the permissions request.', async () => {
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          permissions: [
+            {
+              identity: mockAuthenticatedUser.id,
+              identityType: 'USER',
+              accessLevel: 'read-write'
+            }
+          ]
+        })
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [
+          {
+            identity: mockAuthenticatedUser.id,
+            identityType: 'USER',
+            accessLevel: 'read-write'
+          }
+        ]
+      });
     });
   });
 
@@ -415,6 +601,7 @@ describe('DataSetService', () => {
           mockAuthenticatedUser
         )
       ).rejects.toThrow('Preconditions are not met');
+      expect(audit.write).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -423,6 +610,7 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getDataSetMountObject('name', 'endPointName', mockAuthenticatedUser)
       ).rejects.toThrow(new Error(`'endPointName' not found on DataSet 'name'.`));
+      expect(audit.write).toBeCalledTimes(2);
     });
 
     it('returns endpoint attributes when called with a name that exists.', async () => {
@@ -531,6 +719,16 @@ describe('DataSetService', () => {
         }
       ]);
     });
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).rejects.toThrowError(
+        new Error('intentional test error')
+      );
+      expect(audit.write).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('getDataSet', () => {
@@ -548,8 +746,9 @@ describe('DataSetService', () => {
       try {
         await dataSetService.getDataSet(mockInvalidId, mockAuthenticatedUser);
       } catch (error) {
-        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+        expect(audit.write).toHaveBeenCalledTimes(1);
       }
     });
   });
@@ -601,6 +800,7 @@ describe('DataSetService', () => {
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(EndPointExistsError);
+      expect(audit.write).toHaveBeenCalledTimes(2);
     });
 
     it('throws if the subject doesnt have permission to access the dataset', async () => {
@@ -626,7 +826,7 @@ describe('DataSetService', () => {
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions').mockResolvedValue({
         data: {
           dataSetId: mockDataSetId,
-          permissions: [{ identity: mockUserId, identityType: 'USER', accessLevel: 'read-only' }]
+          permissions: [{ identity: mockUserId, identityType: 'USER', accessLevel: 'read-write' }]
         }
       });
       await expect(
@@ -670,7 +870,7 @@ describe('DataSetService', () => {
       ).rejects.toThrow(EndPointExistsError);
     });
 
-    it('throws if the subject doesnt have permission to access the dataset', async () => {
+    it('throws if the subject does not have permission to access the dataset', async () => {
       jest
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
         .mockResolvedValue({ data: { dataSetId: mockDataSetId, permissions: [] } });
@@ -685,6 +885,7 @@ describe('DataSetService', () => {
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(NotAuthorizedError);
+      expect(audit.write).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -768,6 +969,23 @@ describe('DataSetService', () => {
           mockAuthenticatedUser
         )
       ).resolves.not.toThrow();
+      expect(metaPlugin.updateDataSet).toHaveBeenCalledTimes(1);
+    });
+
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetMetadata')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(
+        dataSetService.removeDataSetExternalEndpoint(
+          mockDataSetId,
+          mockExistingEndpointId,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
+      ).rejects.toThrowError(new Error('intentional test error'));
+      expect(audit.write).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -807,6 +1025,36 @@ describe('DataSetService', () => {
         )
       ).resolves.toBeUndefined();
     });
+
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(
+        dataSetService.addRoleToExternalEndpoint(
+          mockDataSetId,
+          mockNoRolesEndpointId,
+          mockRoleArn,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
+      ).rejects.toThrowError(new Error('intentional test error'));
+      expect(audit.write).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getExternalEndPoint', () => {
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(
+        dataSetService.getExternalEndPoint(mockDataSetId, mockNoRolesEndpointId, mockAuthenticatedUser)
+      ).rejects.toThrowError(new Error('intentional test error'));
+      expect(audit.write).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('listStorageLocations', () => {
@@ -819,6 +1067,16 @@ describe('DataSetService', () => {
           region: mockAwsBucketRegion
         }
       ]);
+    });
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
+      await expect(dataSetService.listStorageLocations(mockAuthenticatedUser)).rejects.toThrowError(
+        new Error('intentional test error')
+      );
+      expect(audit.write).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -837,6 +1095,20 @@ describe('DataSetService', () => {
         )
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
+    it('throws if the dataSet is not found.', async () => {
+      const ttlSeconds = 3600;
+      const fileName = 'test.txt';
+      await expect(
+        dataSetService.getPresignedSinglePartUploadUrl(
+          mockInvalidId,
+          fileName,
+          ttlSeconds,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
+      ).rejects.toThrowError(DataSetNotFoundError);
+      expect(audit.write).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('addDataSetAccessPermissions', () => {
@@ -853,8 +1125,9 @@ describe('DataSetService', () => {
       try {
         await dataSetService.addDataSetAccessPermissions(invalidAccessParams);
       } catch (error) {
-        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+        expect(audit.write).toHaveBeenCalledTimes(2);
       }
     });
   });
@@ -869,8 +1142,9 @@ describe('DataSetService', () => {
       try {
         await dataSetService.getAllDataSetAccessPermissions(mockInvalidId, mockAuthenticatedUser);
       } catch (error) {
-        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+        expect(audit.write).toHaveBeenCalledTimes(2);
       }
     });
   });
@@ -899,8 +1173,9 @@ describe('DataSetService', () => {
           mockAuthenticatedUser
         );
       } catch (error) {
-        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+        expect(audit.write).toHaveBeenCalledTimes(2);
       }
     });
   });
@@ -919,8 +1194,9 @@ describe('DataSetService', () => {
       try {
         await dataSetService.removeDataSetAccessPermissions(invalidAccessParams);
       } catch (error) {
-        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+        expect(audit.write).toHaveBeenCalledTimes(2);
       }
     });
   });
