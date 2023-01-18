@@ -58,16 +58,16 @@ describe('datasets create integration test', () => {
           }
         ]
       });
-      console.log(JSON.stringify(response.data));
+
       expect(response.data).toBeDefined();
       expect(response.data.id).toBeDefined();
       expect(response.data.permissions).toBeDefined();
       expect(response.data.permissions.length).toBe(2);
-      expect(response.data.permissions[0].accessLevel).toEqual('read-only');
-      expect(response.data.permissions[0].identityType).toEqual('USER');
-      expect(response.data.permissions[1].accessLevel).toEqual('read-write');
-      expect(response.data.permisisons[1].identityType).toEqual('GROUP');
-      expect(response.data.permissions[1].identity).toEqual(groupId);
+      expect(response.data.permissions[1].accessLevel).toEqual('read-only');
+      expect(response.data.permissions[1].identityType).toEqual('USER');
+      expect(response.data.permissions[0].accessLevel).toEqual('read-write');
+      expect(response.data.permissions[0].identityType).toEqual('GROUP');
+      expect(response.data.permissions[0].identity).toEqual(groupId);
     });
   });
 

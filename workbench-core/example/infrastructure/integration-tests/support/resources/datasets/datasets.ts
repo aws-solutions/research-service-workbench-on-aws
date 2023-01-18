@@ -4,7 +4,8 @@
  */
 import {
   AddDatasetPermissionsToRoleRequest,
-  CreateRegisterExternalBucketRoleRequest
+  CreateRegisterExternalBucketRoleRequest,
+  DataSetPermission
 } from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
@@ -78,7 +79,8 @@ export default class Datasets extends CollectionResource {
       path: resource.path ?? dataSetName,
       storageName: resource.storageName ?? storageName,
       awsAccountId: resource.awsAccountId ?? awsAccountId,
-      region: resource.region ?? region
+      region: resource.region ?? region,
+      permissions: resource.permissions ?? []
     };
   }
 }
@@ -89,4 +91,5 @@ interface DataSetCreateRequest {
   path: string;
   awsAccountId: string;
   region: string;
+  permissions?: DataSetPermission[];
 }
