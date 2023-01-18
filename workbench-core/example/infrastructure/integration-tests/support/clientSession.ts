@@ -2,8 +2,10 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { DecodedJWT } from '@aws/workbench-core-authentication';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import Csrf from 'csrf';
+import jwt_decode from 'jwt-decode';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
@@ -31,12 +33,15 @@ export default class ClientSession {
     } = { 'Content-Type': 'application/json' };
 
     // For anonymous sessions, access token cookie is not required
-    if (!this._isAnonymousSession) {
+    if (accessToken) {
       const csrf = new Csrf();
       const secret = csrf.secretSync();
       const token = csrf.create(secret);
       headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
       headers['csrf-token'] = token;
+
+      const decodedToken: DecodedJWT = jwt_decode(accessToken);
+      this._settings.set('userId', decodedToken.sub!);
     }
 
     this._axiosInstance = axios.create({

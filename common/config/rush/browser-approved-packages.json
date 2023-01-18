@@ -476,7 +476,7 @@
     },
     {
       "name": "jwt-decode",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "license-check-and-add",
