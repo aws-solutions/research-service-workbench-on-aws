@@ -11,6 +11,7 @@ import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { EndpointExistsError } from './errors/endpointExistsError';
+import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import {
@@ -315,11 +316,13 @@ export class DataSetService {
       externalEndpointId
     };
     try {
-      const targetDS: DataSet = await this.getDataSet(dataSetId, authenticatedUser);
+      const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
       const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId, authenticatedUser);
 
       if (!targetDS.externalEndpoints?.find((endpoint) => endpoint === targetEndpoint.name)) {
-        return;
+        throw new EndpointNotFoundError(
+          `Could not find the endpoint '${externalEndpointId}' on '${dataSetId}'.`
+        );
       }
 
       await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
