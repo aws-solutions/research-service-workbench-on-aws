@@ -322,7 +322,10 @@ export class DynamicAuthorizationService {
     try {
       const response = await this._groupManagementPlugin.deleteGroup(deleteGroupRequest);
 
-      // ToDo: Remove delete_pending status information
+      await this._groupManagementPlugin.setGroupStatus({
+        groupId,
+        status: 'deleted'
+      });
 
       metadata.statusCode = 200;
       await this._auditService.write(metadata, response);

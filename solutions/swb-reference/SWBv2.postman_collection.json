@@ -943,6 +943,37 @@
       "name": "projects",
       "item": [
         {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": null,
+                  "description": "ID of project to GET"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "List projects",
           "request": {
             "method": "GET",
@@ -961,7 +992,167 @@
             "url": {
               "raw": "{{API_URL}}/projects",
               "host": ["{{API_URL}}"],
+              "path": ["projects"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[name][begins]",
+                  "value": "Project",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value1]",
+                  "value": "date1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value2]",
+                  "value": "date2",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[dependency][eq]",
+                  "value": "cc-1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[status][lte]",
+                  "value": "AVAILABLE",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[createdAt]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[dependency]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[status]",
+                  "value": "asc",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects",
+              "host": ["{{API_URL}}"],
               "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/softDelete",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "softDelete"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": null,
+                  "description": "ID of project to SOFT DELETE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"New name\",\n    \"description\": \"New description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "proj-123"
+                }
+              ]
             }
           },
           "response": []

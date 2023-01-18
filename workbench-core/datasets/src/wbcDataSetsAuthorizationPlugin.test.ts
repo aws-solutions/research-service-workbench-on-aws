@@ -13,6 +13,7 @@ import {
   CASLAuthorizationPlugin,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse,
+  DeleteIdentityPermissionsRequest,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
   GetIdentityPermissionsBySubjectResponse,
@@ -40,6 +41,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   let plugin: WbcDataSetsAuthorizationPlugin;
   let testMethod: (i: IdentityPermission[]) => PermissionsResponse[];
   let createPermissionsSpy: jest.SpyInstance;
+  let deletePermissionsSpy: jest.SpyInstance;
   const dataSetId: string = 'fake-dataset-id';
   const anotherDataSetId: string = 'fake-another-dataset-id';
   const userId: string = 'fake-user-id';
@@ -254,6 +256,17 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       }
       return mockReadOnlyPermissionsResponse;
     });
+
+    deletePermissionsSpy = jest.spyOn(DynamicAuthorizationService.prototype, 'deleteIdentityPermissions');
+    deletePermissionsSpy.mockImplementation(async (params: DeleteIdentityPermissionsRequest) => {
+      if (params.identityPermissions[0].identityType === 'USER') {
+        return mockUserPermissionResponse;
+      } else if (params.identityPermissions.length === 2) {
+        return mockReadWritePermissionsResponse;
+      }
+      return mockReadOnlyPermissionsResponse;
+    });
+
     //@ts-ignore - get the private method under test.
     testMethod = plugin._identityPermissionsToPermissionsResponse;
   });
@@ -346,6 +359,89 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       });
       await expect(plugin.addAccessPermission(readOnlyAccessPermission)).rejects.toThrowError(
         new InvalidPermissionError('No permissions found.')
+      );
+    });
+  });
+
+  describe('removeAccessPermission tests', () => {
+    it('throws a invalidPermission exception when identityType is not USER or GROUP', async () => {
+      await expect(
+        plugin.removeAccessPermissions({
+          dataSetId: dataSetId,
+          authenticatedUser,
+          permission: {
+            identityType: fakeData,
+            identity: groupId,
+            accessLevel: 'read-only'
+          }
+        })
+      ).rejects.toThrow(new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'."));
+      expect(authzService.deleteIdentityPermissions).not.toBeCalled();
+    });
+
+    it('throws a invalidPermission exception when accessLevel is not read-only or read-write', async () => {
+      await expect(
+        plugin.removeAccessPermissions({
+          dataSetId: dataSetId,
+          authenticatedUserId: userId,
+          roles: [],
+          permission: {
+            identityType: 'GROUP',
+            identity: groupId,
+            // @ts-ignore to test poor JS usage.
+            accessLevel: fakeData
+          }
+        })
+      ).rejects.toThrow(new InvalidPermissionError("Access Level must be 'read-only' or 'read-write'."));
+      expect(authzService.deleteIdentityPermissions).not.toBeCalled();
+    });
+
+    it('removes an UPDATE permission when read-write access is requested.', async () => {
+      await expect(plugin.removeAccessPermissions(readWriteAccessPermission)).resolves.toStrictEqual({
+        data: {
+          dataSetId: dataSetId,
+          permissions: [
+            {
+              identityType: 'GROUP',
+              identity: groupId,
+              accessLevel: 'read-write'
+            }
+          ]
+        }
+      });
+      expect(authzService.deleteIdentityPermissions).toBeCalledTimes(1);
+    });
+
+    it('removes a USER permission when identityType is USER', async () => {
+      await expect(plugin.removeAccessPermissions(readOnlyAccessPermission)).resolves.toStrictEqual({
+        data: {
+          dataSetId: dataSetId,
+          permissions: [
+            {
+              identityType: 'USER',
+              identity: userId,
+              accessLevel: 'read-only'
+            }
+          ]
+        }
+      });
+      expect(authzService.deleteIdentityPermissions).toBeCalledTimes(1);
+    });
+
+    it('throws if result contains more than one PermissionsResponse object', async () => {
+      deletePermissionsSpy.mockImplementationOnce(async () => mockMultiDatasetPermissionsResponse);
+
+      // arguement should be irrelevant due to mockImplementationOnce above.
+      await expect(plugin.removeAccessPermissions(readOnlyAccessPermission)).rejects.toThrowError(
+        new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
+      );
+    });
+  });
+
+  describe('removeAllAccessPermissions tests', () => {
+    it('throws a notimplemented exception', async () => {
+      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
+        new Error('Method not implemented.')
       );
     });
   });
@@ -580,14 +676,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
           permissions: []
         }
       });
-    });
-  });
-
-  describe('removeAccessPermission tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAccessPermissions(readOnlyAccessPermission)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
     });
   });
 
