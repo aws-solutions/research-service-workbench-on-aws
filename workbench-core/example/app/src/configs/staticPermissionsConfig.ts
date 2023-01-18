@@ -73,6 +73,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetMountObject'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Role'
   },

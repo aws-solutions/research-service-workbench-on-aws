@@ -123,6 +123,15 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}}/share/${endPointPrefix.toLowerCase()}-${uuidRegExpAsString}/mount-object`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'DatasetMountObject'
+        }
+      ]
+    },
   '/datasets/storage': {
     GET: [
       {

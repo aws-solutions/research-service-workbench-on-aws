@@ -19,7 +19,9 @@ import {
   DataSetsStoragePlugin,
   isDataSetHasEndpointError,
   isDataSetNotFoundError,
+  isEndpointNotFoundError,
   isInvalidArnError,
+  isInvalidEndpointError,
   isInvalidIamRoleError,
   isNotAuthorizedError,
   isEndpointExistsError,
@@ -164,6 +166,37 @@ export function setUpDSRoutes(
         res.locals.user
       );
       res.status(204).send();
+    })
+  );
+
+  // get dataset endpoint mount object
+  router.get(
+    '/datasets/:datasetId/share/:endpointId/mount-object',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const authenticatedUser = validateAndParse<AuthenticatedUser>(
+          AuthenticatedUserParser,
+          res.locals.user
+        );
+
+        const { data } = await dataSetService.getDataSetMountObject({
+          dataSetId: req.params.datasetId,
+          endpointId: req.params.endpointId,
+          authenticatedUser
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isDataSetNotFoundError(error) || isEndpointNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isInvalidEndpointError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        if (isNotAuthorizedError(error)) {
+          throw Boom.forbidden(error.message);
+        }
+        throw error;
+      }
     })
   );
 
@@ -317,6 +350,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get all dataset access permissions
   router.get(
     '/datasets/:datasetId/permissions',
     wrapAsync(async (req: Request, res: Response) => {
@@ -341,6 +375,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get specific dataset access permissions for a group
   router.get(
     '/datasets/:datasetId/permissions/roles/:roleId',
     wrapAsync(async (req: Request, res: Response) => {
@@ -372,6 +407,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get specific dataset access permissions for a user
   router.get(
     '/datasets/:datasetId/permissions/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
