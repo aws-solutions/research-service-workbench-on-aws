@@ -645,6 +645,37 @@ export class DataSetService {
     }
   }
 
+  /**
+   * Remove AccessPermissions from a DataSet.
+   *
+   * @param params - a {@link AddRemoveAccessPermissionRequest} object indicating the datasetId and the
+   *                 requested permissions.
+   * @returns a {@link PermissionsResponse} object containing the permissions removed.
+   */
+  public async removeDataSetAccessPermissions(
+    params: AddRemoveAccessPermissionRequest
+  ): Promise<PermissionsResponse> {
+    const metadata: Metadata = {
+      actor: params.authenticatedUser,
+      action: this.removeDataSetAccessPermissions.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      requestBody: params
+    };
+
+    try {
+      // this will throw if the dataset is not found.
+      await this.getDataSet(params.dataSetId, params.authenticatedUser);
+      const response: PermissionsResponse = await this._authzPlugin.removeAccessPermissions(params);
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      await this._audit.write(metadata, error);
+      throw error;
+    }
+  }
+
   private _generateMountObject(
     dataSetName: string,
     endPointURL: string,
