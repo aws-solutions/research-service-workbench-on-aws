@@ -47,7 +47,7 @@ export default class Dataset extends Resource {
     return new Endpoint({
       ...params,
       clientSession: this._clientSession,
-      parentApi: this._api,
+      parentApi: `${this._api}/share`,
       awsAccountId: this._awsAccountId
     });
   }
@@ -149,7 +149,7 @@ export default class Dataset extends Resource {
     });
 
     const endPointParams: EndpointCreateRequest = {
-      id: response.data.endpointId,
+      id: response.data.mountObject.endpointId,
       externalEndpointName: endPointName
     };
 

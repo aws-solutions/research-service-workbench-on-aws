@@ -31,7 +31,7 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { dataSetPrefix, endPointPrefix, groupIdRegExAsString } from '../configs/constants';
+import { dataSetPrefix, endpointPrefix, groupIdRegExAsString } from '../configs/constants';
 import {
   AddRemoveAccessPermissionRequest,
   AddRemoveAccessPermissionParser
@@ -154,7 +154,7 @@ export function setUpDSRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       if (
         req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null ||
-        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endPointPrefix)) === null
+        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endpointPrefix)) === null
       ) {
         throw Boom.badRequest('datasetId and endpointId parameters must be valid');
       }
@@ -439,7 +439,7 @@ export function setUpDSRoutes(
     })
   );
 
-  // remove dataset access permission
+  // remove dataset access permission for user
   router.delete(
     '/datasets/:datasetId/permissions/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
@@ -475,6 +475,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // remove dataset access permission for group
   router.delete(
     '/datasets/:datasetId/permissions/roles/:roleId',
     wrapAsync(async (req: Request, res: Response) => {
