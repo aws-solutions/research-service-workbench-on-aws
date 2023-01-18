@@ -20,7 +20,7 @@ export {
 } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
-export { AuthenticatedUser } from './authenticatedUser';
+export { AuthenticatedUser, AuthenticatedUserParser } from './authenticatedUser';
 export { ForbiddenError, isForbiddenError } from './errors/forbiddenError';
 export {
   AuthenticatedUserNotFoundError,
@@ -128,7 +128,16 @@ export {
   SetGroupStatusRequest,
   SetGroupStatusResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/setGroupStatus';
-export { GroupMetadata, GroupMetadataParser, GroupStatus } from './dynamicAuthorization/models/GroupMetadata';
+export {
+  GetGroupMetadata,
+  GetGroupMetadataParser,
+  GetGroupStatus
+} from './dynamicAuthorization/models/GetGroupMetadata';
+export {
+  SetGroupMetadata,
+  SetGroupMetadataParser,
+  SetGroupStatus
+} from './dynamicAuthorization/models/SetGroupMetadata';
 
 // re-export userManagement package errors that are thrown
 export {

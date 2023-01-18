@@ -25,6 +25,11 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
+import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
+import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
+import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
+import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
@@ -39,6 +44,16 @@ export {
   CostCenterService,
   ProjectService,
   CreateCostCenterRequest,
+  CreateProjectRequest,
+  CreateProjectRequestParser,
+  ListProjectsRequest,
+  ListProjectsRequestParser,
+  UpdateProjectRequest,
+  UpdateProjectRequestParser,
+  GetProjectRequest,
+  GetProjectRequestParser,
+  DeleteProjectRequest,
+  DeleteProjectRequestParser,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,

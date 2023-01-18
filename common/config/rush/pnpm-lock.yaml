@@ -1393,7 +1393,6 @@ importers:
       '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-environments': workspace:*
       '@aws/workbench-core-example-app': workspace:*
       '@aws/workbench-core-infrastructure': workspace:*
       '@aws/workbench-core-user-management': workspace:*
@@ -1448,7 +1447,6 @@ importers:
       '@aws/workbench-core-authorization': link:../../authorization
       '@aws/workbench-core-base': link:../../base
       '@aws/workbench-core-datasets': link:../../datasets
-      '@aws/workbench-core-environments': link:../../environments
       '@aws/workbench-core-example-app': link:../app
       '@aws/workbench-core-infrastructure': link:../../infrastructure
       '@aws/workbench-core-user-management': link:../../user-management

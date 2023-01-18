@@ -25,6 +25,7 @@ import {
 import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
+import { EndPointExistsError } from './errors/endPointExistsError';
 import { AddStorageExternalEndpointResponse } from './models/addStorageExternalEndpoint';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
@@ -1042,6 +1043,40 @@ describe('S3DataSetStoragePlugin', () => {
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)[0].firstArg.input.Policy).toEqual(
         '{"Statement":[{"Action":["kms:Encrypt","kms:Decrypt","kms:ReEncrypt*","kms:GenerateDataKey*","kms:DescribeKey"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"},{"Action":["kms:CreateGrant","kms:ListGrant","kms:RevokeGrant"],"Condition":{"Bool":{"kms:GrantIsForAWSResource":"true"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"}],"Version":"2012-10-17"}'
       );
+    });
+
+    it('throws EndpointAlreadyExistsError when trying to create an access point you already own', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).rejects({ name: 'AccessPointAlreadyOwnedByYou' });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(EndPointExistsError);
+    });
+
+    it('rethrows an unexpected error', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).rejects(new Error());
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(Error);
     });
   });
 

@@ -94,7 +94,6 @@ describe('DataSets access permissions integration tests', () => {
     it('adds access permissions for a user.', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
-
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
           permission: {
@@ -313,6 +312,151 @@ describe('DataSets access permissions integration tests', () => {
           ]
         }
       });
+    });
+  });
+
+  describe('removeDataSetAccessPermissions', () => {
+    it('removes a read-only access permission.', async () => {
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+      await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
+        permission: {
+          identityType: 'GROUP',
+          identity: groupId,
+          accessLevel: 'read-only'
+        }
+      });
+      await expect(
+        (adminSession.resources.datasets.children.get(dataSetId) as Dataset).removeAccess({
+          permission: {
+            identityType: 'GROUP',
+            identity: groupId,
+            accessLevel: 'read-only'
+          }
+        })
+      ).resolves.toMatchObject({
+        data: {
+          dataSetId: dataSetId,
+          permissions: [
+            {
+              identityType: 'GROUP',
+              identity: groupId,
+              accessLevel: 'read-only'
+            }
+          ]
+        }
+      });
+    });
+    it('removes a read-write access permission when read-write is requested.', async () => {
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+      await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
+        permission: {
+          identityType: 'GROUP',
+          identity: groupId,
+          accessLevel: 'read-write'
+        }
+      });
+      await expect(
+        (adminSession.resources.datasets.children.get(dataSetId) as Dataset).removeAccess({
+          permission: {
+            identityType: 'GROUP',
+            identity: groupId,
+            accessLevel: 'read-write'
+          }
+        })
+      ).resolves.toMatchObject({
+        data: {
+          dataSetId: dataSetId,
+          permissions: [
+            {
+              identityType: 'GROUP',
+              identity: groupId,
+              accessLevel: 'read-write'
+            }
+          ]
+        }
+      });
+    });
+    it('removes access permissions for a user.', async () => {
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
+        permission: {
+          identityType: 'USER',
+          identity: userId,
+          accessLevel: 'read-only'
+        }
+      });
+      await expect(
+        (adminSession.resources.datasets.children.get(dataSetId) as Dataset).removeAccess({
+          permission: {
+            identityType: 'USER',
+            identity: userId,
+            accessLevel: 'read-only'
+          }
+        })
+      ).resolves.toMatchObject({
+        data: {
+          dataSetId: dataSetId,
+          permissions: [
+            {
+              identityType: 'USER',
+              identity: userId,
+              accessLevel: 'read-only'
+            }
+          ]
+        }
+      });
+    });
+    it('throws if "accessLevel" is not "read-only" or "read-write"', async () => {
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+      await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
+        permission: {
+          identityType: 'GROUP',
+          identity: groupId,
+          //@ts-ignore
+          accessLevel: 'read-only'
+        }
+      });
+      await expect(
+        (adminSession.resources.datasets.children.get(dataSetId) as Dataset).removeAccess({
+          permission: {
+            identityType: 'GROUP',
+            identity: groupId,
+            //@ts-ignore
+            accessLevel: mockBadValue
+          }
+        })
+      ).rejects.toThrow(new HttpError(400, {}));
+    });
+    it('throws if the DataSet does not exist.', async () => {
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+
+      const fakeDataSet: Dataset = adminSession.resources.datasets.dataset({
+        id: `${dataSetPrefix.toLowerCase()}-${uuidv4()}`,
+        awsAccountId: mockBadValue,
+        storageName: mockBadValue,
+        storagePath: mockBadValue
+      });
+
+      await expect(
+        fakeDataSet.removeAccess({
+          permission: {
+            identityType: 'GROUP',
+            identity: groupId,
+            accessLevel: 'read-only'
+          }
+        })
+      ).rejects.toThrow(new HttpError(404, {}));
     });
   });
 });
