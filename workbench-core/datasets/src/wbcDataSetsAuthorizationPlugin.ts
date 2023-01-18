@@ -186,7 +186,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
         identityId: p.identity,
         action: 'READ',
         effect: permissionsEffect,
-        subjectType: 'DataSet',
+        subjectType: dataSetSubjectType,
         subjectId: dataSetPermissions.dataSetId,
         description: `'${p.accessLevel}' access on DataSet '${dataSetPermissions.dataSetId}'`
       });
@@ -196,7 +196,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
           identityId: p.identity,
           action: 'UPDATE',
           effect: permissionsEffect,
-          subjectType: 'DataSet',
+          subjectType: dataSetSubjectType,
           subjectId: dataSetPermissions.dataSetId,
           description: `'read-write' access on DataSet '${dataSetPermissions.dataSetId}'`
         });
@@ -207,35 +207,32 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
   }
 
   private _identityPermissionsToPermissionsResponse(
-    dataSetIdentityPermissions: IdentityPermission[]
+    authzPermissions: IdentityPermission[]
   ): PermissionsResponse[] {
-    const permissions: PermissionsResponse[] = [];
+    const response: PermissionsResponse[] = [];
 
     // validate
-    if (_.isEmpty(dataSetIdentityPermissions)) {
+    if (_.isEmpty(authzPermissions)) {
       // return the empty array if there is nothing to do.
-      return permissions;
+      return response;
     } else if (
-      _.some(
-        dataSetIdentityPermissions,
-        (i: IdentityPermission) => i.action !== 'READ' && i.action !== 'UPDATE'
-      )
+      _.some(authzPermissions, (i: IdentityPermission) => i.action !== 'READ' && i.action !== 'UPDATE')
     ) {
       throw new InvalidPermissionError(
         "Unsupported actions found in permissions. Only 'READ' and 'UPDATE' are currently supported."
       );
-    } else if (_.some(dataSetIdentityPermissions, (i: IdentityPermission) => i.effect !== 'ALLOW')) {
+    } else if (_.some(authzPermissions, (i: IdentityPermission) => i.effect !== 'ALLOW')) {
       throw new InvalidPermissionError("Only 'ALLOW' effect is supported.");
     }
 
-    dataSetIdentityPermissions.map((i: IdentityPermission) => {
+    authzPermissions.map((i: IdentityPermission) => {
       const dataSetPermissions: PermissionsResponse | undefined = _.find(
-        permissions,
+        response,
         (p: PermissionsResponse) => p.data.dataSetId === i.subjectId
       );
       if (!dataSetPermissions) {
         // dataset has not yet been encountered. Add it.
-        permissions.push({
+        response.push({
           data: {
             dataSetId: i.subjectId,
             permissions: [
@@ -268,6 +265,6 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
       }
     });
 
-    return permissions;
+    return response;
   }
 }

@@ -35,6 +35,42 @@ describe('datasets create integration test', () => {
     await setup.cleanup();
   });
 
+  describe('ProvisionDataSet', () => {
+    it('assigns default permissions when a dataSet is created.', async () => {
+      const response = await adminSession.resources.datasets.create({}, true);
+      expect(response.data).toBeDefined();
+      expect(response.data.id).toBeDefined();
+      expect(response.data.permissions).toBeDefined();
+      expect(response.data.permissions.length).toBe(1);
+      expect(response.data.permissions[0].accessLevel).toEqual('read-only');
+      expect(response.data.permissions[0].identityType).toEqual('USER');
+    });
+
+    it('assigns permissions to a group given at creation time.', async () => {
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+      const response = await adminSession.resources.datasets.create({
+        permissions: [
+          {
+            identity: groupId,
+            identityType: 'GROUP',
+            accessLevel: 'read-write'
+          }
+        ]
+      });
+      console.log(JSON.stringify(response.data));
+      expect(response.data).toBeDefined();
+      expect(response.data.id).toBeDefined();
+      expect(response.data.permissions).toBeDefined();
+      expect(response.data.permissions.length).toBe(2);
+      expect(response.data.permissions[0].accessLevel).toEqual('read-only');
+      expect(response.data.permissions[0].identityType).toEqual('USER');
+      expect(response.data.permissions[1].accessLevel).toEqual('read-write');
+      expect(response.data.permisisons[1].identityType).toEqual('GROUP');
+      expect(response.data.permissions[1].identity).toEqual(groupId);
+    });
+  });
+
   describe('AddExternalEndpointForUser', () => {
     let dataset: Dataset;
     let userId: string;

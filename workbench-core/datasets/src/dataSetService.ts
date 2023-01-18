@@ -614,7 +614,7 @@ export class DataSetService {
   ): Promise<PermissionsResponse> {
     const metadata: Metadata = {
       actor: authenticatedUser,
-      action: this.getAllDataSetAccessPermissions.name,
+      action: this.getDataSetAccessPermissions.name,
       source: {
         serviceName: DataSetService.name
       },
@@ -653,8 +653,13 @@ export class DataSetService {
       dataSetId
     };
     try {
-      await this.getDataSet(dataSetId, authenticatedUser);
-      const response = await this._authzPlugin.getAllDataSetAccessPermissions(dataSetId, pageToken);
+      const dataSetResponse = await this.getDataSet(dataSetId, authenticatedUser);
+      const response = {
+        data: {
+          dataSetId: dataSetResponse.id!,
+          permissions: dataSetResponse.permissions!
+        }
+      };
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {

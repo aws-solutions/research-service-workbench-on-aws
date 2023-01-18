@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DataSetPermission } from '@aws/workbench-core-datasets';
 import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
@@ -178,11 +179,12 @@ describe('DataSets access permissions integration tests', () => {
         storagePath: mockBadValue
       });
 
-      await expect(fakeDataSet.getAllAccess()).rejects.toThrow(new HttpError(404, {}));
+      await expect(fakeDataSet.getAllAccess()).rejects.toThrowError(new HttpError(404, {}));
     });
     it('gets a read-write permission for a group', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
+      const permissions: DataSetPermission[] = createDataSetResponse.data.permissions;
       const createGroupResponse = await adminSession.resources.groups.create({}, true);
       const { groupId } = createGroupResponse.data;
 
@@ -202,13 +204,15 @@ describe('DataSets access permissions integration tests', () => {
               identityType: 'GROUP',
               identity: groupId,
               accessLevel: 'read-write'
-            }
+            },
+            ...permissions
           ]
         }
       });
     });
     it('gets multiple permissions on a dataset.', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const permissions: DataSetPermission[] = createDataSetResponse.data.permissions;
       const dataSetId: string = createDataSetResponse.data.id;
       const createGroupResponse = await adminSession.resources.groups.create({}, true);
       const { groupId } = createGroupResponse.data;
@@ -237,6 +241,7 @@ describe('DataSets access permissions integration tests', () => {
               identity: groupId,
               accessLevel: 'read-write'
             },
+            ...permissions,
             {
               identityType: 'USER',
               identity: userId,
@@ -291,7 +296,6 @@ describe('DataSets access permissions integration tests', () => {
     it('Gets read-only access for a user.', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
-
       const dataSet = adminSession.resources.datasets.children.get(dataSetId) as Dataset;
       await dataSet.addAccess({
         permission: {
