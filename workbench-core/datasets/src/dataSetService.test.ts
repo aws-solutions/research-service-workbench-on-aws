@@ -755,7 +755,8 @@ describe('DataSetService', () => {
         path: mockDataSetPath,
         awsAccountId: mockAwsAccountId,
         storageType: mockDataSetStorageType,
-        storageName: mockDataSetStorageName
+        storageName: mockDataSetStorageName,
+        permissions: [mockReadOnlyUserPermission]
       });
     });
     it('throws when an invalid dataset Id is given.', async () => {
@@ -766,6 +767,33 @@ describe('DataSetService', () => {
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
         expect(audit.write).toHaveBeenCalledTimes(1);
       }
+    });
+    it('returns permissions from two pages of permissions', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAllDataSetAccessPermissions')
+        .mockResolvedValueOnce({
+          data: {
+            dataSetId: mockDataSetId,
+            permissions: [mockReadOnlyUserPermission]
+          },
+          pageToken: 'pageToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            dataSetId: mockDataSetId,
+            permissions: [mockReadWriteGroupPermission]
+          }
+        });
+      await expect(dataSetService.getDataSet(mockDataSetName, mockAuthenticatedUser)).resolves.toMatchObject({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName,
+        permissions: [mockReadOnlyUserPermission, mockReadWriteGroupPermission]
+      });
+      expect(authzPlugin.getAllDataSetAccessPermissions).toHaveBeenCalledTimes(2);
     });
   });
 

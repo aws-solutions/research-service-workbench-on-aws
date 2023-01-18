@@ -257,7 +257,22 @@ export class DataSetService {
       dataSetId: dataSetId
     };
     try {
-      const response = await this._dbProvider.getDataSetMetadata(dataSetId);
+      const [dataSetResponse, permissionsResponse] = await Promise.all([
+        this._dbProvider.getDataSetMetadata(dataSetId),
+        this._authzPlugin.getAllDataSetAccessPermissions(dataSetId)
+      ]);
+      const response = {
+        ...dataSetResponse,
+        permissions: permissionsResponse.data.permissions
+      };
+      let nextPermissions = permissionsResponse;
+      while (nextPermissions.pageToken) {
+        nextPermissions = await this._authzPlugin.getAllDataSetAccessPermissions(
+          dataSetId,
+          permissionsResponse.pageToken
+        );
+        response.permissions.push(...nextPermissions.data.permissions);
+      }
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
