@@ -3,18 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser, IdentityType } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { DataSetMountObject } from './dataSetMountObject';
 
 export interface GetDataSetMountPointRequest {
   /** the ID of the dataset */
   dataSetId: string;
   /** the ID of the endpoint */
-  endPointId: string;
-  /** the identity (userId or groupId) to request the mount object for */
-  identity: string;
-  /** the {@link IdentityType} of the identity */
-  identityType: IdentityType;
+  endpointId: string;
   /** the {@link AuthenticatedUser} making the request */
   authenticatedUser: AuthenticatedUser;
 }

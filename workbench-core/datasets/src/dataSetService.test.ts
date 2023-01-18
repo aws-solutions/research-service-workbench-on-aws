@@ -13,7 +13,6 @@ import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit
 import {
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
-  IdentityType,
   WBCGroupManagementPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
@@ -77,8 +76,6 @@ describe('DataSetService', () => {
   };
   const mockCreatedAt = new Date().toISOString();
   const mockAccessLevel: DataSetsAccessLevel = 'read-only';
-  const mockIdentity = mockUserId;
-  const mockIdentityType: IdentityType = 'USER';
 
   const mockDataSetAddAccessParams: AddRemoveAccessPermissionRequest = {
     authenticatedUser: mockAuthenticatedUser,
@@ -217,8 +214,8 @@ describe('DataSetService', () => {
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'removeDataSet').mockImplementation(async () => {});
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
-      .mockImplementation(async (dataSetId: string, endPointId: string) => {
-        if (endPointId === mockNoRolesEndpointId) {
+      .mockImplementation(async (dataSetId: string, endpointId: string) => {
+        if (endpointId === mockNoRolesEndpointId) {
           return {
             id: mockExistingEndpointId,
             name: mockExistingEndpointName,
@@ -472,9 +469,7 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getDataSetMountObject({
           dataSetId: mockDataSetId,
-          endPointId: mockExistingEndpointId,
-          identity: mockIdentity,
-          identityType: mockIdentityType,
+          endpointId: mockExistingEndpointId,
           authenticatedUser: mockAuthenticatedUser
         })
       ).resolves.toMatchObject<GetDataSetMountPointResponse>({
@@ -519,9 +514,7 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getDataSetMountObject({
           dataSetId: mockDataSetId,
-          endPointId: mockExistingEndpointId,
-          identity: mockIdentity,
-          identityType: mockIdentityType,
+          endpointId: mockExistingEndpointId,
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(InvalidEndpointError);
@@ -564,9 +557,7 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getDataSetMountObject({
           dataSetId: mockDataSetId,
-          endPointId: mockExistingEndpointId,
-          identity: mockIdentity,
-          identityType: mockIdentityType,
+          endpointId: mockExistingEndpointId,
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(NotAuthorizedError);
@@ -609,9 +600,7 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getDataSetMountObject({
           dataSetId: mockDataSetId,
-          endPointId: mockExistingEndpointId,
-          identity: mockIdentity,
-          identityType: mockIdentityType,
+          endpointId: mockExistingEndpointId,
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(NotAuthorizedError);
