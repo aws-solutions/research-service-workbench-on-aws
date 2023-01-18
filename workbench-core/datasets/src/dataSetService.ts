@@ -154,7 +154,10 @@ export class DataSetService {
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         );
       }
-      await this._dbProvider.removeDataSet(dataSetId);
+      await Promise.all([
+        this._authzPlugin.removeAllAccessPermissions(dataSetId, authenticatedUser),
+        this._dbProvider.removeDataSet(dataSetId)
+      ]);
       await this._audit.write(metadata);
     } catch (error) {
       await this._audit.write(metadata, error);
