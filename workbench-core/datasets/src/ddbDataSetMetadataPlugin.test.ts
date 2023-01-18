@@ -19,7 +19,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { AwsService } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { DataSet } from './dataSet';
@@ -286,15 +286,6 @@ describe('DdbDataSetMetadataPlugin', () => {
       };
 
       await expect(plugin.updateDataSet(withEndpointDS)).resolves.toEqual(withEndpointDS);
-    });
-  });
-
-  describe('removeDataSet', () => {
-    it('returns nothing when the dataset is removed.', async () => {
-      mockDdb.on(DeleteItemCommand).resolves({});
-
-      await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
-      expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(1);
     });
   });
 

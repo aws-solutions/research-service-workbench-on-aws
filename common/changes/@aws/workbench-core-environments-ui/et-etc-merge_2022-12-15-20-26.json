@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "change estimatedCost to string from number",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

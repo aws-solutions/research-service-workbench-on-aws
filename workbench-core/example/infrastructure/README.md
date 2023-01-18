@@ -11,6 +11,8 @@
  2. `rush cinstall`
  3. `rush build:test -t @aws/workbench-core-example-infrastructure`
  4. Configure AWS Credentials locally for your AWS Account: either `export the credentials` or on the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `account` as the `default` profile
+ 5. Install [jq](https://stedolan.github.io/jq/) command line tool (required for `./scripts/getResources.sh` script) by running e.g. `brew install jq`
+ 6. Install [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
  ## Setup your environment for Integration Test
  Navigate to `workbench-core/example/infrastructure`
@@ -36,7 +38,7 @@ rushx cdk:deploy
 ```
 
 #### OR
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L17)
 
 ### Run Integration Test
 ```bash
@@ -47,6 +49,8 @@ rushx integration-tests
 Navigate to `workbench-core/example/infrastructure`
 
 ### Destroy the ExampleStack
+**This will destroy the DynamoDB Table, Cognito UserPool, S3Buckets and the encryption keys created by the stack.**
+**RemovalPolicy has been set to DESTROY for the mentioned resources**
 #### Require Approval
 ```bash
 rushx cdk:destroy
@@ -58,19 +62,7 @@ rushx cdk:destroy
 rushx cdk:destroy -f
 ```
 
-### Delete Cognito UserPool, DynamoDB Table and SSM Parameters
+### Delete Cognito SSM Parameters
 ```bash
-./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
+./scripts/cleanup.sh -r <REGION> -p -c
 ```
-
-#### Get UserPool Id and DynamoDB Table
-```bash
-./scripts/getResources.sh -r <REGION> -i -t -g
-```
-
-#### OR
-After `rushx cdk:deploy` you can find:
-
-1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
-
-2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.json#L12)

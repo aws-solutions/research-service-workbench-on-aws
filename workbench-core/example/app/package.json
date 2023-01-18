@@ -36,13 +36,15 @@
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express-rate-limit": "^6.6.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -59,7 +61,6 @@
     "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-security": "^1.4.0",
     "express": "^4.17.3",
     "license-check-and-add": "^4.0.5",

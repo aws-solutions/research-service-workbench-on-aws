@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Duration, SecretValue, Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -78,6 +78,7 @@ export interface WorkbenchCognitoProps {
   idTokenValidity?: Duration;
   refreshTokenValidity?: Duration;
   mfa?: Mfa;
+  removalPolicy?: RemovalPolicy;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -104,7 +105,8 @@ export class WorkbenchCognito extends Construct {
 
     const tempUserPoolProps: UserPoolProps = {
       mfa: props.mfa,
-      userPoolName: props.userPoolName
+      userPoolName: props.userPoolName,
+      removalPolicy: props.removalPolicy
     };
 
     const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);

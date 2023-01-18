@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "Added `TooManyRequestError`s to all Cognito functions",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}
