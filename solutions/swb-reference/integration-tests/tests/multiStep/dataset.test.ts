@@ -12,16 +12,20 @@ describe('multiStep dataset integration test', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
+  let dataSetName: string;
 
   beforeAll(async () => {
-    // adminSession = await setup.getDefaultAdminSession();
+    adminSession = await setup.getDefaultAdminSession();
+
+    const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
+    dataSetName = randomTextGenerator.getFakeText('env-DS-test');
   });
 
   afterAll(async () => {
     await setup.cleanup();
   });
 
-  test.skip('Environment provisioning with dataset', async () => {
+  test('Environment provisioning with DataSet', async () => {
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const datasetName = randomTextGenerator.getFakeText('env-DS-test');
 
