@@ -794,26 +794,25 @@ export class DataSetService {
     dataset: DataSet,
     request: CreateProvisionDatasetRequest
   ): Promise<DataSetPermission[]> {
-    if (dataset.id) {
-      const permissions = request.permissions ?? [];
-      if (
-        !_.some(permissions, (p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')
-      ) {
-        permissions.push({
-          identity: request.authenticatedUser.id,
-          identityType: 'USER',
-          accessLevel: 'read-only'
-        });
-      }
-      const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
-        authenticatedUser: request.authenticatedUser,
-        dataSetId: dataset.id,
-        permission: permissions
-      });
-
-      return response.data.permissions;
+    if (!dataset.id) {
+      return [];
     }
+    const permissions = request.permissions ?? [];
+    if (
+      !_.some(permissions, (p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')
+    ) {
+      permissions.push({
+        identity: request.authenticatedUser.id,
+        identityType: 'USER',
+        accessLevel: 'read-only'
+      });
+    }
+    const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
+      authenticatedUser: request.authenticatedUser,
+      dataSetId: dataset.id,
+      permission: permissions
+    });
 
-    return [];
+    return response.data.permissions;
   }
 }
