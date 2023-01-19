@@ -795,7 +795,7 @@ export class DataSetService {
     request: CreateProvisionDatasetRequest
   ): Promise<DataSetPermission[]> {
     if (dataset.id) {
-      const permissions = _.isEmpty(request.permissions) ? [] : request.permissions!;
+      const permissions = request.permissions ?? [];
       if (
         !_.some(permissions, (p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')
       ) {
