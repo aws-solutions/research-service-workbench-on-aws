@@ -98,6 +98,29 @@ export default class Dataset extends Resource {
     return permissionsCreated;
   }
 
+  public async removeAccess(requestBody: { permission: DataSetPermission }): Promise<PermissionsResponse> {
+    let routeId: string;
+    if (requestBody.permission.identityType === 'GROUP') {
+      routeId = 'roles';
+    } else if (requestBody.permission.identityType === 'USER') {
+      routeId = 'users';
+    } else {
+      throw new Error('identity type must be "USER" or "GROUP"');
+    }
+    const response: AxiosResponse = await this._axiosInstance.delete(
+      `${this._api}/permissions/${routeId}/${requestBody.permission.identity}`,
+      {
+        data: { accessLevel: requestBody.permission.accessLevel }
+      }
+    );
+    const permissionsDeleted: PermissionsResponse = validateAndParse(
+      PermissionsResponseParser,
+      response.data
+    );
+
+    return permissionsDeleted;
+  }
+
   public async share(
     requestBody: {
       externalEndpointName?: string;

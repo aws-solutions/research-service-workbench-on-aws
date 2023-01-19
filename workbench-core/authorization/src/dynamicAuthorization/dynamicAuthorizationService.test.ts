@@ -74,7 +74,8 @@ describe('DynamicAuthorizationService', () => {
       createIdentityPermissions: jest.fn(),
       deleteIdentityPermissions: jest.fn(),
       getIdentityPermissionsByIdentity: jest.fn(),
-      getIdentityPermissionsBySubject: jest.fn()
+      getIdentityPermissionsBySubject: jest.fn(),
+      deleteSubjectIdentityPermissions: jest.fn()
     };
 
     auditService = new AuditService(
@@ -730,6 +731,61 @@ describe('DynamicAuthorizationService', () => {
       await expect(
         dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('deleteSubjectIdentityPermissions', () => {
+    beforeEach(() => {
+      auditAction = 'deleteSubjectIdentityPermissions';
+    });
+
+    test('delete subject identity permissions', async () => {
+      const mockReturnValue = {
+        data: {
+          identityPermissions: mockIdentityPermissions
+        }
+      };
+      mockDynamicAuthorizationPermissionsPlugin.deleteSubjectIdentityPermissions = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const params = {
+        authenticatedUser: mockUser,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId
+      };
+      const response = await dynamicAuthzService.deleteSubjectIdentityPermissions(params);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        response
+      );
+    });
+
+    test('delete subject identity permissions, throws RetryError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.deleteSubjectIdentityPermissions = jest
+        .fn()
+        .mockRejectedValueOnce(new RetryError());
+      const params = {
+        authenticatedUser: mockUser,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId
+      };
+      await expect(dynamicAuthzService.deleteSubjectIdentityPermissions(params)).rejects.toThrow(RetryError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new RetryError()
+      );
     });
   });
 });

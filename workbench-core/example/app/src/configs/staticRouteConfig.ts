@@ -87,6 +87,12 @@ export const routesMap: RoutesMap = {
           action: 'READ',
           subject: 'DatasetAccess'
         }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'DatasetAccess'
+        }
       ]
     },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/roles/${groupIDRegExpAsString}`]:
@@ -94,6 +100,12 @@ export const routesMap: RoutesMap = {
       GET: [
         {
           action: 'READ',
+          subject: 'DatasetAccess'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
           subject: 'DatasetAccess'
         }
       ]
@@ -281,6 +293,12 @@ export const routesMap: RoutesMap = {
     GET: [
       {
         action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
         subject: 'IdentityPermission'
       }
     ]
