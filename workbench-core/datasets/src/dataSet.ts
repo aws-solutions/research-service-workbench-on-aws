@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DataSetPermission } from './models/dataSetPermission';
+
 export interface DataSet {
   /**
    * an internally generated value which uniquely identifies the dataset.
@@ -63,4 +65,9 @@ export interface DataSet {
    * AWS region of the dataset storage
    */
   region?: string;
+
+  /**
+   * Permissions associated with the DataSet
+   */
+  permissions?: DataSetPermission[];
 }
