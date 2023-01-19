@@ -35,6 +35,7 @@ import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './const
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
+import KeyPairService from './services/keyPairService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
@@ -126,7 +127,8 @@ const apiRouteConfig: ApiRouteConfig = {
     projectService,
     envTypeConfigService,
     envTypeService
-  )
+  ),
+  keyPairService: new KeyPairService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);
