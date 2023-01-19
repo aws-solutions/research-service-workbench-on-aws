@@ -295,6 +295,12 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'IdentityPermission'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
     ]
   },
   '/authorization/routes/ignored': {
