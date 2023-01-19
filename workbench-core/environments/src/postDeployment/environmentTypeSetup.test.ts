@@ -5,17 +5,17 @@
 jest.mock('../services/environmentTypeService');
 
 import { AwsService } from '@aws/workbench-core-base';
-import { EnvironmentTypeHandler } from '..';
+import { EnvironmentTypeSetup } from '../index';
 
-describe('EnvironmentTypeHandler', () => {
+describe('EnvironmentTypeSetup', () => {
   const ORIGINAL_ENV = process.env;
+  const portfolioName = 'swb-swbv2-va';
 
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     jest.clearAllMocks();
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
-    process.env.SC_PORTFOLIO_NAME = 'swb-swbv2-va';
   });
 
   afterAll(() => {
@@ -28,11 +28,11 @@ describe('EnvironmentTypeHandler', () => {
     awsService.helpers.serviceCatalog.getPortfolioId = jest.fn().mockResolvedValue(undefined);
     awsService.helpers.serviceCatalog.getProductsByPortfolioId = jest.fn().mockResolvedValue([]);
 
-    const environmentTypeHandler = new EnvironmentTypeHandler(awsService);
+    const environmentTypeHandler = new EnvironmentTypeSetup(awsService);
 
     // OPERATE
-    await expect(environmentTypeHandler.execute({})).rejects.toThrowError(
-      new Error(`Could not find portfolioId for portfolio: ${process.env.SC_PORTFOLIO_NAME}`)
+    await expect(environmentTypeHandler.run(portfolioName)).rejects.toThrowError(
+      new Error(`Could not find portfolioId for portfolio: ${portfolioName}`)
     );
   });
 
@@ -51,16 +51,16 @@ describe('EnvironmentTypeHandler', () => {
       .mockResolvedValue({ Info: { TemplateUrl: 'www.test.com' } });
     awsService.helpers.s3.getTemplateByURL = jest.fn().mockResolvedValue({});
 
-    const environmentTypeHandler = new EnvironmentTypeHandler(awsService);
+    const environmentTypeHandler = new EnvironmentTypeSetup(awsService);
 
     environmentTypeHandler['_getExistingEnvironmentType'] = jest.fn().mockResolvedValue(undefined);
 
     const saveMethod = jest
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .spyOn(EnvironmentTypeHandler.prototype as any, '_saveEnvironmentType');
+      .spyOn(EnvironmentTypeSetup.prototype as any, '_saveEnvironmentType');
 
     // OPERATE
-    await expect(environmentTypeHandler.execute({})).resolves.not.toThrowError();
+    await expect(environmentTypeHandler.run(portfolioName)).resolves.not.toThrowError();
 
     //CHECK
     await expect(saveMethod).rejects.toThrow(
@@ -85,12 +85,12 @@ describe('EnvironmentTypeHandler', () => {
       .mockResolvedValue({ Info: { TemplateUrl: 'www.test.com' } });
     awsService.helpers.s3.getTemplateByURL = jest.fn().mockResolvedValue({});
 
-    const environmentTypeHandler = new EnvironmentTypeHandler(awsService);
+    const environmentTypeHandler = new EnvironmentTypeSetup(awsService);
 
     environmentTypeHandler['_getExistingEnvironmentType'] = jest.fn().mockResolvedValueOnce(undefined);
 
     // OPERATE
-    await expect(environmentTypeHandler.execute({})).resolves.not.toThrowError();
+    await expect(environmentTypeHandler.run(portfolioName)).resolves.not.toThrowError();
   });
 
   test('Do not save Environment Type when there is not a new provision artifact', async () => {
@@ -108,7 +108,7 @@ describe('EnvironmentTypeHandler', () => {
       .mockResolvedValue({ Info: { TemplateUrl: 'www.test.com' } });
     awsService.helpers.s3.getTemplateByURL = jest.fn().mockResolvedValue({});
 
-    const environmentTypeHandler = new EnvironmentTypeHandler(awsService);
+    const environmentTypeHandler = new EnvironmentTypeSetup(awsService);
 
     environmentTypeHandler['_getExistingEnvironmentType'] = jest.fn().mockResolvedValue({
       id: 'test',
@@ -117,11 +117,11 @@ describe('EnvironmentTypeHandler', () => {
     });
     const saveMethod = jest
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .spyOn(EnvironmentTypeHandler.prototype as any, '_saveEnvironmentType')
+      .spyOn(EnvironmentTypeSetup.prototype as any, '_saveEnvironmentType')
       .mockResolvedValueOnce(() => {});
 
     // OPERATE
-    await expect(environmentTypeHandler.execute({})).resolves.not.toThrowError();
+    await expect(environmentTypeHandler.run(portfolioName)).resolves.not.toThrowError();
 
     // CHECK
     expect(saveMethod).not.toBeCalled();

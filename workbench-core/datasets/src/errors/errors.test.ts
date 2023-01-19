@@ -4,9 +4,12 @@
  */
 
 import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
+import { DataSetNotFoundError, isDataSetNotFoundError } from './dataSetNotFoundError';
 import { EndPointExistsError, isEndPointExistsError } from './endPointExistsError';
+import { InvalidArnError, isInvalidArnError } from './invalidArnError';
 import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleError';
 import { InvalidPermissionError, isInvalidPermissionError } from './invalidPermissionError';
+import { isNotAuthorizedError, NotAuthorizedError } from './notAuthorizedError';
 import { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './roleExistsOnEndpointError';
 
 const error = new Error();
@@ -48,6 +51,15 @@ describe('custom error tests', () => {
     expect(isInvalidIamRoleError(error)).toBe(false);
   });
 
+  test('NotAuthorizedError', () => {
+    const notAuthorizedError = new NotAuthorizedError();
+
+    expect(isNotAuthorizedError(notAuthorizedError)).toBe(true);
+  });
+  test('not NotAuthorizedError', () => {
+    expect(isNotAuthorizedError(error)).toBe(false);
+  });
+
   test('InvalidPermissionError', () => {
     const invalidPermissionError = new InvalidPermissionError();
 
@@ -55,5 +67,23 @@ describe('custom error tests', () => {
   });
   test('not InvalidPermissionError', () => {
     expect(isInvalidPermissionError(error)).toBe(false);
+  });
+
+  test('DataSetNotFoundError', () => {
+    const dataSetNotFoundError = new DataSetNotFoundError();
+
+    expect(isDataSetNotFoundError(dataSetNotFoundError)).toBe(true);
+  });
+  test('not DataSetNotFoundError', () => {
+    expect(isDataSetNotFoundError(error)).toBe(false);
+  });
+
+  test('InvalidArnError', () => {
+    const invalidArnError = new InvalidArnError();
+
+    expect(isInvalidArnError(invalidArnError)).toBe(true);
+  });
+  test('not InvalidArnError', () => {
+    expect(isInvalidArnError(error)).toBe(false);
   });
 });

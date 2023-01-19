@@ -38,7 +38,15 @@ export default class EnvironmentLifecycleHelper {
       table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
     });
     const logger: LoggingService = new LoggingService();
-    const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
+    const requiredAuditValues: string[] = ['actor', 'source'];
+    const fieldsToMask: string[] = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
+
+    const auditService: AuditService = new AuditService(
+      new BaseAuditPlugin(new AuditLogger(logger)),
+      true,
+      requiredAuditValues,
+      fieldsToMask
+    );
     const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
       groupManagementPlugin: new WBCGroupManagementPlugin({
         userManagementService: new UserManagementService(
@@ -52,6 +60,7 @@ export default class EnvironmentLifecycleHelper {
       }),
       auditService: auditService
     });
+
     this.dataSetService = new DataSetService(
       auditService,
       logger,
@@ -179,7 +188,11 @@ export default class EnvironmentLifecycleHelper {
         await this.dataSetService.removeDataSetExternalEndpoint(
           endpoint.dataSetId,
           endpoint.id,
-          new S3DataSetStoragePlugin(this.aws)
+          new S3DataSetStoragePlugin(this.aws),
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
@@ -207,16 +220,23 @@ export default class EnvironmentLifecycleHelper {
     const endpointsCreated: { [key: string]: string }[] = [];
 
     const datasetsToMount = await Promise.all(
-      _.map(datasetIds, async (datasetId) => {
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
-        const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
-          datasetId,
-          datasetEndPointName,
-          new S3DataSetStoragePlugin(this.aws)
-        );
+      _.map(datasetIds, async (dataSetId) => {
+        const datasetEndPointName = `${dataSetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
+        const {
+          data: { mountObject }
+        } = await this.dataSetService.addDataSetExternalEndpointForGroup({
+          dataSetId,
+          externalEndpointName: datasetEndPointName,
+          storageProvider: new S3DataSetStoragePlugin(this.aws),
+          groupId: `${envMetadata.projectId}#Researcher`,
+          authenticatedUser: { id: '', roles: [] }
+        });
 
-        const dataSet = await this.dataSetService.getDataSet(datasetId);
-        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        const dataSet = await this.dataSetService.getDataSet(dataSetId, { id: '', roles: [] });
+        const endpoint = await this.dataSetService.getExternalEndPoint(dataSetId, mountObject.endpointId, {
+          id: '',
+          roles: []
+        });
         const endpointObj = {
           id: endpoint.id!,
           dataSetId: endpoint.dataSetId,
@@ -292,7 +312,11 @@ export default class EnvironmentLifecycleHelper {
           endpoint.dataSetId,
           endpoint.id,
           instanceRoleArn,
-          s3DataSetStoragePlugin
+          s3DataSetStoragePlugin,
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );

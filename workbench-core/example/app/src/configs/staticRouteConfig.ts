@@ -66,6 +66,50 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetAccess'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/users/${uuidRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'DatasetAccess'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'DatasetAccess'
+        }
+      ]
+    },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/roles/${groupIDRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'DatasetAccess'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'DatasetAccess'
+        }
+      ]
+    },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
     POST: [
       {
@@ -215,6 +259,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/authorization/groups/${groupIDRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
   '/authorization/permissions': {
     POST: [
       {
@@ -242,6 +294,28 @@ export const routesMap: RoutesMap = {
       {
         action: 'READ',
         subject: 'IdentityPermission'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/routes/ignored': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
+      }
+    ]
+  },
+  '/authorization/routes/protected': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
       }
     ]
   }

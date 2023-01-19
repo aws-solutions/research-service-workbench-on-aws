@@ -6,11 +6,15 @@
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { DynamoDBService, JSONValue, addPaginationToken, getPaginationToken } from '@aws/workbench-core-base';
 import _ from 'lodash';
+import { createRouter, RadixRouter } from 'radix3';
 import { Action } from '../action';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
+import { RouteMapError } from '../errors/routeMapError';
+import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
+import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
 
 import {
   CreateIdentityPermissionsRequest,
@@ -20,6 +24,10 @@ import {
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/deleteIdentityPermissions';
+import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsResponse
+} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
 import {
   GetDynamicOperationsByRouteRequest,
   GetDynamicOperationsByRouteResponse
@@ -45,23 +53,84 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   private readonly _getIdentityPermissionsByIdentityPartitionKey: string = 'identity';
   private readonly _delimiter: string = '|';
   private _dynamoDBService: DynamoDBService;
+  private _protectedRoutes: RadixRouter;
+  private _ignoredRoutes: RadixRouter;
 
-  public constructor(config: { dynamoDBService: DynamoDBService }) {
+  public constructor(config: {
+    dynamoDBService: DynamoDBService;
+    dynamicRoutesMap?: DynamicRoutesMap;
+    routesIgnored?: RoutesIgnored;
+  }) {
     this._dynamoDBService = config.dynamoDBService;
+    this._protectedRoutes = createRouter();
+    this._ignoredRoutes = createRouter();
+
+    const routesSet = new Set();
+
+    if (config.routesIgnored) {
+      for (const [route, httpMethods] of Object.entries(config.routesIgnored)) {
+        this._ignoredRoutes.insert(route, { httpMethods });
+        Object.keys(httpMethods).forEach((method) => {
+          routesSet.add(`${method}:${route}`);
+        });
+      }
+    }
+
+    if (config.dynamicRoutesMap) {
+      for (const [route, methodToDynamicOperations] of Object.entries(config.dynamicRoutesMap)) {
+        this._protectedRoutes.insert(route, { methodToDynamicOperations });
+        Object.keys(methodToDynamicOperations).forEach((method) => {
+          if (routesSet.has(`${method}:${route}`))
+            throw new RouteMapError(`${method}:${route} was already ignored`);
+        });
+      }
+    }
   }
 
   public async isRouteIgnored(isRouteIgnoredRequest: IsRouteIgnoredRequest): Promise<IsRouteIgnoredResponse> {
-    throw new Error('Method not implemented.');
+    const { route, method } = isRouteIgnoredRequest;
+    const payload = this._ignoredRoutes.lookup(route) ?? {};
+    const httpMethods = _.get(payload, 'httpMethods', {});
+    return {
+      data: {
+        routeIgnored: _.get(httpMethods, method, false)
+      }
+    };
   }
   public async isRouteProtected(
     isRouteProtectedRequest: IsRouteProtectedRequest
   ): Promise<IsRouteProtectedResponse> {
-    throw new Error('Method not implemented.');
+    const { route, method } = isRouteProtectedRequest;
+    const payload = this._protectedRoutes.lookup(route) ?? {};
+    const methodToDynamicOperations: MethodToDynamicOperations = _.get(
+      payload,
+      'methodToDynamicOperations',
+      {}
+    );
+    return {
+      data: {
+        routeProtected: _.get(methodToDynamicOperations, method, undefined) ? true : false
+      }
+    };
   }
   public async getDynamicOperationsByRoute(
     getDynamicOperationsByRouteRequest: GetDynamicOperationsByRouteRequest
   ): Promise<GetDynamicOperationsByRouteResponse> {
-    throw new Error('Method not implemented.');
+    const { route, method } = getDynamicOperationsByRouteRequest;
+    const payload = this._protectedRoutes.lookup(route);
+    if (!payload) throw new RouteNotFoundError();
+    const methodToDynamicOperations: MethodToDynamicOperations = _.get(
+      payload,
+      'methodToDynamicOperations',
+      {}
+    );
+    const dynamicOperations = _.get(methodToDynamicOperations, method, undefined);
+    if (!dynamicOperations) throw new RouteNotFoundError();
+    return {
+      data: {
+        dynamicOperations
+      }
+    };
   }
   public async getIdentityPermissionsByIdentity(
     getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
@@ -143,7 +212,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     if (identityPermissions.length > 100)
       throw new ThroughputExceededError('Exceeds 100 identity permissions');
 
-    //Create an item with createIdenttiyPermissions
+    //Create an item with createIdentityPermissions
     const putRequests = identityPermissions.map((identityPermission) => {
       const item = this._transformIdentityPermissionsToItem(identityPermission);
       const conditionExpression = 'attribute_not_exists(pk)';
@@ -199,6 +268,45 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     return {
       data: {
         identityPermissions: deleteIdentityPermissionsRequest.identityPermissions
+      }
+    };
+  }
+  public async deleteSubjectIdentityPermissions(
+    deleteSubjectIdentityPermissionsRequest: DeleteSubjectIdentityPermissionsRequest
+  ): Promise<DeleteSubjectIdentityPermissionsResponse> {
+    const { authenticatedUser, subjectType, subjectId } = deleteSubjectIdentityPermissionsRequest;
+    const getIdentityPermissionsBySubject = this.getIdentityPermissionsBySubject.bind(this);
+
+    async function* pageThroughResults(
+      paginationToken?: string
+    ): AsyncGenerator<IdentityPermission[], void, void> {
+      const result = await getIdentityPermissionsBySubject({ subjectId, subjectType, paginationToken });
+
+      yield result.data.identityPermissions;
+
+      if (result.paginationToken) {
+        yield* pageThroughResults(result.paginationToken);
+      }
+    }
+
+    const allIdentityPermissions = new Array<IdentityPermission>();
+
+    for await (const page of pageThroughResults()) {
+      allIdentityPermissions.push(...page);
+    }
+
+    if (allIdentityPermissions.length > 0) {
+      for (const identityPermissions of _.chunk(allIdentityPermissions, 100)) {
+        await this.deleteIdentityPermissions({
+          authenticatedUser,
+          identityPermissions
+        });
+      }
+    }
+
+    return {
+      data: {
+        identityPermissions: allIdentityPermissions
       }
     };
   }

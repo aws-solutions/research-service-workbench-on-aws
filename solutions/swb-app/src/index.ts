@@ -7,6 +7,10 @@ import { ApiRouteConfig, ApiRoute, HTTPMethod } from './apiRouteConfig';
 import { AddRemoveAccessPermissionRequest } from './dataSets/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './dataSets/createProvisionDatasetRequest';
 import { DataSet } from './dataSets/dataSet';
+import {
+  DataSetAddExternalEndpointResponse,
+  DataSetAddExternalEndpointResponseParser
+} from './dataSets/dataSetAddExternalEndpointResponseParser';
 import { DataSetExternalEndpointRequest } from './dataSets/dataSetExternalEndpointRequest';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
@@ -27,6 +31,8 @@ export {
   ApiRoute,
   CreateProvisionDatasetRequest,
   DataSet,
+  DataSetAddExternalEndpointResponse,
+  DataSetAddExternalEndpointResponseParser,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,

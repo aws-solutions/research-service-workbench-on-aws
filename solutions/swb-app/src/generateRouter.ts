@@ -122,7 +122,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.environmentTypeConfigService,
     apiRouteConfig.environmentService
   );
-  setUpProjectRoutes(router, apiRouteConfig.projectService);
+  setUpProjectRoutes(
+    router,
+    apiRouteConfig.projectService,
+    apiRouteConfig.environmentService,
+    apiRouteConfig.metadataService
+  );
   setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   // Error handling. Order of the error handlers is important

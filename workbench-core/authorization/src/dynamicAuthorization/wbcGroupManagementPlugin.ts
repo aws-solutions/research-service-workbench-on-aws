@@ -33,7 +33,8 @@ import {
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { SetGroupStatusRequest, SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { GroupManagementPlugin } from './groupManagementPlugin';
-import { GroupMetadata, GroupMetadataParser } from './models/GroupMetadata';
+import { GetGroupMetadataParser } from './models/GetGroupMetadata';
+import { SetGroupMetadata } from './models/SetGroupMetadata';
 
 /**
  * A WBCGroupManagementPlugin instance that interfaces with Workbench Core's UserManagementService to provide group management.
@@ -78,8 +79,17 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       throw error;
     }
   }
-  public async deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async deleteGroup({ groupId }: DeleteGroupRequest): Promise<DeleteGroupResponse> {
+    try {
+      await this._userManagementService.deleteRole(groupId);
+
+      return { data: { groupId } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     const { userId } = request;
@@ -168,7 +178,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
         throw new GroupNotFoundError(`Group "${groupId}" doesnt exist in the provided DDB table.`);
       }
 
-      const { status } = GroupMetadataParser.parse(response.Item);
+      const { status } = GetGroupMetadataParser.parse(response.Item);
 
       return { data: { status } };
     } catch (error) {
@@ -191,6 +201,11 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       if (currentStatus === 'delete_pending' && newStatus === 'active') {
         throw new ForbiddenError(`Cannot set group '${groupId}' status to active. It is pending delete.`);
       }
+      if (currentStatus === 'active' && newStatus === 'deleted') {
+        throw new ForbiddenError(
+          `Cannot set group '${groupId}' status to delete, it first must be marked for deletion.`
+        );
+      }
     } catch (error) {
       if (!isGroupNotFoundError(error)) {
         throw error;
@@ -198,19 +213,24 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     }
 
     try {
-      const item: GroupMetadata = {
-        id: groupId,
-        status: newStatus
-      };
+      const key = buildDynamoDBPkSk(groupId, this._userGroupKeyType);
+      if (newStatus === 'deleted') {
+        await this._ddbService.delete(key).execute();
+      } else {
+        const item: SetGroupMetadata = {
+          id: groupId,
+          status: newStatus
+        };
 
-      await this._ddbService
-        .update({
-          key: buildDynamoDBPkSk(groupId, this._userGroupKeyType),
-          params: {
-            item
-          }
-        })
-        .execute();
+        await this._ddbService
+          .update({
+            key,
+            params: {
+              item
+            }
+          })
+          .execute();
+      }
 
       return { data: { status: newStatus } };
     } catch (error) {

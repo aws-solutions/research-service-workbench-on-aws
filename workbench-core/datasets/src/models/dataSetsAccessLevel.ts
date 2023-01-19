@@ -3,4 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export type DataSetsAccessLevel = 'read-only' | 'read-write';
+import { z } from 'zod';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DataSetsAccessLevelParser = z.union([z.literal('read-only'), z.literal('read-write')]);
+
+export type DataSetsAccessLevel = z.infer<typeof DataSetsAccessLevelParser>;

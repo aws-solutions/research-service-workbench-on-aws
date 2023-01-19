@@ -59,6 +59,10 @@ export default class IdentityPermissions extends CollectionResource {
     return this._axiosInstance.get(`${this._api}/subject`, { params: bodyParams });
   }
 
+  public async deleteBySubjectIdentity(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(`${this._api}/subject`, { data: bodyParams });
+  }
+
   public async delete(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
     return this._axiosInstance.delete(`${this._api}`, { data: bodyParams });
   }

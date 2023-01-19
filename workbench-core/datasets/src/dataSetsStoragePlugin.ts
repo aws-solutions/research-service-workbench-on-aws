@@ -4,6 +4,10 @@
  */
 
 import { DataSet } from './dataSet';
+import {
+  AddStorageExternalEndpointRequest,
+  AddStorageExternalEndpointResponse
+} from './models/addStorageExternalEndpoint';
 
 export interface EndpointConnectionStrings {
   /**
@@ -54,27 +58,16 @@ export interface DataSetsStoragePlugin {
   /**
    * Configures an existing dataset to be connected to an external environment.
    *
-   * @param name - the name of the storage destination to be accessed
-   * @param path - a string which locates to root of the dataset within the storage medium
-   * such as a prefix in an S3 bucket.
-   * @param externalEndpointName - a name to uniquely identify the endpoint.
-   * @param ownerAccountId - the AWS Account Id where the storage resides.
-   * @param externalRoleName - an optional role name which the external environment will assume to
-   * access the DataSet.
-   * @param kmsKeyArn - an optional ARN of the KMS key used to encrypt the bucket.
-   * @param vpcId - an optional ID of the VPC interacting with the endpoint.
+   * @param request - a {@link AddStorageExternalEndpointRequest} object
    *
-   * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
+   * @returns a {@link AddStorageExternalEndpointResponse} object
+   *
+   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(
-    name: string,
-    path: string,
-    externalEndpointName: string,
-    ownerAccountId: string,
-    externalRoleName?: string,
-    kmsKeyArn?: string,
-    vpcId?: string
-  ): Promise<EndpointConnectionStrings>;
+    request: AddStorageExternalEndpointRequest
+  ): Promise<AddStorageExternalEndpointResponse>;
 
   /**
    * Removes an existing dataset connection which was used for access by an external environment
@@ -95,6 +88,8 @@ export interface DataSetsStoragePlugin {
    * @param endPointUrl - a URL which can be used to reach the endpoint.
    * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
+   * @throws {@link InvalidArnError} - the externalRoleName parameter is invalid
+   * @throws {@link InvalidArnError} - the endPointUrl parameter is invalid
    */
   addRoleToExternalEndpoint(
     name: string,
