@@ -17,7 +17,6 @@ import {
 } from '@aws-sdk/client-s3';
 import {
   CreateAccessPointCommandInput,
-  CreateAccessPointCommandOutput,
   DeleteAccessPointCommandInput,
   GetAccessPointPolicyCommandInput,
   GetAccessPointPolicyCommandOutput,
@@ -28,6 +27,7 @@ import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { InvalidArnError } from './errors/invalidArnError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
@@ -116,7 +116,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       kmsKeyArn
     } = request;
 
-    const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
+    const response: { endPointArn: string; endPointAlias: string } = await this._createAccessPoint(
       name,
       externalEndpointName,
       ownerAccountId,
@@ -205,7 +205,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalEndpointName: string,
     bucketAccount: string,
     vpcId?: string
-  ): Promise<{ endPointArn: string; endPointAlias?: string }> {
+  ): Promise<{ endPointArn: string; endPointAlias: string }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
       Bucket: name,
@@ -215,12 +215,22 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       accessPointConfig.VpcConfiguration = { VpcId: vpcId };
     }
     try {
-      const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
+      const { AccessPointArn, Alias } = await this._aws.clients.s3Control.createAccessPoint(
         accessPointConfig
       );
+
+      if (!AccessPointArn) {
+        throw new InvalidEndpointError(`Endpoint "${externalEndpointName}" did not generate an endPointArn.`);
+      }
+      if (!Alias) {
+        throw new InvalidEndpointError(
+          `Endpoint "${externalEndpointName}" did not generate an endPointAlias.`
+        );
+      }
+
       return {
-        endPointArn: response.AccessPointArn!,
-        endPointAlias: response.Alias
+        endPointArn: AccessPointArn,
+        endPointAlias: Alias
       };
     } catch (error) {
       if (error.name === 'AccessPointAlreadyOwnedByYou') {

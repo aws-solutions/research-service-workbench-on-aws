@@ -25,7 +25,6 @@ import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
-import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { AddDataSetExternalEndpointResponse } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
@@ -67,7 +66,7 @@ describe('DataSetService', () => {
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
   const mockNoRolesEndpointId = 'Sample-NoRoles-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
-  const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
+  const mockEndpointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
   const mockDataSetObject = 'datasetObjectId';
   const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
   const mockGroupId = 'Sample-Group-Id';
@@ -224,7 +223,7 @@ describe('DataSetService', () => {
             dataSetId: mockDataSetId,
             dataSetName: mockDataSetName,
             path: mockDataSetPath,
-            endPointUrl: mockEndPointUrl,
+            endPointUrl: mockEndpointUrl,
             endPointAlias: mockAccessPointAlias,
             createdAt: mockCreatedAt,
             accessLevel: mockAccessLevel
@@ -236,7 +235,7 @@ describe('DataSetService', () => {
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
           path: mockDataSetPath,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           endPointAlias: mockAccessPointAlias,
           allowedRoles: [mockRoleArn],
           createdAt: mockCreatedAt,
@@ -250,7 +249,7 @@ describe('DataSetService', () => {
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
+        endPointUrl: mockEndpointUrl,
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn],
         createdAt: mockCreatedAt,
@@ -265,7 +264,7 @@ describe('DataSetService', () => {
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
           path: mockDataSetPath,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           endPointAlias: mockAccessPointAlias,
           allowedRoles: [mockRoleArn],
           createdAt: mockCreatedAt,
@@ -280,7 +279,7 @@ describe('DataSetService', () => {
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
+        endPointUrl: mockEndpointUrl,
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn, mockAlternateRoleArn],
         createdAt: mockCreatedAt,
@@ -311,7 +310,7 @@ describe('DataSetService', () => {
       return {
         data: {
           connections: {
-            endPointUrl: mockEndPointUrl,
+            endPointUrl: mockEndpointUrl,
             endPointAlias: mockAccessPointAlias
           }
         }
@@ -455,7 +454,7 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -498,7 +497,7 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -522,7 +521,7 @@ describe('DataSetService', () => {
       });
     });
 
-    it('throws DataSetNotFoundError when called with a name that does not have an alias.', async () => {
+    it('throws DataSetNotFoundError when the provided dataset id does not exist.', async () => {
       dataSetService.getDataSet = jest.fn().mockRejectedValueOnce(new DataSetNotFoundError());
 
       dataSetService.getExternalEndPoint = jest.fn(async () => {
@@ -532,7 +531,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: '',
+          endPointUrl: mockEndpointUrl,
+          endPointAlias: mockAccessPointAlias,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -547,7 +547,7 @@ describe('DataSetService', () => {
       ).rejects.toThrow(DataSetNotFoundError);
     });
 
-    it('throws EndpointNotFoundError when called with a name that does not have an alias.', async () => {
+    it('throws EndpointNotFoundError when the provided endpoint id does not exist.', async () => {
       dataSetService.getDataSet = jest.fn();
 
       dataSetService.getExternalEndPoint = jest.fn().mockRejectedValueOnce(new EndpointNotFoundError());
@@ -559,31 +559,6 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(EndpointNotFoundError);
-    });
-
-    it('throws InvalidEndpointError when called with a name that does not have an alias.', async () => {
-      dataSetService.getDataSet = jest.fn();
-
-      dataSetService.getExternalEndPoint = jest.fn(async () => {
-        return {
-          id: mockExistingEndpointId,
-          name: mockExistingEndpointName,
-          path: mockDataSetPath,
-          dataSetId: mockDataSetId,
-          dataSetName: mockDataSetName,
-          endPointUrl: '',
-          createdAt: mockCreatedAt,
-          accessLevel: mockAccessLevel
-        };
-      });
-
-      await expect(
-        dataSetService.getDataSetMountObject({
-          dataSetId: mockDataSetId,
-          endpointId: mockExistingEndpointId,
-          authenticatedUser: mockAuthenticatedUser
-        })
-      ).rejects.toThrow(InvalidEndpointError);
     });
 
     it('throws NotAuthorizedError when the authenticated user doesnt have permission to access the dataSet.', async () => {
@@ -728,6 +703,10 @@ describe('DataSetService', () => {
         }
       });
 
+      jest
+        .spyOn(S3DataSetStoragePlugin.prototype, 'addExternalEndpoint')
+        .mockRejectedValueOnce(new EndpointExistsError());
+
       await expect(
         dataSetService.addDataSetExternalEndpointForGroup({
           dataSetId: mockDataSetWithEndpointId,
@@ -795,6 +774,10 @@ describe('DataSetService', () => {
         }
       });
 
+      jest
+        .spyOn(S3DataSetStoragePlugin.prototype, 'addExternalEndpoint')
+        .mockRejectedValueOnce(new EndpointExistsError());
+
       await expect(
         dataSetService.addDataSetExternalEndpointForUser({
           dataSetId: mockDataSetWithEndpointId,
@@ -832,7 +815,7 @@ describe('DataSetService', () => {
           id: mockDataSetId,
           name: mockDataSetName,
           path: mockDataSetPath,
-          externalEndpoints: [mockExistingEndpointName],
+          externalEndpoints: [mockExistingEndpointId],
           awsAccountId: mockAwsAccountId,
           storageType: mockDataSetStorageType,
           storageName: mockDataSetStorageName,
@@ -847,7 +830,7 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -897,7 +880,7 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -933,7 +916,7 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: mockEndPointUrl,
+          endPointUrl: mockEndpointUrl,
           createdAt: mockCreatedAt,
           accessLevel: mockAccessLevel
         };
@@ -1116,7 +1099,7 @@ describe('DataSetService', () => {
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
+        endPointUrl: mockEndpointUrl,
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn],
         createdAt: mockCreatedAt,
@@ -1130,7 +1113,7 @@ describe('DataSetService', () => {
         .mockRejectedValueOnce(new EndpointNotFoundError());
 
       await expect(
-        dataSetService.getExternalEndPoint(mockDataSetId, mockEndPointUrl, mockAuthenticatedUser)
+        dataSetService.getExternalEndPoint(mockDataSetId, mockEndpointUrl, mockAuthenticatedUser)
       ).rejects.toThrow(EndpointNotFoundError);
     });
   });

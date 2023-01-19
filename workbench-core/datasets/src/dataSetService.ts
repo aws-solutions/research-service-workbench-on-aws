@@ -10,9 +10,7 @@ import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
-import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
-import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import {
   AddDataSetExternalEndpointBaseRequest,
@@ -203,11 +201,6 @@ export class DataSetService {
       }
 
       const endpoint = await this.getExternalEndPoint(dataSetId, endpointId, authenticatedUser);
-      if (!endpoint.endPointAlias) {
-        throw new InvalidEndpointError(
-          `Endpoint "${endpointId}" does not have an "endPointAlias" associated with it.`
-        );
-      }
 
       const hasEndPointPermission = allPermissions.some(
         ({ accessLevel }) => accessLevel === endpoint.accessLevel
@@ -223,9 +216,9 @@ export class DataSetService {
         data: {
           mountObject: this._generateMountObject(
             endpoint.dataSetName,
-            endpoint.endPointAlias!,
+            endpoint.endPointAlias,
             endpoint.path,
-            endpoint.id!
+            endpoint.id
           )
         }
       };
@@ -319,7 +312,7 @@ export class DataSetService {
       const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
       const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId, authenticatedUser);
 
-      if (!targetDS.externalEndpoints?.find((endpoint) => endpoint === targetEndpoint.name)) {
+      if (!targetDS.externalEndpoints?.find((endpointId) => endpointId === targetEndpoint.id)) {
         throw new EndpointNotFoundError(
           `Could not find the endpoint '${externalEndpointId}' on '${dataSetId}'.`
         );
@@ -328,7 +321,7 @@ export class DataSetService {
       await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
 
       targetDS.externalEndpoints = targetDS.externalEndpoints.filter(
-        (endpoint) => endpoint !== targetEndpoint.name
+        (endpointId) => endpointId !== targetEndpoint.id
       );
 
       await this._dbProvider.updateDataSet(targetDS);
@@ -743,10 +736,6 @@ export class DataSetService {
       );
     }
 
-    if (targetDS.externalEndpoints?.find((ep) => ep === externalEndpointName)) {
-      throw new EndpointExistsError(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
-    }
-
     const accessLevel = this._getMinimumAccessLevel(permissionsData.permissions);
 
     const { data: connectionsData } = await storageProvider.addExternalEndpoint({
@@ -762,7 +751,7 @@ export class DataSetService {
 
     const endpointParam: CreateExternalEndpoint = {
       name: externalEndpointName,
-      dataSetId: targetDS.id!,
+      dataSetId: targetDS.id,
       dataSetName: targetDS.name,
       path: targetDS.path,
       endPointUrl: connectionsData.connections.endPointUrl,
@@ -780,7 +769,7 @@ export class DataSetService {
       targetDS.externalEndpoints = [];
     }
 
-    targetDS.externalEndpoints.push(endpoint.id!);
+    targetDS.externalEndpoints.push(endpoint.id);
 
     await this._dbProvider.updateDataSet(targetDS);
 
@@ -788,7 +777,7 @@ export class DataSetService {
       data: {
         mountObject: this._generateMountObject(
           endpoint.dataSetName,
-          endpoint.endPointAlias!,
+          endpoint.endPointAlias,
           endpoint.path,
           endpoint.id
         )

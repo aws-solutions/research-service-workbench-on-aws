@@ -41,9 +41,9 @@ export const ExternalEndpointParser = z.object({
    */
   endPointUrl: z.string(),
   /**
-   * An optional alias through which the endpoint can be accessed.
+   * An alias through which the endpoint can be accessed.
    */
-  endPointAlias: z.string().optional(),
+  endPointAlias: z.string(),
   /**
    * The {@link DataSetsAccessLevel} the endpoint has.
    */

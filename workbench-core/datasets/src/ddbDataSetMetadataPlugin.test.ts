@@ -48,9 +48,10 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockDataSetOwner = 'Sample-DataSet-Owner';
   const mockDataSetRegion = 'Sample-DataSet-Region';
   const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
-  const mockEndPointName = `${endpointKeyTypeId}-Sample-Access-Point`;
-  const mockEndPointRole = 'Sample-Role';
-  const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndPointName}/${mockDataSetPath}/`;
+  const mockEndpointName = `${endpointKeyTypeId}-Sample-Access-Point`;
+  const mockEndpointRole = 'Sample-Role';
+  const mockEndpointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndpointName}/${mockDataSetPath}/`;
+  const mockEndpointAlias = `${mockEndpointName}-s3alias`;
   const mockCreatedAt = 'Sample-Created-At-ISO-String';
   const mockAccessLevel: DataSetsAccessLevel = 'read-only';
 
@@ -282,12 +283,13 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({});
 
       const exampleEndpoint: CreateExternalEndpoint = {
-        name: mockEndPointName,
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole],
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
         accessLevel: mockAccessLevel
       };
 
@@ -295,10 +297,11 @@ describe('DdbDataSetMetadataPlugin', () => {
         id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
-        endPointUrl: mockEndPointUrl,
-        name: mockEndPointName,
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        name: mockEndpointName,
         path: mockDataSetPath,
-        allowedRoles: [mockEndPointRole],
+        allowedRoles: [mockEndpointRole],
         createdAt: mockCreatedAt,
         accessLevel: mockAccessLevel
       });
@@ -313,7 +316,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
           storageName: { S: mockDataSetStorageName },
-          externalEndpoints: { L: [{ S: mockEndPointName }] },
+          externalEndpoints: { L: [{ S: mockEndpointName }] },
           createdAt: { S: mockCreatedAt },
           accessLevel: { S: mockAccessLevel }
         }
@@ -321,13 +324,14 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({
         Items: [
           {
-            name: { S: mockEndPointName },
+            name: { S: mockEndpointName },
             dataSetId: { S: mockDataSetId },
             dataSetName: { S: mockDataSetName },
             path: { S: mockDataSetPath },
-            endPointUrl: { S: mockEndPointUrl },
-            allowedRoles: { L: [{ S: mockEndPointRole }] },
-            id: { S: mockEndPointName },
+            endPointUrl: { S: mockEndpointUrl },
+            endPointAlias: { S: mockEndpointAlias },
+            allowedRoles: { L: [{ S: mockEndpointRole }] },
+            id: { S: mockEndpointName },
             createdAt: { S: mockCreatedAt },
             accessLevel: { S: mockAccessLevel }
           }
@@ -335,12 +339,13 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
 
       const exampleEndpoint: CreateExternalEndpoint = {
-        name: mockEndPointName,
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole],
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
         accessLevel: mockAccessLevel
       };
 
@@ -352,7 +357,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('throws when an empty response is given.', async () => {
       mockDdb.on(GetItemCommand).resolves({});
 
-      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)).rejects.toThrow(
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)).rejects.toThrow(
         EndpointNotFoundError
       );
     });
@@ -360,7 +365,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('throws when an empty item is given.', async () => {
       mockDdb.on(GetItemCommand).resolves({ Item: undefined });
 
-      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)).rejects.toThrow(
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)).rejects.toThrow(
         EndpointNotFoundError
       );
     });
@@ -369,26 +374,28 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: {
           id: { S: mockEndpointId },
-          name: { S: mockEndPointName },
+          name: { S: mockEndpointName },
           dataSetId: { S: mockDataSetId },
           dataSetName: { S: mockDataSetName },
           path: { S: mockDataSetPath },
-          endPointUrl: { S: mockEndPointUrl },
-          allowedRoles: { L: [{ S: mockEndPointRole }] },
+          endPointUrl: { S: mockEndpointUrl },
+          endPointAlias: { S: mockEndpointAlias },
+          allowedRoles: { L: [{ S: mockEndpointRole }] },
           createdAt: { S: mockCreatedAt },
           accessLevel: { S: mockAccessLevel }
         }
       });
       await expect(
-        plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)
+        plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)
       ).resolves.toMatchObject<ExternalEndpoint>({
         id: mockEndpointId,
-        name: mockEndPointName,
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole],
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
         createdAt: mockCreatedAt,
         accessLevel: mockAccessLevel
       });

@@ -26,6 +26,7 @@ import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { EndpointExistsError } from './errors/endpointExistsError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { AddStorageExternalEndpointResponse } from './models/addStorageExternalEndpoint';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
@@ -267,6 +268,7 @@ describe('S3DataSetStoragePlugin', () => {
     it('throws when the arn for the access point is invalid. ', async () => {
       const endPointNameNoColon = externalEndpointName.replace(/\:/g, '_');
       const accessPointArn = `arn:s3:us-east-1:123456789012:accesspoint/${endPointNameNoColon}`;
+      const accessPointAlias = `${endPointNameNoColon}-s3alias`;
 
       const s3Mock = mockClient(S3Client);
       s3Mock
@@ -303,7 +305,8 @@ describe('S3DataSetStoragePlugin', () => {
       s3ControlMock
         .on(CreateAccessPointCommand)
         .resolves({
-          AccessPointArn: accessPointArn
+          AccessPointArn: accessPointArn,
+          Alias: accessPointAlias
         })
         .on(GetAccessPointPolicyCommand)
         .resolves({})
@@ -1060,6 +1063,40 @@ describe('S3DataSetStoragePlugin', () => {
           kmsKeyArn
         })
       ).rejects.toThrow(EndpointExistsError);
+    });
+
+    it('throws InvalidEndpointError when an access point without an Alias is created', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).resolves({ Alias: mockAccessPointAlias });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(InvalidEndpointError);
+    });
+
+    it('throws InvalidEndpointError when an access point without an AccessPointArn is created', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).resolves({ AccessPointArn: accessPointArn });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(InvalidEndpointError);
     });
 
     it('rethrows an unexpected error', async () => {
