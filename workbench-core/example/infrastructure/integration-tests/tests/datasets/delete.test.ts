@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
+import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
@@ -15,7 +15,7 @@ describe('datasets delete integration test', () => {
   let adminSession: ClientSession;
   let user: CreateUser;
   let userId: string;
-  const fakeDataSetId: string = 'example-ds-badbadba-dbad-badb-adba-dbadbadbadba';
+  const mockBadValue: string = 'fake-data';
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -41,17 +41,21 @@ describe('datasets delete integration test', () => {
       const response = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = response.data.id;
 
-      await expect(adminSession.resources.datasets.delete({ id: dataSetId })).resolves.not.toThrow();
+      await expect(adminSession.resources.datasets.children.get(dataSetId)!.delete()).resolves.not.toThrow();
 
-      await expect(adminSession.resources.datasets.get({ id: dataSetId })).rejects.toThrow(
+      await expect(adminSession.resources.datasets.get({ id: dataSetId })).rejects.toThrowError(
         new HttpError(404, 'Not Found')
       );
     });
 
     it('throws when removing a dataset which does not exist', async () => {
-      await expect(adminSession.resources.datasets.delete({ id: fakeDataSetId })).rejects.toThrow(
-        new HttpError(404, 'Not Found')
-      );
+      const fakeDataSet: Dataset = adminSession.resources.datasets.dataset({
+        id: `${dataSetPrefix.toLowerCase()}-${uuidv4()}`,
+        awsAccountId: mockBadValue,
+        storageName: mockBadValue,
+        storagePath: mockBadValue
+      });
+      await expect(fakeDataSet.delete()).rejects.toThrow(new HttpError(404, 'Not Found'));
     });
 
     it('throws when attempting to remove a DataSet with an endpoint', async () => {
@@ -67,7 +71,7 @@ describe('datasets delete integration test', () => {
       });
       await ds.share({ userId: userId });
 
-      await expect(adminSession.resources.datasets.delete({ id: dataSetId })).rejects.toThrow(
+      await expect(adminSession.resources.datasets.children.get(dataSetId)!.delete()).rejects.toThrow(
         new HttpError(
           400,
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
@@ -76,7 +80,13 @@ describe('datasets delete integration test', () => {
     });
 
     it('throws when dataset Id passed to remove is not a UUID', async () => {
-      await expect(adminSession.resources.datasets.delete({ id: 'this is not a UUID!' })).rejects.toThrow(
+      const fakeDataSet: Dataset = adminSession.resources.datasets.dataset({
+        id: 'this is not a UUID!',
+        awsAccountId: mockBadValue,
+        storageName: mockBadValue,
+        storagePath: mockBadValue
+      });
+      await expect(fakeDataSet.delete()).rejects.toThrow(
         new HttpError(403, 'User is forbidden: Route has not been secured')
       );
     });
