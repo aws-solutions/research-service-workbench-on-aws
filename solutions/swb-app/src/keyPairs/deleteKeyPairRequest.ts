@@ -5,8 +5,10 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const DeleteKeyPairRequestParser = z.object({
-  projectId: z.string()
-});
+export const DeleteKeyPairRequestParser = z
+  .object({
+    projectId: z.string()
+  })
+  .strict();
 
 export type DeleteKeyPairRequest = z.infer<typeof DeleteKeyPairRequestParser>;
