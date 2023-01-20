@@ -12,6 +12,10 @@ import {
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/deleteIdentityPermissions';
 import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsResponse
+} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+import {
   GetDynamicOperationsByRouteRequest,
   GetDynamicOperationsByRouteResponse
 } from './dynamicAuthorizationInputs/getDynamicOperationsByRoute';
@@ -95,4 +99,14 @@ export interface DynamicAuthorizationPermissionsPlugin {
   deleteIdentityPermissions(
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse>;
+
+  /**
+   * Delete all subject identity permissions.
+   * @param DeleteSubjectIdentityPermissionsRequest - {@link DeleteSubjectIdentityPermissionsRequest}
+   *
+   * @returns - {@link DeleteIdentityPermissionsResponse}
+   */
+  deleteSubjectIdentityPermissions(
+    deleteSubjectIdentityPermissionsRequest: DeleteSubjectIdentityPermissionsRequest
+  ): Promise<DeleteSubjectIdentityPermissionsResponse>;
 }

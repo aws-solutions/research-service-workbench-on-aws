@@ -281,4 +281,36 @@ describe('dynamic authorization identity permission integration tests ', () => {
       ).rejects.toThrow(new HttpError(429, {}));
     });
   });
+  describe('deleteSubjectIdentityPermissions', () => {
+    let identityPermissions: IdentityPermission[];
+    beforeEach(async () => {
+      const { data } = await adminSession.resources.groups.create();
+      const { groupId } = data;
+
+      const response = await adminSession.resources.identityPermissions.create({
+        identities: [
+          {
+            identityId: groupId,
+            identityType: 'GROUP'
+          }
+        ],
+        authenticatedUser: mockUser
+      });
+
+      identityPermissions = response.data.identityPermissions;
+    });
+
+    test('delete subject identity permisions', async () => {
+      const { subjectId, subjectType, identityType, identityId } = identityPermissions[0];
+      const { data } = await adminSession.resources.identityPermissions.deleteBySubjectIdentity({
+        authenticatedUser: mockUser,
+        subjectId,
+        subjectType,
+        identityType,
+        identityId
+      });
+
+      expect(data.identityPermissions).toStrictEqual(identityPermissions);
+    });
+  });
 });
