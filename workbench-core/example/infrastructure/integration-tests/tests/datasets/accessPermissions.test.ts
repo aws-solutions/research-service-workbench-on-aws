@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSetPermission } from '@aws/workbench-core-datasets';
+import { DataSetPermission, PermissionsResponse } from '@aws/workbench-core-datasets';
 import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
@@ -232,24 +232,37 @@ describe('DataSets access permissions integration tests', () => {
           accessLevel: 'read-only'
         }
       });
-      await expect(dataSet.getAllAccess()).resolves.toMatchObject({
-        data: {
-          dataSetId: dataSetId,
-          permissions: [
-            {
-              identityType: 'GROUP',
-              identity: groupId,
-              accessLevel: 'read-write'
-            },
-            ...permissions,
-            {
-              identityType: 'USER',
-              identity: userId,
-              accessLevel: 'read-only'
-            }
-          ]
+      // using await expect(...).toMatchObject(...) requires permissions order to be
+      // deterministic. This is not.
+      const response: PermissionsResponse = await dataSet.getAllAccess();
+      expect(response.data).toBeDefined();
+      expect(response.data.dataSetId).toEqual(dataSetId);
+      expect(response.data.permissions).toHaveLength(3);
+      // using filter instead of find as failure is desirable on duplicates
+      const defaultPermission = response.data.permissions.filter(
+        (p: DataSetPermission) => p.identity === permissions[0].identity
+      );
+      expect(defaultPermission).toMatchObject(permissions);
+      const userPermission = response.data.permissions.filter(
+        (p: DataSetPermission) => p.identity === userId
+      );
+      expect(userPermission).toMatchObject([
+        {
+          identityType: 'USER',
+          identity: userId,
+          accessLevel: 'read-only'
         }
-      });
+      ]);
+      const groupPermission = response.data.permissions.filter(
+        (p: DataSetPermission) => p.identity === groupId
+      );
+      expect(groupPermission).toMatchObject([
+        {
+          identityType: 'GROUP',
+          identity: groupId,
+          accessLevel: 'read-write'
+        }
+      ]);
     });
   });
 
