@@ -25,6 +25,10 @@ import {
   DeleteIdentityPermissionsRequestParser,
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/deleteIdentityPermissions';
+import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsResponse
+} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import {
@@ -574,6 +578,41 @@ export class DynamicAuthorizationService {
    */
   public async doesGroupExist(doesGroupExistRequest: DoesGroupExistRequest): Promise<DoesGroupExistResponse> {
     throw new Error('Not implemented');
+  }
+
+  /**
+   * Delete all subject identity permissions.
+   * @param DeleteSubjectIdentityPermissionsRequest - {@link DeleteSubjectIdentityPermissionsRequest}
+   *
+   * @returns - {@link DeleteIdentityPermissionsResponse}
+   */
+  public async deleteSubjectIdentityPermissions(
+    deleteSubjectIdentityPermissionsRequest: DeleteSubjectIdentityPermissionsRequest
+  ): Promise<DeleteSubjectIdentityPermissionsResponse> {
+    const metadata: Metadata = {
+      actor: deleteSubjectIdentityPermissionsRequest.authenticatedUser,
+      action: this.deleteSubjectIdentityPermissions.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: deleteSubjectIdentityPermissionsRequest
+    };
+
+    try {
+      const response = await this._dynamicAuthorizationPermissionsPlugin.deleteSubjectIdentityPermissions(
+        deleteSubjectIdentityPermissionsRequest
+      );
+
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, error);
+
+      throw error;
+    }
   }
 
   private async _createIdentityPermissions(

@@ -15,12 +15,18 @@ import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 describe('dynamic authorization identity permission integration tests ', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let mockUser: AuthenticatedUser;
+
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    mockUser = {
+      id: 'sampleId',
+      roles: []
+    };
   });
 
   afterAll(async () => {
@@ -527,6 +533,39 @@ describe('dynamic authorization identity permission integration tests ', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrowError(new HttpError(403, {}));
+    });
+  });
+
+  describe('deleteSubjectIdentityPermissions', () => {
+    let identityPermissions: IdentityPermission[];
+    beforeEach(async () => {
+      const { data } = await adminSession.resources.groups.create();
+      const { groupId } = data;
+
+      const response = await adminSession.resources.identityPermissions.create({
+        identities: [
+          {
+            identityId: groupId,
+            identityType: 'GROUP'
+          }
+        ],
+        authenticatedUser: mockUser
+      });
+
+      identityPermissions = response.data.identityPermissions;
+    });
+
+    test('delete subject identity permisions', async () => {
+      const { subjectId, subjectType, identityType, identityId } = identityPermissions[0];
+      const { data } = await adminSession.resources.identityPermissions.deleteBySubjectIdentity({
+        authenticatedUser: mockUser,
+        subjectId,
+        subjectType,
+        identityType,
+        identityId
+      });
+
+      expect(data.identityPermissions).toStrictEqual(identityPermissions);
     });
   });
 });

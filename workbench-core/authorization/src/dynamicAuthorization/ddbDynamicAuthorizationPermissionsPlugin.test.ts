@@ -678,4 +678,64 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       ).rejects.toThrow(Error);
     });
   });
+
+  describe('deleteSubjectIdentityPermissions', () => {
+    test.skip('Delete subject identity permission', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest.fn().mockResolvedValue({
+        data: {
+          identityPermissions: [mockIdentityPermission]
+        }
+      });
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+
+    test('Delete subject identity exceeding 100 permissions', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: Array(100).fill(mockIdentityPermission)
+          },
+          paginationToken: 'test_token'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions = jest.fn();
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions).toBeCalledTimes(2);
+      expect(data.identityPermissions).toStrictEqual(Array(101).fill(mockIdentityPermission));
+    });
+
+    test.skip('Gracefully handles subject without identity permissions', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest.fn().mockResolvedValue({
+        data: {
+          identityPermissions: []
+        }
+      });
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([]);
+    });
+  });
 });

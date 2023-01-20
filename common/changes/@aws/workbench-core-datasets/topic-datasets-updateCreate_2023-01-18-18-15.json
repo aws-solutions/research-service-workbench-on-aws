@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "implement access permission update on dataset creation",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

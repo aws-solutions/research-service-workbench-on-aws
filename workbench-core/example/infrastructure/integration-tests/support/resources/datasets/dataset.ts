@@ -69,15 +69,9 @@ export default class Dataset extends Resource {
     return validateAndParse(PermissionsResponseParser, response.data);
   }
 
-  public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
+  public generateDataSetPermissions(permissionObjects: DataSetPermission[]): void {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
-    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
-    const permissionsCreated: PermissionsResponse = validateAndParse(
-      PermissionsResponseParser,
-      response.data
-    );
-
-    const permissions: Permission[] = permissionsCreated.data.permissions.map((p: DataSetPermission) => {
+    const permissions: Permission[] = permissionObjects.map((p: DataSetPermission) => {
       return {
         action: p.accessLevel === 'read-only' ? 'READ' : 'UPDATE',
         effect: 'ALLOW',
@@ -94,7 +88,15 @@ export default class Dataset extends Resource {
       this._permissions.set(resourceNode.id, resourceNode);
       this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
     });
+  }
 
+  public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
+    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
+    const permissionsCreated: PermissionsResponse = validateAndParse(
+      PermissionsResponseParser,
+      response.data
+    );
+    this.generateDataSetPermissions(permissionsCreated.data.permissions);
     return permissionsCreated;
   }
 

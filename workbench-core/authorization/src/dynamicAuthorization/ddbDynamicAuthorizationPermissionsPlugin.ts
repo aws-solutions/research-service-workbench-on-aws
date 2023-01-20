@@ -25,6 +25,10 @@ import {
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/deleteIdentityPermissions';
 import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsResponse
+} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+import {
   GetDynamicOperationsByRouteRequest,
   GetDynamicOperationsByRouteResponse
 } from './dynamicAuthorizationInputs/getDynamicOperationsByRoute';
@@ -208,7 +212,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     if (identityPermissions.length > 100)
       throw new ThroughputExceededError('Exceeds 100 identity permissions');
 
-    //Create an item with createIdenttiyPermissions
+    //Create an item with createIdentityPermissions
     const putRequests = identityPermissions.map((identityPermission) => {
       const item = this._transformIdentityPermissionsToItem(identityPermission);
       const conditionExpression = 'attribute_not_exists(pk)';
@@ -264,6 +268,45 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     return {
       data: {
         identityPermissions: deleteIdentityPermissionsRequest.identityPermissions
+      }
+    };
+  }
+  public async deleteSubjectIdentityPermissions(
+    deleteSubjectIdentityPermissionsRequest: DeleteSubjectIdentityPermissionsRequest
+  ): Promise<DeleteSubjectIdentityPermissionsResponse> {
+    const { authenticatedUser, subjectType, subjectId } = deleteSubjectIdentityPermissionsRequest;
+    const getIdentityPermissionsBySubject = this.getIdentityPermissionsBySubject.bind(this);
+
+    async function* pageThroughResults(
+      paginationToken?: string
+    ): AsyncGenerator<IdentityPermission[], void, void> {
+      const result = await getIdentityPermissionsBySubject({ subjectId, subjectType, paginationToken });
+
+      yield result.data.identityPermissions;
+
+      if (result.paginationToken) {
+        yield* pageThroughResults(result.paginationToken);
+      }
+    }
+
+    const allIdentityPermissions = new Array<IdentityPermission>();
+
+    for await (const page of pageThroughResults()) {
+      allIdentityPermissions.push(...page);
+    }
+
+    if (allIdentityPermissions.length > 0) {
+      for (const identityPermissions of _.chunk(allIdentityPermissions, 100)) {
+        await this.deleteIdentityPermissions({
+          authenticatedUser,
+          identityPermissions
+        });
+      }
+    }
+
+    return {
+      data: {
+        identityPermissions: allIdentityPermissions
       }
     };
   }
