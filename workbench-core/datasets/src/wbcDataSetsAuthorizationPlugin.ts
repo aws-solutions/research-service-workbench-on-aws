@@ -152,41 +152,31 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     datasetId: string,
     authenticatedUser: { id: string; roles: string[] }
   ): Promise<PermissionsResponse> {
-    const response: PermissionsResponse = {
-      data: {
-        dataSetId: datasetId,
-        permissions: []
-      }
-    };
-    let authzResponse;
-    let pageToken: string | undefined = undefined;
-    do {
-      authzResponse = await this._authorizer.deleteIdentityPermissionsBySubject({
-        subjectId: datasetId,
-        subjectType: dataSetSubjectType,
-        paginationToken: pageToken,
-        authenticatedUser
-      });
+    const authzResponse = await this._authorizer.deleteSubjectIdentityPermissions({
+      subjectId: datasetId,
+      subjectType: dataSetSubjectType,
+      authenticatedUser
+    });
+    const dataSetPermissions = _.filter(
+      authzResponse.data.identityPermissions,
+      (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
+    );
 
-      const dataSetPermissions = authzResponse._filter(
-        authzResponse.data.identityPermissions,
-        (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
-      );
-
-      const permissionsResponse = this._identityPermissionsToPermissionsResponse(dataSetPermissions);
-      if (!_.isEmpty(permissionsResponse)) {
-        if (permissionsResponse.length !== 1) {
-          throw new InvalidPermissionError(
-            `Expected a single permissions response, but got ${permissionsResponse.length}.`
-          );
+    const permissionsResponse = this._identityPermissionsToPermissionsResponse(dataSetPermissions);
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: datasetId,
+          permissions: []
         }
-        response.data.permissions.push(...permissionsResponse[0].data.permissions);
-      }
-
-      pageToken = authzResponse.paginationToken;
-    } while (pageToken);
-
-    return response;
+      };
+    }
+    if (permissionsResponse.length !== 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsResponse.length}.`
+      );
+    }
+    return permissionsResponse[0];
   }
 
   private _dataSetPermissionToIdentityPermissions(

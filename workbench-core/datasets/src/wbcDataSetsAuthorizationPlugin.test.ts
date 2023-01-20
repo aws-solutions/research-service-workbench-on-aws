@@ -436,7 +436,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
   describe('removeAllAccessPermissions tests', () => {
     it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).rejects.toThrow(
         new Error('Method not implemented.')
       );
     });
@@ -738,7 +738,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
   describe('removeAllAccessPermissions tests', () => {
     it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).rejects.toThrow(
         new Error('Method not implemented.')
       );
     });
