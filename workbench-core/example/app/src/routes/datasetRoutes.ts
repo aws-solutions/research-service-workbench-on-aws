@@ -64,7 +64,8 @@ export function setUpDSRoutes(
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
         storageProvider: dataSetStoragePlugin,
-        authenticatedUser: res.locals.user
+        authenticatedUser: res.locals.user,
+        permissions: req.body.permissions
       });
       res.status(201).send(dataSet);
     })
@@ -82,7 +83,8 @@ export function setUpDSRoutes(
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
         storageProvider: dataSetStoragePlugin,
-        authenticatedUser: res.locals.user
+        authenticatedUser: res.locals.user,
+        permissions: req.body.permissions
       });
       res.status(201).send(dataSet);
     })
