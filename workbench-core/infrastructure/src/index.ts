@@ -14,3 +14,7 @@ export * from './workbenchDynamodb';
 export * from './workbenchEncryptionKeyWithRotation';
 
 export * from './workbenchSecureS3Bucket';
+
+export * from './workbenchAppRegistry';
+
+export * from './workbenchAssociateStackToExistingAppRegistryApplication';
