@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { DataSetPermissionParser } from './dataSetPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DataSetParser = z.object({
@@ -55,7 +56,11 @@ export const DataSetParser = z.object({
   /**
    * AWS region of the dataset storage
    */
-  region: z.string().optional()
+  region: z.string().optional(),
+  /**
+   * Permissions associated with the DataSet
+   */
+  permissions: z.array(DataSetPermissionParser).optional()
 });
 
 export type DataSet = z.infer<typeof DataSetParser>;

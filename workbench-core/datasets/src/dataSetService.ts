@@ -11,6 +11,7 @@ import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
+import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import {
   AddDataSetExternalEndpointBaseRequest,
@@ -83,6 +84,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(provisioned);
+      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -116,6 +118,7 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response = await this._dbProvider.addDataSet(imported);
+      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -192,7 +195,7 @@ export class DataSetService {
     try {
       await this.getDataSet(dataSetId, authenticatedUser);
 
-      const allPermissions = await this._getAllUserPermissionsForDataset(authenticatedUser, dataSetId);
+      const allPermissions = await this._getAuthenticatedUserDatasetPermissions(authenticatedUser, dataSetId);
 
       if (!allPermissions.length) {
         throw new NotAuthorizedError(
@@ -273,7 +276,22 @@ export class DataSetService {
       dataSetId: dataSetId
     };
     try {
-      const response = await this._dbProvider.getDataSetMetadata(dataSetId);
+      const [dataSetResponse, permissionsResponse] = await Promise.all([
+        this._dbProvider.getDataSetMetadata(dataSetId),
+        this._authzPlugin.getAllDataSetAccessPermissions(dataSetId)
+      ]);
+      const response = {
+        ...dataSetResponse,
+        permissions: permissionsResponse.data.permissions
+      };
+      let nextPermissions = permissionsResponse;
+      while (nextPermissions.pageToken) {
+        nextPermissions = await this._authzPlugin.getAllDataSetAccessPermissions(
+          dataSetId,
+          permissionsResponse.pageToken
+        );
+        response.permissions.push(...nextPermissions.data.permissions);
+      }
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -614,7 +632,7 @@ export class DataSetService {
   ): Promise<PermissionsResponse> {
     const metadata: Metadata = {
       actor: authenticatedUser,
-      action: this.getAllDataSetAccessPermissions.name,
+      action: this.getDataSetAccessPermissions.name,
       source: {
         serviceName: DataSetService.name
       },
@@ -653,8 +671,13 @@ export class DataSetService {
       dataSetId
     };
     try {
-      await this.getDataSet(dataSetId, authenticatedUser);
-      const response = await this._authzPlugin.getAllDataSetAccessPermissions(dataSetId, pageToken);
+      const dataSetResponse = await this.getDataSet(dataSetId, authenticatedUser);
+      const response = {
+        data: {
+          dataSetId: dataSetResponse.id!,
+          permissions: dataSetResponse.permissions!
+        }
+      };
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -792,10 +815,13 @@ export class DataSetService {
     if (permissions.some(({ accessLevel }) => accessLevel === 'read-write')) {
       return 'read-write';
     }
-    throw new NotAuthorizedError('No permissions exist');
+    throw new InvalidPermissionError('No permissions exist');
   }
 
-  private async _getAllUserPermissionsForDataset(
+  /**
+   * Gets the user and group dataset permissions for the passed in authenticated user
+   */
+  private async _getAuthenticatedUserDatasetPermissions(
     authenticatedUser: AuthenticatedUser,
     dataSetId: string
   ): Promise<DataSetPermission[]> {
@@ -812,5 +838,26 @@ export class DataSetService {
     const groupPermissions = groupPermissionsData.map((data) => data.data.permissions);
 
     return userPermissionsData.permissions.concat(...groupPermissions);
+  }
+
+  private async _updateNewDataSetPermissions(
+    dataset: DataSet,
+    request: CreateProvisionDatasetRequest
+  ): Promise<DataSetPermission[]> {
+    const permissions = request.permissions ?? [];
+    if (!permissions.some((p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')) {
+      permissions.push({
+        identity: request.authenticatedUser.id,
+        identityType: 'USER',
+        accessLevel: 'read-only'
+      });
+    }
+    const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
+      authenticatedUser: request.authenticatedUser,
+      dataSetId: dataset.id,
+      permission: permissions
+    });
+
+    return response.data.permissions;
   }
 }

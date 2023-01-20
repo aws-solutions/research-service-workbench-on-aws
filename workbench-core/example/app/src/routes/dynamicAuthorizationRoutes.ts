@@ -25,6 +25,10 @@ import {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser
 } from '@aws/workbench-core-authorization';
+import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsRequestParser
+} from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
@@ -255,6 +259,21 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isThroughputExceededError(err)) throw Boom.tooManyRequests('Too many identities');
         throw err;
       }
+    })
+  );
+  router.delete(
+    '/authorization/permissions/subject',
+    wrapAsync(async (req: Request, res: Response) => {
+      const authenticatedUser = res.locals.user;
+      const validatedRequest = validateAndParse<DeleteSubjectIdentityPermissionsRequest>(
+        DeleteSubjectIdentityPermissionsRequestParser,
+        {
+          ...req.body,
+          authenticatedUser
+        }
+      );
+      const { data } = await service.deleteSubjectIdentityPermissions(validatedRequest);
+      res.status(201).send(data);
     })
   );
 
