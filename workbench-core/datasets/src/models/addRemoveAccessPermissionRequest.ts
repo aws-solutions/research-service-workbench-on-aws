@@ -15,8 +15,8 @@ export const AddRemoveAccessPermissionParser = z.object({
   }),
   /** the ID of the dataset */
   dataSetId: z.string(),
-  /** the permission to add or remove */
-  permission: DataSetPermissionParser
+  /** the permissions to add or remove */
+  permission: z.union([DataSetPermissionParser, z.array(DataSetPermissionParser)])
 });
 
 export type AddRemoveAccessPermissionRequest = z.infer<typeof AddRemoveAccessPermissionParser>;
