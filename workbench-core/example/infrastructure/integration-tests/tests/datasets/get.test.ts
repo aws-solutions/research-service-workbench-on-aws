@@ -42,13 +42,6 @@ describe('datasets get integration test', () => {
 
     it('returns the endpoint mount object when the user has permission', async () => {
       const userId = adminSession.getSettings().get('userId');
-      await dataset.addAccess({
-        permission: {
-          identityType: 'USER',
-          identity: userId,
-          accessLevel: 'read-only'
-        }
-      });
       const { data: endpointData } = await dataset.share({ userId });
       const endpoint = dataset.children.get(endpointData.mountObject.endpointId)!;
       const { data } = await endpoint.getMountObject();
@@ -66,22 +59,21 @@ describe('datasets get integration test', () => {
     });
 
     it('throws when getting the mount object of an endpoint which does not exist', async () => {
-      const userId = adminSession.getSettings().get('userId');
-      // give user access to the dataset
-      await dataset.addAccess({
-        permission: {
-          identityType: 'USER',
-          identity: userId,
-          accessLevel: 'read-only'
-        }
-      });
-
       await expect(
         dataset.endpoint({ id: fakeEndpointId, externalEndpointName: '' }).getMountObject()
       ).rejects.toThrow(new HttpError(404, {}));
     });
 
     it('throws when the calling user doesnt have permission on the dataset', async () => {
+      // remove default authenticated user access
+      const userId = adminSession.getSettings().get('userId');
+      await dataset.removeAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
       // create a fake group and give it access to the dataset
       const { data: groupData } = await adminSession.resources.groups.create();
       await dataset.addAccess({
@@ -99,15 +91,6 @@ describe('datasets get integration test', () => {
     });
 
     it('throws when the calling user doesnt have permission on the endpoint', async () => {
-      const userId = adminSession.getSettings().get('userId');
-      // give user access to the dataset
-      await dataset.addAccess({
-        permission: {
-          identityType: 'USER',
-          identity: userId,
-          accessLevel: 'read-only'
-        }
-      });
       // create a fake group and give it access to the dataset
       const { data: groupData } = await adminSession.resources.groups.create();
       await dataset.addAccess({
