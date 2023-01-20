@@ -235,7 +235,12 @@ export function setUpDSRoutes(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        await dataSetService.removeDataSet(req.params.datasetId, () => Promise.resolve(), res.locals.user);
+        const response = await dataSetService.removeDataSet(
+          req.params.datasetId,
+          () => Promise.resolve(),
+          res.locals.user
+        );
+        res.status(200).send(response);
       } catch (error) {
         if (isDataSetHasEndpointError(error)) {
           throw Boom.badRequest(error.message);
@@ -245,7 +250,6 @@ export function setUpDSRoutes(
         }
         throw error;
       }
-      res.status(204).send();
     })
   );
 

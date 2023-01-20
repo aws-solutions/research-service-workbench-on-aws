@@ -598,10 +598,27 @@ describe('DataSetService', () => {
   });
 
   describe('removeDataset', () => {
-    it('returns nothing when the dataset is removed', async () => {
+    it('returns the dataset when the dataset is removed', async () => {
+      const dataSetPermissionsResponse: PermissionsResponse = {
+        data: {
+          dataSetId: mockDataSetId,
+          permissions: [mockReadOnlyUserPermission]
+        }
+      };
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'removeAllAccessPermissions')
+        .mockImplementationOnce(async () => dataSetPermissionsResponse);
       await expect(
         dataSetService.removeDataSet(mockDataSetId, () => Promise.resolve(), mockAuthenticatedUser)
-      ).resolves.not.toThrow();
+      ).resolves.toMatchObject({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName,
+        permissions: dataSetPermissionsResponse.data.permissions
+      });
     });
     it('throws when an external endpoint exists on the DataSet.', async () => {
       await expect(
@@ -610,7 +627,7 @@ describe('DataSetService', () => {
           () => Promise.resolve(),
           mockAuthenticatedUser
         )
-      ).rejects.toThrow(
+      ).rejects.toThrowError(
         new DataSetHasEndpointError(
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         )
@@ -625,7 +642,7 @@ describe('DataSetService', () => {
           },
           mockAuthenticatedUser
         )
-      ).rejects.toThrow('Preconditions are not met');
+      ).rejects.toThrowError('Preconditions are not met');
       expect(audit.write).toHaveBeenCalledTimes(1);
     });
   });
