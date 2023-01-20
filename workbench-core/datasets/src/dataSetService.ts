@@ -252,11 +252,10 @@ export class DataSetService {
       const response: DataSet[] = [];
       const allDatasets = await this._dbProvider.listDataSets();
       for (const dataset of allDatasets) {
-        console.log(dataset);
-        // const permissions = await _getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id);
-        // if (permissions.length) {
-        //   returnedDatasets.push(dataset);
-        // }
+        const permissions = await this._getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id);
+        if (permissions.length) {
+          response.push(dataset);
+        }
       }
 
       await this._audit.write(metadata, response);
