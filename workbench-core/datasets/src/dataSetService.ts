@@ -4,6 +4,7 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -220,7 +221,7 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: { id: string; roles: string[] }): Promise<DataSet[]> {
+  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -228,8 +229,18 @@ export class DataSetService {
         serviceName: DataSetService.name
       }
     };
+
     try {
-      const response = await this._dbProvider.listDataSets();
+      const response: DataSet[] = [];
+      const allDatasets = await this._dbProvider.listDataSets();
+      for (const dataset of allDatasets) {
+        console.log(dataset);
+        // const permissions = await _getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id);
+        // if (permissions.length) {
+        //   returnedDatasets.push(dataset);
+        // }
+      }
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {

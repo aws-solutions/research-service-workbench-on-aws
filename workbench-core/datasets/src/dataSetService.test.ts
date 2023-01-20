@@ -723,7 +723,7 @@ describe('DataSetService', () => {
   });
 
   describe('listDataSets', () => {
-    it('returns an array of known DataSets.', async () => {
+    it('returns an array of DataSets the authenticated user has access to.', async () => {
       await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toEqual([
         {
           id: mockDataSetId,
