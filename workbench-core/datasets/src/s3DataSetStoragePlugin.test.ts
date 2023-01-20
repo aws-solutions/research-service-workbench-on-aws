@@ -1067,7 +1067,7 @@ describe('S3DataSetStoragePlugin', () => {
 
     it('throws InvalidEndpointError when an access point without an Alias is created', async () => {
       const s3Mock = mockClient(S3ControlClient);
-      s3Mock.on(CreateAccessPointCommand).resolves({ Alias: mockAccessPointAlias });
+      s3Mock.on(CreateAccessPointCommand).resolves({ AccessPointArn: accessPointArn, Alias: undefined });
 
       await expect(
         plugin.addExternalEndpoint({
@@ -1084,7 +1084,9 @@ describe('S3DataSetStoragePlugin', () => {
 
     it('throws InvalidEndpointError when an access point without an AccessPointArn is created', async () => {
       const s3Mock = mockClient(S3ControlClient);
-      s3Mock.on(CreateAccessPointCommand).resolves({ AccessPointArn: accessPointArn });
+      s3Mock
+        .on(CreateAccessPointCommand)
+        .resolves({ AccessPointArn: undefined, Alias: mockAccessPointAlias });
 
       await expect(
         plugin.addExternalEndpoint({
