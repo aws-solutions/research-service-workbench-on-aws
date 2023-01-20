@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Application } from '@aws-cdk/aws-servicecatalogappregistry-alpha';
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
