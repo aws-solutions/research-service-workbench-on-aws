@@ -2,7 +2,7 @@
 
 ## Description
 
-**A CDK Construct to associate a Stack to an existing AppRegistry Application**:
+**A CDK Construct to associate a Stack with an existing AppRegistry Application**:
 
 ## Usage
 
