@@ -256,6 +256,7 @@ Resources:
       DirectInternetAccess: Enabled
       LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
+      PlatformIdentifier: 'notebook-al2-v2'
 
   # Add script for mounting studies and autostop
   BasicNotebookInstanceLifecycleConfig:
