@@ -19,17 +19,19 @@ import {
   DataSetsStoragePlugin,
   isDataSetHasEndpointError,
   isDataSetNotFoundError,
+  isEndpointNotFoundError,
   isInvalidArnError,
+  isInvalidEndpointError,
   isInvalidIamRoleError,
   isNotAuthorizedError,
-  isEndPointExistsError,
+  isEndpointExistsError,
   isInvalidPermissionError,
   PermissionsResponse
 } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { dataSetPrefix, endPointPrefix, groupIdRegExAsString } from '../configs/constants';
+import { dataSetPrefix, endpointPrefix, groupIdRegExAsString } from '../configs/constants';
 import {
   AddRemoveAccessPermissionRequest,
   AddRemoveAccessPermissionParser
@@ -140,7 +142,7 @@ export function setUpDSRoutes(
         if (isNotAuthorizedError(error)) {
           throw Boom.forbidden(error.message);
         }
-        if (isEndPointExistsError(error) || isInvalidArnError(error)) {
+        if (isEndpointExistsError(error) || isInvalidArnError(error)) {
           throw Boom.badRequest(error.message);
         }
         throw error;
@@ -154,7 +156,7 @@ export function setUpDSRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       if (
         req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null ||
-        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endPointPrefix)) === null
+        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endpointPrefix)) === null
       ) {
         throw Boom.badRequest('datasetId and endpointId parameters must be valid');
       }
@@ -166,6 +168,37 @@ export function setUpDSRoutes(
         res.locals.user
       );
       res.status(204).send();
+    })
+  );
+
+  // get dataset endpoint mount object
+  router.get(
+    '/datasets/:datasetId/share/:endpointId/mount-object',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const authenticatedUser = validateAndParse<AuthenticatedUser>(
+          AuthenticatedUserParser,
+          res.locals.user
+        );
+
+        const { data } = await dataSetService.getDataSetMountObject({
+          dataSetId: req.params.datasetId,
+          endpointId: req.params.endpointId,
+          authenticatedUser
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isDataSetNotFoundError(error) || isEndpointNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isInvalidEndpointError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        if (isNotAuthorizedError(error)) {
+          throw Boom.forbidden(error.message);
+        }
+        throw error;
+      }
     })
   );
 
@@ -323,6 +356,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get all dataset access permissions
   router.get(
     '/datasets/:datasetId/permissions',
     wrapAsync(async (req: Request, res: Response) => {
@@ -347,6 +381,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get specific dataset access permissions for a group
   router.get(
     '/datasets/:datasetId/permissions/roles/:roleId',
     wrapAsync(async (req: Request, res: Response) => {
@@ -378,6 +413,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // get specific dataset access permissions for a user
   router.get(
     '/datasets/:datasetId/permissions/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
@@ -409,7 +445,7 @@ export function setUpDSRoutes(
     })
   );
 
-  // remove dataset access permission
+  // remove dataset access permission for user
   router.delete(
     '/datasets/:datasetId/permissions/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
@@ -445,6 +481,7 @@ export function setUpDSRoutes(
     })
   );
 
+  // remove dataset access permission for group
   router.delete(
     '/datasets/:datasetId/permissions/roles/:roleId',
     wrapAsync(async (req: Request, res: Response) => {
