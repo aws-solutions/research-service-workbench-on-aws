@@ -51,7 +51,7 @@ export function setUpProjectRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListProjectsRequest>(ListProjectsRequestParser, {
         ...req.query,
-        userId: res.locals.user.id
+        user: res.locals.user
       });
 
       res.send(await projectService.listProjects(validatedRequest));

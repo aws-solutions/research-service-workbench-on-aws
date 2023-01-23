@@ -18,7 +18,17 @@ import {
   UpdateItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import {
+  AuthenticatedUser,
+  CreateGroupRequest,
+  CreateGroupResponse,
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsResponse,
+  DynamicAuthorizationService,
+  GetUserGroupsRequest,
+  GetUserGroupsResponse,
+  IdentityPermission
+} from '@aws/workbench-core-authorization';
 import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import { UpdateUnmarshalledOutput } from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/interfaces/updateUnmarshalledOutput';
@@ -35,10 +45,18 @@ import ProjectService from './projectService';
 describe('ProjectService', () => {
   const ddbMock = mockClient(DynamoDBClient);
   const TABLE_NAME = 'exampleDDBTable';
-  const projService = new ProjectService({ TABLE_NAME });
+  const dynamoDBService = new DynamoDBService({
+    region: process.env.AWS_REGION!,
+    table: TABLE_NAME
+  });
+  const dynamicAuthZ = {} as DynamicAuthorizationService;
+  const projService = new ProjectService(dynamoDBService, dynamicAuthZ);
   const timestamp = '2022-05-18T20:33:42.608Z';
   const mockDateObject = new Date(timestamp);
-  const userId = 'user-123';
+  const user: AuthenticatedUser = {
+    id: 'user-123',
+    roles: []
+  };
   let projects: Project[];
   const project1: Project = {
     id: 'proj-123',
@@ -187,26 +205,36 @@ describe('ProjectService', () => {
       // BUILD
       const pageSize = -1;
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ userId, pageSize })).rejects.toThrow(
+      await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
         'Please supply a non-negative page size.'
       );
     });
 
     test('list all projects with no group membership', async () => {
       // BUILD
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => []);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: []
+            }
+          });
+        }
+      );
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse).toEqual({ data: [] });
@@ -218,9 +246,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -240,7 +274,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse.data).toEqual([]);
@@ -256,9 +290,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -278,7 +318,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -294,9 +334,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -325,7 +371,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { createdAt: { between: { value1: 'date1', value2: 'date2' } } }
       });
 
@@ -343,9 +389,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -370,7 +422,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { dependency: { eq: 'cc-123' } }
       });
 
@@ -388,9 +440,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -415,7 +473,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { status: { eq: 'AVAILABLE' } }
       });
 
@@ -433,9 +491,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -460,7 +524,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { name: { eq: 'Example project' } }
       });
 
@@ -478,9 +542,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -502,7 +572,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { createdAt: 'asc' }
       });
 
@@ -520,9 +590,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -544,7 +620,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { dependency: 'asc' }
       });
 
@@ -562,9 +638,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -586,7 +668,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { status: 'asc' }
       });
 
@@ -604,9 +686,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -628,7 +716,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { name: 'asc' }
       });
 
@@ -656,9 +744,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -678,7 +772,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -704,9 +798,15 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
 
       ddbMock
         .on(QueryCommand, {
@@ -726,26 +826,29 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
     });
 
     test('list projects when user is only part of 1 groups', async () => {
-      // BUILD
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA']
+            }
+          });
+        }
+      );
 
       const getItemResponse: Record<string, JSONValue> = projItem;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       jest.spyOn(DynamoDBService.prototype as any, 'getItem').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -757,11 +860,15 @@ describe('ProjectService', () => {
       const pageSize = 4;
       const expectedResponse = { data: projects, paginationToken: undefined };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -775,7 +882,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -792,11 +899,15 @@ describe('ProjectService', () => {
       const pageSize = 3;
       const expectedResponse = { data: projects, paginationToken: paginationToken };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -810,7 +921,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -820,11 +931,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -839,7 +954,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: {
           createdAt: { between: { value1: '2022-11-10T04:19:00.000Z', value2: '2022-11-10T04:20:00.000Z' } }
         }
@@ -853,11 +968,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock getBatchItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -872,7 +991,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { dependency: { eq: 'cc-1' } }
       });
 
@@ -884,11 +1003,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -903,7 +1026,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { status: { eq: 'AVAILABLE' } }
       });
 
@@ -915,11 +1038,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -934,7 +1061,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         filter: { name: { begins: 'name' } }
       });
 
@@ -946,11 +1073,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -965,7 +1096,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { createdAt: 'asc' }
       });
 
@@ -977,11 +1108,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -996,7 +1131,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { dependency: 'asc' }
       });
 
@@ -1008,11 +1143,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1027,7 +1166,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { status: 'asc' }
       });
 
@@ -1039,11 +1178,15 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1058,7 +1201,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        userId,
+        user,
         sort: { name: 'desc' }
       });
 
@@ -1077,11 +1220,15 @@ describe('ProjectService', () => {
       const pageSize = 2;
       const expectedResponse = { data: [project3], paginationToken: undefined };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1095,7 +1242,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1117,11 +1264,15 @@ describe('ProjectService', () => {
         )
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1135,7 +1286,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1151,11 +1302,15 @@ describe('ProjectService', () => {
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 1;
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1169,7 +1324,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ userId, pageSize, paginationToken })).rejects.toThrow(
+      await expect(() => projService.listProjects({ user, pageSize, paginationToken })).rejects.toThrow(
         'Pagination token is invalid.'
       );
     });
@@ -1181,11 +1336,15 @@ describe('ProjectService', () => {
         paginationToken: undefined
       };
 
-      // mock getUserGroups--TODO update after dynamic AuthZ intergration
-      jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+            }
+          });
+        }
+      );
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1195,7 +1354,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ userId });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1244,6 +1403,46 @@ describe('ProjectService', () => {
       id: 'user-456',
       roles: []
     };
+
+    beforeEach(() => {
+      dynamicAuthZ.getUserGroups = jest.fn(
+        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+          return Promise.resolve({
+            data: {
+              groupIds: ['ITAdmin']
+            }
+          });
+        }
+      );
+
+      dynamicAuthZ.createGroup = jest.fn((request: CreateGroupRequest): Promise<CreateGroupResponse> => {
+        return Promise.resolve({
+          data: {
+            groupId: 'proj-123#PA'
+          }
+        });
+      });
+
+      const identityPermission: IdentityPermission = {
+        action: 'CREATE',
+        effect: 'ALLOW',
+        subjectType: '',
+        subjectId: '',
+        identityType: 'GROUP',
+        identityId: ''
+      };
+
+      dynamicAuthZ.createIdentityPermissions = jest.fn(
+        (request: CreateIdentityPermissionsRequest): Promise<CreateIdentityPermissionsResponse> => {
+          return Promise.resolve({
+            data: {
+              identityPermissions: [identityPermission]
+            }
+          });
+        }
+      );
+    });
+
     test('create a project with valid name', async () => {
       // BUILD
       const params = {
@@ -1768,7 +1967,7 @@ describe('ProjectService', () => {
     };
 
     beforeEach(() => {
-      request = { projectId };
+      request = { authenticatedUser: user, projectId };
       checkDependency = async function (projectId: string): Promise<void> {
         return;
       };
