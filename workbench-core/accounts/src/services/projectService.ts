@@ -199,33 +199,22 @@ export default class ProjectService {
     // Generate Project ID
     const projectId = uuidWithLowercasePrefix(resourceTypeToKey.project);
 
-    const createProjectAdminGroupResponse = await this._dynamicAuthorizationService.createGroup({
+    await this._dynamicAuthorizationService.createGroup({
       authenticatedUser: user,
       groupId: `${projectId}#ProjectAdmin`,
       description: `Project Admin group for ${projectId}`
     });
-    const createResearcherGroupResponse = await this._dynamicAuthorizationService.createGroup({
+    await this._dynamicAuthorizationService.createGroup({
       authenticatedUser: user,
       groupId: `${projectId}#Researcher`,
       description: `Researcher group for ${projectId}`
     });
-    // if (!createProjectAdminGroupResponse.data.groupId || !createResearcherGroupResponse.data.groupId) {
-    //   throw Boom.badImplementation(
-    //     'Failed to create Project Admin group or Researcher group with dynamic authorization service.'
-    //   );
-    // }
 
     const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
-    const createIdentityPermissionsResponse =
-      await this._dynamicAuthorizationService.createIdentityPermissions({
-        authenticatedUser: user,
-        identityPermissions: identityPermissions
-      });
-    // if (!createIdentityPermissionsResponse.data.identityPermissions) {
-    //   throw Boom.badImplementation(
-    //     'Failed to create batch identity permissions for project with dyamic authorization service.'
-    //   );
-    // }
+    await this._dynamicAuthorizationService.createIdentityPermissions({
+      authenticatedUser: user,
+      identityPermissions: identityPermissions
+    });
 
     // Create Proj in DDB
     const currentTime = new Date(Date.now()).toISOString();
@@ -324,30 +313,19 @@ export default class ProjectService {
     const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(
       request.projectId
     );
-    const deleteIdentityPermissionsResponse =
-      await this._dynamicAuthorizationService.deleteIdentityPermissions({
-        authenticatedUser: request.authenticatedUser,
-        identityPermissions: identityPermissions
-      });
-    // if (!createIdentityPermissionsResponse.deleted) {
-    //   throw Boom.badImplementation(
-    //     'Failed to delete batch identity permissions for project with dyamic authorization service.'
-    //   );
-    // }
+    await this._dynamicAuthorizationService.deleteIdentityPermissions({
+      authenticatedUser: request.authenticatedUser,
+      identityPermissions: identityPermissions
+    });
 
-    const deleteProjectAdminGroupResponse = await this._dynamicAuthorizationService.deleteGroup({
+    await this._dynamicAuthorizationService.deleteGroup({
       authenticatedUser: request.authenticatedUser,
       groupId: `${request.projectId}#ProjectAdmin`
     });
-    const deleteResearcherGroupResponse = await this._dynamicAuthorizationService.deleteGroup({
+    await this._dynamicAuthorizationService.deleteGroup({
       authenticatedUser: request.authenticatedUser,
       groupId: `${request.projectId}#Researcher`
     });
-    // if (!deleteProjectAdminGroupResponse.created || !deleteResearcherGroupResponse.created) {
-    //   throw Boom.badImplementation(
-    //     'Failed to delete Project Admin group or Researcher group with dynamic authorization service.'
-    //   );
-    // }
 
     // delete from DDB
     try {

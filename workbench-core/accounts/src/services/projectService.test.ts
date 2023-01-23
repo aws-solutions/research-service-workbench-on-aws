@@ -40,6 +40,7 @@ import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { Project } from '../models/projects/project';
 import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
+import CostCenterService from './costCenterService';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
@@ -50,7 +51,8 @@ describe('ProjectService', () => {
     table: TABLE_NAME
   });
   const dynamicAuthZ = {} as DynamicAuthorizationService;
-  const projService = new ProjectService(dynamoDBService, dynamicAuthZ);
+  const costCenterService = new CostCenterService(dynamoDBService);
+  const projService = new ProjectService(dynamoDBService, dynamicAuthZ, costCenterService);
   const timestamp = '2022-05-18T20:33:42.608Z';
   const mockDateObject = new Date(timestamp);
   const user: AuthenticatedUser = {
@@ -200,6 +202,24 @@ describe('ProjectService', () => {
     vpcId: 'vpc-0b0bc7ae01d82e7b3'
   };
 
+  const noUserGroupsFunction = jest.fn((request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+    return Promise.resolve({
+      data: {
+        groupIds: []
+      }
+    });
+  });
+
+  const itAdminUserGroupsFunction = jest.fn(
+    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+      return Promise.resolve({
+        data: {
+          groupIds: ['ITAdmin']
+        }
+      });
+    }
+  );
+
   describe('listProjects', () => {
     test('should fail on list projects for negative pageSize', async () => {
       // BUILD
@@ -223,15 +243,7 @@ describe('ProjectService', () => {
 
     test('list all projects with no group membership', async () => {
       // BUILD
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: []
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = noUserGroupsFunction;
 
       // OPERATE
       const actualResponse = await projService.listProjects({ user });
@@ -246,15 +258,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -290,15 +294,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -334,15 +330,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -389,15 +377,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -440,15 +420,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -491,15 +463,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -542,15 +506,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -590,15 +546,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -638,15 +586,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -686,15 +626,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -744,15 +676,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -798,15 +722,7 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -1405,16 +1321,7 @@ describe('ProjectService', () => {
     };
 
     beforeEach(() => {
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['ITAdmin']
-            }
-          });
-        }
-      );
-
+      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
       dynamicAuthZ.createGroup = jest.fn((request: CreateGroupRequest): Promise<CreateGroupResponse> => {
         return Promise.resolve({
           data: {
