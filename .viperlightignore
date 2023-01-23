@@ -16,11 +16,11 @@ lib
 #SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
 solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:172
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:177
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:232
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:237
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:275
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:280
 # email: 'john@doe.com' is not real email
 workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 # email: 'sample.user@amazon.com' is not real email
@@ -52,3 +52,7 @@ solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivat
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
+#Fake account ID used for workbenchAppRegistry tests
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:110

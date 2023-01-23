@@ -10,7 +10,7 @@ export interface EndpointConnectionStrings {
   endPointUrl: string;
 
   /**
-   * An optional alias which also can be used to access the storage endpoint.
+   * An alias which also can be used to access the storage endpoint.
    */
-  endPointAlias?: string;
+  endPointAlias: string;
 }

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "Add AppRegistry Construct",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}
