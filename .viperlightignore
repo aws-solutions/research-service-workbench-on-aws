@@ -16,11 +16,11 @@ lib
 #SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
 solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:172
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:177
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:232
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:237
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:275
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:280
 # email: 'john@doe.com' is not real email
 workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 # email: 'sample.user@amazon.com' is not real email
@@ -41,7 +41,7 @@ workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorizati
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:242
 # Fake email for DataSetsService integration tests
 workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:31
-workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:29
+workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:30
 workbench-core/example/infrastructure/integration-tests/tests/datasets/create.test.ts:84
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
@@ -51,3 +51,7 @@ solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivat
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
+#Fake account ID used for workbenchAppRegistry tests
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:110
