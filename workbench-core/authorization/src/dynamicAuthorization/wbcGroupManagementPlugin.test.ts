@@ -102,14 +102,6 @@ describe('WBCGroupManagemntPlugin', () => {
       expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
     });
 
-    it('succesfully create a group even when userManagementPlugin throws RoleAlreadyExistsError', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
-      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
-      wbcGroupManagementPlugin.setGroupStatus = jest.fn();
-      const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
-      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
-    });
-
     it('throws GroupAlreadyExistsError when the group is pending delete', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest
         .fn()
@@ -135,6 +127,15 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(IdpUnavailableError);
+    });
+
+    it('throws GroupAlreadyExistsError when the group already exists', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupAlreadyExistsError);
     });
 
     it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {

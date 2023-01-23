@@ -74,9 +74,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       return { data: { groupId } };
     } catch (error) {
       if (isRoleAlreadyExistsError(error)) {
-        //Do not throw error, group can already exist but not exist in Dynamic Authz
-        await this.setGroupStatus({ groupId, status: 'active' });
-        return { data: { groupId } };
+        throw new GroupAlreadyExistsError(error.message);
       }
       throw error;
     }
