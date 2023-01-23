@@ -220,7 +220,7 @@ export class DynamicAuthorizationService {
             subjectValue.replace(paramRegex, (ignore, key) => {
               const response = _.get(params, key);
               if (!response) throw new ParamNotFoundError('Missing parameter');
-              return response;
+              return response as string;
             })
           );
         });

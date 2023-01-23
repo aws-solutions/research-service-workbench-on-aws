@@ -24,7 +24,7 @@ export const IsAuthorizedOnRouteRequestParser = z.object({
   /**
    * Optional params for variable based operations
    */
-  params: z.record(z.string()).optional()
+  params: z.record(z.unknown()).optional()
 });
 
 /**

@@ -277,7 +277,6 @@ describe('dynamic authorization identity permission integration tests ', () => {
       const { data } = await adminSession.resources.groups.create();
       groupId = data.groupId;
       randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
-      randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
       subjectType = 'sampleResource';
       subjectId = randomTextGenerator.getFakeText('sampleSubjectId');
       parentId = randomTextGenerator.getFakeText('sampleParentId');

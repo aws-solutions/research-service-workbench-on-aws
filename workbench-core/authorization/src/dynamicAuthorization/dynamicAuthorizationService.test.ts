@@ -179,7 +179,7 @@ describe('DynamicAuthorizationService', () => {
             identityPermissions: []
           }
         });
-      await dynamicAuthzService.isAuthorizedOnSubject(params);
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
         source: auditSource,
@@ -205,7 +205,7 @@ describe('DynamicAuthorizationService', () => {
             identityPermissions: mockIdentityPermissions
           }
         });
-      await dynamicAuthzService.isAuthorizedOnSubject(params);
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
       expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(2);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
@@ -234,7 +234,7 @@ describe('DynamicAuthorizationService', () => {
             identityPermissions: []
           }
         });
-      await dynamicAuthzService.isAuthorizedOnSubject(params);
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
       expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(3);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
@@ -410,8 +410,8 @@ describe('DynamicAuthorizationService', () => {
         params: mockParams
       };
       mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest.fn();
-      const response = await dynamicAuthzService.isAuthorizedOnRoute(params);
-      expect(response).toBeUndefined();
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
         source: auditSource,
@@ -480,8 +480,8 @@ describe('DynamicAuthorizationService', () => {
         params: mockParams
       };
       mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest.fn();
-      const response = await dynamicAuthzService.isAuthorizedOnRoute(params);
-      expect(response).toBeUndefined();
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
         source: auditSource,
@@ -539,8 +539,8 @@ describe('DynamicAuthorizationService', () => {
         method: mockMethod,
         params: mockParams
       };
-      const response = await dynamicAuthzService.isAuthorizedOnRoute(params);
-      expect(response).toBeUndefined();
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
       expect(auditServiceWriteSpy).toHaveBeenCalledWith({
         actor: mockUser,
         source: auditSource,

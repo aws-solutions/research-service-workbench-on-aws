@@ -19,6 +19,10 @@ describe('CASL Authorization Plugin', () => {
   let mockGuestPermissions: Permission[];
   let mockOperations: Operation[];
 
+  beforeEach(() => {
+    expect.hasAssertions();
+  });
+
   describe('isAuthorized', () => {
     beforeEach(() => {
       mockAdminPermissions = [
@@ -66,7 +70,6 @@ describe('CASL Authorization Plugin', () => {
       ];
       try {
         await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-        expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(ForbiddenError);
         expect(err.message).toBe('User is not capable of updating');
@@ -94,7 +97,6 @@ describe('CASL Authorization Plugin', () => {
       ];
       try {
         await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-        expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(ForbiddenError);
         expect(err.message).toBe('Permission Not Granted');
@@ -131,7 +133,6 @@ describe('CASL Authorization Plugin', () => {
       ];
       try {
         await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-        expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(ForbiddenError);
         expect(err.message).toBe(`Cannot execute "${testAction}" on "${testSubject}"`);
@@ -149,15 +150,9 @@ describe('CASL Authorization Plugin', () => {
       'Random array should throw error',
       [fc.uniqueArray(fc.anything()), fc.uniqueArray(fc.anything(), { minLength: 1 })],
       async (userPermissions, operations) => {
-        try {
-          await caslAuthorizationPlugin.isAuthorized(
-            userPermissions as Permission[],
-            operations as Operation[]
-          );
-          expect.hasAssertions();
-        } catch (err) {
-          // eslint-disable-next-line no-empty
-        }
+        await expect(
+          caslAuthorizationPlugin.isAuthorized(userPermissions as Permission[], operations as Operation[])
+        ).rejects.toThrow();
       }
     );
   });
@@ -205,11 +200,13 @@ describe('CASL Authorization Plugin', () => {
           }
         }
       ];
-      const response = await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
-        mockIdentityPermissions,
-        mockDynamicOperations
-      );
-      expect(response).toBeUndefined();
+      expect(
+        async () =>
+          await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+            mockIdentityPermissions,
+            mockDynamicOperations
+          )
+      ).not.toThrow();
     });
 
     test('Check for a invalid dynamic operations due invalid conditions', async () => {
@@ -222,16 +219,13 @@ describe('CASL Authorization Plugin', () => {
           }
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
           mockIdentityPermissions,
           mockDynamicOperations
-        );
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('Cannot execute "CREATE" on "SampleSubject"');
-      }
+        )
+      ).rejects.toThrow(new ForbiddenError('Cannot execute "CREATE" on "SampleSubject"'));
     });
     test('Ensure DENY takes precedence', async () => {
       const mockDynamicOperations: DynamicOperation[] = [
@@ -243,16 +237,13 @@ describe('CASL Authorization Plugin', () => {
           }
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
           mockIdentityPermissions,
           mockDynamicOperations
-        );
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('Cannot execute "UPDATE" on "SampleSubject"');
-      }
+        )
+      ).rejects.toThrow(new ForbiddenError('Cannot execute "UPDATE" on "SampleSubject"'));
     });
   });
 });

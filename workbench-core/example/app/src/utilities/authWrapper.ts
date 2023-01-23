@@ -7,9 +7,16 @@ import { DynamicAuthorizationService, HTTPMethodParser } from '@aws/workbench-co
 import { Request, Response, NextFunction } from 'express';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const wrapAuth = (fn: any, dynamicAuthorizationService: DynamicAuthorizationService): any => {
+export const wrapAuth = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+  dynamicAuthorizationService: DynamicAuthorizationService
+): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
   // eslint-disable-next-line func-names
-  return async function (req: Request, res: Response, next: NextFunction) {
+  const wrapper: (req: Request, res: Response, next: NextFunction) => Promise<void> = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const params = req.params;
     const route = req.originalUrl;
     const authenticatedUser = res.locals.user;
@@ -26,4 +33,6 @@ export const wrapAuth = (fn: any, dynamicAuthorizationService: DynamicAuthorizat
       res.status(403).send();
     }
   };
+
+  return wrapper;
 };
