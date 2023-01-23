@@ -141,7 +141,7 @@ export class DataSetService {
       id: string;
       roles: string[];
     }
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.removeDataSet.name,
@@ -159,8 +159,14 @@ export class DataSetService {
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         );
       }
-      await this._dbProvider.removeDataSet(dataSetId);
-      await this._audit.write(metadata);
+      const [accessResponse] = await Promise.all([
+        this._authzPlugin.removeAllAccessPermissions(dataSetId, authenticatedUser),
+        this._dbProvider.removeDataSet(dataSetId)
+      ]);
+
+      targetDS.permissions = accessResponse.data.permissions;
+      await this._audit.write(metadata, targetDS);
+      return targetDS;
     } catch (error) {
       await this._audit.write(metadata, error);
       throw error;

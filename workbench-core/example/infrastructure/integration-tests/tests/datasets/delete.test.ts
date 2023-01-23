@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { DataSet } from '@aws/workbench-core-datasets';
 import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,11 +40,16 @@ describe('datasets delete integration test', () => {
   describe('RemoveDataSets', () => {
     it('removes a dataset', async () => {
       const response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId: string = response.data.id;
+      // remove property not normally part of a dataset.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { authenticatedUser, ...dataSet } = response.data;
 
-      await expect(adminSession.resources.datasets.children.get(dataSetId)!.delete()).resolves.not.toThrow();
+      const deleteResponse = await adminSession.resources.datasets.children.get(dataSet.id!)!.delete();
+      const deleted: DataSet = deleteResponse.data;
 
-      await expect(adminSession.resources.datasets.get({ id: dataSetId })).rejects.toThrowError(
+      expect(deleted).toMatchObject<DataSet>(dataSet);
+
+      await expect(adminSession.resources.datasets.get({ id: dataSet.id! })).rejects.toThrowError(
         new HttpError(404, 'Not Found')
       );
     });
