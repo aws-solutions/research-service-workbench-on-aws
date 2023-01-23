@@ -322,6 +322,15 @@ describe('dynamic authorization identity permission integration tests ', () => {
         .put(`/parentResource/${parentId}/resource/${subjectId}`);
       expect(response.status).toBe(200);
     });
+    test('is not authorized on to PUT /parentResource/:parentId/resource/:resourceId with missing permissions', async () => {
+      const unauthorizedSubjectId = randomTextGenerator.getFakeText('sampleSubjectId');
+
+      await expect(
+        newAdminSession
+          .getAxiosInstance()
+          .put(`/parentResource/${parentId}/resource/${unauthorizedSubjectId}`)
+      ).rejects.toThrowError(new HttpError(403, {}));
+    });
     test('is authorized on to GET /listResources/:parentId with correct permissions', async () => {
       const response = await newAdminSession.getAxiosInstance().get(`/listResources/${parentId}`);
       expect(response.status).toBe(200);
