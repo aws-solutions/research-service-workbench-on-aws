@@ -68,12 +68,10 @@ describe('CASL Authorization Plugin', () => {
           subject: 'Sample'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('User is not capable of updating');
-      }
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError('User is not capable of updating'));
     });
     test('authorized user with action and subject', async () => {
       mockOperations = [
@@ -95,12 +93,9 @@ describe('CASL Authorization Plugin', () => {
           field: 'id'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('Permission Not Granted');
-      }
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError('Permission Not Granted'));
     });
 
     test('authorized user with action, subject, and field', async () => {
@@ -131,12 +126,10 @@ describe('CASL Authorization Plugin', () => {
           field: 'id'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe(`Cannot execute "${testAction}" on "${testSubject}"`);
-      }
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError(`Cannot execute "${testAction}" on "${testSubject}"`));
     });
 
     test('authorized with no action', async () => {
