@@ -1452,6 +1452,7 @@ importers:
       '@aws/workbench-core-infrastructure': link:../../infrastructure
       '@aws/workbench-core-user-management': link:../../user-management
       aws-cdk-lib: 2.61.0_constructs@10.1.25
+      aws-jwt-verify: 3.3.0
       constructs: 10.1.25
       cookie-parser: 1.4.6
       csrf: 3.1.0
@@ -8679,6 +8680,7 @@ packages:
   /aws-jwt-verify/3.3.0:
     resolution: {integrity: sha512-gb25clHLamaRXwJnKsW5d/0rEjCUErLsLekryzJYManQV0GfVuv9g8Q+BYeb2owycXvUOi/aqo5czkj3EPtJSg==}
     engines: {node: '>=14.0.0'}
+    dev: false
 
   /aws-lambda/1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
