@@ -45,7 +45,7 @@ export interface ExternalEndpoint {
   endPointUrl: string;
 
   /**
-   * An optional alias through which the endpoint can be accessed.
+   * An alias through which the endpoint can be accessed.
    */
-  endPointAlias?: string;
+  endPointAlias: string;
 }

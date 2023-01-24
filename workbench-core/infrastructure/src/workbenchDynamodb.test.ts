@@ -197,6 +197,22 @@ describe('workbenchDynamodb Test', () => {
         Statement: [
           {
             Action: [
+              'kms:Decrypt',
+              'kms:DescribeKey',
+              'kms:Encrypt',
+              'kms:ReEncrypt*',
+              'kms:GenerateDataKey*'
+            ],
+            Effect: 'Allow',
+            Resource: {
+              'Fn::GetAtt': [
+                'TestDynamodbTableTestDynamodbTableEncryptionKeyTestDynamodbTableEncryptionKeyKeyEE2AC39B',
+                'Arn'
+              ]
+            }
+          },
+          {
+            Action: [
               'dynamodb:BatchGetItem',
               'dynamodb:GetRecords',
               'dynamodb:GetShardIterator',
@@ -219,22 +235,6 @@ describe('workbenchDynamodb Test', () => {
                 Ref: 'AWS::NoValue'
               }
             ]
-          },
-          {
-            Action: [
-              'kms:Decrypt',
-              'kms:DescribeKey',
-              'kms:Encrypt',
-              'kms:ReEncrypt*',
-              'kms:GenerateDataKey*'
-            ],
-            Effect: 'Allow',
-            Resource: {
-              'Fn::GetAtt': [
-                'TestDynamodbTableTestDynamodbTableEncryptionKeyTestDynamodbTableEncryptionKeyKeyEE2AC39B',
-                'Arn'
-              ]
-            }
           }
         ]
       }

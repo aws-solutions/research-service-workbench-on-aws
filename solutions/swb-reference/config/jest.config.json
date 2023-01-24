@@ -17,7 +17,8 @@
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
     "<rootDir>/src/services/dataSetService.ts",
-    "<rootDir>/src/services/projectEnvTypeConfigService.ts"
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts",
+    "<rootDir>/src/services/keyPairService.ts"
   ],
   "coverageThreshold": {
     "global": {
