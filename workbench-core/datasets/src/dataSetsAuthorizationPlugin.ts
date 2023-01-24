@@ -55,8 +55,11 @@ export interface DataSetsAuthorizationPlugin {
   /**
    * Remove all permssions from a given dataset.
    * @param datasetId - the ID of the datset for which permissions are to be removed.
+   * @param authenticatedUser - an object representing the user making the request.
    * @returns a {@link PermissionsResponse} indicating the permissions removed.
-   * IMPORTANT: If the returned object has a non-null `pageToken`, there are more permissions to delete.
    */
-  removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
+  removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse>;
 }

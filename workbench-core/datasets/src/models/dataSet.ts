@@ -3,64 +3,69 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface DataSet {
+import { z } from 'zod';
+import { DataSetPermissionParser } from './dataSetPermission';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DataSetParser = z.object({
   /**
    * an internally generated value which uniquely identifies the dataset.
    */
-  id?: string;
-
+  id: z.string(),
   /**
    * the name of a DataSet
    */
-  name: string;
-
+  name: z.string(),
   /**
    * the date and time string at which the DataSet was added to the solution.
    */
-  createdAt?: string;
-
+  createdAt: z.string(),
   /**
    * (optional) a description of the dataset
    */
-  description?: string;
-
+  description: z.string().optional(),
   /**
    * (optional) the owner of the dataset
    */
-  owner?: string;
-
+  owner: z.string().optional(),
   /**
    * (optional) the type of the dataset
    */
-  type?: string;
-
+  type: z.string().optional(),
   /**
    * a string which identifies the storage specific location such the URL to an S3 bucket.
    */
-  storageName: string;
-
+  storageName: z.string(),
   /**
    * Storage Type of the DataSet
    */
-  storageType: string;
-
+  storageType: z.string(),
   /**
    * the storage path where the DataSet files can be found at the location.
    */
-  path: string;
-
+  path: z.string(),
   /**
    * the Ids endpoints through which the dataset is accessible.
    */
-  externalEndpoints?: string[];
+  externalEndpoints: z.array(z.string()).optional(),
 
   /**
    * AWS Account ID of DataSet
    */
-  awsAccountId?: string;
-
+  awsAccountId: z.string().optional(),
   /**
    * AWS region of the dataset storage
    */
-  region?: string;
-}
+  region: z.string().optional(),
+  /**
+   * Permissions associated with the DataSet
+   */
+  permissions: z.array(DataSetPermissionParser).optional()
+});
+
+export type DataSet = z.infer<typeof DataSetParser>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DataSetArrayParser = z.array(DataSetParser);
+
+export type CreateDataSet = Omit<DataSet, 'id' | 'createdAt'>;

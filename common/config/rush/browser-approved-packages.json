@@ -27,6 +27,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@aws-cdk/aws-servicecatalogappregistry-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -73,6 +77,10 @@
     {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog-appregistry",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-ssm",
@@ -399,6 +407,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "dotenv",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "esbuild",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -476,7 +488,7 @@
     },
     {
       "name": "jwt-decode",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "license-check-and-add",
