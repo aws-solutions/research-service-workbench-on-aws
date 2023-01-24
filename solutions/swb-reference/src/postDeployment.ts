@@ -82,7 +82,7 @@ async function uploadBootstrapScriptsToS3(awsService: AwsService): Promise<void>
 
   // resolve full folder path
   const scriptsPath = join(__dirname, '../../src/environment-files');
-  console.log('Downloading offline file-system binary packages');
+  console.log('Uploading offline file-system binary packages');
 
   const s3Service = awsService.helpers.s3;
   console.log(
