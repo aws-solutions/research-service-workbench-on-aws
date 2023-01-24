@@ -10,8 +10,14 @@ describe('ListProjectsRequestParser', () => {
   let requestObject: Record<string, JSONValue>;
 
   beforeEach(() => {
-    requestObject = { userId: 'valid-uid' };
+    requestObject = {
+      user: {
+        id: 'user-id',
+        roles: []
+      }
+    };
   });
+
   describe('when pageSize', () => {
     let expectedPageSize: number;
 
