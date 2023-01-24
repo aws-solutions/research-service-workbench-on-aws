@@ -18,7 +18,9 @@
     "<rootDir>/src/postDeployment.ts",
     "<rootDir>/src/services/dataSetService.ts",
     "<rootDir>/src/services/projectEnvTypeConfigService.ts",
-    "<rootDir>/src/services/keyPairService.ts"
+    "<rootDir>/src/errors/databaseError.ts",
+    "<rootDir>/src/errors/noKeyExistsError.ts",
+    "<rootDir>/src/errors/nonUniqueKeyError.ts"
   ],
   "coverageThreshold": {
     "global": {
@@ -28,5 +30,8 @@
       "statements": 70
     }
   },
-  "coverageReporters": ["json-summary", "json"]
+  "coverageReporters": ["json-summary", "json"],
+  "moduleNameMapper": {
+    "#node-web-compat": "./node-web-compat-node.js"
+  }
 }
