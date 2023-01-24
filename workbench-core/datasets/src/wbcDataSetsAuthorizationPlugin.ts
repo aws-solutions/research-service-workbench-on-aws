@@ -148,8 +148,35 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     return permissionsResponse[0];
   }
 
-  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    throw new Error('Method not implemented.');
+  public async removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse> {
+    const authzResponse = await this._authorizer.deleteSubjectIdentityPermissions({
+      subjectId: datasetId,
+      subjectType: dataSetSubjectType,
+      authenticatedUser
+    });
+    const dataSetPermissions = _.filter(
+      authzResponse.data.identityPermissions,
+      (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
+    );
+
+    const permissionsResponse = this._identityPermissionsToPermissionsResponse(dataSetPermissions);
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: datasetId,
+          permissions: []
+        }
+      };
+    }
+    if (permissionsResponse.length !== 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsResponse.length}.`
+      );
+    }
+    return permissionsResponse[0];
   }
 
   private _dataSetPermissionToIdentityPermissions(

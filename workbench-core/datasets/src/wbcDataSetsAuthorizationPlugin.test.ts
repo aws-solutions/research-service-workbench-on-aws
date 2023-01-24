@@ -439,10 +439,63 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   });
 
   describe('removeAllAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
-        new Error('Method not implemented.')
+    it('returns the removed access permissions', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockReadOnlyGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        }
+      });
+    });
+    it('filters out non READ/UPDATE permissions', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockHasDeleteGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        }
+      });
+    });
+    it('throws if more than one dataset is returned', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockMultiDatasetGetIdentityPermissionsResponse);
+
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).rejects.toThrowError(
+        new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
+    });
+    it('returns an empty permissionsResponse if no identityPermissions are found', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => {
+          return {
+            data: {
+              identityPermissions: []
+            }
+          };
+        });
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).resolves.toMatchObject({
+        data: {
+          dataSetId,
+          permissions: []
+        }
+      });
     });
   });
 
@@ -660,7 +713,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
         new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
     });
-    it('returns an empty permissionsResponse if no identityPermissiosn are found', async () => {
+    it('returns an empty permissionsResponse if no identityPermissions are found', async () => {
       jest
         .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
         .mockImplementation(async () => {
@@ -737,14 +790,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
           permissions: []
         }
       });
-    });
-  });
-
-  describe('removeAllAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
     });
   });
 });
