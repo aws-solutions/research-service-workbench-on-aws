@@ -3,43 +3,28 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { JSONValue } from '@aws/workbench-core-base';
 import { z } from 'zod';
 import { ActionParser } from '../../action';
 import { EffectParser } from '../../effect';
+import { JSONValueParser } from '../dynamicAuthorizationInputs/identityPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const IdentityTypeParser = z.union([z.literal('GROUP'), z.literal('USER')]);
-
-/**
- * The type of identity requesting access
- */
-export type IdentityType = z.infer<typeof IdentityTypeParser>;
-
-// eslint-disable-next-line @rushstack/typedef-var
-export const IdentityParser = z.object({
-  identityType: IdentityTypeParser,
-  identityId: z.string()
-});
-
-export type Identity = z.infer<typeof IdentityParser>;
-
-export const JSONValueParser: z.ZodSchema<JSONValue> = z.lazy(() =>
-  z.union([z.string(), z.number(), z.boolean(), z.record(JSONValueParser), z.array(JSONValueParser)])
-);
-
-// eslint-disable-next-line @rushstack/typedef-var
-export const IdentityPermissionParser = z
+export const IdentityPermissionItemParser = z
   .object({
     /**
-     * {@link IdentityType}
+     * Partition key of a Permission.
      */
-    identityType: IdentityTypeParser,
+    pk: z.string(),
 
     /**
-     * IdentityID associated to the permission
+     * Sort key of a Permission.
      */
-    identityId: z.string(),
+    sk: z.string(),
+
+    /**
+     * The user or group associated with a Permission.
+     */
+    identity: z.string(),
 
     /**
      * The {@link Effect} of a Permission.
@@ -50,17 +35,6 @@ export const IdentityPermissionParser = z
      * The subject type that the {@link Action} acts on.
      */
     action: ActionParser,
-
-    /**
-     * The subject that the {@link Action} acts on.
-     */
-    subjectType: z.string(),
-
-    /**
-     * The id associated to the subject
-     * Capable of using a wildcard '*' to represent all ids
-     */
-    subjectId: z.string(),
 
     /**
      * Used to restrict a {@link User}'s action to a subject's field.
@@ -97,4 +71,4 @@ export const IdentityPermissionParser = z
 /**
  * Represents an Identity Permission
  */
-export type IdentityPermission = z.infer<typeof IdentityPermissionParser>;
+export type IdentityPermissionItem = z.infer<typeof IdentityPermissionItemParser>;

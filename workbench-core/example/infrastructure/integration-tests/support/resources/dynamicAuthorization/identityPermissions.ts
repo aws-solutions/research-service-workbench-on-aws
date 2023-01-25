@@ -1,9 +1,4 @@
-import {
-  AuthenticatedUser,
-  CreateIdentityPermissionsRequest,
-  Identity,
-  IdentityPermission as Permission
-} from '@aws/workbench-core-authorization';
+import { Identity, IdentityPermission as Permission } from '@aws/workbench-core-authorization';
 import { JSONValue } from '@aws/workbench-core-base';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
@@ -67,10 +62,18 @@ export default class IdentityPermissions extends CollectionResource {
     return this._axiosInstance.delete(`${this._api}`, { data: bodyParams });
   }
 
-  protected _buildDefaults(resource: CreateRequest): CreateIdentityPermissionsRequest {
+  public async isAuthorizedOnSubject(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._parentApi}/authorize/subject`, { params: bodyParams });
+  }
+
+  public async isAuthorizedOnRoute(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/authorize/route`, { params: bodyParams });
+  }
+
+  protected _buildDefaults(resource: CreateRequest): CreateResponse {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
 
-    const { identities, authenticatedUser } = resource;
+    const { identities } = resource;
     const identityPermissions: Permission[] = [];
 
     identities.forEach((identity) => {
@@ -79,8 +82,6 @@ export default class IdentityPermissions extends CollectionResource {
 
       const action = 'CREATE';
       const effect = 'ALLOW';
-      const fields: string[] = [];
-      const conditions = {};
       const description = randomTextGenerator.getFakeText('randomDescription');
       identityPermissions.push({
         subjectId,
@@ -89,19 +90,18 @@ export default class IdentityPermissions extends CollectionResource {
         effect,
         identityId: identity.identityId,
         identityType: identity.identityType,
-        fields,
-        conditions,
         description
       });
     });
     return {
-      identityPermissions,
-      authenticatedUser
+      identityPermissions
     };
   }
 }
 
 interface CreateRequest {
   identities: Identity[];
-  authenticatedUser: AuthenticatedUser;
+}
+interface CreateResponse {
+  identityPermissions: Permission[];
 }
