@@ -580,7 +580,77 @@ describe('DynamicAuthorizationService', () => {
         new RouteNotSecuredError('Route is not secured')
       );
     });
+    test('ensure params are being escaped when using regex', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations: mockDynamicOperations
+          }
+        });
 
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      mockParams = {
+        subjectId: '${string}',
+        parentId: '${string}'
+      };
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest
+        .fn()
+        .mockRejectedValueOnce(new ForbiddenError());
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).rejects.toThrowError(ForbiddenError);
+
+      const filledDynamicOperations = [
+        {
+          action: 'CREATE',
+          subject: {
+            subjectId: '\\$\\{string\\}',
+            subjectType: 'sampleSubjectType',
+            parentId: '\\$\\{string\\}'
+          }
+        }
+      ];
+      expect(mockAuthorizationPlugin.isAuthorizedOnDynamicOperations).toBeCalledWith(
+        mockIdentityPermissions,
+        filledDynamicOperations
+      );
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ForbiddenError()
+      );
+    });
     test('user is unauthorized on route, throw ForbiddenError', async () => {
       mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
         data: {
