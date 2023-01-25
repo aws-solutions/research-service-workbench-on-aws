@@ -41,6 +41,7 @@ interface Constants {
 
 interface SecretConstants {
   ROOT_USER_EMAIL: string;
+  DYNAMIC_AUTH_TABLE_TAME: string;
 }
 
 //CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
@@ -119,7 +120,7 @@ async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   const rootUserParamStorePath = config.rootUserEmailParamStorePath;
 
   const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
-  return { ...getConstants(), ROOT_USER_EMAIL };
+  return { ...getConstants(), ROOT_USER_EMAIL, DYNAMIC_AUTH_TABLE_TAME: getDynamicAuthTableName() };
 }
 
 interface Config {
@@ -134,7 +135,6 @@ interface Config {
   clientSecret?: string;
   fieldsToMaskWhenAuditing: string[];
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getConfig(): Config {
   return yaml.load(
     // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
@@ -142,6 +142,17 @@ function getConfig(): Config {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
   ) as unknown as Config;
+}
+
+function getDynamicAuthTableName(): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const outputs: any = JSON.parse(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
+  );
+  const stackName = Object.entries(outputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+  // eslint-disable-next-line security/detect-object-injection
+  return outputs[stackName].dynamicAuthDDBTableName;
 }
 
 async function getSSMParamValue(awsService: AwsService, ssmParamName: string): Promise<string> {

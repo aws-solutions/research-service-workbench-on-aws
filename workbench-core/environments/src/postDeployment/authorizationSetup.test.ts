@@ -3,15 +3,49 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
+import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import AuthorizationSetup from './authorizationSetup';
 
 describe('AuthorizationSetup', () => {
   test('run: Create new group, assign permissions', async () => {
-    const authService = new MockDynamicAuthorizationService();
+    const mockGroupManagementPlugin = {
+      createGroup: jest.fn(),
+      deleteGroup: jest.fn(),
+      getUserGroups: jest.fn(),
+      getGroupUsers: jest.fn(),
+      addUserToGroup: jest.fn(),
+      isUserAssignedToGroup: jest.fn(),
+      removeUserFromGroup: jest.fn(),
+      getGroupStatus: jest.fn(),
+      setGroupStatus: jest.fn()
+    };
+
+    const mockDynamicAuthorizationPermissionsPlugin = {
+      isRouteIgnored: jest.fn(),
+      isRouteProtected: jest.fn(),
+      getDynamicOperationsByRoute: jest.fn(),
+      createIdentityPermissions: jest.fn(),
+      deleteIdentityPermissions: jest.fn(),
+      getIdentityPermissionsByIdentity: jest.fn(),
+      getIdentityPermissionsBySubject: jest.fn(),
+      deleteSubjectIdentityPermissions: jest.fn()
+    };
+
+    const auditService = new AuditService(
+      new BaseAuditPlugin({
+        write: jest.fn()
+      })
+    );
+
+    const authService = new DynamicAuthorizationService({
+      auditService,
+      dynamicAuthorizationPermissionsPlugin: mockDynamicAuthorizationPermissionsPlugin,
+      groupManagementPlugin: mockGroupManagementPlugin
+    });
     authService.createGroup = jest.fn();
     authService.createIdentityPermissions = jest.fn();
-    const authSetup = new AuthorizationSetup(authService);
+    const authSetup = new AuthorizationSetup(authService, { ROOT_USER_EMAIL: 'test' });
 
     await authSetup.run();
 

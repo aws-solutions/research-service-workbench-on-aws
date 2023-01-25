@@ -8,7 +8,12 @@ import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
-import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
+import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
+import {
+  WBCGroupManagementPlugin,
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService
+} from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
 import {
   AuthorizationSetup,
@@ -16,8 +21,10 @@ import {
   ServiceCatalogSetup,
   EnvironmentTypeSetup
 } from '@aws/workbench-core-environments';
+import { LoggingService } from '@aws/workbench-core-logging';
+import { UserManagementService, CognitoUserManagementPlugin } from '@aws/workbench-core-user-management';
 import axios from 'axios';
-import { getConstants, getConstantsWithSecrets } from './constants';
+import { authorizationGroupPrefix, getConstants, getConstantsWithSecrets } from './constants';
 
 async function run(): Promise<void> {
   const {
@@ -28,7 +35,8 @@ async function run(): Promise<void> {
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
     STACK_NAME,
     ROOT_USER_EMAIL,
-    USER_POOL_NAME
+    USER_POOL_NAME,
+    DYNAMIC_AUTH_TABLE_TAME
   } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -43,13 +51,39 @@ async function run(): Promise<void> {
     ROOT_USER_EMAIL,
     USER_POOL_NAME
   });
+
+  const dynamicAuthAwsService = new AwsService({
+    region: AWS_REGION,
+    ddbTableName: DYNAMIC_AUTH_TABLE_TAME
+  });
+
+  const userPoolId = await cognitoSetup.getUserPoolId();
+  const logger: LoggingService = new LoggingService();
+  const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
+    userManagementService: new UserManagementService(
+      new CognitoUserManagementPlugin(userPoolId!, dynamicAuthAwsService)
+    ),
+    ddbService: dynamicAuthAwsService.helpers.ddb,
+    userGroupKeyType: authorizationGroupPrefix
+  });
+  const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
+    new DDBDynamicAuthorizationPermissionsPlugin({
+      dynamoDBService: dynamicAuthAwsService.helpers.ddb
+    });
+  const authService: DynamicAuthorizationService = new DynamicAuthorizationService({
+    groupManagementPlugin: wbcGroupManagementPlugin,
+    dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
+    auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+  });
+
+  const authSetup = new AuthorizationSetup(authService, {
+    ROOT_USER_EMAIL
+  });
+
   const awsService = new AwsService({
     region: AWS_REGION,
     ddbTableName: STACK_NAME
   });
-
-  const authService = new MockDynamicAuthorizationService();
-  const authSetup = new AuthorizationSetup(authService);
 
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../../src/environment'));
   await scSetup.run(cfnFilePaths);
