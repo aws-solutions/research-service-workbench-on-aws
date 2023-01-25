@@ -13,7 +13,6 @@ S3_MOUNTS="$1"
 
 # Get directory in which this script is stored and define URL from which to download goofys
 FILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-GOOFYS_URL="https://github.com/kahing/goofys/releases/download/v0.24.0/goofys"
 
 # Define a function to determine what type of environment this is
 env_type() {
@@ -30,37 +29,14 @@ env_type() {
 update_jupyter_config() {
     config_file="$1"
 
-    # HACK: Update the default SessionManager class used by Jupyter notebooks
-    # so that it runs the S3 mount script the first time sessions are listed
     cat << EOF | cut -b5- >> "$config_file"
 
     import subprocess
-    from notebook.services.sessions.sessionmanager import SessionManager as BaseSessionManager
+    from notebook.services.kernels.kernelmanager import AsyncMappingKernelManager
 
-    class SessionManager(BaseSessionManager):
-        def list_sessions(self, *args, **kwargs):
-            """Override default list_sessions() method"""
-            self.mount_studies()
-            result = super(SessionManager, self).list_sessions(*args, **kwargs)
-            return result
+    subprocess.run(["/usr/local/bin/mount_s3.sh"])
 
-        def mount_studies(self):
-            """Execute mount_s3.sh if it hasn't already been run"""
-            if not hasattr(self, 'studies_mounted'):
-                mounting_result = subprocess.run(
-                    "mount_s3.sh",
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-                )
-
-                # Log results
-                if mounting_result.stdout:
-                    for line in mounting_result.stdout.decode("utf-8").split("\n"):
-                        if line: # Skip empty lines
-                            self.log.info(line)
-
-                self.studies_mounted = True
-
-    c.NotebookApp.session_manager_class = SessionManager
+    c.NotebookApp.kernel_manager_class = AsyncMappingKernelManager
 EOF
 }
 
@@ -75,7 +51,7 @@ case "$(env_type)" in
 esac
 
 echo "Copying Goofys from bootstrap.sh"
-cp "${FILES_DIR}/offline-packages/goofys-0.24.0" /usr/local/bin/goofys
+sudo mv "${FILES_DIR}/offline-packages/goofys" /usr/local/bin/goofys
 chmod +x "/usr/local/bin/goofys"
 
 # Create S3 mount script and config file
@@ -85,15 +61,33 @@ ln -s "${FILES_DIR}/bin/mount_s3.sh" "/usr/local/bin/mount_s3.sh"
 printf "%s" "$S3_MOUNTS" > "/usr/local/etc/s3-mounts.json"
 echo "Finish mounting S3"
 
+OS_VERSION=`cat /etc/os-release | grep VERSION= | sed 's/VERSION="//' | sed 's/"//'`
+
 # Apply updates to environments based on environment type
 case "$(env_type)" in
     "sagemaker") # Update config and restart Jupyter
-        echo "Installing fuse"
-        cd "${FILES_DIR}/offline-packages/sagemaker/fuse-2.9.4"
-        sudo yum --disablerepo=* localinstall -y *.rpm
-        echo "Finish installing fuse"
+        if [ $OS_VERSION = '2' ]
+        then
+            echo "Installing fuse for AL2"
+            cd "${FILES_DIR}/offline-packages/sagemaker/fuse-2.9.4_AL2"
+            sudo yum --disablerepo=* localinstall -y *.rpm
+            echo "Finish installing fuse"
+            echo "Installing boto3 for AL2"
+            cd "${FILES_DIR}/offline-packages/sagemaker/boto3"
+            sudo yum --disablerepo=* localinstall -y python2-boto3-1.4.4-1.amzn2.noarch.rpm
+            echo "Finish installing boto3"
+        else
+            echo "Error! Unsupported OS version"
+            exit 1
+        fi
+        
+        cat "${FILES_DIR}/offline-packages/sagemaker/jupyter_notebook_config.py" > "/home/ec2-user/.jupyter/jupyter_notebook_config.py"
         update_jupyter_config "/home/ec2-user/.jupyter/jupyter_notebook_config.py"
-        initctl restart jupyter-server --no-wait
+
+        # TODO: Automate running mount_s3 script. update_jupyter_config does not seem to work on JupyterLabv3
+        echo "Setting up a one-time mount script."
+
+        sudo systemctl restart jupyter-server
         ;;
 esac
 
