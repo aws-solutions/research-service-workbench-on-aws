@@ -9,10 +9,56 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
   '/helloworld': {
     GET: [
       {
+        action: 'READ',
+        subject: {
+          subjectType: 'helloworld',
+          subjectId: 'helloworld'
+        }
+      }
+    ]
+  },
+  '/parentResource/:parentId/resource/:resourceId': {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: {
+          subjectId: '${resourceId}',
+          subjectType: 'sampleResource',
+          parentId: '${parentId}'
+        }
+      }
+    ]
+  },
+  '/listAllResources': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectId: '*',
+          subjectType: 'sampleResource'
+        }
+      }
+    ]
+  },
+  '/listResources/:parentId': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectId: '*',
+          subjectType: 'sampleResource',
+          parentId: '${parentId}'
+        }
+      }
+    ]
+  },
+  '/createResource': {
+    POST: [
+      {
         action: 'CREATE',
         subject: {
-          subjectType: 'Example',
-          subjectId: '*'
+          subjectId: '*',
+          subjectType: 'sampleResource'
         }
       }
     ]

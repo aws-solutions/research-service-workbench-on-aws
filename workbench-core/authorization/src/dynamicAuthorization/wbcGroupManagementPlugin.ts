@@ -58,7 +58,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
 
     try {
       const { data } = await this.getGroupStatus(request);
-      if (data.status === 'delete_pending') {
+      if (data.status === 'delete_pending' || data.status === 'active') {
         throw new GroupAlreadyExistsError(`Group '${groupId}' already exists.`);
       }
     } catch (error) {

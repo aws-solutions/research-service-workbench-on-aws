@@ -4,6 +4,7 @@
  */
 
 import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings, { Setting } from './utils/settings';
@@ -32,9 +33,9 @@ export default class Setup {
     throw new Error('Implement createAdminSession');
   }
 
-  public async getDefaultAdminSession(): Promise<ClientSession> {
+  public async getDefaultAdminSession(reset: boolean = false): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
-    if (this._defaultAdminSession === undefined) {
+    if (this._defaultAdminSession === undefined || reset) {
       const userPoolId = this._settings.get('ExampleCognitoUserPoolId');
       const clientId = this._settings.get('ExampleCognitoUserPoolClientId');
       const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
@@ -49,7 +50,14 @@ export default class Setup {
         rootUserNameParamStorePath,
         rootPasswordParamStorePath
       });
-
+      const verifier = CognitoJwtVerifier.create({
+        userPoolId,
+        tokenUse: 'access',
+        clientId
+      });
+      const payload = await verifier.verify(accessToken);
+      const userId = payload.sub;
+      this._settings.set('rootUserId', userId);
       const session = this._getClientSession(accessToken);
       this._sessions.push(session);
       this._defaultAdminSession = session;
