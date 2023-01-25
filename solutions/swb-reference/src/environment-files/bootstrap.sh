@@ -29,17 +29,12 @@ env_type() {
 update_jupyter_config() {
     config_file="$1"
 
-    # HACK: Update the default SessionManager class used by Jupyter notebooks
-    # so that it runs the S3 mount script the first time sessions are listed
     cat << EOF | cut -b5- >> "$config_file"
 
     import subprocess
-    import os
-    from notebook.services.kernels.kernelmanager import MappingKernelManager
+    from notebook.services.kernels.kernelmanager import AsyncMappingKernelManager
 
-    path = '/home/ec2-user/studies'
-    isExist = os.path.exists(path)
-    if !isExist: subprocess.call(['sh', '/usr/local/bin/mount_s3.sh'])"
+    subprocess.run(["/usr/local/bin/mount_s3.sh"])
 
     c.NotebookApp.kernel_manager_class = AsyncMappingKernelManager
 EOF
@@ -82,10 +77,8 @@ case "$(env_type)" in
             sudo yum --disablerepo=* localinstall -y python2-boto3-1.4.4-1.amzn2.noarch.rpm
             echo "Finish installing boto3"
         else
-            echo "Installing fuse for AL1"
-            cd "${FILES_DIR}/offline-packages/sagemaker/fuse-2.9.4"
-            sudo yum --disablerepo=* localinstall -y *.rpm
-            echo "Finish installing fuse"
+            echo "Error! Unsupported OS version"
+            exit 1
         fi
         
         cat "${FILES_DIR}/offline-packages/sagemaker/jupyter_notebook_config.py" > "/home/ec2-user/.jupyter/jupyter_notebook_config.py"
@@ -93,14 +86,8 @@ case "$(env_type)" in
 
         # TODO: Automate running mount_s3 script. update_jupyter_config does not seem to work on JupyterLabv3
         echo "Setting up a one-time mount script."
-        conda -v
 
-        if [ $OS_VERSION = '2' ]
-        then
-            sudo systemctl restart jupyter-server
-        else
-            initctl restart jupyter-server --no-wait
-        fi
+        sudo systemctl restart jupyter-server
         ;;
 esac
 
