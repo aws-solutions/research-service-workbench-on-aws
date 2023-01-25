@@ -251,12 +251,19 @@ export class DataSetService {
     try {
       const response: DataSet[] = [];
       const allDatasets = await this._dbProvider.listDataSets();
-      for (const dataset of allDatasets) {
-        const permissions = await this._getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id);
-        if (permissions.length) {
-          response.push(dataset);
+
+      const allDatasetsPermissions = await Promise.all(
+        allDatasets.map((dataset) =>
+          this._getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id)
+        )
+      );
+
+      allDatasetsPermissions.forEach((permission, index) => {
+        if (permission.length) {
+          //eslint-disable-next-line security/detect-object-injection
+          response.push(allDatasets[index]);
         }
-      }
+      });
 
       await this._audit.write(metadata, response);
       return response;
@@ -834,7 +841,7 @@ export class DataSetService {
     authenticatedUser: AuthenticatedUser,
     dataSetId: string
   ): Promise<DataSetPermission[]> {
-    const { data: userPermissionsData } = await this._authzPlugin.getAccessPermissions({
+    const userPermissionsPromise = this._authzPlugin.getAccessPermissions({
       dataSetId,
       identity: authenticatedUser.id,
       identityType: 'USER'
@@ -843,10 +850,10 @@ export class DataSetService {
     const groupPermissionsPromises = authenticatedUser.roles.map((role) =>
       this._authzPlugin.getAccessPermissions({ dataSetId, identity: role, identityType: 'GROUP' })
     );
-    const groupPermissionsData = await Promise.all(groupPermissionsPromises);
-    const groupPermissions = groupPermissionsData.map((data) => data.data.permissions);
+    const permissionsData = await Promise.all([userPermissionsPromise, ...groupPermissionsPromises]);
+    const permissions = permissionsData.map((data) => data.data.permissions);
 
-    return userPermissionsData.permissions.concat(...groupPermissions);
+    return ([] as DataSetPermission[]).concat(...permissions);
   }
 
   private async _updateNewDataSetPermissions(
