@@ -38,8 +38,14 @@ describe('AuthorizationSetup', () => {
       })
     );
 
+    const mockAuthorizationPlugin = {
+      isAuthorized: jest.fn(),
+      isAuthorizedOnDynamicOperations: jest.fn()
+    };
+
     const authService = new DynamicAuthorizationService({
       auditService,
+      authorizationPlugin: mockAuthorizationPlugin,
       dynamicAuthorizationPermissionsPlugin: mockDynamicAuthorizationPermissionsPlugin,
       groupManagementPlugin: mockGroupManagementPlugin
     });

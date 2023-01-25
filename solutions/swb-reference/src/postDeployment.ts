@@ -6,13 +6,12 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import fs from 'fs';
 import { join } from 'path';
-import * as stream from 'stream';
-import { promisify } from 'util';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
   WBCGroupManagementPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
-  DynamicAuthorizationService
+  DynamicAuthorizationService,
+  CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
 import {
@@ -23,7 +22,6 @@ import {
 } from '@aws/workbench-core-environments';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { UserManagementService, CognitoUserManagementPlugin } from '@aws/workbench-core-user-management';
-import axios from 'axios';
 import { authorizationGroupPrefix, getConstants, getConstantsWithSecrets } from './constants';
 
 async function run(): Promise<void> {
@@ -70,10 +68,13 @@ async function run(): Promise<void> {
     new DDBDynamicAuthorizationPermissionsPlugin({
       dynamoDBService: dynamicAuthAwsService.helpers.ddb
     });
+
+  const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
   const authService: DynamicAuthorizationService = new DynamicAuthorizationService({
     groupManagementPlugin: wbcGroupManagementPlugin,
     dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-    auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+    auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+    authorizationPlugin: caslAuthorizationPlugin
   });
 
   const authSetup = new AuthorizationSetup(authService, {
