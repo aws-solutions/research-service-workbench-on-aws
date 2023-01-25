@@ -288,6 +288,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/users/${uuidRegExpAsString}`]:
+    {
+      POST: [
+        {
+          action: 'UPDATE',
+          subject: 'Project'
+        }
+      ]
+    },
   '/roles': {
     POST: [
       {

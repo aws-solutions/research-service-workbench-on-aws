@@ -14,10 +14,13 @@ import {
   GetProjectRequest,
   GetProjectRequestParser,
   DeleteProjectRequest,
-  DeleteProjectRequestParser
+  DeleteProjectRequestParser,
+  AssignUserToProjectRequestParser,
+  AssignUserToProjectRequest
 } from '@aws/workbench-core-accounts';
 import { validateAndParse, MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
+import { isUserNotFoundError, UserManagementService } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -32,7 +35,8 @@ export function setUpProjectRoutes(
   router: Router,
   projectService: ProjectService,
   environmentService: EnvironmentService,
-  metadataService: MetadataService
+  metadataService: MetadataService,
+  userService: UserManagementService
 ): void {
   // Get project
   router.get(
@@ -139,6 +143,71 @@ export function setUpProjectRoutes(
       });
 
       res.send(await projectService.updateProject(validatedRequest));
+    })
+  );
+
+  // add user to the project
+  router.post(
+    '/projects/:projectId/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<AssignUserToProjectRequest>(
+        AssignUserToProjectRequestParser,
+        {
+          projectId: req.params.projectId,
+          userId: req.params.userId,
+          role: req.body.role
+        }
+      );
+
+      const groupId = `${validatedRequest.projectId}#${req.body.role}`;
+
+      try {
+        const existingUser = await userService.getUser(validatedRequest.userId);
+
+        const isITAdmin = existingUser.roles.some((role) => role === 'ITAdmin');
+        if (isITAdmin) {
+          throw Boom.badRequest(
+            `IT Admin ${validatedRequest.userId} cannot be assigned to the project ${validatedRequest.projectId}`
+          );
+        }
+
+        // this call is needed to validate that project and group exists.
+        // If not - 404 will be returned
+        // TODO: use does group exist API
+        const [projectResponse] = await Promise.allSettled([
+          projectService.getProject({ projectId: validatedRequest.projectId }),
+          userService.createRole(groupId)
+        ]);
+
+        if (projectResponse.status === 'rejected') {
+          throw projectResponse.reason;
+        }
+
+        const groups = await userService.getUserRoles(validatedRequest.userId);
+
+        const isUserAssignedToProject = groups.some((id) => id === groupId);
+        if (isUserAssignedToProject) {
+          throw Boom.badRequest(
+            `User ${validatedRequest.userId} is already assigned to the project ${validatedRequest.projectId}`
+          );
+        }
+
+        await userService.addUserToRole(validatedRequest.userId, groupId);
+
+        res.status(204).send();
+      } catch (err) {
+        if (isUserNotFoundError(err)) {
+          throw Boom.notFound(`Could not find user ${validatedRequest.userId}`);
+        }
+
+        if (Boom.isBoom(err)) {
+          throw err;
+        }
+
+        throw Boom.badImplementation(
+          `Could not add user ${validatedRequest.userId} to the project ${validatedRequest.projectId}`
+        );
+      }
     })
   );
 }

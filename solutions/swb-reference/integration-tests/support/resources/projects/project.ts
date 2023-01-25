@@ -14,6 +14,13 @@ export default class Project extends Resource {
     this._clientSession = clientSession;
   }
 
+  public async assignUserToProject(
+    userId: string,
+    requestBody: Record<string, string>
+  ): Promise<AxiosResponse> {
+    return this._axiosInstance.post(`${this._api}/users/${userId}`, requestBody);
+  }
+
   public environmentTypes(): EnvironmentTypes {
     return new EnvironmentTypes(this._clientSession, this._api);
   }
