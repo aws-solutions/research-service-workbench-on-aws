@@ -1,6 +1,7 @@
 *                                                     @aws-solutions/sb-ma-foundation
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
+**/cache/config.json
 .gitallowed
 .gitattributes
 .gitignore
