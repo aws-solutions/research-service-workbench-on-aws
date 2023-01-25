@@ -15,7 +15,8 @@ import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-
 import {
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
-  DDBDynamicAuthorizationPermissionsPlugin
+  DDBDynamicAuthorizationPermissionsPlugin,
+  CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
@@ -64,10 +65,12 @@ const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissio
   new DDBDynamicAuthorizationPermissionsPlugin({
     dynamoDBService: dynamicAuthAws.helpers.ddb
   });
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  authorizationPlugin: caslAuthorizationPlugin
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);

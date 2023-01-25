@@ -6,6 +6,7 @@
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
+  CASLAuthorizationPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
   WBCGroupManagementPlugin
@@ -58,7 +59,8 @@ export default class EnvironmentLifecycleHelper {
       dynamicAuthorizationPermissionsPlugin: new DDBDynamicAuthorizationPermissionsPlugin({
         dynamoDBService: this.dynamoDbService
       }),
-      auditService: auditService
+      auditService: auditService,
+      authorizationPlugin: new CASLAuthorizationPlugin()
     });
 
     this.dataSetService = new DataSetService(
