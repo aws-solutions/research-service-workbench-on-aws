@@ -5,8 +5,9 @@
 
 import * as appreg from '@aws-cdk/aws-servicecatalogappregistry-alpha';
 import { SharePermission } from '@aws-cdk/aws-servicecatalogappregistry-alpha';
-import { Aws, CfnMapping, Fn, Stack } from 'aws-cdk-lib';
+import { Aws, CfnMapping, Fn, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { createAppInsightsConfiguration } from './helpers';
 import { applyTag } from './workbenchApplyTags';
 
 export interface WorkbenchAppRegistryProps {
@@ -17,6 +18,7 @@ export interface WorkbenchAppRegistryProps {
   applicationType: string;
   attributeGroupName: string;
   accountIds?: string[];
+  destroy?: boolean;
 }
 
 export class WorkbenchAppRegistry extends Construct {
@@ -27,6 +29,7 @@ export class WorkbenchAppRegistry extends Construct {
   private _applicationType: string;
   private _attributeGroupName: string;
   private _accountIds: string[];
+  private _destroy: boolean;
   private readonly _registryApplication: appreg.Application;
   private readonly _appRegMap: CfnMapping;
 
@@ -40,14 +43,16 @@ export class WorkbenchAppRegistry extends Construct {
     this._solutionVersion = props.solutionVersion;
     this._attributeGroupName = props.attributeGroupName;
     this._accountIds = props.accountIds ? props.accountIds : [];
+    this._destroy = props.destroy ? props.destroy : false;
     this._appRegMap = this._createMap(stack);
     this._registryApplication = this._createAppRegistry(stack);
     this._applyTagsToApplication();
   }
 
   public applyAppRegistryToStacks(resourceStacks: Stack[]): void {
-    resourceStacks.forEach((resourceStack) => {
-      this._registryApplication.associateApplicationWithStack(resourceStack);
+    resourceStacks.forEach((stack) => {
+      this._registryApplication.associateApplicationWithStack(stack);
+      createAppInsightsConfiguration(stack);
     });
   }
 
@@ -60,6 +65,10 @@ export class WorkbenchAppRegistry extends Construct {
       ]),
       description: `Service Catalog application to track and manage all your resources for the solution ${this._solutionName}`
     });
+
+    if (this._destroy) {
+      application.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    }
 
     if (this._accountIds.length > 0) {
       application.shareApplication({
@@ -80,6 +89,10 @@ export class WorkbenchAppRegistry extends Construct {
       }
     });
 
+    if (this._destroy) {
+      attributeGroup.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    }
+
     if (this._accountIds.length > 0) {
       attributeGroup.shareAttributeGroup({
         accounts: this._accountIds,
@@ -88,6 +101,8 @@ export class WorkbenchAppRegistry extends Construct {
     }
 
     application.associateAttributeGroup(attributeGroup);
+
+    createAppInsightsConfiguration(stack);
 
     return application;
   }
