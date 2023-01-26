@@ -121,7 +121,8 @@ export function setUpProjectRoutes(
       }
       // validate request
       const validatedRequest = validateAndParse<DeleteProjectRequest>(DeleteProjectRequestParser, {
-        ...req.params
+        ...req.params,
+        authenticatedUser: res.locals.user
       });
       // delete project
       await projectService.softDeleteProject(validatedRequest, checkDependencies);

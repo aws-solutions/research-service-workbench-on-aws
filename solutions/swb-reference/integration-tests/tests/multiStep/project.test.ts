@@ -12,7 +12,14 @@ describe('multiStep project tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    costCenterId = setup.getSettings().get('costCenterId');
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: 'project integration test cost center',
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test object'
+    });
+
+    costCenterId = costCenter.id;
   });
 
   afterAll(async () => {

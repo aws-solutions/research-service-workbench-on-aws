@@ -30,7 +30,8 @@ new WorkbenchAppRegistry(exampleStack, exampleStack.stackId, {
   solutionVersion: process.env.solutionVersion!,
   attributeGroupName: process.env.attributeGroupName!,
   applicationType: process.env.applicationType!,
-  appRegistryApplicationName: process.env.appRegistryApplicationName!
+  appRegistryApplicationName: process.env.appRegistryApplicationName!,
+  destroy: true
 });
 
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

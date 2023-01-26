@@ -40,13 +40,18 @@ import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
-import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import {
+  IdentityPermission,
+  IdentityPermissionParser,
+  IdentityType
+} from './dynamicAuthorizationInputs/identityPermission';
 import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './dynamicAuthorizationInputs/isRouteIgnored';
 import {
   IsRouteProtectedRequest,
   IsRouteProtectedResponse
 } from './dynamicAuthorizationInputs/isRouteProtected';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
+import { IdentityPermissionItem, IdentityPermissionItemParser } from './models/IdentityPermissionItem';
 
 export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthorizationPermissionsPlugin {
   private readonly _getIdentityPermissionsByIdentityIndex: string = 'getIdentityPermissionsByIdentity';
@@ -149,6 +154,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const { data, paginationToken } = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     const identityPermissions = data.map((item) => this._transformItemToIdentityPermission(item));
+
     return {
       data: {
         identityPermissions
@@ -256,6 +262,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
         sk
       };
     });
+
     //transact delete items, should be fine if one or more fail, throw a retry error
     try {
       await this._dynamoDBService.commitTransaction({
@@ -323,7 +330,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
    *  "effect": "ALLOW | DENY"
    *  "action" : "<CRUD Action>"
    *  "conditions": {}
-   *  "fields": []
+   *  "fields": ["<fieldValue>"]
    *  "description": "Description of identity"
    * }
    * ```
@@ -331,16 +338,23 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
    */
   private _transformIdentityPermissionsToItem(
     identityPermission: IdentityPermission
-  ): Record<string, JSONValue> {
-    const { subjectType, subjectId, action, effect, identityType, identityId } = identityPermission;
+  ): IdentityPermissionItem {
+    const {
+      subjectType,
+      subjectId,
+      action,
+      effect,
+      identityType,
+      identityId,
+      conditions,
+      fields,
+      description
+    } = identityPermission;
     const pk = this._createIdentityPermissionsPartitionKey(subjectType, subjectId);
     const sk = this._createIdentityPermissionsSortKey(action, effect, identityType, identityId);
     const identity = `${identityType}|${identityId}`;
-    const conditions = identityPermission.conditions ?? {};
-    const fields = identityPermission.fields ?? [];
-    const description = identityPermission.description ?? '';
 
-    const item: Record<string, JSONValue> = {
+    const item: IdentityPermissionItem = IdentityPermissionItemParser.parse({
       pk,
       sk,
       action,
@@ -349,8 +363,9 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
       conditions,
       fields,
       description
-    };
-    return item;
+    });
+
+    return _.omitBy(item, _.isNil) as IdentityPermissionItem;
   }
 
   private _createIdentityPermissionsPartitionKey(subjectType: string, subjectId: string): string {
@@ -371,18 +386,19 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const { action, effect, identityType, identityId } = this._decomposeIdentityPermissionsSortKey(
       sk as string
     );
-
-    return {
+    const identityPermission = IdentityPermissionParser.parse({
       action,
       effect,
       subjectType,
       subjectId,
       identityType,
       identityId,
-      conditions: conditions as Record<string, JSONValue>,
-      fields: fields as string[],
-      description: description as string
-    };
+      conditions,
+      fields,
+      description
+    });
+
+    return _.omitBy(identityPermission, _.isNil) as IdentityPermission;
   }
 
   private _decomposeIdentityPermissionsPartitionKey(partitionKey: string): {

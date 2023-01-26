@@ -30,7 +30,7 @@ export default class CognitoSetup {
   public async run(): Promise<void> {
     const { USER_POOL_NAME, ROOT_USER_EMAIL } = this._constants;
 
-    const userPoolId = await this._getUserPoolId();
+    const userPoolId = await this.getUserPoolId();
     console.log(`User pool id: ${userPoolId}`);
 
     // Create Admin and Researcher groups in user pool if they do not exist
@@ -83,7 +83,7 @@ export default class CognitoSetup {
    */
   public async createGroup(groupName: string, userPoolId: string | undefined): Promise<void> {
     if (!userPoolId) {
-      userPoolId = await this._getUserPoolId();
+      userPoolId = await this.getUserPoolId();
     }
     const createGroupInput = {
       GroupName: groupName,
@@ -97,7 +97,7 @@ export default class CognitoSetup {
    */
   public async adminCreateUser(): Promise<void> {
     const password = this._generatePassword();
-    const poolId = await this._getUserPoolId();
+    const poolId = await this.getUserPoolId();
     const adminCreateUserInput = {
       ForceAliasCreation: true,
       TemporaryPassword: password,
@@ -120,7 +120,7 @@ export default class CognitoSetup {
     username: string
   ): Promise<void> {
     if (!userPoolId) {
-      userPoolId = await this._getUserPoolId();
+      userPoolId = await this.getUserPoolId();
     }
     const adminAddUserToGroupInput = {
       GroupName: groupName,
@@ -135,7 +135,7 @@ export default class CognitoSetup {
    *
    * @returns user pool id
    */
-  private async _getUserPoolId(): Promise<string | undefined> {
+  public async getUserPoolId(): Promise<string | undefined> {
     // Get list of user pools
     let userPools: UserPoolDescriptionType[] = [];
     let nextToken: string | undefined = undefined;

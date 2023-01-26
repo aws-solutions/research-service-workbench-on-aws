@@ -52,6 +52,7 @@
     "@aws/workbench-core-infrastructure": "workspace:*",
     "@aws/workbench-core-user-management": "workspace:*",
     "aws-cdk-lib": "^2.61.0",
+    "aws-jwt-verify": "^3.0.0",
     "constructs": "^10.0.0",
     "cookie-parser": "^1.4.6",
     "csrf": "^3.1.0",

@@ -183,9 +183,9 @@ export default class ProjectService {
       userId: user.id
     });
 
-    const userGroupsForCurrentUser = getUserGroupsResponse.data.groupIds;
+    const userGroupsForCurrentUser = getUserGroupsResponse.data.groupIds || [];
 
-    if (userGroupsForCurrentUser.length !== 1 || userGroupsForCurrentUser[0] !== 'ITAdmin') {
+    if (!userGroupsForCurrentUser.includes('ITAdmin')) {
       throw Boom.forbidden('Only IT Admins are allowed to create new Projects.');
     }
 
