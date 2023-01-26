@@ -11,6 +11,7 @@ import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
@@ -77,7 +78,7 @@ export class DataSetService {
 
     try {
       if (request.owner && !request.ownerType) {
-        throw new Error("'ownerType' is required when 'owner' is provided.");
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
       }
       const { storageProvider, ...dataSet } = request;
 
@@ -114,7 +115,7 @@ export class DataSetService {
     };
     try {
       if (request.owner && !request.ownerType) {
-        throw new Error("'ownerType' is required when 'owner' is provided.");
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
       }
       const { storageProvider, ...dataSet } = request;
 

@@ -22,6 +22,7 @@ import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workben
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
@@ -615,7 +616,9 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           owner: mockGroupId
         })
-      ).rejects.toThrowError(new Error("'ownerType' is required when 'owner' is provided."));
+      ).rejects.toThrowError(
+        new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.")
+      );
       expect(authzPlugin.addAccessPermission).not.toBeCalled();
     });
     it('generates an audit event when an error is thrown', async () => {
@@ -874,7 +877,9 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           owner: mockGroupId
         })
-      ).rejects.toThrowError(new Error("'ownerType' is required when 'owner' is provided."));
+      ).rejects.toThrowError(
+        new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.")
+      );
     });
   });
 
