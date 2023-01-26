@@ -13,6 +13,8 @@ export interface Setting {
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
 
+  rootUserId: string;
+
   // Main CFN template outputs
   ExampleS3BucketExampleS3BucketDatasetsArnOutput393A6D8B: string;
   AwsRegion: string;
