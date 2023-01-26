@@ -219,6 +219,16 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
     subject: 'ProjectEnvironmentTypeConfig'
   },
   {

@@ -210,4 +210,36 @@ export function setUpProjectRoutes(
       }
     })
   );
+
+  // remove user from the project
+  router.delete(
+    '/projects/:projectId/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const userId = req.params.userId;
+      const projectId = req.params.projectId;
+
+      try {
+        await Promise.all([userService.getUser(userId), projectService.getProject({ projectId })]);
+
+        const groups = await userService.getUserRoles(userId);
+
+        const promises = groups
+          .filter((groupId: string) => groupId.includes(projectId))
+          .map((groupId: string) => userService.removeUserFromRole(userId, groupId));
+
+        await Promise.all(promises);
+        res.status(204).send();
+      } catch (err) {
+        if (isUserNotFoundError(err)) {
+          throw Boom.notFound(`Could not find user ${userId}`);
+        }
+
+        if (Boom.isBoom(err)) {
+          throw err;
+        }
+
+        throw Boom.badImplementation(`Could not remove user ${userId} from the project ${projectId}`);
+      }
+    })
+  );
 }
