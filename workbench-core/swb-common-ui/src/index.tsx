@@ -15,7 +15,6 @@ import { TableEmptyDisplay } from './common/tableEmptyState';
 import { TableNoMatchDisplay } from './common/tableNoMatchState';
 import { nameRegex, cidrRegex, emailRegex, convertToRecord, validateField } from './common/utils';
 import BaseLayout from './components/BaseLayout';
-import FileUpload from './components/FileUpload/FileUploadComponent';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Login from './components/Login';
@@ -72,7 +71,6 @@ export {
   Navigation,
   Login,
   RouteGuard,
-  FileUpload,
   // From '/context' folder
   AuthenticationProvider,
   useAuthentication,

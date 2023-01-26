@@ -41,8 +41,6 @@ export default class ClientSession {
     }
 
     this._axiosInstance = axios.create({
-      // TODO: Replace line below with `http://${this._settings.get('MainAccountLoadBalancerDnsNameOutput')} to send requests to ALB
-      // Can only use "https://" for ALB DNS name once port 443 has been established with TLS
       baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers

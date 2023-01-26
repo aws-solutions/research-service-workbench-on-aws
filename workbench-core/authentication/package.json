@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@aws/workbench-core-authorization": "workspace:*",
-    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1",
