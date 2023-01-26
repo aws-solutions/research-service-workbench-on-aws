@@ -202,34 +202,37 @@ describe('datasets list integration test', () => {
       });
 
       // give UPDATE permission on a dataset, CREATE permission on another, and DELETE permission on a third
-      await updatedAdminSession.resources.identityPermissions.create({
-        identityPermissions: [
-          {
-            identityType: 'USER',
-            identityId: userId,
-            action: 'UPDATE',
-            effect: 'ALLOW',
-            subjectType: dataSetSubjectType,
-            subjectId: datasets[1].id
-          },
-          {
-            identityType: 'USER',
-            identityId: userId,
-            action: 'CREATE',
-            effect: 'ALLOW',
-            subjectType: dataSetSubjectType,
-            subjectId: datasets[3].id
-          },
-          {
-            identityType: 'USER',
-            identityId: userId,
-            action: 'DELETE',
-            effect: 'ALLOW',
-            subjectType: dataSetSubjectType,
-            subjectId: datasets[4].id
-          }
-        ]
-      });
+      await updatedAdminSession.resources.identityPermissions.create(
+        {
+          identityPermissions: [
+            {
+              identityType: 'USER',
+              identityId: userId,
+              action: 'UPDATE',
+              effect: 'ALLOW',
+              subjectType: dataSetSubjectType,
+              subjectId: datasets[1].id
+            },
+            {
+              identityType: 'USER',
+              identityId: userId,
+              action: 'CREATE',
+              effect: 'ALLOW',
+              subjectType: dataSetSubjectType,
+              subjectId: datasets[3].id
+            },
+            {
+              identityType: 'USER',
+              identityId: userId,
+              action: 'DELETE',
+              effect: 'ALLOW',
+              subjectType: dataSetSubjectType,
+              subjectId: datasets[4].id
+            }
+          ]
+        },
+        false
+      );
 
       const { data } = await updatedAdminSession.resources.datasets.get();
       const dataSetIds = data.map((dataset: Dataset) => dataset.id);
@@ -265,18 +268,21 @@ describe('datasets list integration test', () => {
       });
 
       // give DENY READ permission on one of the above datasets
-      await updatedAdminSession.resources.identityPermissions.create({
-        identityPermissions: [
-          {
-            identityType: 'USER',
-            identityId: userId,
-            action: 'READ',
-            effect: 'DENY',
-            subjectType: dataSetSubjectType,
-            subjectId: datasets[4].id
-          }
-        ]
-      });
+      await updatedAdminSession.resources.identityPermissions.create(
+        {
+          identityPermissions: [
+            {
+              identityType: 'USER',
+              identityId: userId,
+              action: 'READ',
+              effect: 'DENY',
+              subjectType: dataSetSubjectType,
+              subjectId: datasets[4].id
+            }
+          ]
+        },
+        false
+      );
 
       const { data } = await updatedAdminSession.resources.datasets.get();
       const dataSetIds = data.map((dataset: Dataset) => dataset.id);
