@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddDataSetExternalEndpointResponse } from '@aws/workbench-core-datasets';
+import { AddDataSetExternalEndpointResponse, DataSet } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Dataset from '../../support/resources/datasets/dataset';
@@ -45,7 +45,6 @@ describe('datasets create integration test', () => {
       expect(response.data.permissions[0].accessLevel).toEqual('read-only');
       expect(response.data.permissions[0].identityType).toEqual('USER');
     });
-
     it('assigns permissions to a group given at creation time.', async () => {
       const createGroupResponse = await adminSession.resources.groups.create({}, true);
       const { groupId } = createGroupResponse.data;
@@ -62,13 +61,23 @@ describe('datasets create integration test', () => {
       expect(response.data).toBeDefined();
       expect(response.data.id).toBeDefined();
       expect(response.data.permissions).toBeDefined();
-      expect(response.data.permissions.length).toBe(2);
-      expect(response.data.permissions[1].accessLevel).toEqual('read-only');
-      expect(response.data.permissions[1].identityType).toEqual('USER');
+      expect(response.data.permissions.length).toBe(1);
       expect(response.data.permissions[0].accessLevel).toEqual('read-write');
       expect(response.data.permissions[0].identityType).toEqual('GROUP');
       expect(response.data.permissions[0].identity).toEqual(groupId);
     });
+  });
+  it('assigns read-only permissions to the owner if provided at creation time', async () => {
+    const createGroupResponse = await adminSession.resources.groups.create({}, true);
+    const { groupId } = createGroupResponse.data;
+    const response = await adminSession.resources.datasets.create({
+      owner: groupId,
+      ownerType: 'GROUP'
+    });
+    const dataSet: DataSet = response.data;
+    expect(dataSet.permissions![0].accessLevel).toBe('read-only');
+    expect(dataSet.permissions![0].identity).toBe(groupId);
+    expect(dataSet.permissions![0].identityType).toBe('GROUP');
   });
 
   describe('AddExternalEndpointForUser', () => {

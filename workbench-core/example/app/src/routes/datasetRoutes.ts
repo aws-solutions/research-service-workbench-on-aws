@@ -67,6 +67,8 @@ export function setUpDSRoutes(
         region: req.body.region,
         storageProvider: dataSetStoragePlugin,
         authenticatedUser: res.locals.user,
+        owner: req.body.owner,
+        ownerType: req.body.ownerType,
         permissions: req.body.permissions
       });
       res.status(201).send(dataSet);
@@ -86,6 +88,8 @@ export function setUpDSRoutes(
         region: req.body.region,
         storageProvider: dataSetStoragePlugin,
         authenticatedUser: res.locals.user,
+        owner: req.body.owner,
+        ownerType: req.body.ownerType,
         permissions: req.body.permissions
       });
       res.status(201).send(dataSet);
