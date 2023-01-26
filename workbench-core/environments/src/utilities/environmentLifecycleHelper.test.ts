@@ -8,6 +8,7 @@ import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-se
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { AwsService } from '@aws/workbench-core-base';
+import { DataSetsAccessLevel } from '@aws/workbench-core-datasets';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper, { Operation } from './environmentLifecycleHelper';
 
@@ -79,7 +80,7 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpointForUser = jest.fn();
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
     helper.environmentService.addMetadata = jest.fn();
 
@@ -121,7 +122,7 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpointForUser = jest.fn(async () => {
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn(async () => {
       return {
         data: {
           mountObject: {
@@ -135,11 +136,13 @@ describe('EnvironmentLifecycleHelper', () => {
     });
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
+        id: 'sampleDataSetId',
         storageName: 'sampleStorageName',
         storageType: 'sampleStorageType',
         path: 'sampleBucketPath',
         name: 'sampleDataset',
-        externalEndpoints: []
+        externalEndpoints: [],
+        createdAt: 'fakeDateIsoString'
       };
     });
     helper.dataSetService.getExternalEndPoint = jest.fn(async () => {
@@ -150,7 +153,9 @@ describe('EnvironmentLifecycleHelper', () => {
         path: 'mockDataSetPath',
         dataSetId: 'mockDataSetId',
         dataSetName: 'mockDataSetName',
-        endPointUrl: 's3://sampleBucket'
+        endPointUrl: 's3://sampleBucket',
+        accessLevel: 'read-only' as DataSetsAccessLevel,
+        createdAt: 'fakeDateIsoString'
       };
     });
     helper.environmentService.addMetadata = jest.fn();

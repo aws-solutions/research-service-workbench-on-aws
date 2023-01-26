@@ -3,37 +3,51 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
-import _ from 'lodash';
-import { DataSet } from './dataSet';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import {
+  AwsService,
+  buildDynamoDbKey,
+  buildDynamoDBPkSk,
+  QueryParams,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
-import { ExternalEndpoint } from './externalEndpoint';
-import { StorageLocation } from './storageLocation';
+import { DataSetExistsError } from './errors/dataSetExistsError';
+import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
+import { EndpointExistsError } from './errors/endpointExistsError';
+import { EndpointNotFoundError } from './errors/endpointNotFoundError';
+import { CreateDataSet, DataSet, DataSetArrayParser, DataSetParser } from './models/dataSet';
+import {
+  CreateExternalEndpoint,
+  ExternalEndpoint,
+  ExternalEndpointArrayParser,
+  ExternalEndpointParser
+} from './models/externalEndpoint';
+import { StorageLocation } from './models/storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
   private _dataSetKeyType: string;
-  private _endPointKeyType: string;
+  private _endpointKeyType: string;
 
-  public constructor(aws: AwsService, dataSetKeyTypeId: string, endPointKeyTypeId: string) {
+  public constructor(aws: AwsService, dataSetKeyTypeId: string, endpointKeyTypeId: string) {
     this._aws = aws;
     this._dataSetKeyType = dataSetKeyTypeId;
-    this._endPointKeyType = endPointKeyTypeId;
+    this._endpointKeyType = endpointKeyTypeId;
   }
 
-  public async getDataSetEndPointDetails(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
-    const response: GetItemCommandOutput = (await this._aws.helpers.ddb
+  public async getDataSetEndPointDetails(dataSetId: string, endpointId: string): Promise<ExternalEndpoint> {
+    const response = (await this._aws.helpers.ddb
       .get({
-        pk: `${this._dataSetKeyType}#${dataSetId}`,
-        sk: `${this._endPointKeyType}#${endPointId}`
+        pk: buildDynamoDbKey(dataSetId, this._dataSetKeyType),
+        sk: buildDynamoDbKey(endpointId, this._endpointKeyType)
       })
       .execute()) as GetItemCommandOutput;
 
-    if (!response || !response.Item)
-      throw Boom.notFound(`Could not find the endpoint '${endPointId}' on '${dataSetId}'.`);
-    return response.Item as unknown as ExternalEndpoint;
+    if (!response.Item) {
+      throw new EndpointNotFoundError(`Could not find the endpoint '${endpointId}' on '${dataSetId}'.`);
+    }
+    return ExternalEndpointParser.parse(response.Item);
   }
 
   public async listDataSets(): Promise<DataSet[]> {
@@ -41,22 +55,23 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'dataset' }
     };
-    const response: QueryCommandOutput = await this._aws.helpers.ddb.query(params).execute();
+    const response = await this._aws.helpers.ddb.query(params).execute();
 
-    if (!response || !response.Items) return [];
-    return response.Items as unknown as DataSet[];
+    if (!response.Items) {
+      return [];
+    }
+    return DataSetArrayParser.parse(response.Items);
   }
 
   public async getDataSetMetadata(id: string): Promise<DataSet> {
-    const response: GetItemCommandOutput = (await this._aws.helpers.ddb
-      .get({
-        pk: `${this._dataSetKeyType}#${id}`,
-        sk: `${this._dataSetKeyType}#${id}`
-      })
+    const response = (await this._aws.helpers.ddb
+      .get(buildDynamoDBPkSk(id, this._dataSetKeyType))
       .execute()) as GetItemCommandOutput;
 
-    if (!response || !response.Item) throw Boom.notFound(`Could not find DataSet '${id}'.`);
-    return response.Item as unknown as DataSet;
+    if (!response.Item) {
+      throw new DataSetNotFoundError(`Could not find DataSet '${id}'.`);
+    }
+    return DataSetParser.parse(response.Item);
   }
 
   public async listDataSetObjects(dataSetName: string): Promise<string[]> {
@@ -70,14 +85,18 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     throw new Error('Method not implemented.');
   }
 
-  public async addDataSet(dataSet: DataSet): Promise<DataSet> {
-    const dataSetParam: DataSet = dataSet;
+  public async addDataSet(dataSet: CreateDataSet): Promise<DataSet> {
     await this._validateCreateDataSet(dataSet);
-    dataSetParam.id = uuidWithLowercasePrefix(this._dataSetKeyType);
-    if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
-    await this._storeDataSetToDdb(dataSetParam);
 
-    return dataSetParam;
+    const createdDataSet: DataSet = {
+      ...dataSet,
+      id: uuidWithLowercasePrefix(this._dataSetKeyType),
+      createdAt: new Date().toISOString()
+    };
+
+    await this._storeDataSetToDdb(createdDataSet);
+
+    return createdDataSet;
   }
 
   public async updateDataSet(dataSet: DataSet): Promise<DataSet> {
@@ -90,40 +109,41 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
    * @param dataSetId - the ID of the Dataset to remove.
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
-    const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSetId}`,
-      sk: `${this._dataSetKeyType}#${dataSetId}`
-    };
-
-    await this._aws.helpers.ddb.delete(dataSetKey).execute();
+    await this._aws.helpers.ddb.delete(buildDynamoDBPkSk(dataSetId, this._dataSetKeyType)).execute();
   }
 
-  public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
-    const endPointParam: ExternalEndpoint = endPoint;
-    await this._validateCreateExternalEndpoint(endPoint);
-    endPointParam.id = uuidWithLowercasePrefix(this._endPointKeyType);
-    if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
-    await this._storeEndPointToDdb(endPointParam);
-    return endPointParam;
+  public async addExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<ExternalEndpoint> {
+    await this._validateCreateExternalEndpoint(endpoint);
+
+    const createdEndpoint: ExternalEndpoint = {
+      ...endpoint,
+      id: uuidWithLowercasePrefix(this._endpointKeyType),
+      createdAt: new Date().toISOString()
+    };
+
+    await this._storeEndpointToDdb(createdEndpoint);
+
+    return createdEndpoint;
   }
 
   public async listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpoint[]> {
     const params: QueryParams = {
-      key: { name: 'pk', value: `${this._dataSetKeyType}#${dataSetId}` },
+      key: { name: 'pk', value: buildDynamoDbKey(dataSetId, this._dataSetKeyType) },
       sortKey: 'sk',
-      begins: { S: `${this._endPointKeyType}#` }
+      begins: { S: `${this._endpointKeyType}#` }
     };
 
-    const dataSetEndPoints: QueryCommandOutput = await this._aws.helpers.ddb.query(params).execute();
+    const response = await this._aws.helpers.ddb.query(params).execute();
 
-    if (!dataSetEndPoints || !dataSetEndPoints.Items) return [];
-    return dataSetEndPoints.Items as unknown as ExternalEndpoint[];
+    if (!response.Items) {
+      return [];
+    }
+    return ExternalEndpointArrayParser.parse(response.Items);
   }
 
-  public async updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
-    const endPointParam: ExternalEndpoint = endPoint;
-    await this._storeEndPointToDdb(endPointParam);
-    return endPointParam;
+  public async updateExternalEndpoint(endpoint: ExternalEndpoint): Promise<ExternalEndpoint> {
+    await this._storeEndpointToDdb(endpoint);
+    return endpoint;
   }
 
   public async listStorageLocations(): Promise<StorageLocation[]> {
@@ -141,94 +161,54 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return Array.from(map.values());
   }
 
-  private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
-    if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
-    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
-    const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id!);
+  private async _validateCreateExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<void> {
+    const targetDS = await this.getDataSetMetadata(endpoint.dataSetId);
+    const endpoints = await this.listEndpointsForDataSet(targetDS.id!);
 
-    if (_.find(endPoints, (ep) => ep.name === endPoint.name))
-      throw new Error(
-        `Cannot create the EndPoint. EndPoint with name '${endPoint.name}' already exists on DataSet '${targetDS.name}'.`
+    if (endpoints.some((ep) => ep.name === endpoint.name))
+      throw new EndpointExistsError(
+        `Cannot create the Endpoint. Endpoint with name '${endpoint.name}' already exists on DataSet '${targetDS.name}'.`
       );
   }
 
-  private async _validateCreateDataSet(dataSet: DataSet): Promise<void> {
-    if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
-    if (_.isUndefined(dataSet.name))
-      throw new Error("Cannot create the DataSet. A 'name' was not supplied but it is required.");
-
+  private async _validateCreateDataSet(dataSet: CreateDataSet): Promise<void> {
     const queryParams: QueryParams = {
       index: 'getResourceByName',
       key: { name: 'resourceType', value: 'dataset' },
       sortKey: 'name',
       eq: { S: dataSet.name }
     };
-    const response: QueryCommandOutput = await this._aws.helpers.ddb.query(queryParams).execute();
+    const response = await this._aws.helpers.ddb.query(queryParams).execute();
 
-    if (response && response.Items && response.Items.length > 0) {
-      throw new Error(
-        `Cannot create the DataSet. A DataSet must have a unique \'name\', and  \'${dataSet.name}\' already exists. `
+    if (response.Items?.length) {
+      throw new DataSetExistsError(
+        `Cannot create the DataSet. A DataSet must have a unique 'name', and  '${dataSet.name}' already exists.`
       );
     }
   }
 
-  private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
-    const endPointKey = {
-      pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
-      sk: `${this._endPointKeyType}#${endPoint.id}`
+  private async _storeEndpointToDdb(endpoint: ExternalEndpoint): Promise<void> {
+    const endpointKey = {
+      pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
+      sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)
     };
-    const endPointParams: { item: { [key: string]: string | string[] } } = {
-      item: {
-        id: endPoint.id!,
-        name: endPoint.name,
-        createdAt: endPoint.createdAt!,
-        dataSetId: endPoint.dataSetId,
-        dataSetName: endPoint.dataSetName,
-        path: endPoint.path,
-        endPointUrl: endPoint.endPointUrl,
-        resourceType: 'endpoint'
-      }
+    const endpointItem: ExternalEndpoint & { resourceType: string } = {
+      ...endpoint,
+      resourceType: 'endpoint'
     };
 
-    if (endPoint.allowedRoles) {
-      endPointParams.item.allowedRoles = endPoint.allowedRoles;
-    }
-
-    if (endPoint.endPointAlias) {
-      endPointParams.item.endPointAlias = endPoint.endPointAlias;
-    }
-
-    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endPointKey, params: endPointParams });
-
-    return endPoint.id!;
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endpointKey, params: { item: endpointItem } });
   }
 
-  private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
-    const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSet.id}`,
-      sk: `${this._dataSetKeyType}#${dataSet.id}`
-    };
-    const dataSetParams: { item: { [key: string]: string | string[] | undefined } } = {
-      item: {
-        id: dataSet.id!,
-        name: dataSet.name,
-        createdAt: dataSet.createdAt!,
-        description: dataSet.description,
-        owner: dataSet.owner,
-        type: dataSet.type,
-        storageName: dataSet.storageName,
-        path: dataSet.path,
-        awsAccountId: dataSet.awsAccountId,
-        region: dataSet.region,
-        storageType: dataSet.storageType,
-        resourceType: 'dataset'
-      }
+  private async _storeDataSetToDdb(dataSet: DataSet): Promise<void> {
+    const dataSetItem: DataSet & { resourceType: string } = {
+      ...dataSet,
+      resourceType: 'dataset'
     };
 
-    if (dataSet.externalEndpoints) dataSetParams.item.externalEndpoints = dataSet.externalEndpoints!;
-
-    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: dataSetKey, params: dataSetParams });
-
-    return dataSet.id!;
+    await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(dataSet.id, this._dataSetKeyType),
+      params: { item: dataSetItem }
+    });
   }
 }

@@ -14,13 +14,14 @@ export { Action } from './action';
 export {
   default as RoutesMap,
   HTTPMethod,
+  HTTPMethodParser,
   RoutesIgnored,
   MethodToOperations,
   DynamicRoutesMap
 } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
-export { AuthenticatedUser } from './authenticatedUser';
+export { AuthenticatedUser, AuthenticatedUserParser } from './authenticatedUser';
 export { ForbiddenError, isForbiddenError } from './errors/forbiddenError';
 export {
   AuthenticatedUserNotFoundError,
@@ -104,7 +105,10 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 export { InitRequest, InitResponse } from './dynamicAuthorization/dynamicAuthorizationInputs/init';
 export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnRoute';
-export { IsAuthorizedOnSubjectRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
+export {
+  IsAuthorizedOnSubjectRequest,
+  IsAuthorizedOnSubjectRequestParser
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
 export {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser,
@@ -127,7 +131,16 @@ export {
   SetGroupStatusRequest,
   SetGroupStatusResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/setGroupStatus';
-export { GroupMetadata, GroupMetadataParser, GroupStatus } from './dynamicAuthorization/models/GroupMetadata';
+export {
+  GetGroupMetadata,
+  GetGroupMetadataParser,
+  GetGroupStatus
+} from './dynamicAuthorization/models/GetGroupMetadata';
+export {
+  SetGroupMetadata,
+  SetGroupMetadataParser,
+  SetGroupStatus
+} from './dynamicAuthorization/models/SetGroupMetadata';
 
 // re-export userManagement package errors that are thrown
 export {

@@ -249,4 +249,40 @@ describe('updater', () => {
     // OPERATE n CHECK
     expect(() => updater.condition('')).toThrow(`Condition cannot be empty`);
   });
+
+  test('update item with createdAt does not overwrite value', async () => {
+    // BUILD
+    const updater = new Updater({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const expectedParams = {
+      UpdateExpression:
+        'SET #attr1 = :attr1, #attr2 = :attr2, #createdAt = :createdAt, #updatedAt = :updatedAt'
+    };
+
+    // OPERATE
+    const generatedParams = updater
+      .key({ pk: { S: 'pk' } })
+      .item({ pk: { S: 'pk' }, attr1: { S: 'attr1' }, attr2: { S: 'attr2' }, createdAt: { S: 'someDate' } })
+      .getParams();
+
+    // CHECK
+    expect(generatedParams.UpdateExpression).toEqual(expectedParams.UpdateExpression);
+  });
+
+  test('update item with updatedAt does not overwrite value', async () => {
+    // BUILD
+    const updater = new Updater({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const expectedParams = {
+      UpdateExpression:
+        'SET #attr1 = :attr1, #attr2 = :attr2, #updatedAt = :updatedAt, #createdAt = if_not_exists(#createdAt, :createdAt)'
+    };
+
+    // OPERATE
+    const generatedParams = updater
+      .key({ pk: { S: 'pk' } })
+      .item({ pk: { S: 'pk' }, attr1: { S: 'attr1' }, attr2: { S: 'attr2' }, updatedAt: { S: 'someDate' } })
+      .getParams();
+
+    // CHECK
+    expect(generatedParams.UpdateExpression).toEqual(expectedParams.UpdateExpression);
+  });
 });

@@ -142,7 +142,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     sampleSubjectType = 'sampleSubjectType';
     sampleSubjectId = 'sampleSubjectId';
     sampleConditions = {};
-    sampleFields = [];
+    sampleFields = ['sampleField'];
     sampleDescription = 'sampleDescription';
     mockIdentityPermission = {
       action: sampleAction,
@@ -168,7 +168,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       subjectId: { S: sampleSubjectId },
       identity: { S: sampleGroupIdentity },
       conditions: { M: marshall(sampleConditions) },
-      fields: { L: [] },
+      fields: { L: [{ S: 'sampleField' }] },
       description: { S: sampleDescription }
     };
     base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';
@@ -676,6 +676,66 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('deleteSubjectIdentityPermissions', () => {
+    test.skip('Delete subject identity permission', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest.fn().mockResolvedValue({
+        data: {
+          identityPermissions: [mockIdentityPermission]
+        }
+      });
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+
+    test('Delete subject identity exceeding 100 permissions', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: Array(100).fill(mockIdentityPermission)
+          },
+          paginationToken: 'test_token'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions = jest.fn();
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions).toBeCalledTimes(2);
+      expect(data.identityPermissions).toStrictEqual(Array(101).fill(mockIdentityPermission));
+    });
+
+    test.skip('Gracefully handles subject without identity permissions', async () => {
+      dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject = jest.fn().mockResolvedValue({
+        data: {
+          identityPermissions: []
+        }
+      });
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteSubjectIdentityPermissions({
+        authenticatedUser: mockAuthenticatedUser,
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([]);
     });
   });
 });

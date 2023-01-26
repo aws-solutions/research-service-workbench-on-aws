@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "fix project routes with zod validation",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

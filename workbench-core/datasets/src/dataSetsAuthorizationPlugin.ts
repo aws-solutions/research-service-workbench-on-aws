@@ -7,6 +7,8 @@ import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermis
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 
+export const dataSetSubjectType: string = 'Dataset';
+
 /**
  * Defines the contract between DataSets and an Authorization Service
  */
@@ -45,15 +47,19 @@ export interface DataSetsAuthorizationPlugin {
    * Return all access permissions associated with a given dataset.
    *
    * @param datasetId - the ID of the dataset for which permissions should be retrieved.
+   * @param pageToken - an optional token indicating the start point of the returned values.
    * @returns a {@link PermissionsResponse} object containing the permissions associated with the dataset.
    */
-  getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
+  getAllDataSetAccessPermissions(datasetId: string, pageToken?: string): Promise<PermissionsResponse>;
 
   /**
    * Remove all permssions from a given dataset.
    * @param datasetId - the ID of the datset for which permissions are to be removed.
+   * @param authenticatedUser - an object representing the user making the request.
    * @returns a {@link PermissionsResponse} indicating the permissions removed.
-   * IMPORTANT: If the returned object has a non-null `pageToken`, there are more permissions to delete.
    */
-  removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
+  removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse>;
 }

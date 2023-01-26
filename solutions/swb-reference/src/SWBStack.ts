@@ -465,7 +465,7 @@ export class SWBStack extends Stack {
           resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: ['arn:aws:s3:::sc-*']
         }),
         new PolicyStatement({
@@ -514,7 +514,7 @@ export class SWBStack extends Stack {
           resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
         }),
         new PolicyStatement({
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
@@ -567,7 +567,8 @@ export class SWBStack extends Stack {
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      versioned: true
     });
 
     s3Bucket.addToResourcePolicy(
@@ -659,7 +660,8 @@ export class SWBStack extends Stack {
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
-      encryptionKey: mainAcctEncryptionKey
+      encryptionKey: mainAcctEncryptionKey,
+      versioned: true
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
@@ -698,12 +700,16 @@ export class SWBStack extends Stack {
               's3:GetObject',
               's3:GetObjectVersion',
               's3:GetObjectTagging',
+              's3:GetObjectVersionTagging',
               's3:AbortMultipartUpload',
               's3:ListMultipartUploadParts',
               's3:PutObject',
               's3:PutObjectAcl',
+              's3:PutObjectVersionAcl',
               's3:PutObjectTagging',
+              's3:PutObjectVersionTagging',
               's3:ListBucket',
+              's3:ListBucketVersions',
               's3:PutAccessPointPolicy',
               's3:GetAccessPointPolicy'
             ],
@@ -775,7 +781,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           sid: 'GetObject',
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`arn:aws:s3:::${this.lambdaEnvVars.STACK_NAME}*`]
         }),
         new PolicyStatement({
@@ -813,7 +819,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           sid: 'S3Bucket',
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`${artifactS3Bucket.bucketArn}/*`]
         })
       ]
@@ -910,14 +916,18 @@ export class SWBStack extends Stack {
               's3:GetObject',
               's3:GetObjectVersion',
               's3:GetObjectTagging',
+              's3:GetObjectVersionTagging',
               's3:AbortMultipartUpload',
               's3:ListMultipartUploadParts',
               's3:GetBucketPolicy',
               's3:PutBucketPolicy',
               's3:PutObject',
               's3:PutObjectAcl',
+              's3:PutObjectVersionAcl',
               's3:PutObjectTagging',
+              's3:PutObjectVersionTagging',
               's3:ListBucket',
+              's3:ListBucketVersions',
               's3:PutAccessPointPolicy',
               's3:GetAccessPointPolicy',
               's3:CreateAccessPoint',
@@ -931,7 +941,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             sid: 'environmentBootstrapS3Access',
-            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+            actions: ['s3:GetObject', 's3:GetObjectVersion', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
             resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
           }),
           new PolicyStatement({
@@ -1126,7 +1136,7 @@ export class SWBStack extends Stack {
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the 'main' client access token expiration time can be return to 15 minutes
+      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);

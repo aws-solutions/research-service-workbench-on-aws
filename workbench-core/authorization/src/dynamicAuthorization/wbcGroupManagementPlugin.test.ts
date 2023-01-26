@@ -37,7 +37,7 @@ import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroup
 import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
 import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
-import { GroupStatus } from './models/GroupMetadata';
+import { GetGroupStatus } from './models/GetGroupMetadata';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
 
 describe('WBCGroupManagemntPlugin', () => {
@@ -46,7 +46,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   let groupId: string;
   let userId: string;
-  let status: GroupStatus;
+  let status: GetGroupStatus;
   let mockUser: AuthenticatedUser;
 
   let wbcGroupManagementPlugin: WBCGroupManagementPlugin;
@@ -112,6 +112,14 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(GroupAlreadyExistsError);
     });
 
+    it('throws GroupAlreadyExistsError when the group is active', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockReturnValue({ data: { status: 'active' } });
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new IdpUnavailableError());
@@ -121,15 +129,6 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(IdpUnavailableError);
     });
 
-    it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
-      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new PluginConfigurationError());
-
-      await expect(
-        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(PluginConfigurationError);
-    });
-
     it('throws GroupAlreadyExistsError when the group already exists', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
@@ -137,6 +136,15 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+
+    it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new PluginConfigurationError());
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(PluginConfigurationError);
     });
 
     it('throws TooManyRequestsError when the request is rate limited', async () => {
@@ -526,6 +534,14 @@ describe('WBCGroupManagemntPlugin', () => {
         .mockResolvedValue({ data: { status: 'delete_pending' } });
 
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
+        ForbiddenError
+      );
+    });
+
+    it('throws ForbiddenError when status tried to go from active to deleted', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'active' } });
+
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'deleted' })).rejects.toThrow(
         ForbiddenError
       );
     });

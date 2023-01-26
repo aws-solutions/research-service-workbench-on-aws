@@ -38,6 +38,16 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Storage'
   },
@@ -65,6 +75,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'CREATE',
     subject: 'DatasetFile'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetMountObject'
   },
   {
     effect: 'ALLOW',
@@ -150,6 +165,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Routes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Subject'
   }
 ];
 

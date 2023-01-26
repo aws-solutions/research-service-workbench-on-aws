@@ -6,6 +6,7 @@
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
+  CASLAuthorizationPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
   WBCGroupManagementPlugin
@@ -58,7 +59,8 @@ export default class EnvironmentLifecycleHelper {
       dynamicAuthorizationPermissionsPlugin: new DDBDynamicAuthorizationPermissionsPlugin({
         dynamoDBService: this.dynamoDbService
       }),
-      auditService: auditService
+      auditService: auditService,
+      authorizationPlugin: new CASLAuthorizationPlugin()
     });
 
     this.dataSetService = new DataSetService(
@@ -224,12 +226,11 @@ export default class EnvironmentLifecycleHelper {
         const datasetEndPointName = `${dataSetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
         const {
           data: { mountObject }
-        } = await this.dataSetService.addDataSetExternalEndpointForUser({
-          // TODO use ForGroup version when implemented
+        } = await this.dataSetService.addDataSetExternalEndpointForGroup({
           dataSetId,
           externalEndpointName: datasetEndPointName,
           storageProvider: new S3DataSetStoragePlugin(this.aws),
-          userId: `${envMetadata.projectId}#Researcher`,
+          groupId: `${envMetadata.projectId}#Researcher`,
           authenticatedUser: { id: '', roles: [] }
         });
 

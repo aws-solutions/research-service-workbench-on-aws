@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet } from './dataSet';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
 
 export interface EndpointConnectionStrings {
   /**
@@ -16,9 +16,9 @@ export interface EndpointConnectionStrings {
   endPointUrl: string;
 
   /**
-   * An optional alias which also can be used to access the storage endpoint.
+   * An alias which also can be used to access the storage endpoint.
    */
-  endPointAlias?: string;
+  endPointAlias: string;
 }
 
 /**
@@ -61,6 +61,9 @@ export interface DataSetsStoragePlugin {
    * @param request - a {@link AddStorageExternalEndpointRequest} object
    *
    * @returns a {@link AddStorageExternalEndpointResponse} object
+   *
+   * @throws {@link EndpointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(
     request: AddStorageExternalEndpointRequest
@@ -85,6 +88,8 @@ export interface DataSetsStoragePlugin {
    * @param endPointUrl - a URL which can be used to reach the endpoint.
    * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
+   * @throws {@link InvalidArnError} - the externalRoleName parameter is invalid
+   * @throws {@link InvalidArnError} - the endPointUrl parameter is invalid
    */
   addRoleToExternalEndpoint(
     name: string,

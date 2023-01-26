@@ -2,7 +2,6 @@
 set -e
 
 BRANCH=$1
-STAGE=$2
 
 function upload_docker_image_ecr() {
   swb_stack_name="$(jq -r '. |= keys[0]' ../../swb-reference/src/config/${STAGE}.json)"
@@ -11,6 +10,7 @@ function upload_docker_image_ecr() {
   aws_account_number=$(aws sts get-caller-identity --query 'Account' --output text)
   apiUrl=$(cat ../../swb-reference/src/config/${STAGE}.json| grep apiUrlOutput | awk '{print $NF}' | sed 's/\"//g' | sed 's/,//g' ) ##Get value from swb-reference/src/config/{STAGE}.json and replace all '"' and ',' with empty.
 
+  printf "\nDeploying UI from branch $BRANCH\n"
   docker build --no-cache -t $ecr_repository_name . --build-arg BRANCH=$BRANCH --build-arg STAGE=$STAGE --build-arg API_URL=$apiUrl
   aws ecr get-login-password --region $aws_region | docker login --username AWS --password-stdin $aws_account_number.dkr.ecr.$aws_region.amazonaws.com
   docker tag $ecr_repository_name:latest $aws_account_number.dkr.ecr.$aws_region.amazonaws.com/$ecr_repository_name:latest
@@ -18,7 +18,21 @@ function upload_docker_image_ecr() {
 }
 
 printf "\nBuilding and deploying docker image for SWB v2.\n"
+
+if [ -z "$STAGE" ]
+then
+    >&2 echo "[ERROR] STAGE is not set. Exiting..."
+    exit 1
+fi
+
+if [ -z "$BRANCH" ]
+then
+    printf "\nBRANCH not set. Using origin/develop...\n"
+    BRANCH="origin/develop"
+fi
+
 upload_docker_image_ecr
+
 printf "\nCompleted deploying SWB v2 UI image to ECR.\n"
 
 if [ ! -f ../infrastructure/src/config/${STAGE}.json ]

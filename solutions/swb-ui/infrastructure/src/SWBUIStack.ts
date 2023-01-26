@@ -156,7 +156,8 @@ export class SWBUIStack extends Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       serverAccessLogsBucket: accessLogsBucket,
       serverAccessLogsPrefix: S3_ACCESS_LOGS_BUCKET_PREFIX,
-      encryption: BucketEncryption.S3_MANAGED // CloudFront requires S3 managed key
+      encryption: BucketEncryption.S3_MANAGED, // CloudFront requires S3 managed key
+      versioned: true
     });
 
     this._addS3TLSSigV4BucketPolicy(s3Bucket);

@@ -4,6 +4,7 @@
  */
 
 import {
+  CASLAuthorizationPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
@@ -27,9 +28,10 @@ const ddbDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsP
     routesIgnored: routesIgnored,
     dynamicRoutesMap: dynamicRoutesMap
   });
-
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 export const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-  auditService
+  auditService,
+  authorizationPlugin: caslAuthorizationPlugin
 });

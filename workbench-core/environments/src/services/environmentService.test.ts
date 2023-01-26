@@ -1191,79 +1191,43 @@ describe('EnvironmentService', () => {
         Boom.badRequest('datasetIds dataset-123 do not exist')
       );
     });
-    test('failed because ETC does not exist', async () => {
-      // BUILD
-      const filteredBatchItems = getBatchItemsWith(['project', 'dataset']);
-      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+  });
 
-      // Write data to DDB
-      ddbMock.on(TransactWriteItemsCommand).resolves({});
+  describe('doesDependencyHaveEnvironments', () => {
+    describe('when dependencies exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: ['someDependency'] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
 
-      // Get environment from DDB
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
-      const queryItemResponse: QueryCommandOutput = {
-        Items: envWithMetadata.map((item) => {
-          return marshall(item);
-        }),
-        $metadata: {}
-      };
-      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+      test('evaluates to true', async () => {
+        // OPERATE
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
 
-      // OPERATE && CHECK
-      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist')
-      );
+        // CHECK
+        expect(result).toEqual(true);
+      });
     });
 
-    test('failed because Project does not exist', async () => {
-      // BUILD
-      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'dataset']);
-      // @ts-ignore
-      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+    describe('when dependencies do not exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: [] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
 
-      // Write data to DDB
-      ddbMock.on(TransactWriteItemsCommand).resolves({});
+      test('evaluates to false', async () => {
+        // OPERATE
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
 
-      // Get environment from DDB
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
-      const queryItemResponse: QueryCommandOutput = {
-        Items: envWithMetadata.map((item) => {
-          return marshall(item);
-        }),
-        $metadata: {}
-      };
-      ddbMock.on(QueryCommand).resolves(queryItemResponse);
-
-      // OPERATE && CHECK
-      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('projectId proj-123 does not exist')
-      );
-    });
-    test('failed because Dataset does not exist', async () => {
-      // BUILD
-      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project']);
-      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
-
-      // Write data to DDB
-      ddbMock.on(TransactWriteItemsCommand).resolves({});
-
-      // Get environment from DDB
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
-      const queryItemResponse: QueryCommandOutput = {
-        Items: envWithMetadata.map((item) => {
-          return marshall(item);
-        }),
-        $metadata: {}
-      };
-      ddbMock.on(QueryCommand).resolves(queryItemResponse);
-
-      // OPERATE && CHECK
-      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('datasetIds dataset-123 do not exist')
-      );
+        // CHECK
+        expect(result).toEqual(false);
+      });
     });
   });
 });

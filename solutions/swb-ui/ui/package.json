@@ -21,7 +21,7 @@
     "build:test": "rushx build && rushx test",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
-    "deploy-ui-and-api": "bash ./scripts/deploy.sh",
+    "deploy-ui-and-api": "bash ./scripts/image-deploy.sh $BRANCH && bash ./scripts/deploy.sh",
     "dev": "bash ./scripts/dev.sh",
     "e2e-test": "cypress run --env STAGE=${STAGE}",
     "e2e-test:open": "cypress open --env STAGE=${STAGE}",

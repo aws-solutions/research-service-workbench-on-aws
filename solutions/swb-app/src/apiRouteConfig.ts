@@ -14,6 +14,7 @@ import {
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
 export interface ApiRouteConfig {
@@ -30,6 +31,7 @@ export interface ApiRouteConfig {
   costCenterService: CostCenterService;
   metadataService: MetadataService;
   projectEnvTypeConfigPlugin: ProjectEnvTypeConfigPlugin;
+  keyPairService: KeyPairPlugin;
 }
 
 export interface ApiRoute {

@@ -17,7 +17,6 @@ import {
 } from '@aws-sdk/client-s3';
 import {
   CreateAccessPointCommandInput,
-  CreateAccessPointCommandOutput,
   DeleteAccessPointCommandInput,
   GetAccessPointPolicyCommandInput,
   GetAccessPointPolicyCommandOutput,
@@ -25,12 +24,15 @@ import {
 } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
-import { DataSet } from './dataSet';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
+import { EndpointExistsError } from './errors/endpointExistsError';
+import { InvalidArnError } from './errors/invalidArnError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 
 /**
@@ -97,6 +99,8 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
    * @param vpcId - an optional ID of the VPC interacting with the endpoint.
    * @returns the S3 URL and the alias which can be used to access the endpoint.
+   * @throws {@link EndpointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   public async addExternalEndpoint(
     request: AddStorageExternalEndpointRequest
@@ -112,7 +116,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       kmsKeyArn
     } = request;
 
-    const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
+    const response: { endPointArn: string; endPointAlias: string } = await this._createAccessPoint(
       name,
       externalEndpointName,
       ownerAccountId,
@@ -201,7 +205,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalEndpointName: string,
     bucketAccount: string,
     vpcId?: string
-  ): Promise<{ endPointArn: string; endPointAlias?: string }> {
+  ): Promise<{ endPointArn: string; endPointAlias: string }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
       Bucket: name,
@@ -210,13 +214,30 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     if (vpcId) {
       accessPointConfig.VpcConfiguration = { VpcId: vpcId };
     }
-    const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
-      accessPointConfig
-    );
-    return {
-      endPointArn: response.AccessPointArn!,
-      endPointAlias: response.Alias
-    };
+    try {
+      const { AccessPointArn, Alias } = await this._aws.clients.s3Control.createAccessPoint(
+        accessPointConfig
+      );
+
+      if (!AccessPointArn) {
+        throw new InvalidEndpointError(`Endpoint "${externalEndpointName}" did not generate an endPointArn.`);
+      }
+      if (!Alias) {
+        throw new InvalidEndpointError(
+          `Endpoint "${externalEndpointName}" did not generate an endPointAlias.`
+        );
+      }
+
+      return {
+        endPointArn: AccessPointArn,
+        endPointAlias: Alias
+      };
+    } catch (error) {
+      if (error.name === 'AccessPointAlreadyOwnedByYou') {
+        throw new EndpointExistsError(error.message);
+      }
+      throw error;
+    }
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {
@@ -430,11 +451,13 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _awsAccountIdFromArn(arn: string): string {
     const arnParts = arn.split(':');
     if (arnParts.length < 6) {
-      throw new Error("Expected an arn with at least six ':' separated values.");
+      throw new InvalidArnError("Expected an arn with at least six ':' separated values.");
     }
 
     if (!arnParts[4] || arnParts[4] === '') {
-      throw new Error('Expected an arn with an AWS AccountID however AWS AccountID field is empty.');
+      throw new InvalidArnError(
+        'Expected an arn with an AWS AccountID however AWS AccountID field is empty.'
+      );
     }
 
     return arnParts[4];

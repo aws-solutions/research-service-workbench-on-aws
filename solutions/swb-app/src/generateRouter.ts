@@ -36,6 +36,7 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { setUpKeyPairRoutes } from './keyPairRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
@@ -123,8 +124,15 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.environmentTypeConfigService,
     apiRouteConfig.environmentService
   );
-  setUpProjectRoutes(router, apiRouteConfig.projectService);
+  setUpProjectRoutes(
+    router,
+    apiRouteConfig.projectService,
+    apiRouteConfig.environmentService,
+    apiRouteConfig.metadataService
+  );
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
+  setUpKeyPairRoutes(router, apiRouteConfig.keyPairService);
+
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);
   router.use(unknownErrorHandler);

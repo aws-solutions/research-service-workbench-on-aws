@@ -15,11 +15,11 @@ export default class Resource {
   protected _axiosInstance: AxiosInstance;
   protected _api: string = '';
   protected _setup: Setup;
+  protected _clientSession: ClientSession;
   public id: string;
-  private readonly _session: ClientSession;
 
   public constructor(clientSession: ClientSession, type: string, id: string, parentApi: string) {
-    this._session = clientSession;
+    this._clientSession = clientSession;
     this._axiosInstance = clientSession.getAxiosInstance();
     this._settings = clientSession.getSettings();
     this._setup = clientSession.getSetup();
@@ -46,7 +46,7 @@ export default class Resource {
 
   public async delete(): Promise<AxiosResponse> {
     const response = await this._axiosInstance.delete(this._api);
-    this._session.removeCleanupTask(`group-${this.id}`);
+    this._clientSession.removeCleanupTask(`group-${this.id}`);
 
     return response;
   }

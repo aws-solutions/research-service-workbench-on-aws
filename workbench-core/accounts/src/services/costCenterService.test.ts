@@ -274,6 +274,7 @@ describe('CostCenterService', () => {
             ...costCenter,
             accountId: costCenter.dependency
           });
+
           await expect(costCenterService.create(createCostCenter)).resolves.toEqual(expectedCostCenter);
         });
       });

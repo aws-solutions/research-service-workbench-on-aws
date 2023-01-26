@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "add skeleton code for key pairs routes and request/response contracts",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

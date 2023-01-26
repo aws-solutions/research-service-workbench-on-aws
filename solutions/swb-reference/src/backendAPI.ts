@@ -15,7 +15,8 @@ import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-
 import {
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
-  DDBDynamicAuthorizationPermissionsPlugin
+  DDBDynamicAuthorizationPermissionsPlugin,
+  CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
@@ -35,6 +36,7 @@ import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './const
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
+import KeyPairService from './services/keyPairService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
@@ -63,10 +65,12 @@ const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissio
   new DDBDynamicAuthorizationPermissionsPlugin({
     dynamoDBService: dynamicAuthAws.helpers.ddb
   });
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  authorizationPlugin: caslAuthorizationPlugin
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
@@ -126,7 +130,8 @@ const apiRouteConfig: ApiRouteConfig = {
     projectService,
     envTypeConfigService,
     envTypeService
-  )
+  ),
+  keyPairService: new KeyPairService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

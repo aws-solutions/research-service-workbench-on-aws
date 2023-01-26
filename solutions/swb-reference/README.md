@@ -25,7 +25,7 @@ To test the new Service Workbench on AWS v2 r0.1.0, follow the deployment instru
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-98.91%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-89.47%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-94.11%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.88%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-98.52%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-90%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-92.3%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.48%25-brightgreen.svg?style=flat) |
 
 ## Requirements
 
@@ -223,44 +223,41 @@ To run integration tests
     4. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
 
 
-4. For `projectId` open Postman Collection and select `List projects` inside `projects` folder.
+4. For `projectId`, `costCenterId`, and `projectName`, open Postman Collection and select `List projects` inside `projects` folder.
 
     1. Excecute `List projects` request, you should get a json response with the next information
         ```
         {
             "data": [
                 {
-                    "subnetId": "subnet-<subnet id>",
-                    "accountId": "<account id>",
-                    "awsAccountId": "<Hosting account id>",
-                    "environmentInstanceFiles": "s3://swb-dev-va-<bucket id>/environment-files",
-                    "createdAt": "2022-01-28T22:42:20.296Z",
-                    "updatedBy": "abc",
-                    "vpcId": "vpc<vpc id>",
-                    "envMgmtRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-env-mgmt",
-                    "createdBy": "abc",
-                    "name": "Project 1",
-                    "encryptionKeyArn": "arn:aws:kms:us-east-1:<hosting account id>:key/########-####-####-####-############",
-                    "resourceType": "project",
-                    "externalId": "workbench",
-                    "updatedAt": "2022-02-02T21:07:30.237Z",
-                    "projectAdmins": [],
-                    "indexId": "index-123",
-                    "sk": "PROJ#<proj id>",
-                    "owner": "abc",
-                    "description": "Example project 1",
-                    "id": "########-####-####-####-############",
-                    "pk": "########-####-####-####-############",
-                    "hostingAccountHandlerRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-hosting-account-role"
+                "id": "proj-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                "name": "Project Name",
+                "description": "Project Description",
+                "costCenterId": "cc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                "status": "AVAILABLE",
+                "createdAt": "2022-12-22T16:43:10.617Z",
+                "updatedAt": "2023-01-09T22:51:52.026Z",
+                "awsAccountId": "XXXXXXXXXXXX",
+                "envMgmtRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/swb-<stage>-<region>-env-mgmt",
+                "hostingAccountHandlerRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/    swb-<stage>-<region>-hosting-account-role",
+                "vpcId": "vpc-xxxxxxxxxxxxxxxxx",
+                "subnetId": "subnet-xxxxxxxxxxxxxxxxx",
+                "environmentInstanceFiles": "s3://swb-<stage>-<region>-s3artifactsXXXXXXXXXX/environment-files",
+                "encryptionKeyArn": "arn:aws:kms:us-east-2:XXXXXXXXXXXX:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                "externalId": "workbench",
+                "accountId": "acc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 }
             ]
         }
         ```
 
-    2. Choose the Project that integration test will use as default when creating any Environment and copy the `id` value from the request.
+    2. Choose the Project that integration test will use as default when creating any Environment and testing project functionality.
 
-    3. In `./integration-tests/config` directory assign value copied to `projectId` property in `<STAGE>.yaml` file 
+    3. In `./integration-tests/config` directory assign the `id` value from the above request to the `projectId` property in `<STAGE>.yaml` file. 
 
+    4. In `./integration-tests/config` directory assign the `name` value from the above request to the `projectName` property in `<STAGE>.yaml` file.
+
+    5. In `./integration-tests/config` directory assign the `costCenterId` value from the above request to the `costCenterId` property in `<STAGE>.yaml` file.
 
 5. For `terminatedEnvId` we need the id of an environment that has been terminated, Postman collection request `List Environments` does not show terminated environments ,so we need to save the id of a stopped environment before we terminate it.
 

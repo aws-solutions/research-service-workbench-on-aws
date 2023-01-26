@@ -48,9 +48,8 @@ export class DataSetService implements DataSetPlugin {
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse> {
-    return this._workbenchDataSetService.addDataSetExternalEndpointForUser({
+    return this._workbenchDataSetService.addDataSetExternalEndpointForGroup({
       ...request,
-      userId: request.groupId,
       storageProvider: this.storagePlugin
     });
   }
@@ -67,8 +66,17 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
   }
 
-  public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    return this._workbenchDataSetService.provisionDataSet(request);
+  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const response = await this._workbenchDataSetService.provisionDataSet(request);
+    // TODO: remove once addAccessPermissions on ProvisionDataSet is complete.
+    if (response.id && request.permissions && request.permissions.length) {
+      await this._workbenchDataSetService.addDataSetAccessPermissions({
+        authenticatedUser: request.authenticatedUser,
+        permission: request.permissions[0],
+        dataSetId: response.id
+      });
+    }
+    return response;
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
@@ -94,7 +102,10 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId);
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, {
+      id: '',
+      roles: []
+    });
     return PermissionsResponseParser.parse(response);
   }
 }

@@ -8,17 +8,23 @@ import { JSONValue } from '@aws/workbench-core-base';
 import { UserNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
+import AuthorizationPlugin from '../authorizationPlugin';
 import { Effect } from '../effect';
+import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { ParamNotFoundError } from '../errors/paramNotFoundError';
 import { RetryError } from '../errors/retryError';
+import { RouteNotSecuredError } from '../errors/routeNotSecuredError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { HTTPMethod } from '../routesMap';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupResponse, DeleteGroupRequest } from './dynamicAuthorizationInputs/deleteGroup';
+import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
 import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
 import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
@@ -38,6 +44,7 @@ describe('DynamicAuthorizationService', () => {
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
+  let mockAuthorizationPlugin: AuthorizationPlugin;
 
   let sampleGroupId: string;
   let sampleGroupType: IdentityType;
@@ -74,7 +81,13 @@ describe('DynamicAuthorizationService', () => {
       createIdentityPermissions: jest.fn(),
       deleteIdentityPermissions: jest.fn(),
       getIdentityPermissionsByIdentity: jest.fn(),
-      getIdentityPermissionsBySubject: jest.fn()
+      getIdentityPermissionsBySubject: jest.fn(),
+      deleteSubjectIdentityPermissions: jest.fn()
+    };
+
+    mockAuthorizationPlugin = {
+      isAuthorized: jest.fn(),
+      isAuthorizedOnDynamicOperations: jest.fn()
     };
 
     auditService = new AuditService(
@@ -101,7 +114,8 @@ describe('DynamicAuthorizationService', () => {
     dynamicAuthzService = new DynamicAuthorizationService({
       groupManagementPlugin: mockGroupManagementPlugin,
       dynamicAuthorizationPermissionsPlugin: mockDynamicAuthorizationPermissionsPlugin,
-      auditService
+      auditService,
+      authorizationPlugin: mockAuthorizationPlugin
     });
 
     sampleGroupId = 'sampleGroup';
@@ -131,26 +145,146 @@ describe('DynamicAuthorizationService', () => {
     jest.resetAllMocks();
   });
 
-  describe('init', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(dynamicAuthzService.init({})).rejects.toThrow(Error);
-    });
-  });
-
   describe('isAuthorizedOnSubject', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.isAuthorizedOnSubject({
-          user: mockUser,
-          dynamicOperation: {
-            action: 'CREATE',
-            subject: {
-              subjectId: '',
-              subjectType: ''
-            }
+    let mockDynamicOperation: DynamicOperation;
+    let params: IsAuthorizedOnSubjectRequest;
+    beforeEach(() => {
+      mockUser = {
+        id: 'sampleId',
+        roles: ['sampleGroupId']
+      };
+      mockDynamicOperation = {
+        action: sampleAction,
+        subject: {
+          subjectType: sampleSubjectType,
+          subjectId: sampleSubjectId
+        }
+      };
+      auditAction = 'isAuthorizedOnSubject';
+      params = {
+        authenticatedUser: mockUser,
+        dynamicOperation: mockDynamicOperation
+      };
+    });
+    test('is authorized on subject', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
           }
         })
-      ).rejects.toThrow(Error);
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('is authorized on all subject', async () => {
+      //require access to all subjectType with any
+      params.dynamicOperation.subject.subjectId = '*';
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        });
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
+      expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(2);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+    test('is authorized on subject, get all paginated results', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      await expect(dynamicAuthzService.isAuthorizedOnSubject(params)).resolves.not.toThrow();
+      expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(3);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('is authorized on subject, get all paginated results, authorizationPlugin throws ForbiddenError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest
+        .fn()
+        .mockRejectedValueOnce(new ForbiddenError());
+      await expect(
+        dynamicAuthzService.isAuthorizedOnSubject({
+          authenticatedUser: mockUser,
+          dynamicOperation: mockDynamicOperation
+        })
+      ).rejects.toThrowError(ForbiddenError);
+
+      expect(mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject).toBeCalledTimes(3);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ForbiddenError()
+      );
     });
   });
 
@@ -197,10 +331,376 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('isAuthorizedOnRoute', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.isAuthorizedOnRoute({ authenticatedUser: mockUser, route: '', method: 'GET' })
-      ).rejects.toThrow(Error);
+    let mockDynamicOperations: DynamicOperation[];
+    let mockIdentityPermissions: IdentityPermission[];
+    let mockRoute: string;
+    let mockMethod: HTTPMethod;
+    let mockParams: Record<string, string>;
+    beforeEach(() => {
+      mockUser = {
+        id: 'sampleId',
+        roles: ['sampleGroupId']
+      };
+      auditAction = 'isAuthorizedOnRoute';
+      mockDynamicOperations = [
+        {
+          action: 'CREATE',
+          subject: {
+            subjectId: '${subjectId}',
+            subjectType: 'sampleSubjectType',
+            parentId: '${parentId}'
+          }
+        }
+      ];
+      mockIdentityPermissions = [
+        {
+          identityId: sampleGroupId,
+          identityType: 'GROUP',
+          action: 'CREATE',
+          subjectId: 'sampleSubjectId',
+          subjectType: 'sampleSubjectType',
+          effect: 'ALLOW',
+          conditions: {
+            parentId: { $eq: 'sampleParentId' }
+          }
+        }
+      ];
+      mockRoute = '/sample/route';
+      mockMethod = 'GET';
+      mockParams = {
+        parentId: 'sampleParentId',
+        subjectId: 'sampleSubjectId'
+      };
+    });
+
+    test('user is authorized on a simple route, that is protected', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations: mockDynamicOperations
+          }
+        });
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest.fn();
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('user is authorized on a route with multiple dynamic operations', async () => {
+      const dynamicOperations: DynamicOperation[] = [
+        {
+          action: 'READ',
+          subject: {
+            subjectId: '${subjectId}',
+            subjectType: 'sampleSubjectType',
+            parentId: '${parentId}'
+          }
+        },
+        {
+          action: 'READ',
+          subject: {
+            subjectId: '${subjectId}',
+            subjectType: 'sampleSubjectType',
+            parentId: '${parentId2}'
+          }
+        },
+        {
+          action: 'READ',
+          subject: {
+            subjectId: '*',
+            subjectType: 'sampleSubjectType'
+          }
+        }
+      ];
+      mockParams.parentId2 = 'sampleParentId2';
+
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations
+          }
+        });
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest.fn();
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+
+    test('throws ParamNotFound when required params are needed', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations: mockDynamicOperations
+          }
+        });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod
+      };
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).rejects.toThrowError(ParamNotFoundError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ParamNotFoundError('Missing parameter')
+      );
+    });
+
+    test('user is authorized on route ignored', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: true
+        }
+      });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith({
+        actor: mockUser,
+        source: auditSource,
+        action: auditAction,
+        requestBody: params,
+        statusCode: 200
+      });
+    });
+    test('RouteNotSecuredError thrown when no protection found', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: false
+        }
+      });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).rejects.toThrowError(
+        RouteNotSecuredError
+      );
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new RouteNotSecuredError('Route is not secured')
+      );
+    });
+    test('ensure params are being escaped when using regex', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations: mockDynamicOperations
+          }
+        });
+
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      mockParams = {
+        subjectId: '${string}',
+        parentId: '${string}'
+      };
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest
+        .fn()
+        .mockRejectedValueOnce(new ForbiddenError());
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).rejects.toThrowError(ForbiddenError);
+
+      const filledDynamicOperations = [
+        {
+          action: 'CREATE',
+          subject: {
+            subjectId: '\\$\\{string\\}',
+            subjectType: 'sampleSubjectType',
+            parentId: '\\$\\{string\\}'
+          }
+        }
+      ];
+      expect(mockAuthorizationPlugin.isAuthorizedOnDynamicOperations).toBeCalledWith(
+        mockIdentityPermissions,
+        filledDynamicOperations
+      );
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ForbiddenError()
+      );
+    });
+    test('user is unauthorized on route, throw ForbiddenError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeIgnored: false
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest.fn().mockResolvedValueOnce({
+        data: {
+          routeProtected: true
+        }
+      });
+      mockDynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            dynamicOperations: mockDynamicOperations
+          }
+        });
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: mockIdentityPermissions
+          }
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: []
+          }
+        });
+      const params = {
+        authenticatedUser: mockUser,
+        route: mockRoute,
+        method: mockMethod,
+        params: mockParams
+      };
+      mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest
+        .fn()
+        .mockRejectedValueOnce(new ForbiddenError());
+      await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).rejects.toThrowError(ForbiddenError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ForbiddenError()
+      );
     });
   });
 
@@ -730,6 +1230,61 @@ describe('DynamicAuthorizationService', () => {
       await expect(
         dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('deleteSubjectIdentityPermissions', () => {
+    beforeEach(() => {
+      auditAction = 'deleteSubjectIdentityPermissions';
+    });
+
+    test('delete subject identity permissions', async () => {
+      const mockReturnValue = {
+        data: {
+          identityPermissions: mockIdentityPermissions
+        }
+      };
+      mockDynamicAuthorizationPermissionsPlugin.deleteSubjectIdentityPermissions = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const params = {
+        authenticatedUser: mockUser,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId
+      };
+      const response = await dynamicAuthzService.deleteSubjectIdentityPermissions(params);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        response
+      );
+    });
+
+    test('delete subject identity permissions, throws RetryError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.deleteSubjectIdentityPermissions = jest
+        .fn()
+        .mockRejectedValueOnce(new RetryError());
+      const params = {
+        authenticatedUser: mockUser,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId
+      };
+      await expect(dynamicAuthzService.deleteSubjectIdentityPermissions(params)).rejects.toThrow(RetryError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new RetryError()
+      );
     });
   });
 });
