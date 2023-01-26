@@ -4,7 +4,7 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
@@ -258,18 +258,19 @@ export class DataSetService {
       const response: DataSet[] = [];
       const allDatasets = await this._dbProvider.listDataSets();
 
-      const allDatasetsPermissions = await Promise.all(
-        allDatasets.map((dataset) =>
-          this._getAuthenticatedUserDatasetPermissions(authenticatedUser, dataset.id)
-        )
+      await Promise.all(
+        allDatasets.map(async (dataset) => {
+          try {
+            // throws a ForbiddenError if the user doesnt have permission on the dataset
+            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+            response.push(dataset);
+          } catch (error) {
+            if (!isForbiddenError(error)) {
+              throw error;
+            }
+          }
+        })
       );
-
-      allDatasetsPermissions.forEach((permission, index) => {
-        if (permission.length) {
-          //eslint-disable-next-line security/detect-object-injection
-          response.push(allDatasets[index]);
-        }
-      });
 
       await this._audit.write(metadata, response);
       return response;

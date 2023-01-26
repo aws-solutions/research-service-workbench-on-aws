@@ -4,6 +4,7 @@
  */
 
 import { DataSet, StorageLocation } from '@aws/workbench-core-datasets';
+import { dataSetSubjectType } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import ClientSession from '../../support/clientSession';
 import Dataset from '../../support/resources/datasets/dataset';
 import Setup from '../../support/setup';
@@ -69,7 +70,7 @@ describe('datasets list integration test', () => {
       expect(response.data).toStrictEqual([]);
     });
 
-    it('should return the datasets that the user has permissions on from their userId', async () => {
+    it('should not return the datasets that the user has no permissions on from their userId', async () => {
       await datasets[0].addAccess({
         permission: {
           identity: userId,
@@ -95,13 +96,13 @@ describe('datasets list integration test', () => {
       const { data } = await updatedAdminSession.resources.datasets.get();
       const dataSetIds = data.map((dataset: DataSet) => dataset.id);
 
+      expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
       expect(dataSetIds).toStrictEqual(
         expect.arrayContaining([datasets[0].id, datasets[2].id, datasets[4].id])
       );
-      expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
     });
 
-    it('should return the datasets that the user has permissions on from the groups they are in', async () => {
+    it('should not return the datasets that the user has no permissions on from the groups they are in', async () => {
       await datasets[0].addAccess({
         permission: {
           identity: groupId,
@@ -127,13 +128,13 @@ describe('datasets list integration test', () => {
       const { data } = await updatedAdminSession.resources.datasets.get();
       const dataSetIds = data.map((dataset: Dataset) => dataset.id);
 
+      expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
       expect(dataSetIds).toStrictEqual(
         expect.arrayContaining([datasets[0].id, datasets[2].id, datasets[4].id])
       );
-      expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
     });
 
-    it('should return the datasets that the user has permissions on from a combo of their userId and the groups they are in', async () => {
+    it('should not return the datasets that the user has no permissions on from a combo of their userId and the groups they are in', async () => {
       await datasets[0].addAccess({
         permission: {
           identity: userId,
@@ -152,10 +153,138 @@ describe('datasets list integration test', () => {
       const { data } = await updatedAdminSession.resources.datasets.get();
       const dataSetIds = data.map((dataset: Dataset) => dataset.id);
 
-      expect(dataSetIds).toStrictEqual(expect.arrayContaining([datasets[0].id, datasets[2].id]));
       expect(dataSetIds).toStrictEqual(
         expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
       );
+      expect(dataSetIds).toStrictEqual(expect.arrayContaining([datasets[0].id, datasets[2].id]));
+    });
+
+    it('should return the datasets that the user has permissions on when the permissions are for read-write access', async () => {
+      await datasets[0].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-write'
+        }
+      });
+      await datasets[2].addAccess({
+        permission: {
+          identity: groupId,
+          identityType: 'GROUP',
+          accessLevel: 'read-write'
+        }
+      });
+
+      const { data } = await updatedAdminSession.resources.datasets.get();
+      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+
+      expect(dataSetIds).toStrictEqual(
+        expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
+      );
+      expect(dataSetIds).toStrictEqual(expect.arrayContaining([datasets[0].id, datasets[2].id]));
+    });
+
+    it('should not return the datasets that the user does not have READ permissions on', async () => {
+      // give READ permissions to 2 datasets
+      await datasets[0].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
+      await datasets[2].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
+
+      // give UPDATE permission on a dataset, CREATE permission on another, and DELETE permission on a third
+      await updatedAdminSession.resources.identityPermissions.create({
+        identityPermissions: [
+          {
+            identityType: 'USER',
+            identityId: userId,
+            action: 'UPDATE',
+            effect: 'ALLOW',
+            subjectType: dataSetSubjectType,
+            subjectId: datasets[1].id
+          },
+          {
+            identityType: 'USER',
+            identityId: userId,
+            action: 'CREATE',
+            effect: 'ALLOW',
+            subjectType: dataSetSubjectType,
+            subjectId: datasets[3].id
+          },
+          {
+            identityType: 'USER',
+            identityId: userId,
+            action: 'DELETE',
+            effect: 'ALLOW',
+            subjectType: dataSetSubjectType,
+            subjectId: datasets[4].id
+          }
+        ]
+      });
+
+      const { data } = await updatedAdminSession.resources.datasets.get();
+      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+
+      expect(dataSetIds).toStrictEqual(
+        expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
+      );
+      expect(dataSetIds).toStrictEqual(expect.arrayContaining([datasets[0].id, datasets[2].id]));
+    });
+
+    it('should not return the datasets that the user has both ALLOW and DENY permissions on', async () => {
+      // give READ permissions to 3 datasets
+      await datasets[0].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
+      await datasets[2].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
+      await datasets[4].addAccess({
+        permission: {
+          identity: userId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      });
+
+      // give DENY READ permission on one of the above datasets
+      await updatedAdminSession.resources.identityPermissions.create({
+        identityPermissions: [
+          {
+            identityType: 'USER',
+            identityId: userId,
+            action: 'READ',
+            effect: 'DENY',
+            subjectType: dataSetSubjectType,
+            subjectId: datasets[4].id
+          }
+        ]
+      });
+
+      const { data } = await updatedAdminSession.resources.datasets.get();
+      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+
+      expect(dataSetIds).toStrictEqual(
+        expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
+      );
+      expect(dataSetIds).toStrictEqual(expect.arrayContaining([datasets[0].id, datasets[2].id]));
     });
   });
 

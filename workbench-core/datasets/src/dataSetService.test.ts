@@ -4,7 +4,6 @@
  */
 
 jest.mock('@aws/workbench-core-audit');
-jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 jest.mock('./wbcDataSetsAuthorizationPlugin');
@@ -14,6 +13,7 @@ import {
   CASLAuthorizationPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
+  ForbiddenError,
   WBCGroupManagementPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
@@ -857,6 +857,7 @@ describe('DataSetService', () => {
 
   describe('listDataSets', () => {
     let mockDataSetWithoutId: Omit<DataSet, 'id'>;
+
     beforeEach(() => {
       mockDataSetWithoutId = {
         name: mockDataSetName,
@@ -874,15 +875,7 @@ describe('DataSetService', () => {
         { ...mockDataSetWithoutId, id: '2' },
         { ...mockDataSetWithoutId, id: '3' }
       ]);
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '1', permissions: [mockReadOnlyUserPermission] } });
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '2', permissions: [mockReadWriteUserPermission] } });
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '3', permissions: [mockReadWriteGroupPermission] } });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
 
       await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
         { ...mockDataSetWithoutId, id: '1' },
@@ -890,28 +883,25 @@ describe('DataSetService', () => {
         { ...mockDataSetWithoutId, id: '3' }
       ]);
     });
-    it('returns the array of DataSets the authenticated user has access to when the user has access to some of the datasets.', async () => {
+
+    it('returns the array of DataSets the authenticated user has access to when the user doesnt have access to some of the datasets.', async () => {
       jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce([
         { ...mockDataSetWithoutId, id: '1' },
         { ...mockDataSetWithoutId, id: '2' },
         { ...mockDataSetWithoutId, id: '3' }
       ]);
       jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '1', permissions: [mockReadOnlyUserPermission] } });
-      // no permissions on dataset 2
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '2', permissions: [] } });
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValueOnce({ data: { dataSetId: '3', permissions: [mockReadWriteGroupPermission] } });
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
+        .mockResolvedValueOnce()
+        .mockRejectedValueOnce(new ForbiddenError()) // no permissions on dataset 2
+        .mockResolvedValueOnce();
 
       await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
         { ...mockDataSetWithoutId, id: '1' },
         { ...mockDataSetWithoutId, id: '3' }
       ]);
     });
+
     it('generates an audit event when an error is thrown', async () => {
       jest
         .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
@@ -921,6 +911,16 @@ describe('DataSetService', () => {
         new Error('intentional test error')
       );
       expect(audit.write).toHaveBeenCalledTimes(1);
+    });
+
+    it('rethrows an unexpected error', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
+        .mockRejectedValueOnce(new Error('some unknown error'));
+
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).rejects.toThrowError(
+        new Error('some unknown error')
+      );
     });
   });
 
