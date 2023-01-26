@@ -13,7 +13,7 @@ import { i18nStrings, layoutLabels, paginationLables, headerLabels, NavigationLa
 import { getFilterCounterText } from './common/tableCounterStrings';
 import { TableEmptyDisplay } from './common/tableEmptyState';
 import { TableNoMatchDisplay } from './common/tableNoMatchState';
-import { nameRegex, cidrRegex, emailRegex, convertToRecord, validateField } from './common/utils';
+import { nameRegex, cidrRegex, emailRegex, convertToRecord } from './common/utils';
 import BaseLayout from './components/BaseLayout';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -63,7 +63,6 @@ export {
   nameRegex,
   cidrRegex,
   emailRegex,
-  validateField,
   // From '/components' folder
   BaseLayout,
   Header,
