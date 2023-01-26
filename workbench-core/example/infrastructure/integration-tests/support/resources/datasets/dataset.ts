@@ -23,6 +23,8 @@ export default class Dataset extends Resource {
   private _permissions: Map<string, IdentityPermission>;
   public storageName: string;
   public storagePath: string;
+  public owner?: string;
+  public ownerType?: string;
   public children: Map<string, Endpoint>;
 
   public constructor(params: DataSetCreateParams) {
@@ -32,6 +34,8 @@ export default class Dataset extends Resource {
     this.storagePath = params.storagePath;
     this.children = new Map<string, Endpoint>();
     this._permissions = new Map<string, IdentityPermission>();
+    this.owner = params.owner;
+    this.ownerType = params.ownerType;
   }
 
   public identityPermission(
@@ -187,6 +191,8 @@ export interface DataSetCreateParams {
   awsAccountId: string;
   storageName: string;
   storagePath: string;
+  owner?: string;
+  ownerType?: string;
 }
 
 interface EndpointCreateRequest {

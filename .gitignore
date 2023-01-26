@@ -63,6 +63,7 @@ jspm_packages/
 common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
+common/autoinstallers/*/.pnpm-store
 **/.rush/temp/
 **/temp/
 workbench-core/environments/temp/
@@ -88,13 +89,14 @@ build/
 .idea
 
 # Reference package
-solutions/swb-reference/src/environment-files/offline-packages/*
+# solutions/swb-reference/src/environment-files/offline-packages/*  TODO: Uncomment this back once GALI-2093 changes are merged
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/integration-tests/config/testEnv.yaml
+!solutions/swb-reference/integration-tests/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 !solutions/swb-reference/src/config/demo.yaml
