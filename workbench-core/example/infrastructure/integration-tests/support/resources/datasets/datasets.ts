@@ -36,7 +36,9 @@ export default class Datasets extends CollectionResource {
       id: response.data.id,
       awsAccountId: response.data.awsAccountId,
       storageName: response.data.storageName,
-      storagePath: response.data.path
+      storagePath: response.data.path,
+      owner: response.data.owner,
+      ownerType: response.data.ownerType
     };
     const taskId = `${this._childType}-${createParams.id}`;
     const resourceNode: Dataset = this.dataset(createParams);
@@ -80,6 +82,8 @@ export default class Datasets extends CollectionResource {
       storageName: resource.storageName ?? storageName,
       awsAccountId: resource.awsAccountId ?? awsAccountId,
       region: resource.region ?? region,
+      owner: resource.owner,
+      ownerType: resource.ownerType,
       permissions: resource.permissions ?? []
     };
   }
@@ -91,5 +95,7 @@ interface DataSetCreateRequest {
   path: string;
   awsAccountId: string;
   region: string;
+  owner?: string;
+  ownerType?: string;
   permissions?: DataSetPermission[];
 }

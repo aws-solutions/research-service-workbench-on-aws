@@ -12,6 +12,10 @@ export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 export { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
 // errors
+export {
+  DataSetInvalidParameterError,
+  isDataSetInvalidParameterError
+} from './errors/dataSetInvalidParameterError';
 export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 export { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
 export { EndpointExistsError, isEndpointExistsError } from './errors/endpointExistsError';
