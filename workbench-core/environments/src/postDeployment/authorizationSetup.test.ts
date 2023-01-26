@@ -4,12 +4,17 @@
  */
 
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import {
+  AuthorizationPlugin,
+  DynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  GroupManagementPlugin
+} from '@aws/workbench-core-authorization';
 import AuthorizationSetup from './authorizationSetup';
 
 describe('AuthorizationSetup', () => {
   test('run: Create new group, assign permissions', async () => {
-    const mockGroupManagementPlugin = {
+    const mockGroupManagementPlugin: GroupManagementPlugin = {
       createGroup: jest.fn(),
       deleteGroup: jest.fn(),
       getUserGroups: jest.fn(),
@@ -21,7 +26,7 @@ describe('AuthorizationSetup', () => {
       setGroupStatus: jest.fn()
     };
 
-    const mockDynamicAuthorizationPermissionsPlugin = {
+    const mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin = {
       isRouteIgnored: jest.fn(),
       isRouteProtected: jest.fn(),
       getDynamicOperationsByRoute: jest.fn(),
@@ -38,7 +43,7 @@ describe('AuthorizationSetup', () => {
       })
     );
 
-    const mockAuthorizationPlugin = {
+    const mockAuthorizationPlugin: AuthorizationPlugin = {
       isAuthorized: jest.fn(),
       isAuthorizedOnDynamicOperations: jest.fn()
     };
