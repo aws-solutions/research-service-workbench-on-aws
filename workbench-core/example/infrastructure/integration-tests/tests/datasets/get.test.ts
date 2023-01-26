@@ -41,7 +41,7 @@ describe('datasets get integration test', () => {
     });
 
     it('returns the endpoint mount object when the user has permission', async () => {
-      const userId = adminSession.getSettings().get('userId');
+      const userId = adminSession.getSettings().get('rootUserId');
       const { data: endpointData } = await dataset.share({ userId });
       const endpoint = dataset.children.get(endpointData.mountObject.endpointId)!;
       const { data } = await endpoint.getMountObject();
@@ -66,7 +66,7 @@ describe('datasets get integration test', () => {
 
     it('throws when the calling user doesnt have permission on the dataset', async () => {
       // remove default authenticated user access
-      const userId = adminSession.getSettings().get('userId');
+      const userId = adminSession.getSettings().get('rootUserId');
       await dataset.removeAccess({
         permission: {
           identity: userId,
