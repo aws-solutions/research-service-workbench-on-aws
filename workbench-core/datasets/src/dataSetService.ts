@@ -4,7 +4,7 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
@@ -245,7 +245,7 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: { id: string; roles: string[] }): Promise<DataSet[]> {
+  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -253,8 +253,25 @@ export class DataSetService {
         serviceName: DataSetService.name
       }
     };
+
     try {
-      const response = await this._dbProvider.listDataSets();
+      const response: DataSet[] = [];
+      const allDatasets = await this._dbProvider.listDataSets();
+
+      await Promise.all(
+        allDatasets.map(async (dataset) => {
+          try {
+            // throws a ForbiddenError if the user doesnt have permission on the dataset
+            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+            response.push(dataset);
+          } catch (error) {
+            if (!isForbiddenError(error)) {
+              throw error;
+            }
+          }
+        })
+      );
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -831,7 +848,7 @@ export class DataSetService {
     authenticatedUser: AuthenticatedUser,
     dataSetId: string
   ): Promise<DataSetPermission[]> {
-    const { data: userPermissionsData } = await this._authzPlugin.getAccessPermissions({
+    const userPermissionsPromise = this._authzPlugin.getAccessPermissions({
       dataSetId,
       identity: authenticatedUser.id,
       identityType: 'USER'
@@ -840,10 +857,10 @@ export class DataSetService {
     const groupPermissionsPromises = authenticatedUser.roles.map((role) =>
       this._authzPlugin.getAccessPermissions({ dataSetId, identity: role, identityType: 'GROUP' })
     );
-    const groupPermissionsData = await Promise.all(groupPermissionsPromises);
-    const groupPermissions = groupPermissionsData.map((data) => data.data.permissions);
+    const permissionsData = await Promise.all([userPermissionsPromise, ...groupPermissionsPromises]);
+    const permissions = permissionsData.map((data) => data.data.permissions);
 
-    return userPermissionsData.permissions.concat(...groupPermissions);
+    return ([] as DataSetPermission[]).concat(...permissions);
   }
 
   private async _updateNewDataSetPermissions(

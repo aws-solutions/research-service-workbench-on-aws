@@ -18,11 +18,14 @@ Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setu
 
 ### Deploy static website
 
-Project `swb-ui` can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
+#### ECS
+
+To deploy the UI using ECS, make sure all code that needs to be deployed has been pushed to a remote branch in GitHub. Also, make sure to have the Docker daemon running locally.
 
 1. Navigate to `solutions/swb-ui`
 
-2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
+2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api` to deploy origin/develop.
+To use a specific branch, pass in the branch name as follows: `STAGE=<STAGE> BRANCH=<BRANCH_NAME> rushx deploy-ui-and-api`.
 
 After the deployment is completed you'll see the following output:
 
@@ -70,7 +73,6 @@ Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setu
     ```
     STAGE=<STAGE> rushx dev
     ```
-
 
 ## App
 

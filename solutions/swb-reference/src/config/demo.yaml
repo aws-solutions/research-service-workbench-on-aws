@@ -5,6 +5,13 @@ awsRegionShortName: oh
 rootUserEmailParamStorePath: '/swb/demo/rootUser/email'
 allowedOrigins: ['http://localhost:3000']
 cognitoDomain: 'chamonix-dev-demo-domain'
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
+# TODO: once this branch in dev, provide appropriate values
+#hostZoneId: ''
+#domainName: ''
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
