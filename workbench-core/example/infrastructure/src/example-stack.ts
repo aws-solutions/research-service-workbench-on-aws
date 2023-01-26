@@ -351,7 +351,8 @@ export class ExampleStack extends Stack {
       versioned: true,
       enforceSSL: true,
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     });
 
     exampleS3AccessLogsBucket.addToResourcePolicy(

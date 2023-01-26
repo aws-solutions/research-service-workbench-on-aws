@@ -6,6 +6,7 @@
 import { Application } from '@aws-cdk/aws-servicecatalogappregistry-alpha';
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { createAppInsightsConfiguration } from './helpers';
 
 export interface WorkbenchAssociateStackToExistingAppRegistryApplicationProps {
   applicationArn: string;
@@ -31,5 +32,6 @@ export class WorkbenchAssociateStackToExistingAppRegistryApplication extends Con
     );
 
     importedApplication.associateApplicationWithStack(stack);
+    createAppInsightsConfiguration(stack);
   }
 }

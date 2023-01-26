@@ -89,7 +89,7 @@ build/
 .idea
 
 # Reference package
-solutions/swb-reference/src/environment-files/offline-packages/*
+# solutions/swb-reference/src/environment-files/offline-packages/*  TODO: Uncomment this back once GALI-2093 changes are merged
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
