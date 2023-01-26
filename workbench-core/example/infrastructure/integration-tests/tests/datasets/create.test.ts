@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddDataSetExternalEndpointResponse, DataSet } from '@aws/workbench-core-datasets';
+import { AddDataSetExternalEndpointResponse, DataSetPermission } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Dataset from '../../support/resources/datasets/dataset';
@@ -58,26 +58,30 @@ describe('datasets create integration test', () => {
         ]
       });
 
-      expect(response.data).toBeDefined();
       expect(response.data.id).toBeDefined();
-      expect(response.data.permissions).toBeDefined();
-      expect(response.data.permissions.length).toBe(1);
-      expect(response.data.permissions[0].accessLevel).toEqual('read-write');
-      expect(response.data.permissions[0].identityType).toEqual('GROUP');
-      expect(response.data.permissions[0].identity).toEqual(groupId);
+      expect(response.data.permissions).toMatchObject<DataSetPermission[]>([
+        {
+          identity: groupId,
+          identityType: 'GROUP',
+          accessLevel: 'read-write'
+        }
+      ]);
     });
-  });
-  it('assigns read-only permissions to the owner if provided at creation time', async () => {
-    const createGroupResponse = await adminSession.resources.groups.create({}, true);
-    const { groupId } = createGroupResponse.data;
-    const response = await adminSession.resources.datasets.create({
-      owner: groupId,
-      ownerType: 'GROUP'
+    it('assigns read-only permissions to the owner if provided at creation time', async () => {
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+      const response = await adminSession.resources.datasets.create({
+        owner: groupId,
+        ownerType: 'GROUP'
+      });
+      expect(response.data.permissions).toMatchObject<DataSetPermission[]>([
+        {
+          identity: groupId,
+          identityType: 'GROUP',
+          accessLevel: 'read-only'
+        }
+      ]);
     });
-    const dataSet: DataSet = response.data;
-    expect(dataSet.permissions![0].accessLevel).toBe('read-only');
-    expect(dataSet.permissions![0].identity).toBe(groupId);
-    expect(dataSet.permissions![0].identityType).toBe('GROUP');
   });
 
   describe('AddExternalEndpointForUser', () => {
