@@ -74,6 +74,7 @@ describe('DataSetService', () => {
   const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
   const mockGroupId = 'Sample-Group-Id';
   const mockUserId = 'sample-user-id';
+  const mockOwnerUserId = 'sample-owner-user-id';
   const mockAuthenticatedUser = {
     id: mockUserId,
     roles: []
@@ -107,6 +108,11 @@ describe('DataSetService', () => {
     identityType: 'USER',
     accessLevel: 'read-only'
   };
+  const mockReadOnlyOwnerUserPermission: DataSetPermission = {
+    identity: mockOwnerUserId,
+    identityType: 'USER',
+    accessLevel: 'read-only'
+  };
   const mockReadWriteUserPermission: DataSetPermission = {
     identity: mockUserId,
     identityType: 'USER',
@@ -116,6 +122,11 @@ describe('DataSetService', () => {
     identity: mockGroupId,
     identityType: 'GROUP',
     accessLevel: 'read-write'
+  };
+  const mockReadOnlyGroupPermission: DataSetPermission = {
+    identity: mockGroupId,
+    identityType: 'GROUP',
+    accessLevel: 'read-only'
   };
 
   beforeEach(() => {
@@ -466,14 +477,14 @@ describe('DataSetService', () => {
         permission: [mockReadWriteUserPermission]
       });
     });
-    it('can add the authenticated user as read-only if there are other permissions requested.', async () => {
+    it('does not add authenticated user as read-only if there are other permissions requested.', async () => {
       jest
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
         .mockImplementationOnce(async () => {
           return {
             data: {
               dataSetId: mockDataSetId,
-              permissions: [mockReadWriteGroupPermission, mockReadOnlyUserPermission]
+              permissions: [mockReadWriteGroupPermission]
             }
           };
         });
@@ -486,7 +497,7 @@ describe('DataSetService', () => {
           region: mockAwsBucketRegion,
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser,
-          permissions: [mockReadWriteGroupPermission, mockReadOnlyUserPermission]
+          permissions: [mockReadWriteGroupPermission]
         })
       ).resolves.toMatchObject<DataSet>({
         id: mockDataSetId,
@@ -496,13 +507,116 @@ describe('DataSetService', () => {
         storageName: mockDataSetStorageName,
         awsAccountId: mockAwsAccountId,
         storageType: mockDataSetStorageType,
-        permissions: [mockReadWriteGroupPermission, mockReadOnlyUserPermission]
+        permissions: [mockReadWriteGroupPermission]
       });
       expect(authzPlugin.addAccessPermission).toBeCalledWith({
         authenticatedUser: mockAuthenticatedUser,
         dataSetId: mockDataSetId,
-        permission: [mockReadWriteGroupPermission, mockReadOnlyUserPermission]
+        permission: [mockReadWriteGroupPermission]
       });
+    });
+    it('an owning USER gets read-only access instead of authenticated user when provided.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyOwnerUserPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockOwnerUserId,
+          ownerType: 'USER'
+        })
+      ).resolves.toMatchObject<DataSet>({
+        id: mockDataSetId,
+        createdAt: mockCreatedAt,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        permissions: [mockReadOnlyOwnerUserPermission]
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [mockReadOnlyOwnerUserPermission]
+      });
+    });
+    it('an owning GROUP gets read-only access instead of authenticated user when provided.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyGroupPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockGroupId,
+          ownerType: 'GROUP'
+        })
+      ).resolves.toMatchObject<DataSet>({
+        id: mockDataSetId,
+        createdAt: mockCreatedAt,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        permissions: [mockReadOnlyGroupPermission]
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [mockReadOnlyGroupPermission]
+      });
+    });
+    it('throws if owner is provided but owner type is empty.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyGroupPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockGroupId
+        })
+      ).rejects.toThrowError(new Error("'ownerType' is required when 'owner' is provided."));
+      expect(authzPlugin.addAccessPermission).not.toBeCalled();
     });
     it('generates an audit event when an error is thrown', async () => {
       jest
@@ -621,6 +735,146 @@ describe('DataSetService', () => {
         dataSetId: mockDataSetId,
         permission: [mockReadWriteUserPermission]
       });
+    });
+    it('does not add authenticated user as read-only if there are other permissions requested.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadWriteGroupPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          permissions: [mockReadWriteGroupPermission]
+        })
+      ).resolves.toMatchObject<DataSet>({
+        id: mockDataSetId,
+        createdAt: mockCreatedAt,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        permissions: [mockReadWriteGroupPermission]
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [mockReadWriteGroupPermission]
+      });
+    });
+    it('an owning USER gets read-only access instead of authenticated user when provided.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyOwnerUserPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockOwnerUserId,
+          ownerType: 'USER'
+        })
+      ).resolves.toMatchObject<DataSet>({
+        id: mockDataSetId,
+        createdAt: mockCreatedAt,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        permissions: [mockReadOnlyOwnerUserPermission]
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [mockReadOnlyOwnerUserPermission]
+      });
+    });
+    it('an owning GROUP gets read-only access instead of authenticated user when provided.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyGroupPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockGroupId,
+          ownerType: 'GROUP'
+        })
+      ).resolves.toMatchObject<DataSet>({
+        id: mockDataSetId,
+        createdAt: mockCreatedAt,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        permissions: [mockReadOnlyGroupPermission]
+      });
+      expect(authzPlugin.addAccessPermission).toBeCalledWith({
+        authenticatedUser: mockAuthenticatedUser,
+        dataSetId: mockDataSetId,
+        permission: [mockReadOnlyGroupPermission]
+      });
+    });
+    it('throws if owner is provided but owner type is empty.', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyGroupPermission]
+            }
+          };
+        });
+      await expect(
+        dataSetService.importDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser,
+          owner: mockGroupId
+        })
+      ).rejects.toThrowError(new Error("'ownerType' is required when 'owner' is provided."));
     });
   });
 
