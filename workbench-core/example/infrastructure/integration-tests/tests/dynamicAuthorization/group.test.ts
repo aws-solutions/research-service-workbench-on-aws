@@ -311,14 +311,6 @@ describe('dynamic authorization group integration tests', () => {
   });
 
   describe('doesGroupExist', () => {
-    beforeEach(() => {
-      user = {
-        firstName: 'Test',
-        lastName: 'User',
-        email: `success+does-group-exist-${uuidv4()}@simulator.amazonses.com`
-      };
-    });
-
     test.each([true, false])('test does group exist', async (groupExists) => {
       let groupId = 'sampleGroupId';
       if (groupExists) {
