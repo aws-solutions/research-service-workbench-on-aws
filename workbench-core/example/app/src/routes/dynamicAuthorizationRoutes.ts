@@ -26,12 +26,15 @@ import {
   IsRouteIgnoredRequestParser,
   IsAuthorizedOnSubjectRequest,
   isForbiddenError,
-  IsAuthorizedOnSubjectRequestParser
+  IsAuthorizedOnSubjectRequestParser,
+  DoesGroupExistRequest,
+  DoesGroupExistRequestParser
 } from '@aws/workbench-core-authorization';
 import {
   DeleteSubjectIdentityPermissionsRequest,
   DeleteSubjectIdentityPermissionsRequestParser
 } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+import {} from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/doesGroupExist';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
@@ -134,6 +137,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isRetryError(error)) {
           throw Boom.serverUnavailable('Failed to delete group permissions. Please request a retry');
         }
+        if (isForbiddenError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })
@@ -207,7 +213,17 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       }
     })
   );
-
+  router.get(
+    '/authorization/groups/:groupId/does-group-exist',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DoesGroupExistRequest>(DoesGroupExistRequestParser, {
+        groupId: req.params.groupId
+      });
+      console.log(validatedRequest);
+      const { data } = await service.doesGroupExist(validatedRequest);
+      res.status(200).send(data);
+    })
+  );
   router.post(
     '/authorization/permissions',
     wrapAsync(async (req: Request, res: Response) => {
