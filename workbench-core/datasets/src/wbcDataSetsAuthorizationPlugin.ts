@@ -16,6 +16,7 @@ import { DataSetsAuthorizationPlugin, dataSetSubjectType } from './dataSetsAutho
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { DataSetPermission } from './models/dataSetPermission';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 
@@ -177,6 +178,36 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
       );
     }
     return permissionsResponse[0];
+  }
+
+  public async isAuthorizedOnDataSet(
+    dataSetId: string,
+    accessLevel: DataSetsAccessLevel,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<void> {
+    await this._authorizer.isAuthorizedOnSubject({
+      authenticatedUser,
+      dynamicOperation: {
+        action: 'READ',
+        subject: {
+          subjectId: dataSetId,
+          subjectType: dataSetSubjectType
+        }
+      }
+    });
+
+    if (accessLevel === 'read-write') {
+      await this._authorizer.isAuthorizedOnSubject({
+        authenticatedUser,
+        dynamicOperation: {
+          action: 'UPDATE',
+          subject: {
+            subjectId: dataSetId,
+            subjectType: dataSetSubjectType
+          }
+        }
+      });
+    }
   }
 
   private _dataSetPermissionToIdentityPermissions(

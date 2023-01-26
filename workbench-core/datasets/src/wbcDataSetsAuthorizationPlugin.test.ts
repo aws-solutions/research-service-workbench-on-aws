@@ -4,7 +4,6 @@
  */
 
 jest.mock('@aws/workbench-core-audit');
-jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 
@@ -18,7 +17,8 @@ import {
   DynamicAuthorizationService,
   GetIdentityPermissionsBySubjectResponse,
   IdentityPermission,
-  WBCGroupManagementPlugin
+  WBCGroupManagementPlugin,
+  ForbiddenError
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
@@ -790,6 +790,55 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
           permissions: []
         }
       });
+    });
+  });
+
+  describe('isAuthorizedOnDataSet tests', () => {
+    it('resolves if the authenticated user is authorized with read-only access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {});
+
+      await expect(
+        plugin.isAuthorizedOnDataSet(dataSetId, 'read-only', authenticatedUser)
+      ).resolves.not.toThrow();
+    });
+
+    it('throws if the authenticated user is not authorized with read-only access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {
+          throw new ForbiddenError();
+        });
+
+      await expect(plugin.isAuthorizedOnDataSet(dataSetId, 'read-only', authenticatedUser)).rejects.toThrow(
+        ForbiddenError
+      );
+    });
+
+    it('resolves if the authenticated user is authorized with read-write access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {});
+
+      await expect(
+        plugin.isAuthorizedOnDataSet(dataSetId, 'read-write', authenticatedUser)
+      ).resolves.not.toThrow();
+    });
+
+    it('throws if the authenticated user is not authorized with read-write access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementationOnce(async () => {});
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {
+          throw new ForbiddenError();
+        });
+
+      await expect(plugin.isAuthorizedOnDataSet(dataSetId, 'read-write', authenticatedUser)).rejects.toThrow(
+        ForbiddenError
+      );
     });
   });
 });
