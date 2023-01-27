@@ -116,7 +116,7 @@ const apiRouteConfig: ApiRouteConfig = {
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: envTypeConfigService,
-  projectService: projectService,
+  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
@@ -128,7 +128,8 @@ const apiRouteConfig: ApiRouteConfig = {
     envTypeConfigService,
     envTypeService
   ),
-  keyPairService: new KeyPairService(aws.helpers.ddb)
+  keyPairService: new KeyPairService(aws.helpers.ddb),
+  authorizationService: dynamicAuthorizationService
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

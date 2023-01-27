@@ -28,7 +28,7 @@ describe('list users for project tests', () => {
     test('project does not exist', async () => {
       const projectId = `${resourceTypeToKey.project.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
       try {
-        await adminSession.resources.projects.project(projectId).listUsersForProject('Admin');
+        await adminSession.resources.projects.project(projectId).listUsersForProject('ProjectAdmin');
       } catch (e) {
         checkHttpError(
           e,
@@ -81,7 +81,7 @@ describe('list users for project tests', () => {
       projectId = projects.data.data[0].id;
     });
 
-    test('list users for admin', async () => {
+    test('list users for project admin', async () => {
       if (!projectId) {
         console.warn('There are no projects');
 
@@ -93,7 +93,9 @@ describe('list users for project tests', () => {
         return;
       }
 
-      const response = await adminSession.resources.projects.project(projectId).listUsersForProject('Admin');
+      const response = await adminSession.resources.projects
+        .project(projectId)
+        .listUsersForProject('ProjectAdmin');
 
       expect(response.status).toBe(200);
       expect(response.data.users).toBeInstanceOf(Array);

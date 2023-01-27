@@ -37,5 +37,15 @@ export default class Project extends Resource {
     return this._axiosInstance.put(`${this._api}/softDelete`);
   }
 
-  protected async cleanup(): Promise<void> {}
+  protected async cleanup(): Promise<void> {
+    try {
+      console.log(`Attempting to softDelete project ${this._id}.`);
+      await this.softDelete();
+    } catch (e) {
+      console.warn(
+        `Could not delete project ${this._id}". 
+        Encountered error: ${e}`
+      );
+    }
+  }
 }

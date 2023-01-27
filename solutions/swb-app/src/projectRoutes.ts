@@ -18,6 +18,7 @@ import {
   AssignUserToProjectRequestParser,
   AssignUserToProjectRequest
 } from '@aws/workbench-core-accounts';
+import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import { validateAndParse, MetadataService, resourceTypeToKey, runInBatches } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import {
@@ -257,9 +258,11 @@ export function setUpProjectRoutes(
       const groupId = `${projectId}#${role}`;
 
       try {
-        // this call is needed to validate that project exists.
-        // If not - 404 will be returned
-        await projectService.getProject({ projectId });
+        const project = await projectService.getProject({ projectId });
+        if (project.status !== ProjectStatus.AVAILABLE) {
+          console.warn(`Cannot list users for project ${projectId} because status is ${project.status}`);
+          throw Boom.notFound(`Could not find project ${projectId}`);
+        }
 
         try {
           const userIds = await userService.listUsersForRole(groupId);

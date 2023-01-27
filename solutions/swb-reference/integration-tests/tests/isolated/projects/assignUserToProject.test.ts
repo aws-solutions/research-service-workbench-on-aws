@@ -38,7 +38,7 @@ describe('assign user to project negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message: "requires property 'role'"
+            message: 'role: Required'
           })
         );
       }
@@ -115,7 +115,7 @@ describe('assign user to project negative tests', () => {
       }
     });
 
-    test.only('cannot assing user to the same project', async () => {
+    test('cannot assing user to the same project', async () => {
       let projectId = '';
       const projects = await adminSession.resources.projects.get();
       if (!projects.data.data.length) {

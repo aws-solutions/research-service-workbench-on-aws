@@ -27,7 +27,7 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
 }
 
-const validRolesRegExpAsString: string = '(Admin|Researcher)';
+const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 export {
   uuidWithLowercasePrefix,
