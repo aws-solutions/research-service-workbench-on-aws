@@ -220,20 +220,32 @@ describe('ProjectService', () => {
     }
   );
 
+  const getMultipleNonITGroupsFunction = jest.fn(
+    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+      return Promise.resolve({
+        data: {
+          groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
+        }
+      });
+    }
+  );
+
+  const getSingleNonITGroupFunction = jest.fn(
+    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
+      return Promise.resolve({
+        data: {
+          groupIds: ['proj-123#PA']
+        }
+      });
+    }
+  );
+
   describe('listProjects', () => {
     test('should fail on list projects for negative pageSize', async () => {
       // BUILD
       const pageSize = -1;
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // OPERATE n CHECK
       await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
@@ -749,15 +761,7 @@ describe('ProjectService', () => {
     });
 
     test('list projects when user is only part of 1 groups', async () => {
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getSingleNonITGroupFunction;
 
       const getItemResponse: Record<string, JSONValue> = projItem;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -776,15 +780,7 @@ describe('ProjectService', () => {
       const pageSize = 4;
       const expectedResponse = { data: projects, paginationToken: undefined };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -815,15 +811,7 @@ describe('ProjectService', () => {
       const pageSize = 3;
       const expectedResponse = { data: projects, paginationToken: paginationToken };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -847,15 +835,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -884,15 +864,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock getBatchItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -919,15 +891,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -954,15 +918,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -989,15 +945,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1024,15 +972,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1059,15 +999,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1094,15 +1026,7 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1136,15 +1060,7 @@ describe('ProjectService', () => {
       const pageSize = 2;
       const expectedResponse = { data: [project3], paginationToken: undefined };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1180,15 +1096,7 @@ describe('ProjectService', () => {
         )
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1218,15 +1126,7 @@ describe('ProjectService', () => {
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 1;
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -1252,15 +1152,7 @@ describe('ProjectService', () => {
         paginationToken: undefined
       };
 
-      dynamicAuthZ.getUserGroups = jest.fn(
-        (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-          return Promise.resolve({
-            data: {
-              groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-            }
-          });
-        }
-      );
+      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
