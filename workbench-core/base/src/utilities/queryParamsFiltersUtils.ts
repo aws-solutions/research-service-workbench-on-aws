@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { marshall } from '@aws-sdk/util-dynamodb';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { FilterRequest } from '../interfaces/filterRequest';
 import QueryParams from '../interfaces/queryParams';
 
@@ -59,7 +59,9 @@ export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames
     value?.between ? { between: marshall(value.between) } : marshall(value)
   ) as QueryParams;
   //get GSI from gsi list in params
-  const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+  const gsiMatches = gsiNames.filter(
+    (prop) => prop.replace('getResourceBy', '').toLowerCase() === key.toLowerCase()
+  );
   const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
   //only return when format is correct
   if (filterQueryParam && Object.keys(filterQueryParam).length > 0 && gsi) {
@@ -92,7 +94,9 @@ export function getSortQueryParams(sort: SortRequest | undefined, gsiNames: stri
   })[0];
 
   //get GSI from gsi list in params
-  const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+  const gsiMatches = gsiNames.filter(
+    (prop) => prop.replace('getResourceBy', '').toLowerCase() === key.toLowerCase()
+  );
   const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
   const forward = value === 'asc';
   //only return when format is correct

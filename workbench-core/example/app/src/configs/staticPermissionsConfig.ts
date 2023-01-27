@@ -33,6 +33,21 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Storage'
   },
@@ -48,12 +63,42 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'DatasetRole'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'DatasetRole'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'DatasetFile'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetMountObject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Role'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
   {
     effect: 'ALLOW',
     action: 'UPDATE',
+    subject: 'Role'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
     subject: 'Role'
   },
   {
@@ -75,6 +120,56 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'DELETE',
     subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'IdentityPermission'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'AuthorizationUser'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'IdentityPermission'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'IdentityPermission'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Routes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Subject'
   }
 ];
 

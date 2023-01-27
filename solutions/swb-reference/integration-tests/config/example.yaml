@@ -5,7 +5,7 @@
 ## Default Env Config for launching a new environment
 #envTypeId: ''
 #envTypeConfigId: ''
-#projectId: ''
+#projectId: ''  #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
 #envType: ''
 
 ## Negative Testing
@@ -18,9 +18,12 @@
 ## Default Hosting Account
 #defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 
+## For running project integration tests
+costCenterId: '' # ex: 'cc-320991c4-9457-4bf4-b21e-9ffbc224740b'
+projectName: ''
 ## Pre-requisite for running aws-accounts integration test
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:
-#awsAccountId: ''
-#envMgmtRoleArn: ''
-#hostingAccountHandlerRoleArn: ''
-#encryptionKeyArn: ''
+# hostAwsAccountIdParamStorePath: ''
+# hostingAccountHandlerRoleArnParamStorePath: ''
+# envMgmtRoleArnParamStorePath: ''
+# encryptionKeyArnParamStorePath: ''

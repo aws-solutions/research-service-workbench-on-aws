@@ -8,7 +8,7 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import {
   EnvironmentLifecycleHelper,
   EnvironmentService,
@@ -19,6 +19,7 @@ import SagemakerNotebookEnvironmentLifecycleService from './sagemakerNotebookEnv
 describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   let environment: Environment;
+  let envService: EnvironmentService;
   const MOCK_DATASETS_BUCKET_ARN = 'arn:aws:s3:::sampleDatasetsBucket';
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -100,6 +101,12 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
         updatedBy: 'u-HJtc1fiQnF5XNmrIu6KLU'
       }
     };
+
+    const dynamoDBService = new DynamoDBService({
+      table: process.env.STACK_NAME!,
+      region: process.env.AWS_REGION!
+    });
+    envService = new EnvironmentService(dynamoDBService);
   });
 
   afterAll(() => {
@@ -119,7 +126,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     envHelper.getDatasetsToMount = jest.fn(async () => {
       return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
     });
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 
     const sm = new SagemakerNotebookEnvironmentLifecycleService();
@@ -131,7 +137,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   test('Terminate should operate as expected', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.executeSSMDocument = jest.fn();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
 
@@ -149,7 +154,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.getAwsSdkForEnvMgmtRole = jest.fn(async () => hostSdk);
     sm.helper = envHelper;
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
     sm.envService = envService;
@@ -158,7 +162,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   });
   test('Stop should operate as expected', async () => {
     const sm = new SagemakerNotebookEnvironmentLifecycleService();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     const hostSdk = new AwsService({ region: process.env.AWS_REGION! });
     hostSdk.clients.sagemaker.stopNotebookInstance = jest.fn();
     const envHelper = new EnvironmentLifecycleHelper();

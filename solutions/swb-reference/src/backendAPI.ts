@@ -4,14 +4,25 @@
  */
 
 import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
-import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
-import { AwsService, AuditLogger, MetadataService } from '@aws/workbench-core-base';
 import {
-  DataSetService,
+  AccountService,
+  CostCenterService,
+  HostingAccountLifecycleService,
+  HostingAccountService,
+  ProjectService
+} from '@aws/workbench-core-accounts';
+import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import {
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin,
+  DDBDynamicAuthorizationPermissionsPlugin,
+  CASLAuthorizationPlugin
+} from '@aws/workbench-core-authorization';
+import { AwsService, MetadataService } from '@aws/workbench-core-base';
+import {
   S3DataSetStoragePlugin,
-  DdbDataSetMetadataPlugin
+  DdbDataSetMetadataPlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import {
   EnvironmentService,
@@ -19,14 +30,58 @@ import {
   EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
+import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+import { DataSetService } from './services/dataSetService';
+import KeyPairService from './services/keyPairService';
+import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
+
+const requiredAuditValues: string[] = ['actor', 'source'];
+const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
   ddbTableName: process.env.STACK_NAME!
+});
+
+// Dynamic Auth
+const dynamicAuthAws: AwsService = new AwsService({
+  region: process.env.AWS_REGION!,
+  ddbTableName: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
+});
+
+const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  ),
+  ddbService: dynamicAuthAws.helpers.ddb,
+  userGroupKeyType: authorizationGroupPrefix
+});
+const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
+  new DDBDynamicAuthorizationPermissionsPlugin({
+    dynamoDBService: dynamicAuthAws.helpers.ddb
+  });
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
+const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
+  groupManagementPlugin: wbcGroupManagementPlugin,
+  dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  authorizationPlugin: caslAuthorizationPlugin
+});
+
+const accountService: AccountService = new AccountService(aws.helpers.ddb);
+const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
+const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
+  envTypeService,
+  aws.helpers.ddb
+);
+const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
+const projectService: ProjectService = new ProjectService({
+  TABLE_NAME: process.env.STACK_NAME!
 });
 
 const apiRouteConfig: ApiRouteConfig = {
@@ -50,36 +105,33 @@ const apiRouteConfig: ApiRouteConfig = {
     //   connection: new <newEnvTypeName>EnvironmentConnectionService()
     // }
   },
-  account: new HostingAccountService(),
-  environmentService: new EnvironmentService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
-  dataSetService: new DataSetService(
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
-    logger,
-    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
+  account: new HostingAccountService(
+    new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  dataSetsStoragePlugin: new S3DataSetStoragePlugin(aws),
+  environmentService: new EnvironmentService(aws.helpers.ddb),
+  dataSetService: new DataSetService(
+    new S3DataSetStoragePlugin(aws),
+    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
+    logger,
+    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+  ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
-  environmentTypeService: new EnvironmentTypeService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
-  environmentTypeConfigService: new EnvironmentTypeConfigService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
-  projectService: new ProjectService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeService: envTypeService,
+  environmentTypeConfigService: envTypeConfigService,
+  projectService: projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
-  costCenterService: new CostCenterService(
-    {
-      TABLE_NAME: process.env.STACK_NAME!
-    },
-    aws.helpers.ddb
+  costCenterService: new CostCenterService(aws.helpers.ddb),
+  metadataService: metadataService,
+  projectEnvTypeConfigPlugin: new ProjectEnvTypeConfigService(
+    metadataService,
+    projectService,
+    envTypeConfigService,
+    envTypeService
   ),
-  metadataService: new MetadataService(aws.helpers.ddb)
+  keyPairService: new KeyPairService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

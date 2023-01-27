@@ -29,11 +29,20 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
+    "@aws/workbench-core-audit": "workspace:*",
+    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@casl/ability": "^5.4.3",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "radix3": "^1.0.0",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.212.0",
+    "@aws-sdk/client-s3": "^3.212.0",
+    "@aws-sdk/types": "^3.212.0",
+    "@aws-sdk/util-dynamodb": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
@@ -43,9 +52,9 @@
     "@types/heft-jest": "1.0.2",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
+    "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "fast-check": "^2.24.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",

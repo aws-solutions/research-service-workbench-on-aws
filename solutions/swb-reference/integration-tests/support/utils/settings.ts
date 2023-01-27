@@ -15,6 +15,8 @@ interface Setting {
   terminatedEnvId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
+  costCenterId: string;
+  projectName: string;
 
   // Main CFN template outputs
   cognitoUserPoolClientId: string;
@@ -23,6 +25,8 @@ interface Setting {
   awsRegion: string;
   DataSetsBucketName: string;
   apiUrlOutput: string;
+  MainAccountLoadBalancerArnOutput: string;
+  MainAccountLoadBalancerDnsNameOutput: string;
   S3BucketArtifactsArnOutput: string;
   uiClientURL: string;
   LaunchConstraintIamRoleNameOutput: string;
@@ -44,9 +48,13 @@ interface Setting {
 
   // Configs for AWS Account onboard test
   hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;
+  envMgmtRoleArnParamStorePath: string;
   hostingAccountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArnParamStorePath: string;
   encryptionKeyArn: string;
+  encryptionKeyArnParamStorePath: string;
 
   // Derived
   mainAccountId: string;

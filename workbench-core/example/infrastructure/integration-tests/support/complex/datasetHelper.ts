@@ -1,5 +1,6 @@
 import { AccessPoint } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
+import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import _ from 'lodash';
 import Setup from '../setup';
 
@@ -7,7 +8,7 @@ export class DatasetHelper {
   private _awsSdk: AwsService;
   public constructor() {
     const setup = new Setup();
-    this._awsSdk = setup.getMainAwsClient();
+    this._awsSdk = setup.getMainAwsClient('ExampleDataSetDDBTableName');
   }
 
   public async listAccessPoints(bucket: string, accountId: string): Promise<Array<AccessPoint>> {
@@ -16,6 +17,12 @@ export class DatasetHelper {
       Bucket: bucket
     })!;
     return response.AccessPointList!;
+  }
+
+  public async listDatasetFileNames(bucket: string, dir: string): Promise<string[]> {
+    const response = await this._awsSdk.clients.s3.listObjectsV2({ Bucket: bucket, Prefix: dir });
+
+    return response.Contents?.map((file) => file.Key ?? '') ?? [];
   }
 
   public async deleteS3AccessPoint(name: string, bucketAccount: string): Promise<void> {
@@ -27,7 +34,7 @@ export class DatasetHelper {
 
   public async deleteS3Resources(bucket: string, dir: string): Promise<void> {
     const listedObjects = await this._awsSdk.clients.s3.listObjectsV2({ Bucket: bucket, Prefix: dir })!;
-    if (listedObjects.Contents!.length === 0) return;
+    if (!listedObjects.Contents?.length) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deleteParams: { Bucket: string; Delete: { Objects: any } } = {
@@ -44,13 +51,13 @@ export class DatasetHelper {
 
   public async deleteDdbRecords(dataSetId: string): Promise<void> {
     await this._awsSdk.helpers.ddb
-      .delete({ pk: `DATASET#${dataSetId}`, sk: `DATASET#${dataSetId}` })
+      .delete({ pk: `${dataSetPrefix}#${dataSetId}`, sk: `${dataSetPrefix}#${dataSetId}` })
       .execute();
     const data = await this._awsSdk.helpers.ddb
       .query({
         key: {
           name: 'pk',
-          value: `DATASET#${dataSetId}`
+          value: `${dataSetPrefix}#${dataSetId}`
         }
       })
       .execute();

@@ -5,7 +5,13 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
+import {
+  WorkbenchCognito,
+  WorkbenchCognitoProps,
+  WorkbenchEncryptionKeyWithRotation,
+  WorkbenchSecureS3Bucket,
+  WorkbenchDynamodb
+} from '@aws/workbench-core-infrastructure';
 import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
@@ -16,7 +22,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, CfnTable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
   AnyPrincipal,
   CfnPolicy,
@@ -31,8 +37,6 @@ import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { EncryptionKeyWithRotation } from './constructs/encryptionKeyWithRotation';
-import { SecureS3Bucket } from './constructs/secureS3Bucket';
 
 export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
@@ -66,22 +70,26 @@ export class ExampleStack extends Stack {
     };
 
     this._s3AccessLogsPrefix = 'example-access-log';
-    const createEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
+    const workbenchEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
       this,
-      'DataSetBucket-EncryptionKey'
+      'DataSetBucketEncryptionKey',
+      {
+        removalPolicy: RemovalPolicy.DESTROY
+      }
     );
-    const encryptionKey: Key = createEncryptionKey.key;
+    const encryptionKey: Key = workbenchEncryptionKey.key;
+
     this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
-    const createDatasetBucket = new SecureS3Bucket(this, 'Example-S3Bucket', {
-      s3BucketId: 'example-s3-datasets',
-      s3OutputId: 'ExampleS3BucketDatasetsArnOutput',
+
+    const workbenchSecureS3Bucket = new WorkbenchSecureS3Bucket(this, 'ExampleS3Bucket', {
       encryptionKey: encryptionKey,
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
-    const datasetBucket: Bucket = createDatasetBucket.bucket;
+
+    const datasetBucket: Bucket = workbenchSecureS3Bucket.bucket;
 
     new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
       value: datasetBucket.bucketName
@@ -91,9 +99,22 @@ export class ExampleStack extends Stack {
 
     const exampleLambda: Function = this._createLambda(datasetBucket);
 
-    const table = this._createDDBTable(exampleLambda);
+    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
+      this,
+      'DynamoDB-EncryptionKey',
+      {
+        removalPolicy: RemovalPolicy.DESTROY
+      }
+    );
 
-    exampleLambda.addEnvironment('DDB_TABLE_NAME', table.tableName);
+    // Create DatasetTable
+    const datasetTable = this._createDataSetDDBTable(dynamodbEncryptionKey.key, exampleLambda);
+
+    // Create DynamicAuthTable
+    const dynamicAuthTable = this._createDynamicAuthDDBTable(dynamodbEncryptionKey.key, exampleLambda);
+
+    exampleLambda.addEnvironment('DATASET_DDB_TABLE_NAME', datasetTable.tableName);
+    exampleLambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
 
     this._createRestApi(exampleLambda);
 
@@ -103,16 +124,50 @@ export class ExampleStack extends Stack {
     customResourceLambdaMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // Lambda functions require permission to write CloudWatch Logs
         {
           id: 'W58',
           reason:
             'AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs'
         },
+        // Lambda functions should be deployed inside a VPC
         {
           id: 'W89',
           reason:
             'AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC'
         },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
+        {
+          id: 'W92',
+          reason:
+            'AWSCustomResource Lambda Function used for provisioning infrastructure, reserved concurrency is not required'
+        }
+      ]
+    });
+
+    //DatasetBucket autoDelete custom Lambda
+    const autoDeleteCustomResourceLambdaNode = this.node.findChild(
+      'Custom::S3AutoDeleteObjectsCustomResourceProvider'
+    );
+    const autoDeleteCustomResourceLambdaMetaDataNode = autoDeleteCustomResourceLambdaNode.node.findChild(
+      'Handler'
+    ) as CfnFunction;
+    autoDeleteCustomResourceLambdaMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        // // Lambda functions require permission to write CloudWatch Logs
+        {
+          id: 'W58',
+          reason:
+            'AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs'
+        },
+        // Lambda functions should be deployed inside a VPC
+        {
+          id: 'W89',
+          reason:
+            'AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC'
+        },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
         {
           id: 'W92',
           reason:
@@ -130,6 +185,7 @@ export class ExampleStack extends Stack {
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource',
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason:
@@ -142,13 +198,17 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/Resource',
-      [{ id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }]
+      [
+        // The non-container Lambda function is not configured to use the latest runtime version.
+        { id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }
+      ]
     );
 
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/ExampleLambdaService/ServiceRole/DefaultPolicy/Resource',
       [
+        // The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.
         {
           id: 'AwsSolutions-IAM5',
           reason: 'I am OK with using wildcard here'
@@ -156,17 +216,11 @@ export class ExampleStack extends Stack {
       ]
     );
 
-    NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
-      {
-        id: 'AwsSolutions-DDB3',
-        reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app'
-      }
-    ]);
-
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/ExampleRestApi/CloudWatchRole/Resource',
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason: 'I am OK with using managed Policy here',
@@ -178,84 +232,101 @@ export class ExampleStack extends Stack {
     );
 
     NagSuppressions.addStackSuppressions(this, [
+      // The REST API stage is not associated with AWS WAFv2 web ACL.
       { id: 'AwsSolutions-APIG3', reason: 'I am ok with not using WAFv2, this is an example App' },
+      // The REST API Stage does not have CloudWatch logging enabled for all methods.
       {
         id: 'AwsSolutions-APIG6',
         reason: 'I am ok with not enabling Cloudwatch logging at stage level, this is an example App'
       },
+      // The API does not implement authorization.
       { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authorization implemented at app level' },
+      // The API GW method does not use a Cognito user pool authorizer.
       { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authorization implemented at app level' }
     ]);
   }
 
-  // DynamoDB Table
-  private _createDDBTable(exampleLambda: Function): Table {
-    const table = new Table(this, `${this.stackName}`, {
+  // Create DatasetDDBTable
+  private _createDataSetDDBTable(encryptionKey: Key, lambda: Function): Table {
+    const dataSetTable: WorkbenchDynamodb = new WorkbenchDynamodb(this, `ExampleDatasetTable`, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
-      // tableName: tableName,  W28: Resource found with an explicit name, this disallows updates that require replacement of this resource
-      billingMode: BillingMode.PAY_PER_REQUEST
-    });
-
-    //CFN NAG Suppression
-    const tableNode = table.node.defaultChild as CfnTable;
-    tableNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
+      removalPolicy: RemovalPolicy.DESTROY,
+      encryptionKey: encryptionKey,
+      lambdas: [lambda],
+      gsis: [
         {
-          id: 'W78',
-          reason: 'This is an example app for integration test, backup is not required'
+          indexName: 'getResourceByName',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'name', type: AttributeType.STRING }
         },
         {
-          id: 'W74',
-          reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
+          indexName: 'getResourceByStatus',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'status', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByCreatedAt',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'createdAt', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByDependency',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'dependency', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByOwner',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'owner', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByType',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'type', type: AttributeType.STRING }
         }
       ]
     });
 
-    // Add GSI for get resource by name
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByName',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'name', type: AttributeType.STRING }
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDataSetDDBTableArn', {
+      value: dataSetTable.table.tableArn
     });
-    // Add GSI for get resource by status
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByStatus',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'status', type: AttributeType.STRING }
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDataSetDDBTableName', {
+      value: dataSetTable.table.tableName
     });
-    // Add GSI for get resource by createdAt
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByCreatedAt',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'createdAt', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by dependency
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByDependency',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'dependency', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by owner
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByOwner',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'owner', type: AttributeType.STRING }
-    });
-    // TODO Add GSI for get resource by cost
-    // Add GSI for get resource by type
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByType',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'type', type: AttributeType.STRING }
-    });
-    // Grant the Lambda Functions read access to the DynamoDB table
-    table.grantReadWriteData(exampleLambda);
 
-    new CfnOutput(this, 'ExampleDynamoDBTableOutput', { value: table.tableArn });
-    new CfnOutput(this, 'ExampleDynamoDBTableName', { value: table.tableName });
-    return table;
+    return dataSetTable.table;
+  }
+
+  // Create DynamicAuthDDBTable
+  private _createDynamicAuthDDBTable(encryptionKey: Key, lambda: Function): Table {
+    const dynamicAuthDDBTable = new WorkbenchDynamodb(this, `ExampleDynamicAuthTable`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      removalPolicy: RemovalPolicy.DESTROY,
+      encryptionKey: encryptionKey,
+      lambdas: [lambda],
+      gsis: [
+        {
+          indexName: 'getIdentityPermissionsByIdentity',
+          partitionKey: { name: 'identity', type: AttributeType.STRING },
+          sortKey: { name: 'pk', type: AttributeType.STRING }
+        }
+      ]
+    });
+
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDynamicAuthDDBTableArn', {
+      value: dynamicAuthDDBTable.table.tableArn
+    });
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDynamicAuthDDBTableName', {
+      value: dynamicAuthDDBTable.table.tableName
+    });
+
+    return dynamicAuthDDBTable.table;
   }
 
   private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {
@@ -277,8 +348,9 @@ export class ExampleStack extends Stack {
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED,
+      versioned: true,
       enforceSSL: true,
+      encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
@@ -302,6 +374,7 @@ export class ExampleStack extends Stack {
     exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // S3 Bucket should have access logging configured
         {
           id: 'W35',
           reason:
@@ -317,6 +390,7 @@ export class ExampleStack extends Stack {
 
     //CDK NAG Suppression
     NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
+      // The S3 Bucket has server access logs disabled.
       {
         id: 'AwsSolutions-S1',
         reason:
@@ -334,6 +408,7 @@ export class ExampleStack extends Stack {
     logGroupNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data
         {
           id: 'W84',
           reason: 'Cloudwatch LogGroups are encrypted by default'
@@ -379,6 +454,7 @@ export class ExampleStack extends Stack {
     deploymentMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // resources should be associated with an AWS::ApiGateway::UsagePlan
         {
           id: 'W68',
           reason: 'No need to enforce Usage Plan. This is an example App'
@@ -392,6 +468,7 @@ export class ExampleStack extends Stack {
     deploymentStageMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Stage resources should be associated with an AWS::ApiGateway::UsagePlan
         {
           id: 'W64',
           reason: 'No need to enforce Usage Plan. This is an example App'
@@ -419,6 +496,7 @@ export class ExampleStack extends Stack {
     anyMethodMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Method should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.
         {
           id: 'W59',
           reason: 'Making use of custom Authorization at the App level, this is ok !'
@@ -432,6 +510,7 @@ export class ExampleStack extends Stack {
     anyProxyMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Method should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.
         {
           id: 'W59',
           reason: 'Making use of custom Authorization at the App level, this is ok !'
@@ -442,6 +521,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       API,
       [
+        // The REST API does not have request validation enabled
         {
           id: 'AwsSolutions-APIG2',
           reason: 'I am OK with not enabling request validation for Rest API, this is an example App'
@@ -453,7 +533,7 @@ export class ExampleStack extends Stack {
 
   private _createLambda(datasetBucket: Bucket): Function {
     const exampleLambda: Function = new Function(this, 'ExampleLambdaService', {
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_18_X,
       handler: 'buildLambda.handler',
       code: Code.fromAsset('build'),
       functionName: 'ExampleLambda',
@@ -552,14 +632,17 @@ export class ExampleStack extends Stack {
     exampleLambdaNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // Lambda functions require permission to write CloudWatch Logs
         {
           id: 'W58',
           reason: 'Lambda Function has permission to write to Cloudwatch Logs in exampleLambdaPolicy'
         },
+        // Lambda functions should be deployed inside a VPC
         {
           id: 'W89',
           reason: 'This is an example Lambda Function for integration test and is not deployed inside a VPC'
         },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
         {
           id: 'W92',
           reason: 'This is an example Lambda Function, reserved concurrency is not required'
@@ -583,6 +666,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       exampleLambdaPolicy,
       [
+        // The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.
         {
           id: 'AwsSolutions-IAM5',
           reason: 'I am OK with using wildcard here'
@@ -601,6 +685,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       exampleLambda,
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason: 'I am OK with using AWSLambdaBasicExecutionRole here',
@@ -625,7 +710,8 @@ export class ExampleStack extends Stack {
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      removalPolicy: RemovalPolicy.DESTROY
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ExampleServiceWorkbenchCognito', props);
@@ -655,7 +741,12 @@ export class ExampleStack extends Stack {
       this,
       '/ExampleStack/ExampleServiceWorkbenchCognito/WorkbenchUserPool/Resource',
       [
-        { id: 'AwsSolutions-COG1', reason: 'Should be fixed in @aws/workbench-core-infrastructure package' },
+        // The Cognito user pool does not have a password policy that minimally specify a password length of at least 8 characters, as well as requiring uppercase, numeric, and special characters.
+        {
+          id: 'AwsSolutions-COG1',
+          reason: 'Using the default configuration from @aws/workbench-core-infrastructure package'
+        },
+        // The Cognito user pool does not require MFA.
         {
           id: 'AwsSolutions-COG2',
           reason: 'This is an example package for integration test, selecting default MFA Optional'

@@ -10,3 +10,17 @@
 #userPoolId: ''
 #clientId: ''
 #clientSecret: ''
+
+# Please provide the following values if you have a custom network for SWB to use
+#vpcId: ''
+#albSubnetIds: []
+#ecsSubnetIds: []
+
+# internet-facing ALB
+# If you want internet-facing put value `true` else `false`
+#albInternetFacing: true
+
+#hostZoneId: ''
+#domainName: ''
+# Auditing
+#fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]

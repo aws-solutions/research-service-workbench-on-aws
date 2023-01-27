@@ -155,77 +155,107 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 }
 ```
 
-**Create Environment Type**
+**Retrieve Environment Type**
 
-Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
-* productId: `Product ID` of `sagemakerNotebook` product
-* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
-  `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
-
-In POSTMAN, uses the `envType` => `Create envType` request to make a request with the following `body`
+In POSTMAN, use the `envType` => `List envTypes` request to retrieve the `id` property for the environment type.
+If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
+Once the account handler finishes, running the `List envTypes` request in postman should return a json with the following format
 ```json
 {
-    "status": "APPROVED",
-    "name": "Sagemaker Jupyter Notebook",
+    "id": "et-<productId>,<provisioningArtifactId>",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
-    "allowedRoleIds": [],
-    "params": [
+    "description": "description",
+    "name": "name",
+    "type": "sagemakerNotebook",
+    "status": "NOT_APPROVED",
+    "createdAt": "2022-07-21T21:24:57.171Z",
+    "updatedAt": "2022-07-21T21:24:57.171Z",
+    "params": 
         {
-            "DefaultValue": "ml.t3.xlarge",
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "EC2 instance type to launch",
-            "ParameterKey": "InstanceType"
-        },
-        {
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "Number",
-            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-            "ParameterKey": "AutoStopIdleTimeInMinutes"
-        },
-        {
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "The IAM policy to be associated with the launched workstation",
-            "ParameterKey": "IamPolicyDocument"
-        },
-        {
-            "DefaultValue": "1.1.1.1/1",
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "CIDR to restrict IPs that can access the environment",
-            "ParameterKey": "CIDR"
+            "DatasetsBucketArn": {
+                    "Description": "Name of the datasets bucket in the main account",
+                    "Type": "String"
+                },
+                "EncryptionKeyArn": {
+                    "Description": "The ARN of the KMS encryption Key used to encrypt data in the notebook",
+                    "Type": "String"
+                },
+                "AccessFromCIDRBlock": {
+                    "Default": "10.0.0.0/19",
+                    "Description": "The CIDR used to access sagemaker notebook",
+                    "Type": "String"
+                },
+                "VPC": {
+                    "Description": "VPC for Sagemaker Notebook",
+                    "Type": "AWS::EC2::VPC::Id"
+                },
+                "S3Mounts": {
+                    "Description": "A JSON array of objects with name, bucket and prefix properties used to mount data",
+                    "Type": "String"
+                },
+                "Namespace": {
+                    "Description": "An environment name that will be prefixed to resource names",
+                    "Type": "String"
+                },
+                "MainAccountId": {
+                    "Description": "The Main Account ID where application is deployed",
+                    "Type": "String"
+                },
+                "MainAccountKeyArn": {
+                    "Description": "The ARN of main account bucket encryption key",
+                    "Type": "String"
+                },
+                "IamPolicyDocument": {
+                    "Description": "The IAM policy to be associated with the launched workstation",
+                    "Type": "String"
+                },
+                "EnvironmentInstanceFiles": {
+                    "Description": "An S3 URI (starting with \"s3://\") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts",
+                    "Type": "String"
+                },
+                "MainAccountRegion": {
+                    "Description": "The region of application deployment in main account",
+                    "Type": "String"
+                },
+                "InstanceType": {
+                    "Default": "ml.t3.xlarge",
+                    "Description": "EC2 instance type to launch",
+                    "Type": "String"
+                },
+                "Subnet": {
+                    "Description": "Subnet for Sagemaker Notebook, from the VPC selected above",
+                    "Type": "AWS::EC2::Subnet::Id"
+                },
+                "AutoStopIdleTimeInMinutes": {
+                    "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+                    "Type": "Number"
+                }
         }
-    ],
-    "description": "An Amazon SageMaker Jupyter Notebook",
-    "type": "sagemakerNotebook"
 }
 ```
 
 In the response make note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
 
+**Approve Environment Type**
+
+In POSTMAN, use the `envType` => `Update envType` request to change the `status` of environemnt type to `APPROVED`.
+For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+```json
+{
+    "status": "APPROVED"
+}
+```
+
 **Create Environment Type Config**
 
-In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+In POSTMAN, use the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
 ```json
 {
     "type": "sagemakerNotebook",
     "description": "Description for config 1",
     "name": "Config 1",
-    "allowedRoleIds": [], 
+    "estimatedCost": "estimated cost",
     "params": [
      {
       "key": "IamPolicyDocument",

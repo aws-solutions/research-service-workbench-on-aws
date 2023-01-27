@@ -27,6 +27,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@aws-cdk/aws-servicecatalogappregistry-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -73,6 +77,10 @@
     {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog-appregistry",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-ssm",
@@ -167,6 +175,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-user-management",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -251,6 +263,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@next/eslint-plugin-next",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -299,6 +315,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@typescript-eslint/parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@vendia/serverless-express",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -312,7 +332,7 @@
     },
     {
       "name": "aws-jwt-verify",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-lambda",
@@ -387,6 +407,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "dotenv",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "esbuild",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -399,7 +423,19 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "eslint-import-resolver-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "eslint-plugin-import",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
@@ -452,7 +488,7 @@
     },
     {
       "name": "jwt-decode",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "license-check-and-add",
@@ -504,6 +540,10 @@
     },
     {
       "name": "pkce-challenge",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "radix3",
       "allowedCategories": [ "production" ]
     },
     {
@@ -579,8 +619,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "zod",
+      "name": "yaml-cfn",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "zod",
+      "allowedCategories": [ "production", "prototypes" ]
     }
   ]
 }

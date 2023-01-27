@@ -4,13 +4,41 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
+import { resourceTypeToKey, uuidRegExpAsString, envTypeIdRegExpString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
-  '/aws-accounts': {
+  '/awsAccounts': {
     POST: [
       {
         action: 'CREATE',
+        subject: 'Account'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/awsAccountTemplateUrls': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AccountTemplate'
+      }
+    ]
+  },
+  [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
         subject: 'Account'
       }
     ]
@@ -149,29 +177,23 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'EnvironmentType'
       }
-    ],
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'EnvironmentType'
-      }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}`]: {
+  [`/environmentTypes/${envTypeIdRegExpString}`]: {
     GET: [
       {
         action: 'READ',
         subject: 'EnvironmentType'
       }
     ],
-    PUT: [
+    PATCH: [
       {
         action: 'UPDATE',
         subject: 'EnvironmentType'
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}/configurations`]: {
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -185,7 +207,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
@@ -193,9 +215,15 @@ export const routesMap: RoutesMap = {
           subject: 'EnvironmentTypeConfig'
         }
       ],
-      PUT: [
+      PATCH: [
         {
           action: 'UPDATE',
+          subject: 'EnvironmentTypeConfig'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
           subject: 'EnvironmentTypeConfig'
         }
       ]
@@ -204,6 +232,58 @@ export const routesMap: RoutesMap = {
     GET: [
       {
         action: 'READ',
+        subject: 'Project'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Project'
+      }
+    ]
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
+    {
+      PUT: [
+        {
+          action: 'CREATE',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Project'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'Project'
+      }
+    ]
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'DELETE',
         subject: 'Project'
       }
     ]
@@ -226,6 +306,26 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
         subject: 'User'
       }
     ]

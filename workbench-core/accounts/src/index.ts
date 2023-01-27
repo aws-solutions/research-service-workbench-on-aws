@@ -5,6 +5,15 @@
 
 import AccountHandler from './handlers/accountHandler';
 import {
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser
+} from './models/accounts/awsAccountTemplateUrlsRequest';
+import { CreateAccountRequest, CreateAccountRequestParser } from './models/accounts/createAccountRequest';
+import { GetAccountRequest, GetAccountRequestParser } from './models/accounts/getAccountRequest';
+import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import { UpdateAccountRequest, UpdateAccountRequestParser } from './models/accounts/updateAccountRequest';
+import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
+import {
   DeleteCostCenterRequestParser,
   DeleteCostCenterRequest
 } from './models/costCenters/deleteCostCenterRequest';
@@ -16,7 +25,11 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
-import CreateAccountSchema from './schemas/createAccount';
+import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
+import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
+import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
+import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
@@ -30,11 +43,31 @@ export {
   AccountService,
   CostCenterService,
   ProjectService,
-  CreateAccountSchema,
+  CreateCostCenterRequest,
+  CreateProjectRequest,
+  CreateProjectRequestParser,
+  ListProjectsRequest,
+  ListProjectsRequestParser,
+  UpdateProjectRequest,
+  UpdateProjectRequestParser,
+  GetProjectRequest,
+  GetProjectRequestParser,
+  DeleteProjectRequest,
+  DeleteProjectRequestParser,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
-  DeleteCostCenterRequestParser
+  DeleteCostCenterRequestParser,
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
+  CreateAccountRequest,
+  CreateAccountRequestParser,
+  ListAccountRequest,
+  ListAccountsRequestParser,
+  UpdateAccountRequestParser,
+  UpdateAccountRequest,
+  GetAccountRequestParser,
+  GetAccountRequest
 };

@@ -3,26 +3,36 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
+import {
+  CFNTemplate,
+  CFNTemplateParameters,
+  CFNTemplateParametersParser
+} from './aws/helpers/cloudFormationTemplate';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
+import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
-
+import { QueryParameterFilter } from './interfaces/queryParameterFilter';
 import QueryParams from './interfaces/queryParams';
 import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-
+import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { MetadataService } from './services/metadataService';
+import { SecretsService } from './services/secretsService';
+import JSONValue from './types/json';
+import { RelationshipDDBItem, RelationshipDDBItemParser } from './types/relationshipDDBItem';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import {
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
-  MAX_API_PAGE_SIZE
+  MAX_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
 } from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
@@ -33,12 +43,15 @@ import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   uuidRegExp,
-  uuidRegExpAsString
+  uuidRegExpAsString,
+  envTypeIdRegExpString,
+  productIdRegExpString,
+  provisionArtifactIdRegExpString,
+  groupIDRegExpAsString
 } from './utilities/textUtil';
 import { validateAndParse } from './utilities/validatorHelper';
 
 export {
-  AuditLogger,
   AwsService,
   CognitoTokenService,
   QueryParams,
@@ -51,13 +64,22 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
+  productIdRegExpString,
+  provisionArtifactIdRegExpString,
+  envTypeIdRegExpString,
+  groupIDRegExpAsString,
+  CFNTemplateParameters,
+  CFNTemplateParametersParser,
+  CFNTemplate,
   QueryStringParamFilter,
   QueryStringParamFilterParser,
   QueryNumberParamFilter,
   QueryNumberParamFilterParser,
+  QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
+  QueryParameterFilterSchema,
   FilterRequest,
   SortRequest,
   addPaginationToken,
@@ -66,5 +88,12 @@ export {
   MAX_API_PAGE_SIZE,
   PaginatedResponse,
   MetadataService,
-  validateAndParse
+  validateAndParse,
+  JSONValue,
+  DynamoDBService,
+  SecretsService,
+  RelationshipDDBItemParser,
+  RelationshipDDBItem,
+  toPaginationToken,
+  fromPaginationToken
 };

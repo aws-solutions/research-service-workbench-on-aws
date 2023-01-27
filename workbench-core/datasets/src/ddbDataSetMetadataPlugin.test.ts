@@ -19,12 +19,17 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { AwsService } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
-import { DataSet } from './dataSet';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { ExternalEndpoint } from './externalEndpoint';
+import { DataSetExistsError } from './errors/dataSetExistsError';
+import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
+import { EndpointExistsError } from './errors/endpointExistsError';
+import { EndpointNotFoundError } from './errors/endpointNotFoundError';
+import { CreateDataSet, DataSet } from './models/dataSet';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { StorageLocation } from './models/storageLocation';
 
 describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
@@ -43,9 +48,12 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockDataSetOwner = 'Sample-DataSet-Owner';
   const mockDataSetRegion = 'Sample-DataSet-Region';
   const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
-  const mockEndPointName = `${endpointKeyTypeId}-Sample-Access-Point`;
-  const mockEndPointRole = 'Sample-Role';
-  const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndPointName}/${mockDataSetPath}/`;
+  const mockEndpointName = `${endpointKeyTypeId}-Sample-Access-Point`;
+  const mockEndpointRole = 'Sample-Role';
+  const mockEndpointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndpointName}/${mockDataSetPath}/`;
+  const mockEndpointAlias = `${mockEndpointName}-s3alias`;
+  const mockCreatedAt = 'Sample-Created-At-ISO-String';
+  const mockAccessLevel: DataSetsAccessLevel = 'read-only';
 
   let aws: AwsService;
   let plugin: DdbDataSetMetadataPlugin;
@@ -53,11 +61,13 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   beforeEach(() => {
     jest.resetModules();
+    expect.hasAssertions();
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
     plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId);
     mockDdb = mockClient(DynamoDBClient);
+    jest.spyOn(Date.prototype, 'toISOString').mockImplementation(() => mockCreatedAt);
   });
 
   afterAll(() => {
@@ -71,6 +81,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           {
             id: { S: mockDataSetId },
             name: { S: mockDataSetName },
+            createdAt: { S: mockCreatedAt },
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
@@ -79,17 +90,16 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      const response: DataSet[] = await plugin.listDataSets();
-      expect(response).toBeDefined();
-      expect(response).toHaveLength(1);
-      expect(response).toEqual([
+      const response = await plugin.listDataSets();
+      expect(response).toMatchObject<DataSet[]>([
         {
           id: mockDataSetId,
           name: mockDataSetName,
           path: mockDataSetPath,
           awsAccountId: mockAwsAccountId,
           storageType: mockDataSetStorageType,
-          storageName: mockDataSetStorageName
+          storageName: mockDataSetStorageName,
+          createdAt: mockCreatedAt
         }
       ]);
     });
@@ -100,7 +110,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       const response: DataSet[] = await plugin.listDataSets();
       expect(response).toBeDefined();
       expect(response).toHaveLength(0);
-      expect(response).toEqual([]);
+      expect(response).toStrictEqual([]);
     });
   });
 
@@ -110,6 +120,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         Item: {
           id: { S: mockDataSetId },
           name: { S: mockDataSetName },
+          createdAt: { S: mockCreatedAt },
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
@@ -118,46 +129,29 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       const response = await plugin.getDataSetMetadata(mockDataSetId);
 
-      expect(response).toEqual({
+      expect(response).toMatchObject<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
         awsAccountId: mockAwsAccountId,
         storageType: mockDataSetStorageType,
-        storageName: mockDataSetStorageName
+        storageName: mockDataSetStorageName,
+        createdAt: mockCreatedAt
       });
     });
 
-    it('throws not found when an undefined DataSet item is returned.', async () => {
+    it('throws DataSetNotFoundError when an undefined DataSet item is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: undefined
       });
-      let response;
 
-      try {
-        response = await plugin.getDataSetMetadata(mockDataSetId);
-        expect.hasAssertions();
-      } catch (err) {
-        response = err;
-      }
-
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
+      await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
     });
 
-    it('throws not found when no DB response is returned.', async () => {
+    it('throws DataSetNotFoundError when no DB response is returned.', async () => {
       mockDdb.on(GetItemCommand).resolves({});
-      let response;
 
-      try {
-        response = await plugin.getDataSetMetadata(mockDataSetId);
-        expect.hasAssertions();
-      } catch (err) {
-        response = err;
-      }
-
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
+      await expect(plugin.getDataSetMetadata(mockDataSetId)).rejects.toThrow(DataSetNotFoundError);
     });
   });
 
@@ -178,7 +172,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
 
   describe('addDataSet', () => {
-    let exampleDS: DataSet;
+    let exampleDS: CreateDataSet;
 
     beforeEach(() => {
       exampleDS = {
@@ -199,38 +193,11 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
-      expect(newDataSet).toEqual(exampleDS);
-      expect(newDataSet.id).toEqual(mockDataSetId);
-    });
-
-    it('Does not create a DataSet with no name.', async () => {
-      mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(QueryCommand).resolves({});
-
-      const noNameDS = {
+      expect(newDataSet).toMatchObject<DataSet>({
         ...exampleDS,
-        name: undefined
-      };
-
-      // @ts-ignore
-      await expect(plugin.addDataSet(noNameDS)).rejects.toThrow(
-        "Cannot create the DataSet. A 'name' was not supplied but it is required."
-      );
-    });
-
-    it('Does not create a DataSet with an existing id.', async () => {
-      mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(QueryCommand).resolves({});
-
-      const withIdDS = {
-        ...exampleDS,
-        id: mockDataSetId
-      };
-
-      // @ts-ignore
-      await expect(plugin.addDataSet(withIdDS)).rejects.toThrow(
-        "Cannot create the DataSet. 'Id' already exists."
-      );
+        id: mockDataSetId,
+        createdAt: mockCreatedAt
+      });
     });
 
     it('Does not create a DataSet with a duplicate name.', async () => {
@@ -240,6 +207,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           {
             id: { S: mockDataSetId },
             name: { S: mockDataSetName },
+            createdAt: { S: mockCreatedAt },
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
@@ -248,9 +216,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      await expect(plugin.addDataSet(exampleDS)).rejects.toThrow(
-        `Cannot create the DataSet. A DataSet must have a unique 'name', and  '${mockDataSetName}' already exists. `
-      );
+      await expect(plugin.addDataSet(exampleDS)).rejects.toThrow(DataSetExistsError);
     });
   });
 
@@ -259,6 +225,7 @@ describe('DdbDataSetMetadataPlugin', () => {
 
     beforeEach(() => {
       exampleDS = {
+        id: mockDataSetId,
         name: mockDataSetName,
         description: mockDataSetDescription,
         owner: mockDataSetOwner,
@@ -267,14 +234,15 @@ describe('DdbDataSetMetadataPlugin', () => {
         storageName: mockDataSetStorageName,
         path: mockDataSetPath,
         awsAccountId: mockAwsAccountId,
-        region: mockDataSetRegion
+        region: mockDataSetRegion,
+        createdAt: mockCreatedAt
       };
     });
 
     it('Returns the updated DataSet when complete.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
 
-      await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
+      await expect(plugin.updateDataSet(exampleDS)).resolves.toStrictEqual(exampleDS);
     });
 
     it('adds optional external endpoints.', async () => {
@@ -285,7 +253,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         externalEndpoints: ['some-endpoint']
       };
 
-      await expect(plugin.updateDataSet(withEndpointDS)).resolves.toEqual(withEndpointDS);
+      await expect(plugin.updateDataSet(withEndpointDS)).resolves.toStrictEqual(withEndpointDS);
     });
   });
 
@@ -300,11 +268,11 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('addExternalEndpoint', () => {
     it("succeeds when endpoint doesn't exist and no id is provided.", async () => {
-      const mockCreatedDate = new Date().toISOString();
       mockDdb.on(GetItemCommand).resolves({
         Item: {
           id: { S: mockDataSetId },
           name: { S: mockDataSetName },
+          createdAt: { S: mockCreatedAt },
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
@@ -314,42 +282,29 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(QueryCommand).resolves({});
 
-      const exampleEndpoint: ExternalEndpoint = {
-        name: mockEndPointName,
+      const exampleEndpoint: CreateExternalEndpoint = {
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole],
-        createdAt: mockCreatedDate
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
+        accessLevel: mockAccessLevel
       };
 
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toMatchObject<ExternalEndpoint>({
         id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
-        endPointUrl: mockEndPointUrl,
-        name: mockEndPointName,
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        name: mockEndpointName,
         path: mockDataSetPath,
-        allowedRoles: [mockEndPointRole],
-        createdAt: mockCreatedDate
+        allowedRoles: [mockEndpointRole],
+        createdAt: mockCreatedAt,
+        accessLevel: mockAccessLevel
       });
-    });
-
-    it('throws if the endpoint id is already defined.', async () => {
-      const exampleEndpoint: ExternalEndpoint = {
-        name: mockEndPointName,
-        dataSetId: mockDataSetId,
-        dataSetName: mockDataSetName,
-        path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole],
-        id: mockEndPointName
-      };
-
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
-        new Error("Cannot create the Endpoint. 'Id' already exists.")
-      );
     });
 
     it('throws if the endpoint already exists within the DataSet', async () => {
@@ -361,89 +316,88 @@ describe('DdbDataSetMetadataPlugin', () => {
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
           storageName: { S: mockDataSetStorageName },
-          externalEndpoints: { L: [{ S: mockEndPointName }] }
+          externalEndpoints: { L: [{ S: mockEndpointName }] },
+          createdAt: { S: mockCreatedAt },
+          accessLevel: { S: mockAccessLevel }
         }
       });
       mockDdb.on(QueryCommand).resolves({
         Items: [
           {
-            name: { S: mockEndPointName },
+            name: { S: mockEndpointName },
             dataSetId: { S: mockDataSetId },
             dataSetName: { S: mockDataSetName },
             path: { S: mockDataSetPath },
-            endPointUrl: { S: mockEndPointUrl },
-            allowedRoles: { L: [{ S: mockEndPointRole }] },
-            id: { S: mockEndPointName }
+            endPointUrl: { S: mockEndpointUrl },
+            endPointAlias: { S: mockEndpointAlias },
+            allowedRoles: { L: [{ S: mockEndpointRole }] },
+            id: { S: mockEndpointName },
+            createdAt: { S: mockCreatedAt },
+            accessLevel: { S: mockAccessLevel }
           }
         ]
       });
 
-      const exampleEndpoint: ExternalEndpoint = {
-        name: mockEndPointName,
+      const exampleEndpoint: CreateExternalEndpoint = {
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole]
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
+        accessLevel: mockAccessLevel
       };
 
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
-        new Error(
-          `Cannot create the EndPoint. EndPoint with name '${mockEndPointName}' already exists on DataSet '${mockDataSetName}'.`
-        )
-      );
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(EndpointExistsError);
     });
   });
 
   describe('getDataSetEndPointDetails', () => {
     it('throws when an empty response is given.', async () => {
       mockDdb.on(GetItemCommand).resolves({});
-      let response;
-      try {
-        await plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName);
-        expect.hasAssertions();
-      } catch (error) {
-        response = error;
-      }
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(
-        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetId}'.`
+
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)).rejects.toThrow(
+        EndpointNotFoundError
       );
     });
 
     it('throws when an empty item is given.', async () => {
       mockDdb.on(GetItemCommand).resolves({ Item: undefined });
-      let response;
-      try {
-        await plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName);
-        expect.hasAssertions();
-      } catch (error) {
-        response = error;
-      }
-      expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(
-        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetId}'.`
+
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)).rejects.toThrow(
+        EndpointNotFoundError
       );
     });
 
     it('returns the external endpoint from the database.', async () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: {
-          name: { S: mockEndPointName },
+          id: { S: mockEndpointId },
+          name: { S: mockEndpointName },
           dataSetId: { S: mockDataSetId },
           dataSetName: { S: mockDataSetName },
           path: { S: mockDataSetPath },
-          endPointUrl: { S: mockEndPointUrl },
-          allowedRoles: { L: [{ S: mockEndPointRole }] }
+          endPointUrl: { S: mockEndpointUrl },
+          endPointAlias: { S: mockEndpointAlias },
+          allowedRoles: { L: [{ S: mockEndpointRole }] },
+          createdAt: { S: mockCreatedAt },
+          accessLevel: { S: mockAccessLevel }
         }
       });
-      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)).resolves.toEqual({
-        name: mockEndPointName,
+      await expect(
+        plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)
+      ).resolves.toMatchObject<ExternalEndpoint>({
+        id: mockEndpointId,
+        name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
-        endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole]
+        endPointUrl: mockEndpointUrl,
+        endPointAlias: mockEndpointAlias,
+        allowedRoles: [mockEndpointRole],
+        createdAt: mockCreatedAt,
+        accessLevel: mockAccessLevel
       });
     });
   });
@@ -459,7 +413,8 @@ describe('DdbDataSetMetadataPlugin', () => {
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
             storageName: { S: mockDataSetStorageName },
-            region: { S: mockAwsBucketRegion }
+            region: { S: mockAwsBucketRegion },
+            createdAt: { S: mockCreatedAt }
           }
         ]
       });
@@ -467,7 +422,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       const response = await plugin.listStorageLocations();
       expect(response).toBeDefined();
       expect(response).toHaveLength(1);
-      expect(response).toEqual([
+      expect(response).toMatchObject<StorageLocation[]>([
         {
           name: mockDataSetStorageName,
           awsAccountId: mockAwsAccountId,

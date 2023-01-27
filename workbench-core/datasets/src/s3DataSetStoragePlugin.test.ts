@@ -25,7 +25,10 @@ import {
 import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
-import { S3DataSetStoragePlugin } from './';
+import { EndpointExistsError } from './errors/endpointExistsError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
+import { AddStorageExternalEndpointResponse } from './models/addStorageExternalEndpoint';
+import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
 describe('S3DataSetStoragePlugin', () => {
   const region: string = 'us-east-1';
@@ -173,10 +176,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(0);
@@ -227,10 +241,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -243,6 +268,7 @@ describe('S3DataSetStoragePlugin', () => {
     it('throws when the arn for the access point is invalid. ', async () => {
       const endPointNameNoColon = externalEndpointName.replace(/\:/g, '_');
       const accessPointArn = `arn:s3:us-east-1:123456789012:accesspoint/${endPointNameNoColon}`;
+      const accessPointAlias = `${endPointNameNoColon}-s3alias`;
 
       const s3Mock = mockClient(S3Client);
       s3Mock
@@ -279,7 +305,8 @@ describe('S3DataSetStoragePlugin', () => {
       s3ControlMock
         .on(CreateAccessPointCommand)
         .resolves({
-          AccessPointArn: accessPointArn
+          AccessPointArn: accessPointArn,
+          Alias: accessPointAlias
         })
         .on(GetAccessPointPolicyCommand)
         .resolves({})
@@ -287,7 +314,14 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, endPointNameNoColon, externalRoleName)
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName: endPointNameNoColon,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName
+        })
       ).rejects.toThrow(new Error("Expected an arn with at least six ':' separated values."));
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(0);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(0);
@@ -310,10 +344,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleName)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
 
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
@@ -358,10 +403,7 @@ describe('S3DataSetStoragePlugin', () => {
                 "Principal": {
                     "AWS": "${externalRoleArn}"
                 },
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject"
-                ],
+                "Action": "s3:GetObject",
                 "Resource": "${accessPointArn}/object/${path}/*"
             }
         ]
@@ -372,10 +414,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(0);
@@ -415,10 +468,7 @@ describe('S3DataSetStoragePlugin', () => {
                 "Principal": {
                     "AWS": "${externalRoleArn}"
                 },
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject"
-                ],
+                "Action": "s3:GetObject",
                 "Resource": "${accessPointArn}/object/${path}/*"
             }
         ]
@@ -429,10 +479,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -444,7 +505,7 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":"dataset-prefix/*"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":"dataset-prefix/*"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":"s3:GetObject","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"}],"Version":"2012-10-17"}'
       );
     });
 
@@ -482,10 +543,7 @@ describe('S3DataSetStoragePlugin', () => {
             {
                 "Sid": "Statement2",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject"
-                ],
+                "Action": "s3:GetObject",
                 "Resource": "${accessPointArn}/object/${path}/*"
             }
         ]
@@ -496,10 +554,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -511,7 +580,54 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":"dataset-prefix/*"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":"s3:GetObject","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":"dataset-prefix/*"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"}],"Version":"2012-10-17"}'
+      );
+    });
+
+    it('gives the get/put bucket access point policy s3:putBucket permission if the access level is read_write', async () => {
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn,
+          Alias: mockAccessPointAlias
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-write',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
+      });
+
+      expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
+      expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(1);
+      expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.AccountId).toEqual(
+        '123456789012'
+      );
+      expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Name).toEqual(
+        externalEndpointName
+      );
+      expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
+        '{"Statement":[{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":"dataset-prefix/*"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*"}],"Version":"2012-10-17"}'
       );
     });
 
@@ -531,10 +647,21 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(
         s3ControlMock.commandCalls(
@@ -579,18 +706,22 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(
+        plugin.addExternalEndpoint({
           name,
           path,
           externalEndpointName,
-          mockAwsAccountId,
-          externalRoleArn,
-          undefined,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
           vpcId
-        )
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(
         s3ControlMock.commandCalls(
@@ -636,10 +767,21 @@ describe('S3DataSetStoragePlugin', () => {
       const kmsMock = mockClient(KMSClient);
       kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(0);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
@@ -670,17 +812,22 @@ describe('S3DataSetStoragePlugin', () => {
       const kmsMock = mockClient(KMSClient);
       kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
       await expect(
-        plugin.addExternalEndpoint(
+        plugin.addExternalEndpoint({
           name,
           path,
           externalEndpointName,
-          mockAwsAccountId,
-          externalRoleArn,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
           kmsKeyArn
-        )
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
@@ -731,17 +878,22 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(
+        plugin.addExternalEndpoint({
           name,
           path,
           externalEndpointName,
-          mockAwsAccountId,
-          externalRoleArn,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
           kmsKeyArn
-        )
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
@@ -809,17 +961,22 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(
+        plugin.addExternalEndpoint({
           name,
           path,
           externalEndpointName,
-          mockAwsAccountId,
-          externalRoleArn,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
           kmsKeyArn
-        )
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
@@ -867,23 +1024,98 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(
+        plugin.addExternalEndpoint({
           name,
           path,
           externalEndpointName,
-          mockAwsAccountId,
-          externalRoleArn,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
           kmsKeyArn
-        )
-      ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}`,
-        endPointAlias: mockAccessPointAlias
+        })
+      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+        data: {
+          connections: {
+            endPointUrl: `s3://${accessPointArn}`,
+            endPointAlias: mockAccessPointAlias
+          }
+        }
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)[0].firstArg.input.Policy).toEqual(
         '{"Statement":[{"Action":["kms:Encrypt","kms:Decrypt","kms:ReEncrypt*","kms:GenerateDataKey*","kms:DescribeKey"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"},{"Action":["kms:CreateGrant","kms:ListGrant","kms:RevokeGrant"],"Condition":{"Bool":{"kms:GrantIsForAWSResource":"true"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"}],"Version":"2012-10-17"}'
       );
+    });
+
+    it('throws EndpointAlreadyExistsError when trying to create an access point you already own', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).rejects({ name: 'AccessPointAlreadyOwnedByYou' });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(EndpointExistsError);
+    });
+
+    it('throws InvalidEndpointError when an access point without an Alias is created', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).resolves({ AccessPointArn: accessPointArn, Alias: undefined });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(InvalidEndpointError);
+    });
+
+    it('throws InvalidEndpointError when an access point without an AccessPointArn is created', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock
+        .on(CreateAccessPointCommand)
+        .resolves({ AccessPointArn: undefined, Alias: mockAccessPointAlias });
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(InvalidEndpointError);
+    });
+
+    it('rethrows an unexpected error', async () => {
+      const s3Mock = mockClient(S3ControlClient);
+      s3Mock.on(CreateAccessPointCommand).rejects(new Error());
+
+      await expect(
+        plugin.addExternalEndpoint({
+          name,
+          path,
+          externalEndpointName,
+          ownerAccountId: mockAwsAccountId,
+          accessLevel: 'read-only',
+          externalRoleName: externalRoleArn,
+          kmsKeyArn
+        })
+      ).rejects.toThrow(Error);
     });
   });
 
@@ -940,9 +1172,11 @@ describe('S3DataSetStoragePlugin', () => {
   describe('createPresignedUploadUrl', () => {
     it('returns a presigned url for a single part file upload', async () => {
       const ttl = 3600;
+      const fileName = 'test.txt';
 
       const url = await plugin.createPresignedUploadUrl(
-        { name: path, storageName: name, path, storageType: 'S3' },
+        { id: 'fake', createdAt: 'fake', name: path, storageName: name, path, storageType: 'S3' },
+        fileName,
         ttl
       );
 

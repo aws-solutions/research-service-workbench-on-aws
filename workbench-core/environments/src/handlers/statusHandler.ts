@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { isEnvironmentStatus } from '../constants/environmentStatus';
-import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
 import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 
@@ -162,7 +162,11 @@ export default class StatusHandler {
    * @returns EnvironmentService instance
    */
   private _getEnvService(): EnvironmentService {
-    return new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    const dynamoDBService = new DynamoDBService({
+      region: process.env.AWS_REGION!,
+      table: process.env.STACK_NAME!
+    });
+    return new EnvironmentService(dynamoDBService);
   }
 
   /** Get environment helper instance

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CfnResource, Duration, SecretValue, Stack } from 'aws-cdk-lib';
+import { CfnResource, Duration, RemovalPolicy, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -17,7 +17,7 @@ import {
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
-import { Construct} from 'constructs';
+import { Construct } from 'constructs';
 import merge from 'lodash/merge';
 
 const userPoolDefaults: UserPoolProps = {
@@ -78,6 +78,7 @@ export interface WorkbenchCognitoProps {
   idTokenValidity?: Duration;
   refreshTokenValidity?: Duration;
   mfa?: Mfa;
+  removalPolicy?: RemovalPolicy;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -104,7 +105,8 @@ export class WorkbenchCognito extends Construct {
 
     const tempUserPoolProps: UserPoolProps = {
       mfa: props.mfa,
-      userPoolName: props.userPoolName
+      userPoolName: props.userPoolName,
+      removalPolicy: props.removalPolicy
     };
 
     const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);
@@ -113,10 +115,14 @@ export class WorkbenchCognito extends Construct {
     const metadatanode = this.userPool.node.defaultChild as CfnResource;
     metadatanode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [{
+      rules_to_suppress: [
+        {
           id: 'F78',
-          reason: 'By design. MFA is unecessary for this test environment. However, we encourage users to update this to best suit their organization\'s needs.'
-      }]});
+          reason:
+            "By design. MFA is unecessary for this test environment. However, we encourage users to update this to best suit their organization's needs."
+        }
+      ]
+    });
 
     this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
       userPool: this.userPool,
@@ -168,6 +174,7 @@ export class WorkbenchCognito extends Construct {
       policy: AwsCustomResourcePolicy.fromSdkCalls({
         resources: [this.userPool.userPoolArn]
       }),
+      installLatestAwsSdk: true
     });
 
     const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(

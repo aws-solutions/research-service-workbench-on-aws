@@ -3,9 +3,9 @@
 ## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
 # Default Env Config for launching a new environment
-envTypeId: 'b8f160e0-8235-48ca-b928-c057d7ccb309'
+envTypeId: 'et-prod-q5jnmlalb4eya,pa-lszlpvcp7wukg'
 envTypeConfigId: 'etc-7f7bd246-1d51-47e9-a5bd-a4530dd8e040'
-projectId: 'cf3019e3-88d5-4a64-9025-26a177e36f59'
+projectId: 'proj-98ad72ff-8352-4177-9ab7-7cb945646920'
 envType: 'sagemakerNotebook'
 
 # Negative Testing
@@ -15,5 +15,15 @@ terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environme
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
 
+## For running project integration tests
+costCenterId: 'cc-90c8466a-d7d9-4da8-a128-07eb270487f0'
+projectName: 'Integration Test Project'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
+
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '/swb/testEnv/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/testEnv/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/testEnv/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/testEnv/accountsTest/encryptionKeyArn'

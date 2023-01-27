@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "swb dynamic authorization infrastructure update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

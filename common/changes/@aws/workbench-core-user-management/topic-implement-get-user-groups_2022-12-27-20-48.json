@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "Added `getUserRoles` API.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}

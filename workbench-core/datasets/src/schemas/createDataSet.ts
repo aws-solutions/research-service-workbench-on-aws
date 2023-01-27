@@ -14,7 +14,20 @@ const CreateDataSetSchema: Schema = {
     storageName: { type: 'string' },
     path: { type: 'string' },
     awsAccountId: { type: 'string' },
-    region: { type: 'string' }
+    region: { type: 'string' },
+    owner: { type: 'string' },
+    ownerType: { type: 'string' },
+    permissions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          identity: { type: 'string' },
+          identityType: { type: 'string' },
+          accessLevel: { type: 'string' }
+        }
+      }
+    }
   },
   additionalProperties: false,
   required: ['datasetName', 'storageName', 'path', 'awsAccountId', 'region']

@@ -3,23 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AuditLogger } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
-  S3DataSetStoragePlugin
+  S3DataSetStoragePlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
-import { dataSetPrefix, endPointPrefix } from '../configs/constants';
-import { aws } from './awsService';
+import { dataSetPrefix, endpointPrefix } from '../configs/constants';
+import { auditService } from './auditService';
+import { datasetAws } from './awsService';
+import { dynamicAuthorizationService } from './dynamicAuthorizationService';
 import { logger } from './loggingService';
 
 const dataSetService: DataSetService = new DataSetService(
-  new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  auditService,
   logger,
-  new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix)
+  new DdbDataSetMetadataPlugin(datasetAws, dataSetPrefix, endpointPrefix),
+  new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
 );
 
-const dataSetsStoragePlugin: S3DataSetStoragePlugin = new S3DataSetStoragePlugin(aws);
+const dataSetsStoragePlugin: S3DataSetStoragePlugin = new S3DataSetStoragePlugin(datasetAws);
 
 export { dataSetService, dataSetsStoragePlugin };

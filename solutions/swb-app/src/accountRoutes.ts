@@ -4,20 +4,73 @@
  */
 
 // AWS Account management
-import { CreateAccountSchema, HostingAccountService } from '@aws/workbench-core-accounts';
+import {
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
+  HostingAccountService,
+  CreateAccountRequestParser,
+  ListAccountRequest,
+  ListAccountsRequestParser,
+  CreateAccountRequest,
+  UpdateAccountRequest,
+  UpdateAccountRequestParser,
+  GetAccountRequest,
+  GetAccountRequestParser
+} from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
-export function setUpAccountRoutes(router: Router, account: HostingAccountService): void {
-  // Provision
-  router.post(
-    '/aws-accounts',
+export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
+  router.get(
+    '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateAccountSchema));
-      const response = await account.create(req.body);
-      res.send(response);
+      const validatedRequest = validateAndParse<ListAccountRequest>(ListAccountsRequestParser, req.query);
+      res.send(await hostingAccountService.list(validatedRequest));
+    })
+  );
+
+  router.get(
+    '/awsAccounts/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetAccountRequest>(GetAccountRequestParser, {
+        id: req.params.id
+      });
+      res.send(await hostingAccountService.get(validatedRequest));
+    })
+  );
+
+  router.post(
+    '/awsAccountTemplateUrls',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<AwsAccountTemplateUrlsRequest>(
+        AwsAccountTemplateUrlsRequestParser,
+        req.body
+      );
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest));
+    })
+  );
+
+  router.post(
+    '/awsAccounts',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
+
+      const createdAccount = await hostingAccountService.create(validatedRequest);
+      res.status(201).send(createdAccount);
+    })
+  );
+
+  router.patch(
+    '/awsAccounts/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<UpdateAccountRequest>(UpdateAccountRequestParser, {
+        id: req.params.id,
+        ...req.body
+      });
+
+      const updatedAccount = await hostingAccountService.update(validatedRequest);
+      res.send(updatedAccount);
     })
   );
 }

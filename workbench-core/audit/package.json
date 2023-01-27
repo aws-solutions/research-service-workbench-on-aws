@@ -29,7 +29,7 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-logging": "workspace:*",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
@@ -44,7 +44,6 @@
     "@types/node": "^14",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "license-check-and-add": "^4.0.5",
     "license-checker": "^25.0.1",
