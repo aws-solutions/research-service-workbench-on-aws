@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "User to project association API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

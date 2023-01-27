@@ -128,7 +128,8 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     router,
     apiRouteConfig.projectService,
     apiRouteConfig.environmentService,
-    apiRouteConfig.metadataService
+    apiRouteConfig.metadataService,
+    apiRouteConfig.userManagementService
   );
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   setUpKeyPairRoutes(router, apiRouteConfig.keyPairService);
