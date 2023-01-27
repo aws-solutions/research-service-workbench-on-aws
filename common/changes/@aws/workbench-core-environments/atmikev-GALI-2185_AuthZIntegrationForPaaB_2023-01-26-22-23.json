@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-environments",
-      "comment": "",
-      "type": "none"
+      "comment": "Integrating AuthZ with Projects",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-environments"
