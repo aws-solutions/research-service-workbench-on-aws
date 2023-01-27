@@ -26,7 +26,9 @@ import {
   IsRouteIgnoredRequestParser,
   IsAuthorizedOnSubjectRequest,
   isForbiddenError,
-  IsAuthorizedOnSubjectRequestParser
+  IsAuthorizedOnSubjectRequestParser,
+  DoesGroupExistRequest,
+  DoesGroupExistRequestParser
 } from '@aws/workbench-core-authorization';
 import {
   DeleteSubjectIdentityPermissionsRequest,
@@ -128,7 +130,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
 
         res.status(200).send(response.data);
       } catch (error) {
-        if (isGroupNotFoundError(error)) {
+        if (isGroupNotFoundError(error) || isForbiddenError(error)) {
           throw Boom.notFound(error.message);
         }
         if (isRetryError(error)) {
@@ -207,7 +209,16 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       }
     })
   );
-
+  router.get(
+    '/authorization/groups/:groupId/does-group-exist',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DoesGroupExistRequest>(DoesGroupExistRequestParser, {
+        groupId: req.params.groupId
+      });
+      const { data } = await service.doesGroupExist(validatedRequest);
+      res.status(200).send(data);
+    })
+  );
   router.post(
     '/authorization/permissions',
     wrapAsync(async (req: Request, res: Response) => {

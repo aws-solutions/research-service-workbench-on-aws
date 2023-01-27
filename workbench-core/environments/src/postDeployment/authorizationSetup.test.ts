@@ -23,7 +23,8 @@ describe('AuthorizationSetup', () => {
       isUserAssignedToGroup: jest.fn(),
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
-      setGroupStatus: jest.fn()
+      setGroupStatus: jest.fn(),
+      doesGroupExist: jest.fn()
     };
 
     const mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin = {
