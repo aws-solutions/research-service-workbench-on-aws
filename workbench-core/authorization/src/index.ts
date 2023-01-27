@@ -68,6 +68,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/deleteIdentityPermissions';
 export {
   DoesGroupExistRequest,
+  DoesGroupExistRequestParser,
   DoesGroupExistResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/doesGroupExist';
 export { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';

@@ -577,7 +577,7 @@ export class DynamicAuthorizationService {
    * @returns - {@link DoesGroupExistResponse}
    */
   public async doesGroupExist(doesGroupExistRequest: DoesGroupExistRequest): Promise<DoesGroupExistResponse> {
-    throw new Error('Not implemented');
+    return await this._groupManagementPlugin.doesGroupExist(doesGroupExistRequest);
   }
 
   /**

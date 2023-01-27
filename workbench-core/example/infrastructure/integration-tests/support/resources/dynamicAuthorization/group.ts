@@ -29,6 +29,10 @@ export default class Group extends Resource {
     return this._axiosInstance.get(`${this._api}/is-user-assigned/${userId}`);
   }
 
+  public async doesGroupExist(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/does-group-exist`);
+  }
+
   public async cleanup(): Promise<void> {
     try {
       const authzHelper = new DynamicAuthorizationHelper();
