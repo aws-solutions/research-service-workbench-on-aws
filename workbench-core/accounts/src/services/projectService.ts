@@ -461,12 +461,14 @@ export default class ProjectService {
     const effect = 'ALLOW';
     const subjectType = 'Project';
     const subjectId = projectId;
+    const projectAdminIdentity = `${projectId}#ProjectAdmin`;
+    const researcherIdentity = `${projectId}#Researcher`;
 
-    return [
+    const projectAdminPermissions: IdentityPermission[] = [
       {
         // create for PA
         identityType,
-        identityId: `${projectId}#ProjectAdmin`,
+        identityId: projectAdminIdentity,
         effect,
         action: 'CREATE',
         subjectType,
@@ -476,7 +478,7 @@ export default class ProjectService {
       {
         // read for PA
         identityType,
-        identityId: `${projectId}#ProjectAdmin`,
+        identityId: projectAdminIdentity,
         effect,
         action: 'READ',
         subjectType,
@@ -486,7 +488,7 @@ export default class ProjectService {
       {
         // update for PA
         identityType,
-        identityId: `${projectId}#ProjectAdmin`,
+        identityId: projectAdminIdentity,
         effect,
         action: 'UPDATE',
         subjectType,
@@ -496,17 +498,20 @@ export default class ProjectService {
       {
         // delete for PA
         identityType,
-        identityId: `${projectId}#ProjectAdmin`,
+        identityId: projectAdminIdentity,
         effect,
         action: 'DELETE',
         subjectType: 'Project',
         subjectId: projectId,
         fields: ['Environment', 'InternalDataset', 'SSHKey', 'User']
-      },
+      }
+    ];
+
+    const researcherPermissions: IdentityPermission[] = [
       {
         // create for Researcher
         identityType,
-        identityId: `${projectId}#Researcher`,
+        identityId: researcherIdentity,
         effect,
         action: 'CREATE',
         subjectType,
@@ -516,7 +521,7 @@ export default class ProjectService {
       {
         // read for Researcher
         identityType,
-        identityId: `${projectId}#Researcher`,
+        identityId: researcherIdentity,
         effect,
         action: 'READ',
         subjectType,
@@ -526,7 +531,7 @@ export default class ProjectService {
       {
         // update for Researcher
         identityType,
-        identityId: `${projectId}#Researcher`,
+        identityId: researcherIdentity,
         effect,
         action: 'UPDATE',
         subjectType,
@@ -536,7 +541,7 @@ export default class ProjectService {
       {
         // delete for Researcher
         identityType,
-        identityId: `${projectId}#Researcher`,
+        identityId: researcherIdentity,
         effect,
         action: 'DELETE',
         subjectType,
@@ -544,5 +549,7 @@ export default class ProjectService {
         fields: ['Environment', 'SSHKey']
       }
     ];
+
+    return projectAdminPermissions.concat(researcherPermissions);
   }
 }
