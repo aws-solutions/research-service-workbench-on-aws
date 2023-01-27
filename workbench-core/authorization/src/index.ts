@@ -14,6 +14,7 @@ export { Action } from './action';
 export {
   default as RoutesMap,
   HTTPMethod,
+  HTTPMethodParser,
   RoutesIgnored,
   MethodToOperations,
   DynamicRoutesMap
@@ -104,7 +105,10 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 export { InitRequest, InitResponse } from './dynamicAuthorization/dynamicAuthorizationInputs/init';
 export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnRoute';
-export { IsAuthorizedOnSubjectRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
+export {
+  IsAuthorizedOnSubjectRequest,
+  IsAuthorizedOnSubjectRequestParser
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
 export {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser,

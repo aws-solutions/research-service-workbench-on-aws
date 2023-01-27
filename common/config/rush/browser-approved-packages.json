@@ -332,7 +332,7 @@
     },
     {
       "name": "aws-jwt-verify",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-lambda",

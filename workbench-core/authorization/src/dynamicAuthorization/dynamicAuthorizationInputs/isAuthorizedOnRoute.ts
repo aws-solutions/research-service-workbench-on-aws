@@ -3,30 +3,31 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '../../authenticatedUser';
-import { HTTPMethod } from '../../routesMap';
+import { z } from 'zod';
+import { AuthenticatedUserParser } from '../../authenticatedUser';
+import { HTTPMethodParser } from '../../routesMap';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const IsAuthorizedOnRouteRequestParser = z.object({
+  /**
+   * {@link AuthenticatedUser}
+   */
+  authenticatedUser: AuthenticatedUserParser,
+  /**
+   * The route the user is requesting access to
+   */
+  route: z.string(),
+  /**
+   * {@link HTTPMethod}
+   */
+  method: HTTPMethodParser,
+  /**
+   * Optional params for variable based operations
+   */
+  params: z.record(z.string()).optional()
+});
 
 /**
  * Request object for IsAuthorizedOnRoute
  */
-export interface IsAuthorizedOnRouteRequest {
-  /**
-   * {@link AuthenticatedUser}
-   */
-  authenticatedUser: AuthenticatedUser;
-
-  /**
-   * The route the user is requesting access to
-   */
-  route: string;
-
-  /**
-   * {@link HTTPMethod}
-   */
-  method: HTTPMethod;
-
-  /**
-   * Optional params for variable based operations
-   */
-  params?: Record<string, unknown>;
-}
+export type IsAuthorizedOnRouteRequest = z.infer<typeof IsAuthorizedOnRouteRequestParser>;

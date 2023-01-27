@@ -283,6 +283,7 @@ importers:
       '@aws/workbench-core-user-management': link:../../workbench-core/user-management
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
+      axios: 0.27.2
       csrf: 3.1.0
       express: 4.18.1
       js-yaml: 4.1.0
@@ -308,7 +309,6 @@ importers:
       aws-cdk: 2.61.0
       aws-cdk-lib: 2.61.0_constructs@10.1.25
       aws-lambda: 1.0.7
-      axios: 0.27.2
       constructs: 10.1.25
       depcheck: 1.4.3
       esbuild: 0.14.42
@@ -728,7 +728,7 @@ importers:
     dependencies:
       '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-logging': link:../logging
-      aws-jwt-verify: 3.1.0
+      aws-jwt-verify: 3.3.0
       axios: 0.27.2
       csurf: 1.11.0
       lodash: 4.17.21
@@ -1409,6 +1409,7 @@ importers:
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.61.0
       aws-cdk-lib: ^2.61.0
+      aws-jwt-verify: ^3.0.0
       axios: ^0.27.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
@@ -1451,6 +1452,7 @@ importers:
       '@aws/workbench-core-infrastructure': link:../../infrastructure
       '@aws/workbench-core-user-management': link:../../user-management
       aws-cdk-lib: 2.61.0_constructs@10.1.25
+      aws-jwt-verify: 3.3.0
       constructs: 10.1.25
       cookie-parser: 1.4.6
       csrf: 3.1.0
@@ -8675,8 +8677,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /aws-jwt-verify/3.1.0:
-    resolution: {integrity: sha512-8BTDS3xEP5xhK6/mLEQXc7MfRRer5diV4Q2AD6ofoHQnaDbuDXG056egq4UCgo06+rmWQAC7/A6vVRZ/2FCs9g==}
+  /aws-jwt-verify/3.3.0:
+    resolution: {integrity: sha512-gb25clHLamaRXwJnKsW5d/0rEjCUErLsLekryzJYManQV0GfVuv9g8Q+BYeb2owycXvUOi/aqo5czkj3EPtJSg==}
     engines: {node: '>=14.0.0'}
     dev: false
 
@@ -17161,7 +17163,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1
+      jest: 27.5.1_ts-node@10.8.0
       jest-util: 27.5.1
       json5: 2.2.2
       lodash.memoize: 4.1.2

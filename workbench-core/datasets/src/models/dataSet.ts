@@ -29,6 +29,10 @@ export const DataSetParser = z.object({
    */
   owner: z.string().optional(),
   /**
+   * (optional, but required if `owner` is specified.) the identity type of the owner such as 'USER' or 'GROUP')
+   */
+  ownerType: z.string().optional(),
+  /**
    * (optional) the type of the dataset
    */
   type: z.string().optional(),

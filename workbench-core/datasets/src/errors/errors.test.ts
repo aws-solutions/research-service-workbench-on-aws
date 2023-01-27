@@ -5,6 +5,7 @@
 
 import { DataSetExistsError, isDataSetExistsError } from './dataSetExistsError';
 import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
+import { DataSetInvalidParameterError, isDataSetInvalidParameterError } from './dataSetInvalidParameterError';
 import { DataSetNotFoundError, isDataSetNotFoundError } from './dataSetNotFoundError';
 import { EndpointExistsError, isEndpointExistsError } from './endpointExistsError';
 import { EndpointNotFoundError, isEndpointNotFoundError } from './endpointNotFoundError';
@@ -116,5 +117,14 @@ describe('custom error tests', () => {
   });
   test('not InvalidArnError', () => {
     expect(isInvalidArnError(error)).toBe(false);
+  });
+
+  test('DataSetInvalidParameterError', () => {
+    const dataSetInvalidParameterError = new DataSetInvalidParameterError();
+
+    expect(isDataSetInvalidParameterError(dataSetInvalidParameterError)).toBe(true);
+  });
+  test('not DataSetInvalidParameterError', () => {
+    expect(isDataSetInvalidParameterError(error)).toBe(false);
   });
 });

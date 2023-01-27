@@ -4,12 +4,14 @@
  */
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
+import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
@@ -75,6 +77,9 @@ export class DataSetService {
     };
 
     try {
+      if (request.owner && !request.ownerType) {
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
+      }
       const { storageProvider, ...dataSet } = request;
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
@@ -109,6 +114,9 @@ export class DataSetService {
       requestBody: request
     };
     try {
+      if (request.owner && !request.ownerType) {
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
+      }
       const { storageProvider, ...dataSet } = request;
 
       await storageProvider.importStorage(dataSet.storageName, dataSet.path);
@@ -141,7 +149,7 @@ export class DataSetService {
       id: string;
       roles: string[];
     }
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.removeDataSet.name,
@@ -159,8 +167,14 @@ export class DataSetService {
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         );
       }
-      await this._dbProvider.removeDataSet(dataSetId);
-      await this._audit.write(metadata);
+      const [accessResponse] = await Promise.all([
+        this._authzPlugin.removeAllAccessPermissions(dataSetId, authenticatedUser),
+        this._dbProvider.removeDataSet(dataSetId)
+      ]);
+
+      targetDS.permissions = accessResponse.data.permissions;
+      await this._audit.write(metadata, targetDS);
+      return targetDS;
     } catch (error) {
       await this._audit.write(metadata, error);
       throw error;
@@ -239,7 +253,7 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: { id: string; roles: string[] }): Promise<DataSet[]> {
+  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -247,8 +261,25 @@ export class DataSetService {
         serviceName: DataSetService.name
       }
     };
+
     try {
-      const response = await this._dbProvider.listDataSets();
+      const response: DataSet[] = [];
+      const allDatasets = await this._dbProvider.listDataSets();
+
+      await Promise.all(
+        allDatasets.map(async (dataset) => {
+          try {
+            // throws a ForbiddenError if the user doesnt have permission on the dataset
+            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+            response.push(dataset);
+          } catch (error) {
+            if (!isForbiddenError(error)) {
+              throw error;
+            }
+          }
+        })
+      );
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -825,7 +856,7 @@ export class DataSetService {
     authenticatedUser: AuthenticatedUser,
     dataSetId: string
   ): Promise<DataSetPermission[]> {
-    const { data: userPermissionsData } = await this._authzPlugin.getAccessPermissions({
+    const userPermissionsPromise = this._authzPlugin.getAccessPermissions({
       dataSetId,
       identity: authenticatedUser.id,
       identityType: 'USER'
@@ -834,23 +865,28 @@ export class DataSetService {
     const groupPermissionsPromises = authenticatedUser.roles.map((role) =>
       this._authzPlugin.getAccessPermissions({ dataSetId, identity: role, identityType: 'GROUP' })
     );
-    const groupPermissionsData = await Promise.all(groupPermissionsPromises);
-    const groupPermissions = groupPermissionsData.map((data) => data.data.permissions);
+    const permissionsData = await Promise.all([userPermissionsPromise, ...groupPermissionsPromises]);
+    const permissions = permissionsData.map((data) => data.data.permissions);
 
-    return userPermissionsData.permissions.concat(...groupPermissions);
+    return ([] as DataSetPermission[]).concat(...permissions);
   }
 
   private async _updateNewDataSetPermissions(
     dataset: DataSet,
     request: CreateProvisionDatasetRequest
   ): Promise<DataSetPermission[]> {
-    const permissions = request.permissions ?? [];
-    if (!permissions.some((p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')) {
-      permissions.push({
-        identity: request.authenticatedUser.id,
-        identityType: 'USER',
-        accessLevel: 'read-only'
-      });
+    let permissions: DataSetPermission[];
+
+    if (_.isEmpty(request.permissions)) {
+      permissions = [
+        {
+          identity: request.owner ? request.owner : request.authenticatedUser.id,
+          identityType: request.owner ? request.ownerType! : 'USER',
+          accessLevel: 'read-only'
+        }
+      ];
+    } else {
+      permissions = request.permissions!;
     }
     const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
       authenticatedUser: request.authenticatedUser,

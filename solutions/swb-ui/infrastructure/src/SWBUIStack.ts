@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+/* eslint-disable no-new */
+
 import * as path from 'path';
 import { CfnOutput, Duration, Fn, Stack, StackProps } from 'aws-cdk-lib';
 import {
@@ -22,6 +24,7 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
+import { createECSCluster } from './hosting-infra/ecs-cluster';
 
 export class SWBUIStack extends Stack {
   public distributionEnvVars: {
@@ -50,6 +53,8 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      SWB_DOMAIN_NAME,
+      MAIN_ACCT_ALB_LISTENER_ARN,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -60,13 +65,14 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_ARTIFACT_NAME,
       RESPONSE_HEADERS_NAME,
       COGNITO_DOMAIN_NAME_OUTPUT_KEY,
-      COGNITO_DOMAIN_NAME
+      COGNITO_DOMAIN_NAME,
+      USE_CLOUD_FRONT,
+      ECR_REPOSITORY_NAME,
+      VPC_ID,
+      ECS_SUBNET_IDS,
+      ECS_AZS
     } = getConstants();
-    super(scope, STACK_NAME, {
-      env: {
-        region: AWS_REGION
-      }
-    });
+    super(scope, STACK_NAME, props);
 
     this.distributionEnvVars = {
       STAGE,
@@ -86,9 +92,23 @@ export class SWBUIStack extends Stack {
       COGNITO_DOMAIN_NAME_OUTPUT_KEY,
       COGNITO_DOMAIN_NAME
     };
-    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
-    const distribution = this._createDistribution(bucket);
-    this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    if (USE_CLOUD_FRONT) {
+      const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
+      const distribution = this._createDistribution(bucket);
+      this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    } else {
+      new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
+        value: `https://${SWB_DOMAIN_NAME}`
+      });
+      createECSCluster(
+        this,
+        MAIN_ACCT_ALB_LISTENER_ARN,
+        ECR_REPOSITORY_NAME,
+        VPC_ID,
+        ECS_SUBNET_IDS,
+        ECS_AZS
+      );
+    }
     this._addCognitoURLOutput();
   }
 
@@ -142,7 +162,6 @@ export class SWBUIStack extends Stack {
 
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
-    // eslint-disable-next-line no-new
     new CfnOutput(this, outputKey, {
       value: s3Bucket.bucketArn
     });
@@ -150,7 +169,6 @@ export class SWBUIStack extends Stack {
   }
 
   private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
-    // eslint-disable-next-line no-new
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
       sources: [Source.asset(path.resolve(__dirname, '../../ui/out'))],
@@ -188,7 +206,6 @@ export class SWBUIStack extends Stack {
       },
       additionalBehaviors: {}
     });
-    // eslint-disable-next-line no-new
     new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
       value: `https://${distribution.distributionDomainName}`
     });
@@ -238,7 +255,6 @@ export class SWBUIStack extends Stack {
   }
 
   private _addCognitoURLOutput(): void {
-    // eslint-disable-next-line no-new
     new CfnOutput(this, this.distributionEnvVars.COGNITO_DOMAIN_NAME_OUTPUT_KEY, {
       value: this.distributionEnvVars.COGNITO_DOMAIN_NAME
     });

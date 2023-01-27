@@ -326,6 +326,14 @@ export const routesMap: RoutesMap = {
         subject: 'Routes'
       }
     ]
+  },
+  '/authorization/authorize/subject': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Subject'
+      }
+    ]
   }
 };
 
