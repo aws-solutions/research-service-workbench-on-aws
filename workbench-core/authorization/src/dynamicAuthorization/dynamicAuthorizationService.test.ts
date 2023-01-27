@@ -20,6 +20,7 @@ import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { HTTPMethod } from '../routesMap';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupResponse, DeleteGroupRequest } from './dynamicAuthorizationInputs/deleteGroup';
+import { DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -71,7 +72,8 @@ describe('DynamicAuthorizationService', () => {
       isUserAssignedToGroup: jest.fn(),
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
-      setGroupStatus: jest.fn()
+      setGroupStatus: jest.fn(),
+      doesGroupExist: jest.fn()
     };
 
     mockDynamicAuthorizationPermissionsPlugin = {
@@ -1226,10 +1228,16 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('doesGroupExist', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(Error);
+    it('returns the boolen given by the groupManagementPlugin', async () => {
+      mockGroupManagementPlugin.doesGroupExist = jest.fn().mockResolvedValue({
+        data: {
+          exist: true
+        }
+      });
+      const response = await dynamicAuthzService.doesGroupExist({
+        groupId
+      });
+      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: true } });
     });
   });
 

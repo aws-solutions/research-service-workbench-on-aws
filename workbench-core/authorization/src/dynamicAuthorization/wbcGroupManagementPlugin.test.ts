@@ -4,6 +4,8 @@
  */
 
 import {
+  ConditionalCheckFailedException,
+  DeleteItemCommand,
   DynamoDBClient,
   GetItemCommand,
   ProvisionedThroughputExceededException,
@@ -31,6 +33,7 @@ import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
+import { DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -519,67 +522,94 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('setGroupStatus', () => {
-    it('returns the status in the data object when the status was successfully set', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+    it('returns the status in the data object when the status was successfully set for active', async () => {
       ddbMock.on(UpdateItemCommand).resolves({});
-
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status });
-
       expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status } });
     });
 
-    it('throws ForbiddenError when status tried to go from delete_pending to active', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest
-        .fn()
-        .mockResolvedValue({ data: { status: 'delete_pending' } });
+    it('returns the status in the data object when the status was successfully set for delete_pending', async () => {
+      ddbMock.on(UpdateItemCommand).resolves({});
+      const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'delete_pending' });
+      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status: 'delete_pending' } });
+    });
 
-      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
-        ForbiddenError
-      );
+    it('returns the status in the data object when the status was successfully set for deleted', async () => {
+      ddbMock.on(DeleteItemCommand).resolves({});
+      const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'deleted' });
+      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status: 'deleted' } });
+    });
+
+    it('throws ForbiddenError when status tried to go from delete_pending to active', async () => {
+      ddbMock
+        .on(UpdateItemCommand)
+        .rejects(new ConditionalCheckFailedException({ message: '', $metadata: {} }));
+      await expect(
+        wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'delete_pending' })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it('throws ForbiddenError when status tried to go from active to deleted', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'active' } });
-
+      ddbMock
+        .on(DeleteItemCommand)
+        .rejects(new ConditionalCheckFailedException({ message: '', $metadata: {} }));
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'deleted' })).rejects.toThrow(
         ForbiddenError
       );
     });
 
     it('throws PluginConfigurationError when the ddb table doesnt exist', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new ResourceNotFoundException({ message: '', $metadata: {} }));
-
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
         PluginConfigurationError
       );
     });
 
     it('throws TooManyRequestsError when the provisioned throughput is exceeded', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock
         .on(UpdateItemCommand)
         .rejects(new ProvisionedThroughputExceededException({ message: '', $metadata: {} }));
-
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
         TooManyRequestsError
       );
     });
 
     it('throws TooManyRequestsError when the request limit is exceeded', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new RequestLimitExceeded({ message: '', $metadata: {} }));
-
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
         TooManyRequestsError
       );
     });
 
     it('rethrows an unexpected error', async () => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new Error());
-
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(Error);
+    });
+  });
+  describe('doesGroupExist', () => {
+    it('group does exist when status is active', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'active' } });
+      const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
+      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: true } });
+    });
+
+    it('group does not exist when status is delete_pending', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest
+        .fn()
+        .mockResolvedValue({ data: { status: 'delete_pending' } });
+      const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
+      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: false } });
+    });
+
+    it('group does not exist when status does not exist', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
+      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: false } });
+    });
+
+    it('throw error if getGroupStatus encounters error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new Error());
+      await expect(wbcGroupManagementPlugin.doesGroupExist({ groupId })).rejects.toThrowError();
     });
   });
 });
