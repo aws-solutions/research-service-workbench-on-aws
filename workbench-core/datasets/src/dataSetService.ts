@@ -6,10 +6,12 @@
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
+import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
@@ -75,6 +77,9 @@ export class DataSetService {
     };
 
     try {
+      if (request.owner && !request.ownerType) {
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
+      }
       const { storageProvider, ...dataSet } = request;
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
@@ -109,6 +114,9 @@ export class DataSetService {
       requestBody: request
     };
     try {
+      if (request.owner && !request.ownerType) {
+        throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
+      }
       const { storageProvider, ...dataSet } = request;
 
       await storageProvider.importStorage(dataSet.storageName, dataSet.path);
@@ -867,13 +875,18 @@ export class DataSetService {
     dataset: DataSet,
     request: CreateProvisionDatasetRequest
   ): Promise<DataSetPermission[]> {
-    const permissions = request.permissions ?? [];
-    if (!permissions.some((p) => p.identity === request.authenticatedUser.id && p.identityType === 'USER')) {
-      permissions.push({
-        identity: request.authenticatedUser.id,
-        identityType: 'USER',
-        accessLevel: 'read-only'
-      });
+    let permissions: DataSetPermission[];
+
+    if (_.isEmpty(request.permissions)) {
+      permissions = [
+        {
+          identity: request.owner ? request.owner : request.authenticatedUser.id,
+          identityType: request.owner ? request.ownerType! : 'USER',
+          accessLevel: 'read-only'
+        }
+      ];
+    } else {
+      permissions = request.permissions!;
     }
     const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
       authenticatedUser: request.authenticatedUser,
