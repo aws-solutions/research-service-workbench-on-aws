@@ -81,7 +81,7 @@ describe('list users for project tests', () => {
       projectId = projects.data.data[0].id;
     });
 
-    test('list users for project admin', async () => {
+    test.each(['ProjectAdmin', 'Researcher'])('list users for role: %p', async (role: string) => {
       if (!projectId) {
         console.warn('There are no projects');
 
@@ -93,30 +93,7 @@ describe('list users for project tests', () => {
         return;
       }
 
-      const response = await adminSession.resources.projects
-        .project(projectId)
-        .listUsersForProject('ProjectAdmin');
-
-      expect(response.status).toBe(200);
-      expect(response.data.users).toBeInstanceOf(Array);
-      expect(response.data.users.length).toBeGreaterThanOrEqual(0);
-    });
-
-    test('list users for researcher', async () => {
-      if (!projectId) {
-        console.warn('There are no projects');
-
-        // dummy assertion to make sure that test always passes
-        // will be considered to move to multistep test:
-        // create user, project, asign/remove user from project, remove user/project
-        // as soon as project as a boundary feature is implemented
-        expect(true).toBeTruthy();
-        return;
-      }
-
-      const response = await adminSession.resources.projects
-        .project(projectId)
-        .listUsersForProject('Researcher');
+      const response = await adminSession.resources.projects.project(projectId).listUsersForProject(role);
 
       expect(response.status).toBe(200);
       expect(response.data.users).toBeInstanceOf(Array);
