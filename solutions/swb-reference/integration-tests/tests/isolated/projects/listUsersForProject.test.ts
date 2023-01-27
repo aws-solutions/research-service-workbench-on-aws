@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -11,6 +12,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('list users for project tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let project: { id: string };
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -18,6 +20,15 @@ describe('list users for project tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+
+    const costCenterId = setup.getSettings().get('costCenterId');
+    const { data } = await adminSession.resources.projects.create({
+      name: `TestProject-${uuidv4()}`,
+      description: 'Project for list users for project tests',
+      costCenterId
+    });
+
+    project = data;
   });
 
   afterAll(async () => {
@@ -42,23 +53,8 @@ describe('list users for project tests', () => {
     });
 
     test('cannot list users for non existing roles', async () => {
-      let projectId = '';
       try {
-        const projects = await adminSession.resources.projects.get();
-        if (!projects.data.data.length) {
-          console.warn('There are no projects');
-
-          // dummy assertion to make sure that test always passes
-          // will be considered to move to multistep test:
-          // create user, project, asign/remove user from project, remove user/project
-          // as soon as project as a boundary feature is implemented
-          expect(true).toBeTruthy();
-          return;
-        }
-
-        projectId = projects.data.data[0].id;
-
-        await adminSession.resources.projects.project(projectId).listUsersForProject('abc');
+        await adminSession.resources.projects.project(project.id).listUsersForProject('abc');
       } catch (e) {
         checkHttpError(
           e,
@@ -71,29 +67,8 @@ describe('list users for project tests', () => {
   });
 
   describe('basic tests', () => {
-    let projectId = '';
-    beforeEach(async () => {
-      const projects = await adminSession.resources.projects.get();
-      if (!projects.data.data.length) {
-        return;
-      }
-
-      projectId = projects.data.data[0].id;
-    });
-
     test.each(['ProjectAdmin', 'Researcher'])('list users for role: %p', async (role: string) => {
-      if (!projectId) {
-        console.warn('There are no projects');
-
-        // dummy assertion to make sure that test always passes
-        // will be considered to move to multistep test:
-        // create user, project, asign/remove user from project, remove user/project
-        // as soon as project as a boundary feature is implemented
-        expect(true).toBeTruthy();
-        return;
-      }
-
-      const response = await adminSession.resources.projects.project(projectId).listUsersForProject(role);
+      const response = await adminSession.resources.projects.project(project.id).listUsersForProject(role);
 
       expect(response.status).toBe(200);
       expect(response.data.users).toBeInstanceOf(Array);

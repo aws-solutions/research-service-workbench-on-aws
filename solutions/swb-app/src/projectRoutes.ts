@@ -177,9 +177,7 @@ export function setUpProjectRoutes(
           );
         }
 
-        // this call is needed to validate that project and group exists.
-        // If not - 404 will be returned
-        // TODO: use does group exist API
+        // this call is needed to validate that project and ensure group exists.
         const [projectResponse] = await Promise.allSettled([
           projectService.getProject({ projectId: validatedRequest.projectId }),
           userService.createRole(groupId)
@@ -187,6 +185,12 @@ export function setUpProjectRoutes(
 
         if (projectResponse.status === 'rejected') {
           throw projectResponse.reason;
+        }
+
+        const project = projectResponse.value;
+        if (project.status !== ProjectStatus.AVAILABLE) {
+          console.warn(`Cannot list users for project ${project.id} because status is ${project.status}`);
+          throw Boom.notFound(`Could not find project ${project.id}`);
         }
 
         const groups = await userService.getUserRoles(validatedRequest.userId);

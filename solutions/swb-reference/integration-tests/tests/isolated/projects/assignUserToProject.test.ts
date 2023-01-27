@@ -13,6 +13,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('assign user to project negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let project: { id: string };
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -20,6 +21,14 @@ describe('assign user to project negative tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    const costCenterId = setup.getSettings().get('costCenterId');
+    const { data } = await adminSession.resources.projects.create({
+      name: `TestProject-${uuidv4()}`,
+      description: 'Project for assign user to project tests',
+      costCenterId
+    });
+
+    project = data;
   });
 
   afterAll(async () => {
@@ -115,24 +124,9 @@ describe('assign user to project negative tests', () => {
       }
     });
 
-    test('cannot assing user to the same project', async () => {
-      let projectId = '';
-      const projects = await adminSession.resources.projects.get();
-      if (!projects.data.data.length) {
-        console.warn('There are no projects');
-
-        // dummy assertion to make sure that test always passes
-        // will be considered to move to multistep test:
-        // create user, project, asign/remove user from project, remove user/project
-        // as soon as project as a boundary feature is implemented
-        expect(true).toBeTruthy();
-        return;
-      }
-
-      projectId = projects.data.data[0].id;
-
+    test('cannot assign user to the same project', async () => {
       const response = await adminSession.resources.projects
-        .project(projectId)
+        .project(project.id)
         .assignUserToProject(userId ?? '', { role: 'Researcher' });
 
       expect(response.status).toBe(204);
@@ -140,11 +134,11 @@ describe('assign user to project negative tests', () => {
       // expect subsequent call to fail
       try {
         await adminSession.resources.projects
-          .project(projectId)
+          .project(project.id)
           .assignUserToProject(userId ?? '', { role: 'Researcher' });
 
         // if we are here - expectation is not fulfilled
-        console.error(`Assigning user ${userId} to the same project ${projectId} did not cause error`);
+        console.error(`Assigning user ${userId} to the same project ${project.id} did not cause error`);
         expect(false).toBeTruthy();
       } catch (e) {
         checkHttpError(
@@ -152,7 +146,7 @@ describe('assign user to project negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message: `User ${userId} is already assigned to the project ${projectId}`
+            message: `User ${userId} is already assigned to the project ${project.id}`
           })
         );
       }

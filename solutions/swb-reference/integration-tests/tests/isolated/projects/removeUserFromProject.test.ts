@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -11,6 +12,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('remove user from project negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let project: { id: string };
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -18,6 +20,15 @@ describe('remove user from project negative tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    const costCenterId = setup.getSettings().get('costCenterId');
+
+    const { data } = await adminSession.resources.projects.create({
+      name: `TestProject-${uuidv4()}`,
+      description: 'Project for list users for project tests',
+      costCenterId
+    });
+
+    project = data;
   });
 
   afterAll(async () => {
@@ -26,22 +37,8 @@ describe('remove user from project negative tests', () => {
 
   test('user does not exist', async () => {
     const fakeUserId = '00000000-0000-0000-0000-000000000000';
-    let projectId = '';
     try {
-      const projects = await adminSession.resources.projects.get();
-      if (!projects.data.data.length) {
-        console.warn('There are no projects');
-
-        // dummy assertion to make sure that test always passes
-        // will be considered to move to multistep test:
-        // create user, project, asign/remove user from project, remove user/project
-        // as soon as project as a boundary feature is implemented
-        expect(true).toBeTruthy();
-        return;
-      }
-
-      projectId = projects.data.data[0].id;
-      await adminSession.resources.projects.project(projectId).removeUserFromProject(fakeUserId);
+      await adminSession.resources.projects.project(project.id).removeUserFromProject(fakeUserId);
     } catch (e) {
       checkHttpError(
         e,
