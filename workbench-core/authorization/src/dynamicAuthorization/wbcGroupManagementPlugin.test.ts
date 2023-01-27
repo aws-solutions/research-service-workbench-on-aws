@@ -549,7 +549,7 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(ForbiddenError);
     });
 
-    it('throws ForbiddenError when status tried to go from  to deleted', async () => {
+    it('throws ForbiddenError when status tried to go from active to deleted', async () => {
       ddbMock
         .on(DeleteItemCommand)
         .rejects(new ConditionalCheckFailedException({ message: '', $metadata: {} }));

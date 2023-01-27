@@ -235,6 +235,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
           break;
         }
       }
+      return { data: { status: newStatus } };
     } catch (error) {
       if (error.name === 'ConditionalCheckFailedException') {
         throw new ForbiddenError(
@@ -249,7 +250,6 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       }
       throw error;
     }
-    return { data: { status: newStatus } };
   }
   public async doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse> {
     const { groupId } = request;
@@ -257,10 +257,9 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       const { data } = await this.getGroupStatus({
         groupId
       });
-      const exist = data.status === 'active';
       return {
         data: {
-          exist
+          exist: data.status === 'active'
         }
       };
     } catch (err) {
