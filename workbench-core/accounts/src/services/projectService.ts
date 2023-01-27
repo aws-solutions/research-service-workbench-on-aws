@@ -105,34 +105,36 @@ export default class ProjectService {
       return emptyResponse;
     }
 
+    //If user is ITAdmin
+    if (userGroupsForCurrentUser.includes('ITAdmin')) {
+      let queryParams: QueryParams = {
+        key: { name: 'resourceType', value: this._resourceType },
+        index: 'getResourceByCreatedAt',
+        limit: pageSize
+      };
+
+      const filterQuery = getFilterQueryParams(filter, listProjectGSINames);
+      const sortQuery = getSortQueryParams(sort, listProjectGSINames);
+      queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+
+      queryParams = addPaginationToken(paginationToken, queryParams);
+      console.log(queryParams);
+      const projectsResponse = await this._dynamoDBService.getPaginatedItems(queryParams);
+
+      paginationToken = projectsResponse.paginationToken;
+      const items = projectsResponse.data.map((item) => this._mapDDBItemToProject(item));
+
+      return {
+        data: items,
+        paginationToken
+      };
+    }
+
     if (userGroupsForCurrentUser.length === 1) {
-      if (userGroupsForCurrentUser[0] === 'ITAdmin') {
-        let queryParams: QueryParams = {
-          key: { name: 'resourceType', value: this._resourceType },
-          index: 'getResourceByCreatedAt',
-          limit: pageSize
-        };
-
-        const filterQuery = getFilterQueryParams(filter, listProjectGSINames);
-        const sortQuery = getSortQueryParams(sort, listProjectGSINames);
-        queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-
-        queryParams = addPaginationToken(paginationToken, queryParams);
-
-        const projectsResponse = await this._dynamoDBService.getPaginatedItems(queryParams);
-
-        paginationToken = projectsResponse.paginationToken;
-        const items = projectsResponse.data.map((item) => this._mapDDBItemToProject(item));
-
-        return {
-          data: items,
-          paginationToken
-        };
-      }
-
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
       const project = await this.getProject({ projectId: projectId });
+
       return {
         data: [project],
         paginationToken: undefined
