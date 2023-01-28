@@ -9,9 +9,8 @@ vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
 albInternetFacing: true
-# TODO: once this branch in dev, provide appropriate values
-#hostZoneId: ''
-#domainName: ''
+hostZoneId: 'Z0021810358T3Y7HQSY91'
+domainName: 'swbv2-demo.chamonix.public-sector.aws.a2z.com'
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
