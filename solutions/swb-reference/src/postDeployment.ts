@@ -34,7 +34,7 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    DYNAMIC_AUTH_TABLE_TAME
+    DYNAMIC_AUTH_TABLE_NAME
   } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -52,7 +52,7 @@ async function run(): Promise<void> {
 
   const dynamicAuthAwsService = new AwsService({
     region: AWS_REGION,
-    ddbTableName: DYNAMIC_AUTH_TABLE_TAME
+    ddbTableName: DYNAMIC_AUTH_TABLE_NAME
   });
 
   const userPoolId = await cognitoSetup.getUserPoolId();

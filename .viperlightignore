@@ -56,3 +56,6 @@ solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:110
+# Fake emails for user to project integ tests
+solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:108
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:49

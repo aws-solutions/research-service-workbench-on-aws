@@ -80,9 +80,12 @@ const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeCo
   aws.helpers.ddb
 );
 const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
-const projectService: ProjectService = new ProjectService({
-  TABLE_NAME: process.env.STACK_NAME!
-});
+const costCenterService: CostCenterService = new CostCenterService(aws.helpers.ddb);
+const projectService: ProjectService = new ProjectService(
+  aws.helpers.ddb,
+  dynamicAuthorizationService,
+  costCenterService
+);
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -119,7 +122,7 @@ const apiRouteConfig: ApiRouteConfig = {
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: envTypeConfigService,
-  projectService: projectService,
+  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
@@ -131,7 +134,8 @@ const apiRouteConfig: ApiRouteConfig = {
     envTypeConfigService,
     envTypeService
   ),
-  keyPairService: new KeyPairService(aws.helpers.ddb)
+  keyPairService: new KeyPairService(aws.helpers.ddb),
+  authorizationService: dynamicAuthorizationService
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

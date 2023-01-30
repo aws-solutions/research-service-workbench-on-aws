@@ -543,6 +543,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "qs",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "radix3",
       "allowedCategories": [ "production" ]
     },

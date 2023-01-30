@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "User to project association API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}
