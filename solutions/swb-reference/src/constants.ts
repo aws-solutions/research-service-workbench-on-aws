@@ -49,7 +49,6 @@ interface Constants {
   ALB_INTERNET_FACING: boolean;
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
-  USE_CLOUD_FRONT: boolean;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
@@ -70,7 +69,6 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const USE_CLOUD_FRONT = config.useCloudFront || false;
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
@@ -150,7 +148,6 @@ function getConstants(): Constants {
     VPC_ID_OUTPUT_KEY,
     HOSTED_ZONE_ID,
     DOMAIN_NAME,
-    USE_CLOUD_FRONT,
     ALB_SUBNET_IDS,
     ECS_SUBNET_IDS,
     ECS_SUBNET_IDS_OUTPUT_KEY,
@@ -177,7 +174,6 @@ interface Config {
   rootUserEmailParamStorePath: string;
   allowedOrigins: string[];
   cognitoDomain: string;
-  useCloudFront?: boolean;
   userPoolId?: string;
   clientId?: string;
   clientSecret?: string;

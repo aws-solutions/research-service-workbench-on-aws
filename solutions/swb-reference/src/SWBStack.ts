@@ -123,7 +123,6 @@ export class SWBStack extends Stack {
       ECS_SUBNET_AZS_OUTPUT_KEY,
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
-      USE_CLOUD_FRONT,
       ALB_INTERNET_FACING,
       FIELDS_TO_MASK_WHEN_AUDITING
     } = getConstants();
@@ -240,37 +239,27 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    new CfnOutput(this, 'useCloudFront', {
-      value: String(USE_CLOUD_FRONT)
+    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+    new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
+      value: swbVpc.vpc.vpcId
     });
 
-    if (!USE_CLOUD_FRONT) {
-      const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
-      new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
-        value: swbVpc.vpc.vpcId
-      });
+    new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
+      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+    });
 
-      new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
-        value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
-      });
+    new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
+      value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
+    });
 
-      new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
-        value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
-      });
+    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
 
-      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
-
-      const repository = new Repository(this, 'Repository', {
-        imageScanOnPush: true
-      });
-      new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
-        value: repository.repositoryName
-      });
-    } else {
-      new CfnOutput(this, 'apiUrlOutput', {
-        value: apiGwUrl
-      });
-    }
+    const repository = new Repository(this, 'Repository', {
+      imageScanOnPush: true
+    });
+    new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
+      value: repository.repositoryName
+    });
   }
 
   private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
