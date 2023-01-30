@@ -72,7 +72,7 @@ jobs:
           clientSecret: ${{ secrets.CLIENT_SECRET }}
           albSubnetIds: [${{ secrets.ALB_SUBNET_1 }}, ${{ secrets.ALB_SUBNET_2 }}]
           ecsSubnetIds: [${{ secrets.ECS_SUBNET_1 }}, ${{ secrets.ECS_SUBNET_2 }}]
-          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "../../solutions/swb-reference/src/config/swbv2-private.yaml"
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "solutions/swb-reference/src/config/swbv2-private.yaml"
 
       - name: Deploy SWB-Reference
         run: |
