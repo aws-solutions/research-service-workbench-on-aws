@@ -42,6 +42,8 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
       CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
+      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_TEST }}
+      DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_TEST }}
 
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
@@ -70,6 +72,8 @@ jobs:
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_DEMO }}
+      DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_DEMO }}
 
   deploy-example-app:
     needs: [pre-deployment-check]
