@@ -267,6 +267,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/authorization/groups/${groupIDRegExpAsString}/does-group-exist`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
   [`/authorization/groups/${groupIDRegExpAsString}`]: {
     DELETE: [
       {
