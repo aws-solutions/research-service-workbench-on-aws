@@ -41,7 +41,8 @@ jobs:
         shell: bash
         run: |
           echo "
-          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "../../solutions/swb-reference/src/config/demo.yaml"
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}
+          domainName: ${{ secrets.DOMAIN_NAME }}" >> "../../solutions/swb-reference/src/config/demo.yaml"
 
       - name: Deploy SWB-reference Demo
         run: |

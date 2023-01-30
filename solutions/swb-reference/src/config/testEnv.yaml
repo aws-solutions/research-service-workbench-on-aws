@@ -9,7 +9,6 @@ vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
 albInternetFacing: true
-domainName: 'swbv2-integ.chamonix.public-sector.aws.a2z.com'
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
