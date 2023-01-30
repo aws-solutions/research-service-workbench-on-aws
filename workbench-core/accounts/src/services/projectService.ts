@@ -118,7 +118,6 @@ export default class ProjectService {
       queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
       queryParams = addPaginationToken(paginationToken, queryParams);
-      console.log(queryParams);
       const projectsResponse = await this._dynamoDBService.getPaginatedItems(queryParams);
 
       paginationToken = projectsResponse.paginationToken;
