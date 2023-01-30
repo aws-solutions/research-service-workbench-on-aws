@@ -6,9 +6,12 @@
 /* eslint-disable security/detect-object-injection */
 
 import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
-  AwsService,
+  AuthenticatedUser,
+  DynamicAuthorizationService,
+  IdentityPermission
+} from '@aws/workbench-core-authorization';
+import {
   buildDynamoDBPkSk,
   QueryParams,
   resourceTypeToKey,
@@ -20,10 +23,10 @@ import {
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
-  PaginatedResponse
+  PaginatedResponse,
+  DynamoDBService
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
-import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
 import { CostCenter } from '../models/costCenters/costCenter';
 import { CreateProjectRequest } from '../models/projects/createProjectRequest';
@@ -36,18 +39,20 @@ import { manualFilterProjects, manualSortProjects } from '../utilities/projectUt
 import CostCenterService from './costCenterService';
 
 export default class ProjectService {
-  private _aws: AwsService;
   private _resourceType: string = 'project';
-  private _tableName: string;
-  // TODO implement after dynamic AuthZ
-  // private _dynamicAuthorizationService: DynamicAuthorizationService;
+  private readonly _dynamoDBService: DynamoDBService;
 
-  public constructor(constants: { TABLE_NAME: string }) {
-    const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
-    // TODO implement after dynamic AuthZ
-    // this._dynamicAuthorizationService = new DynamicAuthorizationService();
+  private _dynamicAuthorizationService: DynamicAuthorizationService;
+  private _costCenterService: CostCenterService;
+
+  public constructor(
+    dynamoDBService: DynamoDBService,
+    dynamicAuthZService: DynamicAuthorizationService,
+    costCenterService: CostCenterService
+  ) {
+    this._dynamoDBService = dynamoDBService;
+    this._dynamicAuthorizationService = dynamicAuthZService;
+    this._costCenterService = costCenterService;
   }
 
   /**
@@ -57,7 +62,7 @@ export default class ProjectService {
    * @returns Project entry in DDB
    */
   public async getProject(request: GetProjectRequest): Promise<Project> {
-    const response = await this._aws.helpers.ddb.getItem({
+    const response = await this._dynamoDBService.getItem({
       key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project)
     });
 
@@ -66,11 +71,6 @@ export default class ProjectService {
     }
 
     return this._mapDDBItemToProject(response);
-  }
-
-  // TODO--delete after dynamic Authz
-  private _mockGetUserGroups(): string[] {
-    return ['ITAdmin'];
   }
 
   /**
@@ -89,46 +89,55 @@ export default class ProjectService {
     pageSize = pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE;
     validateSingleSortAndFilter(filter, sort);
 
-    // Get user groups--TODO implement after dynamic AuthZ
-    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.userId);
-    const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
+    const emptyResponse = {
+      data: [],
+      paginationToken: undefined
+    };
 
-    // If no group membership, return
-    if (_.isEmpty(userGroupsForCurrentUser)) {
-      return { data: [], paginationToken: undefined };
+    const getUserGroupsResponse = await this._dynamicAuthorizationService.getUserGroups({
+      authenticatedUser: request.user,
+      userId: request.user.id
+    });
+
+    const userGroupsForCurrentUser = getUserGroupsResponse.data.groupIds;
+
+    if (!userGroupsForCurrentUser.length) {
+      return emptyResponse;
     }
 
-    // If IT Admin, return all with pagination
+    //If user is ITAdmin
+    if (userGroupsForCurrentUser.includes('ITAdmin')) {
+      let queryParams: QueryParams = {
+        key: { name: 'resourceType', value: this._resourceType },
+        index: 'getResourceByCreatedAt',
+        limit: pageSize
+      };
+
+      const filterQuery = getFilterQueryParams(filter, listProjectGSINames);
+      const sortQuery = getSortQueryParams(sort, listProjectGSINames);
+      queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+
+      queryParams = addPaginationToken(paginationToken, queryParams);
+      const projectsResponse = await this._dynamoDBService.getPaginatedItems(queryParams);
+
+      paginationToken = projectsResponse.paginationToken;
+      const items = projectsResponse.data.map((item) => this._mapDDBItemToProject(item));
+
+      return {
+        data: items,
+        paginationToken
+      };
+    }
+
     if (userGroupsForCurrentUser.length === 1) {
-      if (userGroupsForCurrentUser[0] === 'ITAdmin') {
-        let queryParams: QueryParams = {
-          key: { name: 'resourceType', value: this._resourceType },
-          index: 'getResourceByCreatedAt',
-          limit: pageSize
-        };
-
-        const filterQuery = getFilterQueryParams(filter, listProjectGSINames);
-        const sortQuery = getSortQueryParams(sort, listProjectGSINames);
-        queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-
-        queryParams = addPaginationToken(paginationToken, queryParams);
-
-        const projectsResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-
-        paginationToken = projectsResponse.paginationToken;
-
-        if (projectsResponse.data) {
-          const items = projectsResponse.data.map((item) => this._mapDDBItemToProject(item));
-          return { data: items, paginationToken: paginationToken };
-        } else {
-          return { data: [], paginationToken: undefined };
-        }
-      }
-
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
       const project = await this.getProject({ projectId: projectId });
-      return { data: [project], paginationToken: undefined };
+
+      return {
+        data: [project],
+        paginationToken: undefined
+      };
     }
 
     // Else, member of more than 1 group, batch get items and manually filter, sort, and paginate
@@ -138,12 +147,12 @@ export default class ProjectService {
     const keys: Record<string, unknown>[] = projectIds.map((projectId) =>
       buildDynamoDBPkSk(projectId, resourceTypeToKey.project)
     );
-    const projectsResponse = (await this._aws.helpers.ddb.get(keys).execute()) as BatchGetItemCommandOutput;
+    const projectsResponse = (await this._dynamoDBService.get(keys).execute()) as BatchGetItemCommandOutput;
     if (!projectsResponse.Responses) {
       return { data: [], paginationToken: undefined };
     }
     // parse responses from DDB
-    const projects: Project[] = projectsResponse.Responses[this._tableName].map((item) =>
+    const projects: Project[] = projectsResponse.Responses[this._dynamoDBService.getTableName()].map((item) =>
       this._mapDDBItemToProject(item)
     );
     // apply sort or filter
@@ -170,12 +179,6 @@ export default class ProjectService {
    * @returns Project object of new project
    */
   public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
-    // Verify caller is an IT Admin--TODO implement after dynamic AuthZ--this can happen in the middleware during integration but keeping here so this code gets moved properly
-    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(user.id);
-    // if(userGroupsForCurrentUser.length !== 1 || userGroupsForCurrentUser[0] !== 'ITAdmin') {
-    //   throw Boom.forbidden('Only IT Admins are allowed to create new Projects.');
-    // }
-
     // Verify project name is unique and cost center exists
     const resultsFromValidityChecks = await Promise.all([
       this._isProjectNameInUse(params.name),
@@ -186,32 +189,22 @@ export default class ProjectService {
     // Generate Project ID
     const projectId = uuidWithLowercasePrefix(resourceTypeToKey.project);
 
-    // Create ProjectAdmin and Researcher groups--TODO implement after dynamic AuthZ
-    // const createProjectAdminGroupResponse = this._dynamicAuthorizationService.createGroup(user, {
-    //   groupId: `${projId}#PA`,
-    //   description: `Project Admin group for ${projId}`
-    // });
-    // const createResearcherGroupResponse = this._dynamicAuthorizationService.createGroup(user, {
-    //   groupId: `${projId}#Researcher`,
-    //   description: `Researcher group for ${projId}`
-    // });
-    // if (!createProjectAdminGroupResponse.created || !createResearcherGroupResponse.created) {
-    //   throw Boom.badImplementation(
-    //     'Failed to create Project Admin group or Researcher group with dynamic authorization service.'
-    //   );
-    // }
+    await this._dynamicAuthorizationService.createGroup({
+      authenticatedUser: user,
+      groupId: `${projectId}#ProjectAdmin`,
+      description: `Project Admin group for ${projectId}`
+    });
+    await this._dynamicAuthorizationService.createGroup({
+      authenticatedUser: user,
+      groupId: `${projectId}#Researcher`,
+      description: `Researcher group for ${projectId}`
+    });
 
-    // Create Permissions for the groups--TODO implement after dynamic AuthZ
-    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
-    // const createIdentityPermissionsResponse = this._dynamicAuthorizationService.createIdentityPermissions(
-    //   user,
-    //   identityPermissions
-    // );
-    // if (!createIdentityPermissionsResponse.created) {
-    //   throw Boom.badImplementation(
-    //     'Failed to create batch identity permissions for project with dyamic authorization service.'
-    //   );
-    // }
+    const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
+    await this._dynamicAuthorizationService.createIdentityPermissions({
+      authenticatedUser: user,
+      identityPermissions: identityPermissions
+    });
 
     // Create Proj in DDB
     const currentTime = new Date(Date.now()).toISOString();
@@ -236,7 +229,7 @@ export default class ProjectService {
       accountId: costCenter.accountId
     };
     try {
-      await this._aws.helpers.ddb.updateExecuteAndFormat({
+      await this._dynamoDBService.updateExecuteAndFormat({
         key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
         params: {
           item: this._mapToDDBItemFromProject(newProject)
@@ -275,7 +268,7 @@ export default class ProjectService {
 
     // update project DDB item
     try {
-      const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      const updateResponse = await this._dynamoDBService.updateExecuteAndFormat({
         key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
         params: { item: updatedValues, return: 'ALL_NEW' }
       });
@@ -301,46 +294,39 @@ export default class ProjectService {
     request: DeleteProjectRequest,
     checkDependencies: (projectId: string) => Promise<void>
   ): Promise<void> {
+    const { projectId, authenticatedUser } = request;
+
     // verify all dependencies are empty
-    await checkDependencies(request.projectId);
+    await checkDependencies(projectId);
 
     // verify project exists
-    await this.getProject({ projectId: request.projectId });
+    await this.getProject({ projectId });
 
-    // Delete Permissions for the groups--TODO implement after dynamic AuthZ
-    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
-    // const deleteIdentityPermissionsResponse = this._dynamicAuthorizationService.deleteIdentityPermissions(
-    //   identityPermissions
-    // );
-    // if (!createIdentityPermissionsResponse.deleted) {
-    //   throw Boom.badImplementation(
-    //     'Failed to delete batch identity permissions for project with dyamic authorization service.'
-    //   );
-    // }
+    const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
+    await this._dynamicAuthorizationService.deleteIdentityPermissions({
+      authenticatedUser,
+      identityPermissions
+    });
 
-    // Delete ProjectAdmin and Researcher groups--TODO implement after dynamic AuthZ
-    // const deleteProjectAdminGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
-    //   groupId: `${projId}#PA`
-    // });
-    // const deleteResearcherGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
-    //   groupId: `${projId}#Researcher`
-    // });
-    // if (!deleteProjectAdminGroupResponse.created || !deleteResearcherGroupResponse.created) {
-    //   throw Boom.badImplementation(
-    //     'Failed to delete Project Admin group or Researcher group with dynamic authorization service.'
-    //   );
-    // }
+    await this._dynamicAuthorizationService.deleteGroup({
+      authenticatedUser,
+      groupId: `${projectId}#ProjectAdmin`
+    });
+    await this._dynamicAuthorizationService.deleteGroup({
+      authenticatedUser,
+      groupId: `${projectId}#Researcher`
+    });
 
     // delete from DDB
     try {
-      await this._aws.helpers.ddb.updateExecuteAndFormat({
-        key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
+      await this._dynamoDBService.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
         params: {
           item: { resourceType: `${this._resourceType}_deleted`, status: ProjectStatus.DELETED }
         }
       });
     } catch (e) {
-      console.error(`Failed to delete project ${request.projectId}}`, e);
+      console.error(`Failed to delete project ${projectId}}`, e);
       throw Boom.internal('Could not delete Project');
     }
   }
@@ -423,7 +409,7 @@ export default class ProjectService {
       sortKey: 'name',
       eq: { S: projectName }
     };
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    const response = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     // If anything is responded, name is in use so error
     if (response.data.length !== 0) {
@@ -435,10 +421,8 @@ export default class ProjectService {
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const costCenterService = new CostCenterService(this._aws.helpers.ddb);
-
     try {
-      return costCenterService.getCostCenter(costCenterId);
+      return this._costCenterService.getCostCenter(costCenterId);
     } catch (e) {
       throw Boom.badRequest(`Could not find cost center ${costCenterId}`);
     }
@@ -458,93 +442,109 @@ export default class ProjectService {
       limit: 1
     };
 
-    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    const associatedProjResponse = await this._dynamoDBService.getPaginatedItems(queryParams);
     return associatedProjResponse.data.length > 0;
   }
 
-  // TODO--implement after dynamic AuthZ
-  // private _generateIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
-  //   return [
-  //     {
-  //       // create for PA
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#PA`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.CREATE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'InternalDataset', 'SSHKey', 'User']
-  //     },
-  //     {
-  //       // read for PA
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#PA`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.READ',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'EnvTypeConfig', 'InternalDataset', 'SSHKey', 'User']
-  //     },
-  //     {
-  //       // update for PA
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#PA`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.UPDATE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'InternalDataset', 'SSHKey']
-  //     },
-  //     {
-  //       // delete for PA
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#PA`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.DELETE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'InternalDataset', 'SSHKey', 'User']
-  //     },
-  //     {
-  //       // create for Researcher
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#Researcher`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.CREATE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'SSHKey']
-  //     },
-  //     {
-  //       // read for Researcher
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#Researcher`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.READ',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'EnvTypeConfig', 'InternalDataset', 'SSHKey']
-  //     },
-  //     {
-  //       // update for Researcher
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#Researcher`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.UPDATE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'SSHKey']
-  //     },
-  //     {
-  //       // delete for Researcher
-  //       identityType: 'GROUP',
-  //       identityId: `${projectId}#Researcher`,
-  //       effect: 'ALLOW',
-  //       action: 'Action.DELETE',
-  //       subject: 'Project',
-  //       subjectId: projectId,
-  //       fields: ['Environment', 'SSHKey']
-  //     }
-  //   ];
-  // }
+  /***
+   * Generates the default identity permissions for the project
+   * @param projectId - the project the permissions are being generated for
+   * @returns an array of Identity Permissions
+   */
+  private _generateIdentityPermissionsForProject(projectId: string): IdentityPermission[] {
+    const identityType = 'GROUP';
+    const effect = 'ALLOW';
+    const subjectType = 'Project';
+    const subjectId = projectId;
+    const projectAdminIdentity = `${projectId}#ProjectAdmin`;
+    const researcherIdentity = `${projectId}#Researcher`;
+
+    const projectAdminPermissions: IdentityPermission[] = [
+      {
+        // create for PA
+        identityType,
+        identityId: projectAdminIdentity,
+        effect,
+        action: 'CREATE',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'InternalDataset', 'SSHKey', 'User']
+      },
+      {
+        // read for PA
+        identityType,
+        identityId: projectAdminIdentity,
+        effect,
+        action: 'READ',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'EnvTypeConfig', 'InternalDataset', 'SSHKey', 'User']
+      },
+      {
+        // update for PA
+        identityType,
+        identityId: projectAdminIdentity,
+        effect,
+        action: 'UPDATE',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'InternalDataset', 'SSHKey']
+      },
+      {
+        // delete for PA
+        identityType,
+        identityId: projectAdminIdentity,
+        effect,
+        action: 'DELETE',
+        subjectType: 'Project',
+        subjectId: projectId,
+        fields: ['Environment', 'InternalDataset', 'SSHKey', 'User']
+      }
+    ];
+
+    const researcherPermissions: IdentityPermission[] = [
+      {
+        // create for Researcher
+        identityType,
+        identityId: researcherIdentity,
+        effect,
+        action: 'CREATE',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'SSHKey']
+      },
+      {
+        // read for Researcher
+        identityType,
+        identityId: researcherIdentity,
+        effect,
+        action: 'READ',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'EnvTypeConfig', 'InternalDataset', 'SSHKey']
+      },
+      {
+        // update for Researcher
+        identityType,
+        identityId: researcherIdentity,
+        effect,
+        action: 'UPDATE',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'SSHKey']
+      },
+      {
+        // delete for Researcher
+        identityType,
+        identityId: researcherIdentity,
+        effect,
+        action: 'DELETE',
+        subjectType,
+        subjectId,
+        fields: ['Environment', 'SSHKey']
+      }
+    ];
+
+    return projectAdminPermissions.concat(researcherPermissions);
+  }
 }

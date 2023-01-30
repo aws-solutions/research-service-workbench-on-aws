@@ -55,7 +55,7 @@ interface Constants {
 
 interface SecretConstants {
   ROOT_USER_EMAIL: string;
-  DYNAMIC_AUTH_TABLE_TAME: string;
+  DYNAMIC_AUTH_TABLE_NAME: string;
 }
 
 //CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
@@ -167,7 +167,7 @@ async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   const rootUserParamStorePath = config.rootUserEmailParamStorePath;
 
   const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
-  return { ...getConstants(), ROOT_USER_EMAIL, DYNAMIC_AUTH_TABLE_TAME: getDynamicAuthTableName() };
+  return { ...getConstants(), ROOT_USER_EMAIL, DYNAMIC_AUTH_TABLE_NAME: getDynamicAuthTableName() };
 }
 
 interface Config {

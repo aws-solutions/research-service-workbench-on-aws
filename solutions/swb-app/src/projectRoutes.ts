@@ -61,7 +61,7 @@ export function setUpProjectRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListProjectsRequest>(ListProjectsRequestParser, {
         ...req.query,
-        userId: res.locals.user.id
+        user: res.locals.user
       });
 
       res.send(await projectService.listProjects(validatedRequest));
@@ -131,7 +131,8 @@ export function setUpProjectRoutes(
       }
       // validate request
       const validatedRequest = validateAndParse<DeleteProjectRequest>(DeleteProjectRequestParser, {
-        ...req.params
+        ...req.params,
+        authenticatedUser: res.locals.user
       });
       // delete project
       await projectService.softDeleteProject(validatedRequest, checkDependencies);
