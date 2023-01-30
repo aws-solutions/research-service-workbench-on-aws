@@ -21,11 +21,17 @@ describe('assign user to project negative tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    const costCenterId = setup.getSettings().get('costCenterId');
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: 'test cost center',
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test object'
+    });
+
     const { data } = await adminSession.resources.projects.create({
       name: `TestProject-${uuidv4()}`,
       description: 'Project for assign user to project tests',
-      costCenterId
+      costCenterId: costCenter.id
     });
 
     project = data;
