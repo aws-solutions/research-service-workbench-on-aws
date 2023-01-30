@@ -21,6 +21,8 @@ on:
         required: true
       HOSTED_ZONE_ID:
         required: true
+      DOMAIN_NAME:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
