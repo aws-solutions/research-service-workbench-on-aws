@@ -4,15 +4,26 @@
  */
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
 describe('multiStep project tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
   let costCenterId: string;
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+  let projectName: string;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    costCenterId = setup.getSettings().get('costCenterId');
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: 'project integration test cost center',
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test object'
+    });
+
+    costCenterId = costCenter.id;
+    projectName = randomTextGenerator.getFakeText('test-project-name');
   });
 
   afterAll(async () => {
@@ -22,7 +33,7 @@ describe('multiStep project tests', () => {
   test('happy path', async () => {
     console.log('Creating Project');
     const { data: createdProject } = await adminSession.resources.projects.create({
-      name: 'Dragon Project',
+      name: projectName,
       description: 'Project for TOP SECRET dragon research',
       costCenterId
     });
@@ -33,13 +44,12 @@ describe('multiStep project tests', () => {
 
     console.log('Listing Projects');
     const { data: listProject } = await adminSession.resources.projects.get({
-      'filter[name][eq]': 'Dragon Project'
+      'filter[name][eq]': createdProject.name
     });
-    expect(listProject.data.length).toEqual(1);
-    expect(listProject.data[0]).toMatchObject(createdProject);
+    expect(listProject.data).toEqual([createdProject]);
 
     console.log('Updating Project');
-    const newName = 'Totally Normal Project';
+    const newName = randomTextGenerator.getFakeText('test-project-name');
     const newDescription = 'Not a Project studying dragons!';
     const { data: updatedProject } = await adminSession.resources.projects
       .project(createdProject.id)
@@ -52,14 +62,14 @@ describe('multiStep project tests', () => {
 
     console.log("Listing projects doesn't return deleted project");
     const { data: listProjectAfterDelete } = await adminSession.resources.projects.get({
-      'filter[name][eq]': 'Totally Normal Project'
+      'filter[name][eq]': newName
     });
     expect(listProjectAfterDelete.data.length).toEqual(0);
   });
 
   test('createProject', async () => {
     console.log('Creating Project');
-    const projectName = 'Unique Name!';
+    const projectName = randomTextGenerator.getFakeText('test-project-name');
     const { data: createdProject1 } = await adminSession.resources.projects.create({
       name: projectName,
       description: 'My uniquely name project',
@@ -86,12 +96,14 @@ describe('multiStep project tests', () => {
   test('updateProject', async () => {
     console.log('Creating Two Projects');
     const { data: createdProject1 } = await adminSession.resources.projects.create({
-      name: 'Top Priority Project',
+      name: projectName,
       description: 'Currently top of my todo list',
       costCenterId
     });
+
+    const otherName = randomTextGenerator.getFakeText('test-project-name');
     const { data: createdProject2 } = await adminSession.resources.projects.create({
-      name: 'Other Project',
+      name: otherName,
       description: 'Backlog project',
       costCenterId
     });
