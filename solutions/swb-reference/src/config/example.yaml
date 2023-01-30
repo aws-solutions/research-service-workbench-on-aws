@@ -20,7 +20,7 @@
 # If you want internet-facing put value `true` else `false`
 #albInternetFacing: true
 
-#hostZoneId: ''
+#hostedZoneId: ''
 #domainName: ''
 # Auditing
 #fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]
