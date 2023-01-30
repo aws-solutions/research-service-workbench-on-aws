@@ -317,7 +317,7 @@ export default class ProjectService {
     );
     await this._dynamicAuthorizationService.deleteIdentityPermissions({
       authenticatedUser: request.authenticatedUser,
-      identityPermissions: identityPermissions
+      identityPermissions
     });
 
     await this._dynamicAuthorizationService.deleteGroup({
