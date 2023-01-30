@@ -10,7 +10,6 @@ albSubnetIds: []
 ecsSubnetIds: []
 albInternetFacing: true
 domainName: 'swbv2-integ.chamonix.public-sector.aws.a2z.com'
-hostedZoneId: 'Z09298172E304LQEQAQXX'
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']

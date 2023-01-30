@@ -9,7 +9,6 @@ vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
 albInternetFacing: true
-hostedZoneId: 'Z0021810358T3Y7HQSY91'
 domainName: 'swbv2-demo.chamonix.public-sector.aws.a2z.com'
 
 # Auditing
