@@ -180,17 +180,6 @@ export default class ProjectService {
    * @returns Project object of new project
    */
   public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
-    const getUserGroupsResponse = await this._dynamicAuthorizationService.getUserGroups({
-      authenticatedUser: user,
-      userId: user.id
-    });
-
-    const userGroupsForCurrentUser = getUserGroupsResponse.data.groupIds || [];
-
-    if (!userGroupsForCurrentUser.includes('ITAdmin')) {
-      throw Boom.forbidden('Only IT Admins are allowed to create new Projects.');
-    }
-
     // Verify project name is unique and cost center exists
     const resultsFromValidityChecks = await Promise.all([
       this._isProjectNameInUse(params.name),
@@ -306,39 +295,39 @@ export default class ProjectService {
     request: DeleteProjectRequest,
     checkDependencies: (projectId: string) => Promise<void>
   ): Promise<void> {
+    const { projectId, authenticatedUser } = request;
+
     // verify all dependencies are empty
-    await checkDependencies(request.projectId);
+    await checkDependencies(projectId);
 
     // verify project exists
-    await this.getProject({ projectId: request.projectId });
+    await this.getProject({ projectId });
 
-    const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(
-      request.projectId
-    );
+    const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
     await this._dynamicAuthorizationService.deleteIdentityPermissions({
-      authenticatedUser: request.authenticatedUser,
+      authenticatedUser,
       identityPermissions
     });
 
     await this._dynamicAuthorizationService.deleteGroup({
-      authenticatedUser: request.authenticatedUser,
-      groupId: `${request.projectId}#ProjectAdmin`
+      authenticatedUser,
+      groupId: `${projectId}#ProjectAdmin`
     });
     await this._dynamicAuthorizationService.deleteGroup({
-      authenticatedUser: request.authenticatedUser,
-      groupId: `${request.projectId}#Researcher`
+      authenticatedUser,
+      groupId: `${projectId}#Researcher`
     });
 
     // delete from DDB
     try {
       await this._dynamoDBService.updateExecuteAndFormat({
-        key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
         params: {
           item: { resourceType: `${this._resourceType}_deleted`, status: ProjectStatus.DELETED }
         }
       });
     } catch (e) {
-      console.error(`Failed to delete project ${request.projectId}}`, e);
+      console.error(`Failed to delete project ${projectId}}`, e);
       throw Boom.internal('Could not delete Project');
     }
   }
@@ -458,6 +447,11 @@ export default class ProjectService {
     return associatedProjResponse.data.length > 0;
   }
 
+  /***
+   * Generates the default identity permissions for the project
+   * @param projectId - the project the permissions are being generated for
+   * @returns an array of Identity Permissions
+   */
   private _generateIdentityPermissionsForProject(projectId: string): IdentityPermission[] {
     const identityType = 'GROUP';
     const effect = 'ALLOW';
