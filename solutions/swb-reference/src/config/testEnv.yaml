@@ -9,8 +9,6 @@ vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
 albInternetFacing: true
-#domainName: 'chamonix-dev-test-domain.example.com'
-#hostedZoneId: ''
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
