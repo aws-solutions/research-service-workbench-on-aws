@@ -11,3 +11,6 @@ cognitoDomain: 'swbv2-private'
 albInternetFacing: true
 
 domainName: 'swbv2-private.chamonix.public-sector.aws.a2z.com'
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
