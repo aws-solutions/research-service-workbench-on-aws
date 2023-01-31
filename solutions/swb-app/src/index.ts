@@ -16,22 +16,28 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
-import { ProjectAccessRequestParser } from './dataSets/projectAccessRequestParser';
 import { generateRouter } from './generateRouter';
+import { CreateKeyPairRequest } from './keyPairs/createKeyPairRequest';
+import { CreateKeyPairResponse } from './keyPairs/createKeyPairResponse';
+import { DeleteKeyPairRequest } from './keyPairs/deleteKeyPairRequest';
+import { GetKeyPairRequest } from './keyPairs/getKeyPairRequest';
+import { GetKeyPairResponse } from './keyPairs/getKeyPairResponse';
+import { KeyPair, KeyPairParser } from './keyPairs/keyPair';
+import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
+import { ListKeyPairsRequest } from './keyPairs/listKeyPairsRequest';
+import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
+import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
-import { AuthenticatedUser, AuthenticatedUserParser } from './users/authenticatedUser';
 
 export {
   generateRouter,
   AddRemoveAccessPermissionRequest,
   ApiRouteConfig,
   ApiRoute,
-  AuthenticatedUserParser,
-  AuthenticatedUser,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetAddExternalEndpointResponse,
@@ -46,5 +52,15 @@ export {
   PermissionsResponse,
   PermissionsResponseParser,
   ProjectEnvTypeConfigPlugin,
-  ProjectAccessRequestParser
+  CreateKeyPairRequest,
+  CreateKeyPairResponse,
+  DeleteKeyPairRequest,
+  GetKeyPairRequest,
+  GetKeyPairResponse,
+  KeyPair,
+  KeyPairParser,
+  KeyPairPlugin,
+  ListKeyPairsRequest,
+  SendPublicKeyRequest,
+  SendPublicKeyResponse
 };

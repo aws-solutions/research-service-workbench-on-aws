@@ -5,7 +5,10 @@
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
-import { dataSetPrefix, endPointPrefix } from './constants';
+import { dataSetPrefix, endpointPrefix } from './constants';
+
+const dataSetRegExpAsString: string = `${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`;
+const endpointRegExpAsString: string = `${endpointPrefix.toLowerCase()}-${uuidRegExpAsString}`;
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -52,7 +55,89 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`]: {
+  '/datasets/storage': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Storage'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/permissions/users/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetAccess'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/permissions/roles/${groupIDRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetAccess'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/permissions`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetAccess'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/presignedUpload`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetFile'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/share/${endpointRegExpAsString}/mount-object`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetMountObject'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/share/${endpointRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Endpoint'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}/share`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Endpoint'
+      }
+    ]
+  },
+  [`/datasets/${dataSetRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -63,83 +148,6 @@ export const routesMap: RoutesMap = {
       {
         action: 'DELETE',
         subject: 'Dataset'
-      }
-    ]
-  },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'DatasetAccess'
-      }
-    ],
-    GET: [
-      {
-        action: 'READ',
-        subject: 'DatasetAccess'
-      }
-    ]
-  },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/users/${uuidRegExpAsString}`]:
-    {
-      GET: [
-        {
-          action: 'READ',
-          subject: 'DatasetAccess'
-        }
-      ],
-      DELETE: [
-        {
-          action: 'DELETE',
-          subject: 'DatasetAccess'
-        }
-      ]
-    },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions/roles/${groupIDRegExpAsString}`]:
-    {
-      GET: [
-        {
-          action: 'READ',
-          subject: 'DatasetAccess'
-        }
-      ],
-      DELETE: [
-        {
-          action: 'DELETE',
-          subject: 'DatasetAccess'
-        }
-      ]
-    },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'Endpoint'
-      }
-    ]
-  },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/presignedUpload`]: {
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'DatasetFile'
-      }
-    ]
-  },
-  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}}/share/${endPointPrefix.toLowerCase()}-${uuidRegExpAsString}`]:
-    {
-      DELETE: [
-        {
-          action: 'DELETE',
-          subject: 'Endpoint'
-        }
-      ]
-    },
-  '/datasets/storage': {
-    GET: [
-      {
-        action: 'READ',
-        subject: 'Storage'
       }
     ]
   },
@@ -259,6 +267,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/authorization/groups/${groupIDRegExpAsString}/does-group-exist`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
   [`/authorization/groups/${groupIDRegExpAsString}`]: {
     DELETE: [
       {
@@ -295,6 +311,12 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'IdentityPermission'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
     ]
   },
   '/authorization/routes/ignored': {
@@ -310,6 +332,14 @@ export const routesMap: RoutesMap = {
       {
         action: 'READ',
         subject: 'Routes'
+      }
+    ]
+  },
+  '/authorization/authorize/subject': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Subject'
       }
     ]
   }

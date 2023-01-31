@@ -130,7 +130,10 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId);
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, {
+      id: '',
+      roles: []
+    });
     return PermissionsResponseParser.parse(response);
   }
 

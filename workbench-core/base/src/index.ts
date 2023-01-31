@@ -34,6 +34,7 @@ import {
   toPaginationToken,
   fromPaginationToken
 } from './utilities/paginationHelper';
+import { runInBatches } from './utilities/promiseUtils';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -47,7 +48,8 @@ import {
   envTypeIdRegExpString,
   productIdRegExpString,
   provisionArtifactIdRegExpString,
-  groupIDRegExpAsString
+  groupIDRegExpAsString,
+  validRolesRegExpAsString
 } from './utilities/textUtil';
 import { validateAndParse } from './utilities/validatorHelper';
 
@@ -75,6 +77,7 @@ export {
   QueryStringParamFilterParser,
   QueryNumberParamFilter,
   QueryNumberParamFilterParser,
+  validRolesRegExpAsString,
   QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,
@@ -95,5 +98,6 @@ export {
   RelationshipDDBItemParser,
   RelationshipDDBItem,
   toPaginationToken,
-  fromPaginationToken
+  fromPaginationToken,
+  runInBatches
 };

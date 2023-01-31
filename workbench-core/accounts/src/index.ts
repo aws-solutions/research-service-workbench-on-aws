@@ -25,6 +25,10 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
+import {
+  AssignUserToProjectRequest,
+  AssignUserToProjectRequestParser
+} from './models/projects/assignUserToProjectRequest';
 import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
@@ -69,5 +73,7 @@ export {
   UpdateAccountRequestParser,
   UpdateAccountRequest,
   GetAccountRequestParser,
-  GetAccountRequest
+  GetAccountRequest,
+  AssignUserToProjectRequestParser,
+  AssignUserToProjectRequest
 };

@@ -23,8 +23,17 @@ import {
   IsRouteProtectedRequest,
   IsRouteProtectedRequestParser,
   IsRouteIgnoredRequest,
-  IsRouteIgnoredRequestParser
+  IsRouteIgnoredRequestParser,
+  IsAuthorizedOnSubjectRequest,
+  isForbiddenError,
+  IsAuthorizedOnSubjectRequestParser,
+  DoesGroupExistRequest,
+  DoesGroupExistRequestParser
 } from '@aws/workbench-core-authorization';
+import {
+  DeleteSubjectIdentityPermissionsRequest,
+  DeleteSubjectIdentityPermissionsRequestParser
+} from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
@@ -121,7 +130,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
 
         res.status(200).send(response.data);
       } catch (error) {
-        if (isGroupNotFoundError(error)) {
+        if (isGroupNotFoundError(error) || isForbiddenError(error)) {
           throw Boom.notFound(error.message);
         }
         if (isRetryError(error)) {
@@ -200,7 +209,16 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       }
     })
   );
-
+  router.get(
+    '/authorization/groups/:groupId/does-group-exist',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DoesGroupExistRequest>(DoesGroupExistRequestParser, {
+        groupId: req.params.groupId
+      });
+      const { data } = await service.doesGroupExist(validatedRequest);
+      res.status(200).send(data);
+    })
+  );
   router.post(
     '/authorization/permissions',
     wrapAsync(async (req: Request, res: Response) => {
@@ -234,7 +252,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         req.query
       );
       const { data } = await service.getIdentityPermissionsByIdentity(validatedRequest);
-      res.status(201).send(data);
+      res.status(200).send(data);
     })
   );
   router.get(
@@ -250,11 +268,26 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           req.query
         );
         const { data } = await service.getIdentityPermissionsBySubject(validatedRequest);
-        res.status(201).send(data);
+        res.status(200).send(data);
       } catch (err) {
         if (isThroughputExceededError(err)) throw Boom.tooManyRequests('Too many identities');
         throw err;
       }
+    })
+  );
+  router.delete(
+    '/authorization/permissions/subject',
+    wrapAsync(async (req: Request, res: Response) => {
+      const authenticatedUser = res.locals.user;
+      const validatedRequest = validateAndParse<DeleteSubjectIdentityPermissionsRequest>(
+        DeleteSubjectIdentityPermissionsRequestParser,
+        {
+          ...req.body,
+          authenticatedUser
+        }
+      );
+      const { data } = await service.deleteSubjectIdentityPermissions(validatedRequest);
+      res.status(201).send(data);
     })
   );
 
@@ -271,7 +304,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           }
         );
         const { data } = await service.deleteIdentityPermissions(validatedRequest);
-        res.status(201).send(data);
+        res.status(200).send(data);
       } catch (err) {
         if (isThroughputExceededError(err))
           throw Boom.tooManyRequests('Exceed limit on deletion of permissions');
@@ -289,7 +322,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         req.query
       );
       const { data } = await service.isRouteProtected(validatedRequest);
-      res.status(201).send(data);
+      res.status(200).send(data);
     })
   );
 
@@ -301,7 +334,28 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         req.query
       );
       const { data } = await service.isRouteIgnored(validatedRequest);
-      res.status(201).send(data);
+      res.status(200).send(data);
+    })
+  );
+
+  router.get(
+    '/authorization/authorize/subject',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        req.query.authenticatedUser = JSON.parse(req.query.authenticatedUser as string);
+        req.query.dynamicOperation = JSON.parse(req.query.dynamicOperation as string);
+        const validatedRequest = validateAndParse<IsAuthorizedOnSubjectRequest>(
+          IsAuthorizedOnSubjectRequestParser,
+          req.query
+        );
+        await service.isAuthorizedOnSubject(validatedRequest);
+        res.status(204).send();
+      } catch (err) {
+        if (isForbiddenError(err)) {
+          throw Boom.forbidden('User is not authorized');
+        }
+        throw err;
+      }
     })
   );
 }

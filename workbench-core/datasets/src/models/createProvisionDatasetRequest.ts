@@ -23,6 +23,11 @@ export interface CreateProvisionDatasetRequest {
   owner?: string;
 
   /**
+   * (optional, but required if `owner` is specified.) the identity type of the owner such as 'USER' or 'GROUP'
+   */
+  ownerType?: string;
+
+  /**
    * (optional) the type of the dataset
    */
   type?: string;

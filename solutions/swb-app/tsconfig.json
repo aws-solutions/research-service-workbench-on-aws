@@ -3,7 +3,7 @@
   "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
   "compilerOptions": {
     "types": ["heft-jest", "node"],
-    "lib": ["es2017", "dom"]
+    "lib": ["es2020", "es2017", "dom"]
   },
   "exclude": ["node_modules", "lib"]
 }

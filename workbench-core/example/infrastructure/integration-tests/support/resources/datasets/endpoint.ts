@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
 import Resource from '../base/resource';
@@ -12,10 +13,13 @@ export default class Endpoint extends Resource {
   private _awsAccountId: string;
 
   public constructor(params: EndpointCreateParams) {
-    super(params.clientSession, 'endpoint', params.id, params.parentApi);
-    this._api = `${this._api}/share`;
+    super(params.clientSession, 'share', params.id, params.parentApi);
     this._name = params.externalEndpointName;
     this._awsAccountId = params.awsAccountId;
+  }
+
+  public async getMountObject(): Promise<AxiosResponse> {
+    return await this._axiosInstance.get(`${this._api}/mount-object`);
   }
 
   public async cleanup(): Promise<void> {

@@ -3,26 +3,31 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Action } from '../../action';
+import { z } from 'zod';
+import { ActionParser } from '../../action';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DynamicOperationParser = z.object({
+  /**
+   * The {@link Action} a {@link User} wants to perform.
+   */
+  action: ActionParser,
+  /**
+   * The subject that the {@link Action} acts on.
+   */
+  subject: z.record(z.string()).and(
+    z.object({
+      subjectType: z.string(),
+      subjectId: z.string()
+    })
+  ),
+  /**
+   * The field a {@link User} wants access to.
+   */
+  field: z.string().optional()
+});
 
 /**
  * The dynamic operation a {@link User} wants to perform
  */
-export interface DynamicOperation {
-  /**
-   * The {@link Action} a {@link User} wants to perform.
-   */
-  action: Action;
-  /**
-   * The subject that the {@link Action} acts on.
-   */
-  subject: {
-    [key: string]: string;
-    subjectType: string;
-    subjectId: string;
-  };
-  /**
-   * The field a {@link User} wants access to.
-   */
-  field?: string;
-}
+export type DynamicOperation = z.infer<typeof DynamicOperationParser>;

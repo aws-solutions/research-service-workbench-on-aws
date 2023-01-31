@@ -4,7 +4,8 @@
  */
 import {
   AddDatasetPermissionsToRoleRequest,
-  CreateRegisterExternalBucketRoleRequest
+  CreateRegisterExternalBucketRoleRequest,
+  DataSetPermission
 } from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
@@ -35,14 +36,16 @@ export default class Datasets extends CollectionResource {
       id: response.data.id,
       awsAccountId: response.data.awsAccountId,
       storageName: response.data.storageName,
-      storagePath: response.data.path
+      storagePath: response.data.path,
+      owner: response.data.owner,
+      ownerType: response.data.ownerType
     };
     const taskId = `${this._childType}-${createParams.id}`;
-    const resourceNode = this.dataset(createParams);
+    const resourceNode: Dataset = this.dataset(createParams);
     this.children.set(resourceNode.id, resourceNode);
     // We add a cleanup task to the cleanup queue for the session
     this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
-
+    resourceNode.generateDataSetPermissions(response.data.permissions);
     return response;
   }
 
@@ -52,10 +55,6 @@ export default class Datasets extends CollectionResource {
       return this._axiosInstance.get(this._api, { params: queryParams });
     }
     return this._axiosInstance.get(`${this._api}/${queryParams.id}`);
-  }
-
-  public async delete(queryParams: Record<string, string>): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`${this._api}/${queryParams.id}`);
   }
   public async import(requestBody: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
@@ -82,7 +81,10 @@ export default class Datasets extends CollectionResource {
       path: resource.path ?? dataSetName,
       storageName: resource.storageName ?? storageName,
       awsAccountId: resource.awsAccountId ?? awsAccountId,
-      region: resource.region ?? region
+      region: resource.region ?? region,
+      owner: resource.owner,
+      ownerType: resource.ownerType,
+      permissions: resource.permissions ?? []
     };
   }
 }
@@ -93,4 +95,7 @@ interface DataSetCreateRequest {
   path: string;
   awsAccountId: string;
   region: string;
+  owner?: string;
+  ownerType?: string;
+  permissions?: DataSetPermission[];
 }

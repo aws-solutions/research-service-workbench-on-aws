@@ -31,7 +31,7 @@ export default class ClientSession {
     } = { 'Content-Type': 'application/json' };
 
     // For anonymous sessions, access token cookie is not required
-    if (!this._isAnonymousSession) {
+    if (accessToken) {
       const csrf = new Csrf();
       const secret = csrf.secretSync();
       const token = csrf.create(secret);

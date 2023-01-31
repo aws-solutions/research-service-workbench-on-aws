@@ -4,6 +4,7 @@
  */
 
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 
@@ -55,8 +56,25 @@ export interface DataSetsAuthorizationPlugin {
   /**
    * Remove all permssions from a given dataset.
    * @param datasetId - the ID of the datset for which permissions are to be removed.
+   * @param authenticatedUser - an object representing the user making the request.
    * @returns a {@link PermissionsResponse} indicating the permissions removed.
-   * IMPORTANT: If the returned object has a non-null `pageToken`, there are more permissions to delete.
    */
-  removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
+  removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse>;
+  /**
+   * Checks whether the authenticated user is authorized to access the dataset with the defined {@link DataSetsAccessLevel}
+   *
+   * @param dataSetId - the ID of the dataset to check
+   * @param accessLevel - the {@link DataSetsAccessLevel} to check authorization on
+   * @param authenticatedUser - the user to check for authorization
+   *
+   * @throws - {@link ForbiddenError} when the user is not authorized.
+   */
+  isAuthorizedOnDataSet(
+    dataSetId: string,
+    accessLevel: DataSetsAccessLevel,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<void>;
 }
