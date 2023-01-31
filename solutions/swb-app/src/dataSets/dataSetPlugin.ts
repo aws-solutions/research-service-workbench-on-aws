@@ -4,6 +4,7 @@
  */
 
 import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
+import { AuthenticatedUser } from '../users/authenticatedUser';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
 import { DataSet } from './dataSet';
 import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpointResponseParser';
@@ -21,7 +22,7 @@ export interface DataSetPlugin {
   addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse>;
-  getDataSet(dataSetId: string): Promise<DataSet>;
+  getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
   listDataSets(): Promise<DataSet[]>;
 
   addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse>;

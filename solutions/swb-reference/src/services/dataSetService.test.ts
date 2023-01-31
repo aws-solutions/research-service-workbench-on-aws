@@ -204,11 +204,13 @@ describe('DataSetService', () => {
       const permissionsResponse: PermissionsResponse = {
         data: {
           dataSetId,
-          permissions: {
-            accessLevel: accessLevel,
-            identity: 'projectId#ProjectAdmin',
-            identityType: 'GROUP'
-          }
+          permissions: [
+            {
+              accessLevel: accessLevel,
+              identity: 'projectId#ProjectAdmin',
+              identityType: 'GROUP'
+            }
+          ]
         }
       };
 

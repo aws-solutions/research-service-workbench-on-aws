@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -30,6 +31,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
         owner: validatedRequest.owner,
+        ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
         permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
@@ -86,8 +88,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
       }
-      const ds = await dataSetService.getDataSet(req.params.id);
-      res.send(ds);
+
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const dataset = await dataSetService.getDataSet(req.params.dataSetId, authenticatedUser);
+      res.send(dataset);
     })
   );
 

@@ -62,8 +62,8 @@ export class DataSetService implements DataSetPlugin {
     });
   }
 
-  public getDataSet(dataSetId: string): Promise<DataSet> {
-    return this._workbenchDataSetService.getDataSet(dataSetId, { id: '', roles: [] });
+  public getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet> {
+    return this._workbenchDataSetService.getDataSet(dataSetId, authenticatedUser);
   }
 
   public importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
@@ -77,9 +77,8 @@ export class DataSetService implements DataSetPlugin {
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
     //add permissions in AuthZ for user to read, write, update, delete, and update read/write permissions
     const dataset = await this._workbenchDataSetService.provisionDataSet(request);
-    const projectId = dataset.owner!;
-    const projectAdmin = getProjectAdminRole(projectId);
 
+    const projectAdmin = dataset.owner!;
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -88,6 +87,7 @@ export class DataSetService implements DataSetPlugin {
       ['READ', 'UPDATE', 'DELETE']
     );
 
+    const projectId = projectAdmin.split('#')[0];
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
@@ -95,14 +95,6 @@ export class DataSetService implements DataSetPlugin {
       [projectAdmin],
       ['READ', 'UPDATE']
     );
-
-    if (dataset.id && request.permissions && request.permissions.length) {
-      await this._workbenchDataSetService.addDataSetAccessPermissions({
-        authenticatedUser: request.authenticatedUser,
-        permission: request.permissions[0],
-        dataSetId: dataset.id
-      });
-    }
 
     return dataset;
   }
