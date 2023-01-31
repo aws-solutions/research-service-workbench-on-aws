@@ -25,16 +25,18 @@ describe('Soft Delete Project negative tests', () => {
   });
 
   describe('with Project that does not exist', () => {
-    const invalidProjectId = 'proj-not-a-real-project';
+    const invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
 
-    test('it throws 403 error', async () => {
+    test('it throws 404 error', async () => {
       try {
         await adminSession.resources.projects.project(invalidProjectId).softDelete();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(403, {
-            error: 'User is not authorized'
+          new HttpError(404, {
+            statusCode: 404,
+            error: 'Not Found',
+            message: `Could not find project ${invalidProjectId}`
           })
         );
       }

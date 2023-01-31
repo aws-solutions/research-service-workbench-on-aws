@@ -11,6 +11,10 @@ on:
         required: true
       slack_webhook_url:
         required: true
+      HOSTED_ZONE_ID:
+        required: true
+      DOMAIN_NAME:
+        required: true
 
 jobs:
   # deploy only when files specific to swb package changed
@@ -34,6 +38,13 @@ jobs:
           aws-region: us-east-2
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
+
+      - name: Enter config settings from GH secrets
+        shell: bash
+        run: |
+          echo "
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}
+          domainName: ${{ secrets.DOMAIN_NAME }}" >> "solutions/swb-reference/src/config/demo.yaml"
 
       - name: Deploy SWB-reference Demo
         run: |

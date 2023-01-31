@@ -6,6 +6,7 @@
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
+import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -144,4 +145,12 @@ export interface GroupManagementPlugin {
    * @throws {@link ForbiddenError} - invalid state transition
    */
   setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse>;
+
+  /**
+   * Check if a group exist
+   * @param request - {@link DoesGroupExistRequest}
+   *
+   * @returns - {@link DoesGroupExistResponse}
+   */
+  doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse>;
 }

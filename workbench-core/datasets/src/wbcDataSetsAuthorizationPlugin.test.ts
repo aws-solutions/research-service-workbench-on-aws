@@ -4,12 +4,12 @@
  */
 
 jest.mock('@aws/workbench-core-audit');
-jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
+  CASLAuthorizationPlugin,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse,
   DeleteIdentityPermissionsRequest,
@@ -17,7 +17,8 @@ import {
   DynamicAuthorizationService,
   GetIdentityPermissionsBySubjectResponse,
   IdentityPermission,
-  WBCGroupManagementPlugin
+  WBCGroupManagementPlugin,
+  ForbiddenError
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
@@ -35,6 +36,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   let ddbService: DynamoDBService;
   let groupManagementPlugin: WBCGroupManagementPlugin;
   let permissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
+  let caslAuthorizationPlugin: CASLAuthorizationPlugin;
   let authzService: DynamicAuthorizationService;
   let plugin: WbcDataSetsAuthorizationPlugin;
   let testMethod: (i: IdentityPermission[]) => PermissionsResponse[];
@@ -236,10 +238,12 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     permissionsPlugin = new DDBDynamicAuthorizationPermissionsPlugin({
       dynamoDBService: ddbService
     });
+    caslAuthorizationPlugin = new CASLAuthorizationPlugin();
     authzService = new DynamicAuthorizationService({
       groupManagementPlugin: groupManagementPlugin,
       dynamicAuthorizationPermissionsPlugin: permissionsPlugin,
-      auditService: audit
+      auditService: audit,
+      authorizationPlugin: caslAuthorizationPlugin
     });
     plugin = new WbcDataSetsAuthorizationPlugin(authzService);
 
@@ -435,10 +439,63 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   });
 
   describe('removeAllAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
-        new Error('Method not implemented.')
+    it('returns the removed access permissions', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockReadOnlyGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        }
+      });
+    });
+    it('filters out non READ/UPDATE permissions', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockHasDeleteGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        }
+      });
+    });
+    it('throws if more than one dataset is returned', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => mockMultiDatasetGetIdentityPermissionsResponse);
+
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).rejects.toThrowError(
+        new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
+    });
+    it('returns an empty permissionsResponse if no identityPermissions are found', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'deleteSubjectIdentityPermissions')
+        .mockImplementation(async () => {
+          return {
+            data: {
+              identityPermissions: []
+            }
+          };
+        });
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).resolves.toMatchObject({
+        data: {
+          dataSetId,
+          permissions: []
+        }
+      });
     });
   });
 
@@ -656,7 +713,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
         new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
       );
     });
-    it('returns an empty permissionsResponse if no identityPermissiosn are found', async () => {
+    it('returns an empty permissionsResponse if no identityPermissions are found', async () => {
       jest
         .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
         .mockImplementation(async () => {
@@ -736,10 +793,51 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     });
   });
 
-  describe('removeAllAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
-        new Error('Method not implemented.')
+  describe('isAuthorizedOnDataSet tests', () => {
+    it('resolves if the authenticated user is authorized with read-only access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {});
+
+      await expect(
+        plugin.isAuthorizedOnDataSet(dataSetId, 'read-only', authenticatedUser)
+      ).resolves.not.toThrow();
+    });
+
+    it('throws if the authenticated user is not authorized with read-only access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {
+          throw new ForbiddenError();
+        });
+
+      await expect(plugin.isAuthorizedOnDataSet(dataSetId, 'read-only', authenticatedUser)).rejects.toThrow(
+        ForbiddenError
+      );
+    });
+
+    it('resolves if the authenticated user is authorized with read-write access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {});
+
+      await expect(
+        plugin.isAuthorizedOnDataSet(dataSetId, 'read-write', authenticatedUser)
+      ).resolves.not.toThrow();
+    });
+
+    it('throws if the authenticated user is not authorized with read-write access on the dataset', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementationOnce(async () => {});
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'isAuthorizedOnSubject')
+        .mockImplementation(async () => {
+          throw new ForbiddenError();
+        });
+
+      await expect(plugin.isAuthorizedOnDataSet(dataSetId, 'read-write', authenticatedUser)).rejects.toThrow(
+        ForbiddenError
       );
     });
   });

@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet } from './dataSet';
-import { ExternalEndpoint } from './externalEndpoint';
-import { StorageLocation } from './storageLocation';
+import { CreateDataSet, DataSet } from './models/dataSet';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { StorageLocation } from './models/storageLocation';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -52,7 +52,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the DataSet object added to the database.
    */
-  addDataSet(dataSet: DataSet): Promise<DataSet>;
+  addDataSet(dataSet: CreateDataSet): Promise<DataSet>;
 
   /**
    * Update a DataSet
@@ -84,9 +84,9 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the details of the endpoint added.
    *
-   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link EndpointExistsError} - the endpoint already exists
    */
-  addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+  addExternalEndpoint(endPoint: CreateExternalEndpoint): Promise<ExternalEndpoint>;
 
   /**
    * Get the endpoint details for a given DataSet.

@@ -1,0 +1,16 @@
+stage: 'swbv2-private'
+awsRegion: 'us-west-1'
+awsRegionShortName: 'ca'
+rootUserEmailParamStorePath: '/swb/privateTestEnv/rootUser/email'
+allowedOrigins: ['http://localhost:3000', 'https://swbv2-private.chamonix.public-sector.aws.a2z.com/']
+
+cognitoDomain: 'swbv2-private'
+
+# internet-facing ALB
+# If you want internet-facing put value `true` else `false`
+albInternetFacing: true
+
+domainName: 'swbv2-private.chamonix.public-sector.aws.a2z.com'
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']

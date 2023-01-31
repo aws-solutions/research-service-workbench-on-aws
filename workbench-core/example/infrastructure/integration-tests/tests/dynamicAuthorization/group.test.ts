@@ -309,4 +309,18 @@ describe('dynamic authorization group integration tests', () => {
       await expect(group.delete()).rejects.toThrow(new HttpError(404, {}));
     });
   });
+
+  describe('doesGroupExist', () => {
+    test.each([true, false])('test does group exist', async (groupExists) => {
+      let groupId = 'sampleGroupId';
+      if (groupExists) {
+        const { data } = await adminSession.resources.groups.create();
+        groupId = data.groupId;
+      }
+      const { data } = await adminSession.resources.groups.group(groupId).doesGroupExist();
+      expect(data).toMatchObject({
+        exist: groupExists
+      });
+    });
+  });
 });

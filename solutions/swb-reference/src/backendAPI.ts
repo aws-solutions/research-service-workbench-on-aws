@@ -15,7 +15,8 @@ import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-
 import {
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
-  DDBDynamicAuthorizationPermissionsPlugin
+  DDBDynamicAuthorizationPermissionsPlugin,
+  CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
@@ -64,10 +65,12 @@ const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissio
   new DDBDynamicAuthorizationPermissionsPlugin({
     dynamoDBService: dynamicAuthAws.helpers.ddb
   });
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  authorizationPlugin: caslAuthorizationPlugin
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
@@ -77,9 +80,12 @@ const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeCo
   aws.helpers.ddb
 );
 const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
-const projectService: ProjectService = new ProjectService({
-  TABLE_NAME: process.env.STACK_NAME!
-});
+const costCenterService: CostCenterService = new CostCenterService(aws.helpers.ddb);
+const projectService: ProjectService = new ProjectService(
+  aws.helpers.ddb,
+  dynamicAuthorizationService,
+  costCenterService
+);
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -116,7 +122,7 @@ const apiRouteConfig: ApiRouteConfig = {
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: envTypeConfigService,
-  projectService: projectService,
+  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
@@ -128,7 +134,8 @@ const apiRouteConfig: ApiRouteConfig = {
     envTypeConfigService,
     envTypeService
   ),
-  keyPairService: new KeyPairService(aws.helpers.ddb)
+  keyPairService: new KeyPairService(aws.helpers.ddb),
+  authorizationService: dynamicAuthorizationService
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

@@ -29,7 +29,9 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.29.1",
+    "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.61.0-alpha.0",
+    "@aws-sdk/client-service-catalog-appregistry": "^3.254.0",
+    "aws-cdk-lib": "^2.61.0",
     "constructs": "^10.0.0",
     "lodash": "^4.17.21"
   },

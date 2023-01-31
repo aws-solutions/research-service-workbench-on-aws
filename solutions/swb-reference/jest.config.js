@@ -48,6 +48,11 @@ async function init() {
     mainAccountId,
     runId: `${Date.now()}`
   };
+
+  if (process.env.LAMBDA_URL) {
+    console.log(`LAMBDA_URL = ${process.env.LAMBDA_URL}`);
+    settings.apiUrlOutput = process.env.LAMBDA_URL;
+  }
 }
 
 module.exports = async () => {

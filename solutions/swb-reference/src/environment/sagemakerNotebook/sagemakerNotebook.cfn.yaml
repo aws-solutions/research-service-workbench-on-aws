@@ -84,11 +84,14 @@ Resources:
           - Effect: Allow
             Action:
               - 's3:GetObject'
+              - 's3:GetObjectVersion'
               - 's3:AbortMultipartUpload'
               - 's3:ListMultipartUploadParts'
               - 's3:PutObject'
               - 's3:GetObjectAcl'
+              - 's3:GetObjectVersionAcl'
               - 's3:PutObjectAcl'
+              - 's3:PutObjectVersionAcl'
             Resource:
               - !Join ['/', [Ref: DatasetsBucketArn, '*']]
               - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
@@ -104,12 +107,14 @@ Resources:
           - Effect: Allow
             Action:
               - 's3:ListBucket'
+              - 's3:ListBucketVersions'
             Resource:
               - !Ref DatasetsBucketArn
               - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
           - Effect: Allow
             Action:
               - 's3:ListBucket'
+              - 's3:ListBucketVersions'
             Resource: !Sub
               - 'arn:aws:s3:::${S3Bucket}'
               - S3Bucket: !Select [2, !Split ['/', !Ref EnvironmentInstanceFiles]]
@@ -121,6 +126,7 @@ Resources:
           - Effect: Allow
             Action:
               - 's3:GetObject'
+              - 's3:GetObjectVersion'
             Resource: !Sub
               - 'arn:aws:s3:::${S3Location}/*'
               # Remove "s3://" prefix from EnvironmentInstanceFiles
@@ -187,13 +193,17 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: 'Allow'
-                Action: 's3:GetObject'
+                Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
                 Resource: !Sub
                   - 'arn:aws:s3:::${S3Location}/*'
                   # Remove "s3://" prefix from EnvironmentInstanceFiles
                   - S3Location: !Select [1, !Split ['s3://', !Ref EnvironmentInstanceFiles]]
               - Effect: 'Allow'
-                Action: 's3:ListBucket'
+                Action:
+                  - 's3:ListBucket'
+                  - 's3:ListBucketVersions'
                 Resource: !Sub
                   - 'arn:aws:s3:::${S3Bucket}'
                   - S3Bucket: !Select [2, !Split ['/', !Ref EnvironmentInstanceFiles]]
@@ -256,6 +266,7 @@ Resources:
       DirectInternetAccess: Enabled
       LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
+      PlatformIdentifier: 'notebook-al2-v2'
 
   # Add script for mounting studies and autostop
   BasicNotebookInstanceLifecycleConfig:
