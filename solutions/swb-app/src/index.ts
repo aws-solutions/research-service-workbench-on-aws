@@ -51,7 +51,6 @@ export {
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
-  ProjectEnvTypeConfigPlugin,
   CreateKeyPairRequest,
   CreateKeyPairResponse,
   DeleteKeyPairRequest,
