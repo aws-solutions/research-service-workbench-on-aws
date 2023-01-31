@@ -19,7 +19,6 @@ import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
 export interface ApiRouteConfig {
-  routes: ApiRoute[];
   environments: { [key: string]: Environment };
   account: HostingAccountService;
   environmentService: EnvironmentService;
