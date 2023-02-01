@@ -105,7 +105,7 @@ solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 
 #exclude binary files
-**/*.rpm
+solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.9.4/*.rpm
 
 
 
