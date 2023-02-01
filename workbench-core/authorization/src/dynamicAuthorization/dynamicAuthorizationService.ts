@@ -285,15 +285,7 @@ export class DynamicAuthorizationService {
       const hasGroupStatus = await this._hasGroupStatus({ groupId });
       //if group has no status, it does not exist in dynamic authorization service
       if (!hasGroupStatus) {
-        //When group does not exist, return successful delete
-        const response: DeleteGroupResponse = {
-          data: {
-            groupId
-          }
-        };
-        metadata.statusCode = 200;
-        await this._auditService.write(metadata, response);
-        return response;
+        throw new GroupNotFoundError('Group does not exist');
       }
       //Lock group by setting group to delete_pending
       await this._groupManagementPlugin.setGroupStatus({

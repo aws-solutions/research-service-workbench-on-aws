@@ -795,23 +795,21 @@ describe('DynamicAuthorizationService', () => {
       );
     });
 
-    it('ensure deleting non existent group is idempotent', async () => {
-      const mockReturnValue = { data: { groupId } };
+    it('ensure deleting non existent group throws GroupNotFoundError', async () => {
       const mockRejectError = new GroupNotFoundError();
       mockGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(mockRejectError);
 
-      const response = await dynamicAuthzService.deleteGroup(params);
+      await expect(dynamicAuthzService.deleteGroup(params)).rejects.toThrow(GroupNotFoundError);
 
-      expect(response).toMatchObject<DeleteGroupResponse>(mockReturnValue);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor: mockUser,
           source: auditSource,
           action: auditAction,
           requestBody: params,
-          statusCode: 200
+          statusCode: 400
         },
-        mockReturnValue
+        new GroupNotFoundError('Group does not exist')
       );
     });
 
