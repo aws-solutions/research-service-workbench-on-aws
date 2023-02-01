@@ -61,7 +61,7 @@ describe('DataSetService', () => {
 
     const mockDataSet: DataSet = {
       id: 'dataSetId',
-      owner: 'projectId',
+      owner: 'projectId#ProjectAdmin',
       name: 'mockDataSet',
       path: 'path',
       storageName: 'storageName',
