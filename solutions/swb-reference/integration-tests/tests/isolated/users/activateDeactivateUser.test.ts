@@ -118,6 +118,7 @@ describe('userManagement activate/deactivate user integration test', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
@@ -131,6 +132,7 @@ describe('userManagement activate/deactivate user integration test', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
