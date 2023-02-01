@@ -11,11 +11,11 @@ import {
 } from '@casl/ability';
 import _ from 'lodash';
 import AuthorizationPlugin from './authorizationPlugin';
-import { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';
-import { IdentityPermission } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
+import { DynamicOperation } from './dynamicAuthorization/models/dynamicOperation';
+import { IdentityPermission } from './dynamicAuthorization/models/identityPermission';
 import { ForbiddenError } from './errors/forbiddenError';
-import Operation from './operation';
-import Permission from './permission';
+import Operation from './models/operation';
+import Permission from './models/permission';
 /**
  * {@link https://github.com/stalniy/casl | CASL } Authorization Plugin.
  *

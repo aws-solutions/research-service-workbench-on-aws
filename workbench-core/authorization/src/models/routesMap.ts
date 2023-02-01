@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';
+import { DynamicOperation } from '../dynamicAuthorization/models/dynamicOperation';
 import Operation from './operation';
 
 // eslint-disable-next-line @rushstack/typedef-var

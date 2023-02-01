@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';
-import { IdentityPermission } from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
-import Operation from './operation';
-import Permission from './permission';
+import { DynamicOperation } from './dynamicAuthorization/models/dynamicOperation';
+import { IdentityPermission } from './dynamicAuthorization/models/identityPermission';
+import Operation from './models/operation';
+import Permission from './models/permission';
 
 /**
  * Represents an AuthorizationPlugin.
