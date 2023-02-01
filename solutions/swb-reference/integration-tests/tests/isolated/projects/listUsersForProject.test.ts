@@ -64,6 +64,7 @@ describe('list users for project tests', () => {
         checkHttpError(
           e,
           new HttpError(403, {
+            statusCode: 403,
             error: 'User is not authorized'
           })
         );
