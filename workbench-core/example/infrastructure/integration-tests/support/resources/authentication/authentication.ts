@@ -55,4 +55,27 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.get('dummyCsurfRoute', { headers });
   }
+
+  public async login(config: {
+    stateVerifier?: string;
+    codeChallenge?: string;
+    origin?: string;
+  }): Promise<AxiosResponse> {
+    const { stateVerifier, codeChallenge, origin } = config;
+
+    const params: Record<string, string> = {};
+    const headers: AxiosRequestHeaders = {};
+
+    if (stateVerifier) {
+      params.stateVerifier = stateVerifier;
+    }
+    if (codeChallenge) {
+      params.codeChallenge = codeChallenge;
+    }
+    if (origin) {
+      headers.origin = origin;
+    }
+
+    return this._axiosInstance.get('login', { params, headers });
+  }
 }
