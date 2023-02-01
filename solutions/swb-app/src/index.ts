@@ -16,6 +16,9 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { DatabaseError } from './errors/databaseError';
+import { NoKeyExistsError } from './errors/noKeyExistsError';
+import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
 import { CreateKeyPairRequest } from './keyPairs/createKeyPairRequest';
 import { CreateKeyPairResponse } from './keyPairs/createKeyPairResponse';
@@ -45,12 +48,13 @@ export {
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
+  GetAccessPermissionRequest,
   HTTPMethod,
-  ProjectEnvTypeConfigPlugin,
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
+  ProjectEnvTypeConfigPlugin,
   CreateKeyPairRequest,
   CreateKeyPairResponse,
   DeleteKeyPairRequest,
@@ -61,5 +65,8 @@ export {
   KeyPairPlugin,
   ListKeyPairsRequest,
   SendPublicKeyRequest,
-  SendPublicKeyResponse
+  SendPublicKeyResponse,
+  DatabaseError,
+  NonUniqueKeyError,
+  NoKeyExistsError
 };

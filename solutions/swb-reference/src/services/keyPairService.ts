@@ -14,12 +14,12 @@ import {
   KeyPairPlugin,
   ListKeyPairsRequest,
   SendPublicKeyRequest,
-  SendPublicKeyResponse
+  SendPublicKeyResponse,
+  DatabaseError,
+  NoKeyExistsError,
+  NonUniqueKeyError
 } from '@aws/swb-app';
 import { DynamoDBService, PaginatedResponse } from '@aws/workbench-core-base';
-import { DatabaseError } from '../errors/databaseError';
-import { NoKeyExistsError } from '../errors/noKeyExistsError';
-import { NonUniqueKeyError } from '../errors/nonUniqueKeyError';
 
 export default class KeyPairService implements KeyPairPlugin {
   private _dynamoDbService: DynamoDBService;
@@ -79,7 +79,7 @@ export default class KeyPairService implements KeyPairPlugin {
 
     // HARD delete item
     try {
-      await this._dynamoDbService.delete({ pk: existingKeyPair.pk, sk: existingKeyPair.sk }).execute();
+      await this._dynamoDbService.deleteItem({ key: { pk: existingKeyPair.pk, sk: existingKeyPair.sk } });
     } catch (e) {
       throw new DatabaseError(e.message);
     }
