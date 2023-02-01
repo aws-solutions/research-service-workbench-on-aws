@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '../../authenticatedUser';
+import { AuthenticatedUser } from '../../models/authenticatedUser';
 
 /**
  * Request object for IsUserAssignedToGroup

@@ -303,10 +303,11 @@ describe('dynamic authorization group integration tests', () => {
       expect(data).toMatchObject({ groupId });
     });
 
-    it('returns a 404 error when trying to delete a group that does not exists', async () => {
+    it('deleting a group that does not exist should be valid', async () => {
       const group = adminSession.resources.groups.group('invalidUserId');
+      const { data } = await group.delete();
 
-      await expect(group.delete()).rejects.toThrow(new HttpError(404, {}));
+      expect(data).toMatchObject({ groupId: 'invalidUserId' });
     });
   });
 

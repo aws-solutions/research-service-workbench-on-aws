@@ -4,8 +4,8 @@
  */
 
 import { z } from 'zod';
-import { AuthenticatedUserParser } from '../../authenticatedUser';
-import { HTTPMethodParser } from '../../routesMap';
+import { AuthenticatedUserParser } from '../../models/authenticatedUser';
+import { HTTPMethodParser } from '../../models/routesMap';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const IsAuthorizedOnRouteRequestParser = z.object({

@@ -28,12 +28,10 @@ import {
   isForbiddenError,
   IsAuthorizedOnSubjectRequestParser,
   DoesGroupExistRequest,
-  DoesGroupExistRequestParser
-} from '@aws/workbench-core-authorization';
-import {
+  DoesGroupExistRequestParser,
   DeleteSubjectIdentityPermissionsRequest,
   DeleteSubjectIdentityPermissionsRequestParser
-} from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+} from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
