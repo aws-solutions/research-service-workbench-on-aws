@@ -103,6 +103,9 @@ solutions/swb-reference/integration-tests/config/*.yaml
 solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 
+#exclude binary files
+**/*.rpm
+
 
 
 # local environment variables
