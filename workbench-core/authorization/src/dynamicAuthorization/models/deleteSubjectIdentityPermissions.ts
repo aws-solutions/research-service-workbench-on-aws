@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { AuthenticatedUserParser } from '../../authenticatedUser';
+import { AuthenticatedUserParser } from '../../models/authenticatedUser';
 import { IdentityPermission } from './identityPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var

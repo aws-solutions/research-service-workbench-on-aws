@@ -7,51 +7,44 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { DynamoDBService, JSONValue, addPaginationToken, getPaginationToken } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import { createRouter, RadixRouter } from 'radix3';
-import { Action } from '../action';
-import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
 import { RouteMapError } from '../errors/routeMapError';
 import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
+import { Action } from '../models/action';
+import { Effect } from '../models/effect';
+import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../models/routesMap';
 
+import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 import {
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/createIdentityPermissions';
+} from './models/createIdentityPermissions';
 import {
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteIdentityPermissions';
+} from './models/deleteIdentityPermissions';
 import {
   DeleteSubjectIdentityPermissionsRequest,
   DeleteSubjectIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+} from './models/deleteSubjectIdentityPermissions';
 import {
   GetDynamicOperationsByRouteRequest,
   GetDynamicOperationsByRouteResponse
-} from './dynamicAuthorizationInputs/getDynamicOperationsByRoute';
+} from './models/getDynamicOperationsByRoute';
 import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+} from './models/getIdentityPermissionsByIdentity';
 import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
-import {
-  IdentityPermission,
-  IdentityPermissionParser,
-  IdentityType
-} from './dynamicAuthorizationInputs/identityPermission';
-import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './dynamicAuthorizationInputs/isRouteIgnored';
-import {
-  IsRouteProtectedRequest,
-  IsRouteProtectedResponse
-} from './dynamicAuthorizationInputs/isRouteProtected';
-import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
+} from './models/getIdentityPermissionsBySubject';
+import { IdentityPermission, IdentityPermissionParser, IdentityType } from './models/identityPermission';
 import { IdentityPermissionItem, IdentityPermissionItemParser } from './models/IdentityPermissionItem';
+import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './models/isRouteIgnored';
+import { IsRouteProtectedRequest, IsRouteProtectedResponse } from './models/isRouteProtected';
 
 export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthorizationPermissionsPlugin {
   private readonly _getIdentityPermissionsByIdentityIndex: string = 'getIdentityPermissionsByIdentity';

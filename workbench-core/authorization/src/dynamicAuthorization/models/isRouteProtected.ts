@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { HTTPMethodParser } from '../../routesMap';
+import { HTTPMethodParser } from '../../models/routesMap';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const IsRouteProtectedRequestParser = z.object({
