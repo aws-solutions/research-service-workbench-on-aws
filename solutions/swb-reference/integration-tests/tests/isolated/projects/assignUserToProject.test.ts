@@ -105,7 +105,7 @@ describe('assign user to project negative tests', () => {
       const response = await adminSession.resources.users.create({
         firstName: 'Test',
         lastName: 'User',
-        email: `user-${uuidv4()}@simulator.amazonses.com`
+        email: `success+user-${uuidv4()}@simulator.amazonses.com`
       });
 
       const user: User = response.data;
