@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationPlugin from './authorizationPlugin';
-import Operation from './operation';
-import Permission from './permission';
+import { AuthenticatedUser } from './models/authenticatedUser';
+import Operation from './models/operation';
+import Permission from './models/permission';
+import { HTTPMethod } from './models/routesMap';
 import PermissionsPlugin from './permissionsPlugin';
-import { HTTPMethod } from './routesMap';
 
 /**
  * Authorization Service.

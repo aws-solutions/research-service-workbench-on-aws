@@ -4,9 +4,9 @@
  */
 
 import { z } from 'zod';
-import { ActionParser } from '../../action';
-import { EffectParser } from '../../effect';
-import { JSONValueParser } from '../dynamicAuthorizationInputs/identityPermission';
+import { ActionParser } from '../../models/action';
+import { EffectParser } from '../../models/effect';
+import { JSONValueParser } from './identityPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const IdentityPermissionItemParser = z

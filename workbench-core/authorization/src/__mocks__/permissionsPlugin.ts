@@ -4,7 +4,7 @@
  */
 
 import { AuthenticatedUser, HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
-import { RoutesIgnored } from '../routesMap';
+import { RoutesIgnored } from '../models/routesMap';
 import {
   mockAdminPermissions,
   mockGetOperations,

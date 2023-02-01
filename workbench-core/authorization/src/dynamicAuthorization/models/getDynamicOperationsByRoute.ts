@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { HTTPMethodParser } from '../../routesMap';
+import { HTTPMethodParser } from '../../models/routesMap';
 import { DynamicOperation } from './dynamicOperation';
 
 // eslint-disable-next-line @rushstack/typedef-var
