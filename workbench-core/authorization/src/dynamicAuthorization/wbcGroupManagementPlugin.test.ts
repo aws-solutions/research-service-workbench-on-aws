@@ -27,20 +27,20 @@ import {
   RoleNotFoundError
 } from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { AuthenticatedUser } from '../authenticatedUser';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
-import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
-import { DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
-import { DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
-import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
-import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
-import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
-import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
-import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
-import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
+import { AuthenticatedUser } from '../models/authenticatedUser';
+import { CreateGroupResponse } from './models/createGroup';
+import { DeleteGroupResponse } from './models/deleteGroup';
+import { DoesGroupExistResponse } from './models/doesGroupExist';
 import { GetGroupStatus } from './models/GetGroupMetadata';
+import { GetGroupStatusResponse } from './models/getGroupStatus';
+import { GetGroupUsersResponse } from './models/getGroupUsers';
+import { GetUserGroupsResponse } from './models/getUserGroups';
+import { IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
+import { RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
+import { SetGroupStatusResponse } from './models/setGroupStatus';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
 
 describe('WBCGroupManagemntPlugin', () => {

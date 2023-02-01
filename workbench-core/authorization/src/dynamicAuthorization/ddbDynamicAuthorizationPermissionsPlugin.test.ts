@@ -17,18 +17,18 @@ import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import _ from 'lodash';
-import { Action } from '../action';
-import { AuthenticatedUser } from '../authenticatedUser';
-import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
 import { RouteMapError } from '../errors/routeMapError';
 import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
+import { Action } from '../models/action';
+import { AuthenticatedUser } from '../models/authenticatedUser';
+import { Effect } from '../models/effect';
+import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../models/routesMap';
 import { DDBDynamicAuthorizationPermissionsPlugin } from './ddbDynamicAuthorizationPermissionsPlugin';
-import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
-import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import { DynamicOperation } from './models/dynamicOperation';
+import { IdentityPermission, IdentityType } from './models/identityPermission';
 
 describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
   let region: string;
