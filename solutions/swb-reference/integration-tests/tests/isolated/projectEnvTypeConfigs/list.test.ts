@@ -49,6 +49,7 @@ describe('list environment type configs associated to project', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
@@ -87,6 +88,7 @@ describe('list environment type configs associated to project', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
