@@ -42,6 +42,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
@@ -82,6 +83,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );
@@ -122,6 +124,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );

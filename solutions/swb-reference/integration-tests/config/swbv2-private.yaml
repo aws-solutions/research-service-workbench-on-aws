@@ -1,0 +1,25 @@
+## Note:
+## Please deploy the swb-reference package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
+
+# Default Env Config for launching a new environment
+envTypeId: 'et-prod-yyw2vt5xgkxe2,pa-7tewdo2r3ygvc'
+envTypeConfigId: 'etc-931a5637-5fd2-4669-a67d-d0783e972a81'
+projectId: 'proj-5ecc951a-6a82-4542-8487-47d0f1a623f8'
+envType: 'sagemakerNotebook'
+
+# Negative Testing
+terminatedEnvId: 'env-c0744abe-a97e-4945-8e7c-ac9ba433cc13' # id of an environment that has already been terminated
+
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '/swb/privateTestEnv/rootUser/email'
+rootPasswordParamStorePath: '/swb/privateTestEnv/rootUser/password'
+
+## Default Hosting Account
+defaultHostingAccountId: 'acc-0e7f612f-55c8-415b-9b76-b4c4096d3135'
+
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '/swb/privateTestEnv/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/privateTestEnv/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/privateTestEnv/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/privateTestEnv/accountsTest/encryptionKeyArn'

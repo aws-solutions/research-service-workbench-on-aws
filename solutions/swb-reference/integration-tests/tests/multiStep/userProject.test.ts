@@ -46,7 +46,7 @@ describe('multiStep user to project integration test', () => {
       const { data: user } = await adminSession.resources.users.create({
         firstName: 'Project',
         lastName: role,
-        email: `success-user-to-project-user-${uuidv4()}@simulator.amazonses.com`
+        email: `success+user-to-project-user-${uuidv4()}@simulator.amazonses.com`
       });
 
       // assign user to project
