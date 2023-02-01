@@ -6,10 +6,7 @@
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
 import { UserNotFoundError } from '@aws/workbench-core-user-management';
-import { Action } from '../action';
-import { AuthenticatedUser } from '../authenticatedUser';
 import AuthorizationPlugin from '../authorizationPlugin';
-import { Effect } from '../effect';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
@@ -17,20 +14,23 @@ import { ParamNotFoundError } from '../errors/paramNotFoundError';
 import { RetryError } from '../errors/retryError';
 import { RouteNotSecuredError } from '../errors/routeNotSecuredError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { HTTPMethod } from '../routesMap';
-import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
-import { DeleteGroupResponse, DeleteGroupRequest } from './dynamicAuthorizationInputs/deleteGroup';
-import { DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
-import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
-import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
-import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
-import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
-import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
-import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
-import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { Action } from '../models/action';
+import { AuthenticatedUser } from '../models/authenticatedUser';
+import { Effect } from '../models/effect';
+import { HTTPMethod } from '../models/routesMap';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
+import { CreateGroupResponse } from './models/createGroup';
+import { DeleteGroupResponse, DeleteGroupRequest } from './models/deleteGroup';
+import { DoesGroupExistResponse } from './models/doesGroupExist';
+import { DynamicOperation } from './models/dynamicOperation';
+import { GetGroupUsersResponse } from './models/getGroupUsers';
+import { GetUserGroupsResponse } from './models/getUserGroups';
+import { IdentityPermission, IdentityType } from './models/identityPermission';
+import { IsAuthorizedOnSubjectRequest } from './models/isAuthorizedOnSubject';
+import { IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
+import { RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 
 describe('DynamicAuthorizationService', () => {
   let groupId: string;
@@ -754,13 +754,22 @@ describe('DynamicAuthorizationService', () => {
 
   describe('deleteGroup', () => {
     let params: DeleteGroupRequest;
+    let mockIdentityPermission: IdentityPermission;
     beforeEach(() => {
       params = { groupId, authenticatedUser: mockUser };
       auditAction = 'deleteGroup';
+      mockIdentityPermission = {
+        identityId: groupId,
+        identityType: 'GROUP',
+        action: 'CREATE',
+        effect: 'ALLOW',
+        subjectId: 'sampleSubjectId',
+        subjectType: 'sampleSubjectType'
+      };
 
       dynamicAuthzService.getIdentityPermissionsByIdentity = jest.fn().mockResolvedValue({
         data: {
-          identityPermissions: [{}]
+          identityPermissions: [mockIdentityPermission]
         }
       });
 
@@ -786,11 +795,83 @@ describe('DynamicAuthorizationService', () => {
       );
     });
 
+    it('ensure deleting non existent group throws GroupNotFoundError', async () => {
+      const mockRejectError = new GroupNotFoundError();
+      mockGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(mockRejectError);
+
+      await expect(dynamicAuthzService.deleteGroup(params)).rejects.toThrow(GroupNotFoundError);
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new GroupNotFoundError('Group does not exist')
+      );
+    });
+
+    it('ensure deletion paginates over all identity permissions associated to group', async () => {
+      const mockReturnValue = { data: { groupId } };
+      mockGroupManagementPlugin.deleteGroup = jest.fn().mockResolvedValue(mockReturnValue);
+      dynamicAuthzService.getIdentityPermissionsByIdentity = jest
+        .fn()
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          },
+          paginationToken: 'samplePaginationToken'
+        })
+        .mockResolvedValueOnce({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      const deleteIdentityPermissionsSpy = jest.spyOn(dynamicAuthzService, 'deleteIdentityPermissions');
+
+      const response = await dynamicAuthzService.deleteGroup(params);
+      expect(response).toMatchObject<DeleteGroupResponse>(mockReturnValue);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        mockReturnValue
+      );
+      expect(deleteIdentityPermissionsSpy).toBeCalledWith({
+        authenticatedUser: mockUser,
+        identityPermissions: [mockIdentityPermission, mockIdentityPermission]
+      });
+    });
+
+    it('throws exception when get group status has throws error that is not GroupNotFoundError', async () => {
+      const mockRejectedValue = new Error();
+      mockGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(mockRejectedValue);
+
+      await expect(dynamicAuthzService.deleteGroup(params)).rejects.toThrow(mockRejectedValue);
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        mockRejectedValue
+      );
+    });
+
     it('throws exception when identity permissions retrieval fails', async () => {
       const mockReturnValue = new Error();
       dynamicAuthzService.getIdentityPermissionsByIdentity = jest.fn().mockRejectedValue(mockReturnValue);
 
-      await expect(dynamicAuthzService.deleteGroup(params)).rejects.toThrow(Error);
+      await expect(dynamicAuthzService.deleteGroup(params)).rejects.toThrow(RetryError);
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {

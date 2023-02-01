@@ -6,6 +6,8 @@ overrides:
   jsonwebtoken: '>=9.0.0'
   json5: '>=2.2.2'
   debug: '>=3.1.0'
+  caniuse-lite: latest
+  jszip: '>=3.8.0'
 
 importers:
 
@@ -6816,7 +6818,7 @@ packages:
       ignore: 5.1.9
       inquirer: 7.3.3
       js-yaml: 3.13.1
-      jszip: 3.7.1
+      jszip: 3.10.1
       lodash: 4.17.21
       node-fetch: 2.6.7
       npm-check: 5.9.2
@@ -9026,7 +9028,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001382
+      caniuse-lite: 1.0.30001450
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -9181,8 +9183,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001382:
-    resolution: {integrity: sha512-2rtJwDmSZ716Pxm1wCtbPvHtbDWAreTPxXbkc5RkKglow3Ig/4GNGazDI9/BVnXbG/wnv6r3B5FEbkfg9OcTGg==}
+  /caniuse-lite/1.0.30001450:
+    resolution: {integrity: sha512-qMBmvmQmFXaSxexkjjfMvD5rnDL0+m+dUMZKoDYsGG8iZN29RuYh9eRoMvKsT6uMAWlyUUGDEQGJJYjzCIO9ew==}
 
   /capture-exit/2.0.0:
     resolution: {integrity: sha512-PiT/hQmTonHhl/HFGN+Lx3JJUznrVYJ3+AQsnthneZbvW7x+f08Tk7yLJTLEOUvBTbduLeeBkxEaYXUOUrRq6g==}
@@ -13850,13 +13852,13 @@ packages:
       array-includes: 3.1.6
       object.assign: 4.1.2
 
-  /jszip/3.7.1:
-    resolution: {integrity: sha512-ghL0tz1XG9ZEmRMcEN2vt7xabrDdqHHeykgARpmZ0BiIctWxM47Vt63ZO2dnp4QYt/xJVLLy5Zv1l/xRdh2byg==}
+  /jszip/3.10.1:
+    resolution: {integrity: sha512-xXDvecyTpGLrqFrvkrUSoxxfJI5AH7U8zxxtVclpsUtMCq4JQ290LY8AW5c7Ggnr/Y/oK+bQMbqK2qmtk3pN4g==}
     dependencies:
       lie: 3.3.0
       pako: 1.0.11
       readable-stream: 2.3.7
-      set-immediate-shim: 1.0.1
+      setimmediate: 1.0.5
     dev: false
 
   /just-extend/4.2.1:
@@ -14535,7 +14537,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001382
+      caniuse-lite: 1.0.30001450
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -14578,7 +14580,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001382
+      caniuse-lite: 1.0.30001450
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -16228,11 +16230,6 @@ packages:
   /set-blocking/2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
 
-  /set-immediate-shim/1.0.1:
-    resolution: {integrity: sha512-Li5AOqrZWCVA2n5kryzEmqai6bKSIvpz5oUJHPVj6+dsbD3X1ixtsY5tEnsaNpH3pFAHmG8eIHUrtEtohrg+UQ==}
-    engines: {node: '>=0.10.0'}
-    dev: false
-
   /set-value/2.0.1:
     resolution: {integrity: sha512-JxHc1weCN68wRY0fhCoXpyK55m/XPHafOmK4UWD7m2CI14GMcFypt4w/0+NV5f/ZMby2F6S2wwA7fgynh9gWSw==}
     engines: {node: '>=0.10.0'}
@@ -16242,6 +16239,10 @@ packages:
       is-plain-object: 2.0.4
       split-string: 3.1.0
     dev: true
+
+  /setimmediate/1.0.5:
+    resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
+    dev: false
 
   /setprototypeof/1.1.1:
     resolution: {integrity: sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==}
@@ -17172,7 +17173,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1_ts-node@10.8.0
+      jest: 27.5.1
       jest-util: 27.5.1
       json5: 2.2.2
       lodash.memoize: 4.1.2
