@@ -5,8 +5,8 @@
 
 import { JSONValue } from '@aws/workbench-core-base';
 import { z } from 'zod';
-import { ActionParser } from '../../action';
-import { EffectParser } from '../../effect';
+import { ActionParser } from '../../models/action';
+import { EffectParser } from '../../models/effect';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const IdentityTypeParser = z.union([z.literal('GROUP'), z.literal('USER')]);
