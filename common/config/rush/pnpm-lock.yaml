@@ -6,6 +6,7 @@ overrides:
   jsonwebtoken: '>=9.0.0'
   json5: '>=2.2.2'
   debug: '>=3.1.0'
+  caniuse-lite: latest
 
 importers:
 
