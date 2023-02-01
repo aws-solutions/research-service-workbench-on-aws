@@ -88,7 +88,7 @@ export async function handler(event: any) {
     params = {};
     Object.keys(event.multiValueQueryStringParameters).forEach((key) => {
       // eslint-disable-next-line security/detect-object-injection
-      params[key] = event.multiValueQueryStringParameters[key][0];
+      params[decodeURIComponent(key)] = decodeURIComponent(event.multiValueQueryStringParameters[key][0]);
     });
   }
 
@@ -117,12 +117,22 @@ export async function handler(event: any) {
     }
     response.statusCode = status;
     response.statusDescription = statusText;
-    response.body = JSON.stringify(data);
+    if (data) {
+      response.body = JSON.stringify(data);
+    }
   }
 
   try {
     if (HTTP_METHOD === 'GET') {
       const { data, status, statusText, headers } = await axios.get(targetPath, {
+        headers: reqHeaders,
+        params
+      });
+      setupResponse(response, data, status, statusText, headers);
+    }
+
+    if (HTTP_METHOD === 'PATCH') {
+      const { data, status, statusText, headers } = await axios.patch(targetPath, body, {
         headers: reqHeaders,
         params
       });
