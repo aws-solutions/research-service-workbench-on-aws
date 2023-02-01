@@ -19,9 +19,9 @@ import {
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
   DynamicAuthorizationService,
-  IdentityPermission
+  IdentityPermission,
+  IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
-import { IdentityPermissionParser } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
 import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,

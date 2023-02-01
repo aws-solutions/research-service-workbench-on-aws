@@ -2,7 +2,6 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-// import {DynamicAuthorizationService} from "@aws/workbench-core-authorization";
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
@@ -83,7 +82,7 @@ describe('multiStep dataset integration test', () => {
       envType: settings.get('envType'),
       datasetIds: [dataSet.id],
       name: randomTextGenerator.getFakeText('dataset-name'),
-      projectId: projectId,
+      projectId,
       description: 'Temporary DataSet for integration test'
     };
     const { data: env } = await adminSession.resources.environments.create(envBody);
@@ -124,7 +123,7 @@ describe('multiStep dataset integration test', () => {
     const { data: unassociatedProject } = await adminSession.resources.projects.create({
       name: `${dataSetName} unassociated project`,
       description: 'test description',
-      costCenterId: costCenterId
+      costCenterId
     });
     await adminSession.resources.datasets
       .dataset(dataSetDetails.id)

@@ -2,7 +2,6 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-// import {JSONValue} from "@aws/workbench-core-base";
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -22,14 +21,6 @@ export default class Datasets extends CollectionResource {
   public async import(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
-
-  // public async createWithProject(projectId: string, body: Record<string, JSONValue> = {}): Promise<AxiosResponse> {
-  //   this._api = `projects/${projectId}/datasets`;
-  //   const response = super.create(body, false);
-  //   this._api = 'datasets';
-  //
-  //   return response;
-  // }
 
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
