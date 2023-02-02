@@ -5,72 +5,64 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import _ from 'lodash';
-import { Action } from '../action';
 import AuthorizationPlugin from '../authorizationPlugin';
-import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';
 import { ParamNotFoundError } from '../errors/paramNotFoundError';
 import { RetryError } from '../errors/retryError';
 import { RouteNotSecuredError } from '../errors/routeNotSecuredError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
-import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
+import { Action } from '../models/action';
+import { AuthenticatedUser } from '../models/authenticatedUser';
+import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
+import { GroupManagementPlugin } from './groupManagementPlugin';
+import { AddUserToGroupRequest, AddUserToGroupResponse } from './models/addUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './models/createGroup';
 import {
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsRequestParser,
   CreateIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/createIdentityPermissions';
-import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
+} from './models/createIdentityPermissions';
+import { DeleteGroupRequest, DeleteGroupResponse } from './models/deleteGroup';
 import {
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsRequestParser,
   DeleteIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteIdentityPermissions';
+} from './models/deleteIdentityPermissions';
 import {
   DeleteSubjectIdentityPermissionsRequest,
   DeleteSubjectIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
-import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
-import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
+} from './models/deleteSubjectIdentityPermissions';
+import { DoesGroupExistRequest, DoesGroupExistResponse } from './models/doesGroupExist';
+import { GetGroupUsersRequest, GetGroupUsersResponse } from './models/getGroupUsers';
 import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityRequestParser,
   GetIdentityPermissionsByIdentityResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+} from './models/getIdentityPermissionsByIdentity';
 import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectRequestParser,
   GetIdentityPermissionsBySubjectResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
-import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
-import { Identity, IdentityPermission } from './dynamicAuthorizationInputs/identityPermission';
-import {
-  IsAuthorizedOnRouteRequest,
-  IsAuthorizedOnRouteRequestParser
-} from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
+} from './models/getIdentityPermissionsBySubject';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './models/getUserGroups';
+import { Identity, IdentityPermission, IdentityType } from './models/identityPermission';
+import { IsAuthorizedOnRouteRequest, IsAuthorizedOnRouteRequestParser } from './models/isAuthorizedOnRoute';
 import {
   IsAuthorizedOnSubjectRequest,
   IsAuthorizedOnSubjectRequestParser
-} from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
+} from './models/isAuthorizedOnSubject';
 import {
   IsRouteIgnoredRequest,
   IsRouteIgnoredRequestParser,
   IsRouteIgnoredResponse
-} from './dynamicAuthorizationInputs/isRouteIgnored';
+} from './models/isRouteIgnored';
 import {
   IsRouteProtectedRequest,
   IsRouteProtectedRequestParser,
   IsRouteProtectedResponse
-} from './dynamicAuthorizationInputs/isRouteProtected';
-import {
-  IsUserAssignedToGroupRequest,
-  IsUserAssignedToGroupResponse
-} from './dynamicAuthorizationInputs/isUserAssignedToGroup';
-import {
-  RemoveUserFromGroupRequest,
-  RemoveUserFromGroupResponse
-} from './dynamicAuthorizationInputs/removeUserFromGroup';
-import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
-import { GroupManagementPlugin } from './groupManagementPlugin';
+} from './models/isRouteProtected';
+import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
+import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 
 export class DynamicAuthorizationService {
   private readonly _wildcardSubjectId: string = '*';
@@ -289,41 +281,24 @@ export class DynamicAuthorizationService {
       requestBody: deleteGroupRequest
     };
 
-    let identityPermissions: IdentityPermission[];
-
     try {
-      const { data } = await this.getIdentityPermissionsByIdentity({
-        identityId: groupId,
-        identityType: 'GROUP'
-      });
-
-      identityPermissions = data.identityPermissions;
-
+      const hasGroupStatus = await this._hasGroupStatus({ groupId });
+      //if group has no status, it does not exist in dynamic authorization service
+      if (!hasGroupStatus) {
+        throw new GroupNotFoundError('Group does not exist');
+      }
+      //Lock group by setting group to delete_pending
       await this._groupManagementPlugin.setGroupStatus({
         groupId,
         status: 'delete_pending'
       });
-    } catch (error) {
-      metadata.statusCode = 400;
-      await this._auditService.write(metadata, error);
 
-      throw error;
-    }
-
-    if (identityPermissions.length > 0) {
-      try {
-        await this.deleteIdentityPermissions({
-          authenticatedUser,
-          identityPermissions
-        });
-      } catch (error) {
-        metadata.statusCode = 400;
-        await this._auditService.write(metadata, error);
-        throw new RetryError(error.message);
-      }
-    }
-
-    try {
+      //Delete all permissions associated to the group, will throw RetryError if an error is encountered
+      await this._deleteAllIdentityPermissionsByIdentity({
+        authenticatedUser,
+        identityId: groupId,
+        identityType: 'GROUP'
+      });
       const response = await this._groupManagementPlugin.deleteGroup(deleteGroupRequest);
 
       await this._groupManagementPlugin.setGroupStatus({
@@ -333,7 +308,6 @@ export class DynamicAuthorizationService {
 
       metadata.statusCode = 200;
       await this._auditService.write(metadata, response);
-
       return response;
     } catch (error) {
       metadata.statusCode = 400;
@@ -667,5 +641,74 @@ export class DynamicAuthorizationService {
       identityPermissions = identityPermissions.concat(response.data.identityPermissions);
     } while (paginationToken);
     return identityPermissions;
+  }
+
+  private async _getAllIdentityPermissionsByIdentity(params: {
+    identityId: string;
+    identityType: IdentityType;
+  }): Promise<IdentityPermission[]> {
+    const { identityId, identityType } = params;
+    let paginationToken = undefined;
+    let identityPermissions: IdentityPermission[] = [];
+    //paginate through response
+    do {
+      // get all identity permissions associated to an identity
+      const response: GetIdentityPermissionsBySubjectResponse = await this.getIdentityPermissionsByIdentity({
+        paginationToken,
+        identityId,
+        identityType
+      });
+      paginationToken = response.paginationToken;
+      identityPermissions = identityPermissions.concat(response.data.identityPermissions);
+    } while (paginationToken);
+    return identityPermissions;
+  }
+  /**
+   * Delete all identity permissions associated to an identity
+   * @param params - requires an IdentityId, IdentityType, and AuthenticatedUser
+   *
+   * @throws - {@link RetryError} if an error is encountered during deletion
+   */
+  private async _deleteAllIdentityPermissionsByIdentity(params: {
+    identityId: string;
+    identityType: IdentityType;
+    authenticatedUser: AuthenticatedUser;
+  }): Promise<void> {
+    const { identityId, identityType, authenticatedUser } = params;
+    try {
+      const identityPermissions = await this._getAllIdentityPermissionsByIdentity({
+        identityId,
+        identityType
+      });
+      const deleteIdentityPermissionsPromises = _.chunk(identityPermissions, 100).map(
+        (chunkedIdentityPermissions) => {
+          return this.deleteIdentityPermissions({
+            authenticatedUser,
+            identityPermissions: chunkedIdentityPermissions
+          });
+        }
+      );
+      await Promise.all(deleteIdentityPermissionsPromises);
+    } catch (error) {
+      throw new RetryError(error.message);
+    }
+  }
+  /**
+   * Check to see if a group has a status
+   * @param params - groupId required to check
+   */
+  private async _hasGroupStatus(params: { groupId: string }): Promise<boolean> {
+    const { groupId } = params;
+    try {
+      await this._groupManagementPlugin.getGroupStatus({
+        groupId
+      });
+      return true;
+    } catch (err) {
+      if (isGroupNotFoundError(err)) {
+        return false;
+      }
+      throw err;
+    }
   }
 }
