@@ -4,6 +4,7 @@
  */
 
 import axios, { AxiosError } from 'axios';
+import _ from 'lodash';
 import HttpError from '../integration-tests/support/utils/HttpError';
 
 /* eslint-disable-next-line */
@@ -11,7 +12,7 @@ export async function handler(event: any) {
   const baseUrl = process.env.API_GW_URL!.replace('/dev/', '/dev');
   let HTTP_METHOD = '';
 
-  const reqHeaders: { [id: string]: string } = {};
+  let reqHeaders: { [id: string]: string } = {};
 
   const response: {
     statusCode: number;
@@ -76,6 +77,7 @@ export async function handler(event: any) {
       // (Should be API GW host, not UI)
       delete reqHeaders.host;
     }
+    reqHeaders = _.omitBy(reqHeaders, _.isNil);
   }
 
   if (event.body && event.body!.length !== 0) {
@@ -128,10 +130,13 @@ export async function handler(event: any) {
   }
 
   try {
+    console.log(`Target path: ${targetPath}`);
+
     if (HTTP_METHOD === 'GET') {
       const { data, status, statusText, headers } = await axios.get(targetPath, {
         headers: reqHeaders,
-        params
+        params,
+        withCredentials: true
       });
       setupResponse(response, data, status, statusText, headers);
     }
@@ -139,7 +144,8 @@ export async function handler(event: any) {
     if (HTTP_METHOD === 'PATCH') {
       const { data, status, statusText, headers } = await axios.patch(targetPath, body, {
         headers: reqHeaders,
-        params
+        params,
+        withCredentials: true
       });
       setupResponse(response, data, status, statusText, headers);
     }
@@ -147,7 +153,8 @@ export async function handler(event: any) {
     if (HTTP_METHOD === 'POST') {
       const { data, status, statusText, headers } = await axios.post(targetPath, body, {
         headers: reqHeaders,
-        params
+        params,
+        withCredentials: true
       });
       setupResponse(response, data, status, statusText, headers);
     }
@@ -155,7 +162,8 @@ export async function handler(event: any) {
     if (HTTP_METHOD === 'PUT') {
       const { data, status, statusText, headers } = await axios.put(targetPath, body, {
         headers: reqHeaders,
-        params
+        params,
+        withCredentials: true
       });
       setupResponse(response, data, status, statusText, headers);
     }
@@ -163,7 +171,8 @@ export async function handler(event: any) {
     if (HTTP_METHOD === 'DELETE') {
       const { data, status, statusText, headers } = await axios.delete(targetPath, {
         headers: reqHeaders,
-        params
+        params,
+        withCredentials: true
       });
       setupResponse(response, data, status, statusText, headers);
     }
