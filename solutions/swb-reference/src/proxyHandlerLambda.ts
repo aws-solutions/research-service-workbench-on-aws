@@ -42,7 +42,12 @@ export async function handler(event: any) {
   }
 
   // Short-circuit if this is a ALB health-check
-  if (event.headers['user-agent'] && event.headers['user-agent'] === 'ELB-HealthChecker/2.0') return;
+  if (event.headers['user-agent'] && event.headers['user-agent'] === 'ELB-HealthChecker/2.0') {
+    response.statusDescription = 'OK';
+    console.log(`Health Check response: ${JSON.stringify(response)}`);
+
+    return setupResponse(response, {}, 200, 'Health check passed', event.headers);
+  }
 
   // One more layer of logging incoming API calls
   console.log(`Proxy handler called with: ${JSON.stringify(event)}`);

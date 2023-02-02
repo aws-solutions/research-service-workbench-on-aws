@@ -85,7 +85,7 @@ export function createECSCluster(
     vpc,
     healthCheck: {
       path: '/',
-      port: '80',
+      port: '3000',
       protocol: Protocol.HTTP,
       timeout: Duration.seconds(30),
       interval: Duration.seconds(60)
