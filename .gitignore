@@ -128,6 +128,7 @@ solutions/swb-ui/infrastructure/src/config/*.json
 solutions/swb-ui/ui/end-to-end-tests/config/*.yaml
 !solutions/swb-ui/ui/end-to-end-tests/config/example.yaml
 !solutions/swb-ui/ui/end-to-end-tests/config/testEnv.yaml
+!solutions/swb-ui/ui/end-to-end-tests/config/swbv2-private.yaml
 solutions/swb-ui/ui/end-to-end-tests/cypress/screenshots
 solutions/swb-ui/ui/end-to-end-tests/cypress/videos
 solutions/swb-ui/ui/end-to-end-tests/cypress/downloads
