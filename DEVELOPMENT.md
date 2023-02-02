@@ -78,5 +78,15 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
 ### Add packages using rush:
 1. `rush add -p <packageName> --caret -s; rush cupdate`
 
+### Fix pnpm audit errors
+1. In `<rootDir>/common/config/rush/pnpm-config.json` update:
+
+        "globalOverrides": {
+            "`<packageName>`":  "`<suggestedVersion>`"
+        }
+2. `rush update --recheck --bypass-policy`
+3. `rush cinstall/cupdate`
+4. `cd common/temp; pnpm audit --prod` -> this should report no vulnerabilities
+
 ## Getting support for rush
 [Getting Support](https://rushjs.io/pages/help/support/)
