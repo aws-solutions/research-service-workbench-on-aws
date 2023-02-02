@@ -36,15 +36,3 @@ require('esbuild')
     outfile: path.join(__dirname, '../build/accountHandler/accountHandlerLambda.js')
   })
   .catch(() => process.exit(1));
-
-// Lambda Proxy handler
-require('esbuild')
-  .build({
-    entryPoints: [path.join(__dirname, '/../src/proxyHandlerLambda.ts')],
-    bundle: true,
-    platform: 'node',
-    target: 'node16',
-    external: ['aws-sdk'],
-    outfile: path.join(__dirname, '../build/proxyHandler/proxyHandlerLambda.js')
-  })
-  .catch(() => process.exit(1));

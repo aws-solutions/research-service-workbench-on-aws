@@ -21,7 +21,7 @@
     "build:test": "rushx build && rushx test",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
-    "deploy-ui-and-api": "bash ./scripts/image-deploy.sh $BRANCH && bash ./scripts/deploy.sh",
+    "deploy-ui-and-api": "bash ./scripts/deploy.sh",
     "dev": "bash ./scripts/dev.sh",
     "e2e-test": "cypress run --env STAGE=${STAGE}",
     "e2e-test:open": "cypress open --env STAGE=${STAGE}",
@@ -32,7 +32,6 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
-    "start": "next start",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },

@@ -35,20 +35,7 @@ interface Constants {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
-  VPC_ID: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
-  MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
-  SWB_DOMAIN_NAME_OUTPUT_KEY: string;
-  MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
-  ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
-  VPC_ID_OUTPUT_KEY: string;
-  ALB_SUBNET_IDS: string[];
-  ECS_SUBNET_IDS: string[];
-  ECS_SUBNET_IDS_OUTPUT_KEY: string;
-  ECS_SUBNET_AZS_OUTPUT_KEY: string;
-  ALB_INTERNET_FACING: boolean;
-  HOSTED_ZONE_ID: string;
-  DOMAIN_NAME: string;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
@@ -69,6 +56,8 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
+  const uiClientURL = getUiClientUrl();
+  if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
@@ -76,19 +65,6 @@ function getConstants(): Constants {
   const USER_POOL_ID = config.userPoolId || '';
   const CLIENT_ID = config.clientId || '';
   const CLIENT_SECRET = config.clientSecret || '';
-  const VPC_ID = config.vpcId || '';
-  const ALB_SUBNET_IDS = config.albSubnetIds || [];
-  const ECS_SUBNET_IDS = config.ecsSubnetIds || [];
-  const ALB_INTERNET_FACING = config.albInternetFacing || false;
-  const HOSTED_ZONE_ID = config.hostedZoneId || '';
-  const DOMAIN_NAME = config.domainName || '';
-  let uiClientURL = '';
-  if (DOMAIN_NAME) {
-    uiClientURL = `https://${DOMAIN_NAME}`;
-  } else {
-    uiClientURL = getUiClientUrl();
-  }
-  if (uiClientURL) allowedOrigins.push(uiClientURL);
 
   const FIELDS_TO_MASK_WHEN_AUDITING: string[] = config.fieldsToMaskWhenAuditing;
 
@@ -96,7 +72,7 @@ function getConstants(): Constants {
 
   // These are the OutputKey for the SWB Main Account CFN stack
   const SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
-  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = `${config.stage}-S3BucketAccessLogsNameOutput`;
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   const S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
@@ -104,13 +80,6 @@ function getConstants(): Constants {
   const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
-  const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
-  const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
-  const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
-  const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
-  const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
-  const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
-  const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
 
   return {
     STAGE: config.stage,
@@ -139,20 +108,7 @@ function getConstants(): Constants {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    VPC_ID,
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
-    MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-    SWB_DOMAIN_NAME_OUTPUT_KEY,
-    MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
-    ECR_REPOSITORY_NAME_OUTPUT_KEY,
-    VPC_ID_OUTPUT_KEY,
-    HOSTED_ZONE_ID,
-    DOMAIN_NAME,
-    ALB_SUBNET_IDS,
-    ECS_SUBNET_IDS,
-    ECS_SUBNET_IDS_OUTPUT_KEY,
-    ECS_SUBNET_AZS_OUTPUT_KEY,
-    ALB_INTERNET_FACING,
     FIELDS_TO_MASK_WHEN_AUDITING
   };
 }
@@ -177,12 +133,6 @@ interface Config {
   userPoolId?: string;
   clientId?: string;
   clientSecret?: string;
-  vpcId?: string;
-  albSubnetIds?: string[];
-  ecsSubnetIds?: string[];
-  albInternetFacing?: boolean;
-  hostedZoneId?: string;
-  domainName?: string;
   fieldsToMaskWhenAuditing: string[];
 }
 function getConfig(): Config {

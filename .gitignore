@@ -63,7 +63,6 @@ jspm_packages/
 common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
-common/autoinstallers/*/.pnpm-store
 **/.rush/temp/
 **/temp/
 workbench-core/environments/temp/
@@ -96,7 +95,6 @@ solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/integration-tests/config/testEnv.yaml
-!solutions/swb-reference/integration-tests/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 !solutions/swb-reference/src/config/swbv2-private.yaml

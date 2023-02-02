@@ -45,27 +45,6 @@ jobs:
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_TEST }}
       DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_TEST }}
 
-  deploy-swb-reference-byon:
-    needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
-    secrets:
-      aws-dev-region: ${{ secrets.AWS_DEV_REGION_BYON }}
-      role-to-assume: ${{ secrets.ASSUME_ROLE }}
-      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION_BYON }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-      CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD_BYON }}
-      CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER_BYON }}
-      COGNITO_DOMAIN: ${{ secrets.COGNITO_DOMAIN_BYON }}
-      USER_POOL_ID: ${{ secrets.USER_POOL_ID_BYON }}
-      CLIENT_ID: ${{ secrets.CLIENT_ID_BYON }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_BYON }}
-      VPC_ID: ${{ secrets.VPC_ID_BYON }}
-      ALB_SUBNET_1: ${{ secrets.ALB_SUBNET_1_BYON }}
-      ALB_SUBNET_2: ${{ secrets.ALB_SUBNET_2_BYON }}
-      ECS_SUBNET_1: ${{ secrets.ECS_SUBNET_1_BYON }}
-      ECS_SUBNET_2: ${{ secrets.ECS_SUBNET_2_BYON }}
-      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_BYON }}
-
   deploy-swb-demo:
     needs: [deploy-swb-reference]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
