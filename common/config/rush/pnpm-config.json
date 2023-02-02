@@ -95,7 +95,8 @@
       "json5": ">=2.2.2",
       "debug": ">=3.1.0",
       "caniuse-lite": "latest",
-      "jszip": ">=3.8.0"
+      "jszip": ">=3.8.0",
+      "http-cache-semantics": ">=4.1.1"
     },
 
     /**
