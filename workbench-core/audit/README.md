@@ -5,7 +5,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-96.96%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-92.59%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.41%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-93.5%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-93.33%25-brightgreen.svg?style=flat) |
 
 ## Description
 The audit component is a flexible and extensible auditing library. It is designed with the plugin-architecture to allow developers to decide and implement their own process of storing audit logs.

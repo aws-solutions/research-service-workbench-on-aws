@@ -6,6 +6,7 @@
 import _ from 'lodash';
 import AuditEntry from './auditEntry';
 import AuditPlugin from './auditPlugin';
+import { AuditIncompleteError } from './errors/auditIncompleteError';
 import Metadata from './metadata';
 
 /**
@@ -61,7 +62,14 @@ export default class AuditService {
    */
   public async createAuditEntry(metadata: Metadata, body?: object): Promise<AuditEntry> {
     const auditEntry: AuditEntry = {};
-    if (body) auditEntry.body = body;
+    if (body) {
+      //in the instance it is an Error
+      if (body instanceof Error) {
+        auditEntry.body = { error: body.name, message: body.message, stack: body.stack };
+      } else {
+        auditEntry.body = body;
+      }
+    }
 
     auditEntry.timestamp = Date.now();
 
@@ -80,7 +88,7 @@ export default class AuditService {
   public async write(metadata: Metadata, body?: object): Promise<void> {
     const auditEntry: Readonly<AuditEntry> = await this.createAuditEntry(metadata, body);
     if (!this.isAuditComplete(auditEntry) && !this._auditServiceConfig.continueOnError) {
-      throw new Error('Audit Entry is not complete');
+      throw new AuditIncompleteError('Audit Entry is not complete');
     }
     await this._auditServiceConfig.auditPlugin.write(metadata, auditEntry);
   }
