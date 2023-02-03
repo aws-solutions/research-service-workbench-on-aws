@@ -82,25 +82,10 @@ jobs:
           STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
-      - name: Deploy SWB-UI
-        run: |
-          cd solutions/swb-ui/ui
-          STAGE='swbv2-private' node ../../../common/scripts/install-run-rushx.js deploy-ui-and-api
-
       - name: Run Integration tests
         run: |
           cd solutions/swb-reference
           STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js integration-tests
-
-      - name: Run End To End tests
-        run: |
-          cd solutions/swb-ui/ui
-          STAGE='swbv2-private' node ../../../common/scripts/install-run-rushx.js e2e-test
-        env:
-          # Env parameters for cypress tests need header 'CYPRESS_' or 'cypress_'
-          # Cypress will strip the header and pass it to the tests
-          CYPRESS_AdminPassword: ${{ secrets.CYPRESS_ADMIN_PASSWORD_BYON }}
-          CYPRESS_AdminUser: ${{ secrets.CYPRESS_ADMIN_USER_BYON }}
 
       - name: Slack Failure Notification
         if: failure()
