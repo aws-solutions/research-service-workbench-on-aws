@@ -65,7 +65,7 @@ Cypress.Commands.add('login', (role: string) => {
   cy.get('[data-testid="environmentListHeader"]', { timeout: 10000 })
     .contains('Workspaces')
     .should('be.visible'); //redirection for environments may take time to load
-  cy.location('pathname').should('eq', '/environments');
+  cy.location('pathname').should('eq', '/environments/');
 });
 
 Cypress.Commands.add('logout', () => {
