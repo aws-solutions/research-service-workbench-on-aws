@@ -23,7 +23,6 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
-import { Repository } from 'aws-cdk-lib/aws-ecr';
 import {
   ApplicationTargetGroup,
   ListenerCondition,
@@ -102,7 +101,6 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
-      UI_CLIENT_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -115,7 +113,6 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       SWB_DOMAIN_NAME_OUTPUT_KEY,
       MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
-      ECR_REPOSITORY_NAME_OUTPUT_KEY,
       VPC_ID_OUTPUT_KEY,
       ALB_SUBNET_IDS,
       ECS_SUBNET_IDS,
@@ -182,7 +179,7 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ID
     };
 
-    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
     this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
@@ -253,13 +250,6 @@ export class SWBStack extends Stack {
     });
 
     this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
-
-    const repository = new Repository(this, 'Repository', {
-      imageScanOnPush: true
-    });
-    new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
-      value: repository.repositoryName
-    });
   }
 
   private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
@@ -355,12 +345,7 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createInitialOutputs(
-    accountId: string,
-    awsRegion: string,
-    awsRegionName: string,
-    uiClientURL: string
-  ): void {
+  private _createInitialOutputs(accountId: string, awsRegion: string, awsRegionName: string): void {
     new CfnOutput(this, 'accountId', {
       value: accountId
     });
@@ -369,9 +354,6 @@ export class SWBStack extends Stack {
     });
     new CfnOutput(this, 'awsRegionShortName', {
       value: awsRegionName
-    });
-    new CfnOutput(this, 'uiClientURL', {
-      value: uiClientURL
     });
   }
 
