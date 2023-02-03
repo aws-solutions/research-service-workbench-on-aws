@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { ActionParser } from '../../action';
+import { ActionParser } from '../../models/action';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DynamicOperationParser = z.object({
