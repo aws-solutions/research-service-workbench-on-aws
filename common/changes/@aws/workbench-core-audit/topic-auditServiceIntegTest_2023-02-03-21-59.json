@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-audit",
+      "comment": "Fix logging of errors and metadata",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-audit"
+}

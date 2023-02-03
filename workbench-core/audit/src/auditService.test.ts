@@ -6,33 +6,45 @@
 import AuditEntry from './auditEntry';
 import AuditPlugin from './auditPlugin';
 import AuditService from './auditService';
+import { AuditIncompleteError } from './errors/auditIncompleteError';
 import Metadata from './metadata';
 
 const sysTime = new Date('2022-01-01').getTime();
 jest.useFakeTimers().setSystemTime(sysTime);
 describe('Audit Service', () => {
-  const statusCode: number = 200;
-  const action: string = 'GET /user/sample';
-  const actor: object = {
-    principalIdentifier: { uid: 'userIdFromContext' }
-  };
-  const body: object = { data: 'sample data' };
-  const source: object = {
-    ipAddress: 'sampleIPAddress'
-  };
+  let statusCode: number;
+  let action: string;
+  let actor: Record<string, object>;
+  let body: Record<string, string>;
+  let source: Record<string, string>;
   let mockMetadata: Metadata;
-  const mockAuditPlugin: AuditPlugin = {
-    write: jest.fn(async (metadata: Metadata, auditEntry: Readonly<AuditEntry>): Promise<void> => {}),
-    prepare: jest.fn(async (metadata: Metadata, auditEntry: AuditEntry): Promise<void> => {
-      auditEntry.action = metadata.action;
-      auditEntry.statusCode = metadata.statusCode;
-      auditEntry.source = metadata.source;
-      auditEntry.actor = metadata.actor;
-    })
-  };
+  let mockAuditPlugin: AuditPlugin;
 
   let auditService: AuditService;
   let requiredAuditValues: string[];
+
+  beforeEach(() => {
+    expect.hasAssertions();
+    statusCode = 200;
+    action = 'GET /user/sample';
+    actor = {
+      principalIdentifier: { uid: 'userIdFromContext' }
+    };
+
+    body = { data: 'sample data' };
+    source = {
+      ipAddress: 'sampleIPAddress'
+    };
+    mockAuditPlugin = {
+      write: jest.fn(async (metadata: Metadata, auditEntry: Readonly<AuditEntry>): Promise<void> => {}),
+      prepare: jest.fn(async (metadata: Metadata, auditEntry: AuditEntry): Promise<void> => {
+        auditEntry.action = metadata.action;
+        auditEntry.statusCode = metadata.statusCode;
+        auditEntry.source = metadata.source;
+        auditEntry.actor = metadata.actor;
+      })
+    };
+  });
 
   describe('Use mockAuditPugin and continues on error', () => {
     beforeEach(() => {
@@ -64,7 +76,8 @@ describe('Audit Service', () => {
         info: {
           userInfo: {
             password: 'samplePassword'
-          }
+          },
+          value: undefined
         }
       };
       const auditEntry = await auditService.createAuditEntry(mockMetadata, exposedBody);
@@ -131,6 +144,18 @@ describe('Audit Service', () => {
         source
       });
     });
+    test('Create Audit Entry when body is an Error', async () => {
+      const error = new Error('sampleError');
+      const auditEntry = await auditService.createAuditEntry(mockMetadata, error);
+      expect(auditEntry).toStrictEqual({
+        body: { error: error.name, message: 'sampleError', stack: error.stack },
+        statusCode,
+        timestamp: 1640995200000,
+        action,
+        actor,
+        source
+      });
+    });
 
     test('Write Audit Entry', async () => {
       await auditService.write(mockMetadata, body);
@@ -140,13 +165,7 @@ describe('Audit Service', () => {
 
     test('Fails when source is undefined', async () => {
       mockMetadata.source = undefined;
-      try {
-        await auditService.write(mockMetadata, body);
-        expect.hasAssertions();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        expect(err.message).toBe('Audit Entry is not complete');
-      }
+      await expect(auditService.write(mockMetadata, body)).rejects.toThrow(AuditIncompleteError);
     });
 
     test('Continue on error when audit not complete', async () => {
@@ -172,12 +191,7 @@ describe('Audit Service', () => {
     });
 
     test('Should fail without resourceId, audit entry not complete', async () => {
-      try {
-        await auditService.write(mockMetadata, body);
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err.message).toBe('Audit Entry is not complete');
-      }
+      await expect(auditService.write(mockMetadata, body)).rejects.toThrow(AuditIncompleteError);
     });
 
     test('Change plugin to add resourceId', async () => {
