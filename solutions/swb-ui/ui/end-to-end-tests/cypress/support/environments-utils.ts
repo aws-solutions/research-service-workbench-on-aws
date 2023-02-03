@@ -34,7 +34,7 @@ export const createEnvironment = (environmentData: CreateEnvironmentForm): void 
 };
 
 export function navigateToCreateEnvironment(): void {
-  cy.visit('/environments');
+  cy.visit('/environments/');
   cy.get('[data-testid="environmentListHeader"]').contains('Workspaces').should('be.visible');
   cy.get('[data-testid="environmentCreate"]').click();
   cy.get('[data-testid="environmentCreateHeader"]').should('be.visible');
