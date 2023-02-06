@@ -1,6 +1,0 @@
-AdminUser: ''
-AdminPassword: ''
-EnvTypes: [{ EnvironmentType: 'Sagemaker Jupyter Notebook', EnvironmentTypeConfig: 'Config 1' }] ##Environment Types to test
-EnvProject: 'Integration Test Project' ##default environment project to be selected when creating an environment
-EnvStudies: ['test data set'] ##default environment studies to be selected when creating an environment
-CleanEnvironments: true
