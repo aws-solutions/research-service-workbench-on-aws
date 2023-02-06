@@ -2,9 +2,14 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import {
+  BatchGetItemCommandOutput,
+  DeleteItemCommandOutput,
+  GetItemCommandOutput
+} from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
+import DeleteItemParams from '../../../interfaces/deleteItemParams';
 import GetItemParams from '../../../interfaces/getItemParams';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
 import QueryParams from '../../../interfaces/queryParams';
@@ -400,6 +405,23 @@ export default class DynamoDBService {
       }
     }
     return updater;
+  }
+
+  /**
+   * Deletes a single item from the DynamoDB table.
+   *
+   * @param params - {@link DeleteItemParams} object of properties to generate a delete item request
+   * @returns Promise of a string, {@link JSONValue} paired object
+   *
+   * @example Use this to delete a single item from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.deleteItem({key: 'pk'});
+   * ```
+   */
+  public async deleteItem(params: DeleteItemParams): Promise<Record<string, JSONValue>> {
+    const result = (await this.delete(params.key, params.params).execute()) as DeleteItemCommandOutput;
+
+    return result.Attributes as unknown as Record<string, JSONValue>;
   }
 
   /**
