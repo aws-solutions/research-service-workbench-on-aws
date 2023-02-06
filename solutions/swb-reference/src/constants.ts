@@ -29,7 +29,6 @@ interface Constants {
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
-  UI_CLIENT_URL: string;
   COGNITO_DOMAIN: string;
   WEBSITE_URLS: string[];
   USER_POOL_ID: string;
@@ -40,7 +39,6 @@ interface Constants {
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   SWB_DOMAIN_NAME_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
-  ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
   VPC_ID_OUTPUT_KEY: string;
   ALB_SUBNET_IDS: string[];
   ECS_SUBNET_IDS: string[];
@@ -82,13 +80,6 @@ function getConstants(): Constants {
   const ALB_INTERNET_FACING = config.albInternetFacing || false;
   const HOSTED_ZONE_ID = config.hostedZoneId || '';
   const DOMAIN_NAME = config.domainName || '';
-  let uiClientURL = '';
-  if (DOMAIN_NAME) {
-    uiClientURL = `https://${DOMAIN_NAME}`;
-  } else {
-    uiClientURL = getUiClientUrl();
-  }
-  if (uiClientURL) allowedOrigins.push(uiClientURL);
 
   const FIELDS_TO_MASK_WHEN_AUDITING: string[] = config.fieldsToMaskWhenAuditing;
 
@@ -107,7 +98,6 @@ function getConstants(): Constants {
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
-  const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
   const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
   const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
   const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
@@ -130,7 +120,6 @@ function getConstants(): Constants {
     USER_POOL_NAME,
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
     AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
-    UI_CLIENT_URL: uiClientURL,
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
@@ -144,7 +133,6 @@ function getConstants(): Constants {
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     SWB_DOMAIN_NAME_OUTPUT_KEY,
     MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
-    ECR_REPOSITORY_NAME_OUTPUT_KEY,
     VPC_ID_OUTPUT_KEY,
     HOSTED_ZONE_ID,
     DOMAIN_NAME,
@@ -212,27 +200,6 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
   });
 
   return response.Parameter!.Value!;
-}
-
-function getUiClientUrl(): string {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uiClientOutput: any = JSON.parse(
-      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-      // correct file
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.readFileSync(
-        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
-        'utf8'
-      ) // nosemgrep
-    );
-    const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
-    // eslint-disable-next-line security/detect-object-injection
-    return uiClientOutput[uiClientStackName].WebsiteURL;
-  } catch {
-    console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
-    return '';
-  }
 }
 
 const dataSetPrefix: string = 'DATASET';

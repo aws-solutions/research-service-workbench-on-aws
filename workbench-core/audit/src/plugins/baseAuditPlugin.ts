@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import _ from 'lodash';
 import AuditEntry from '../auditEntry';
 import AuditPlugin from '../auditPlugin';
 import Metadata from '../metadata';
@@ -24,11 +25,10 @@ class BaseAuditPlugin implements AuditPlugin {
    * @param auditEntry - {@link AuditEntry}
    */
   public async prepare(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
-    auditEntry.logEventType = 'audit';
-    auditEntry.statusCode = metadata.statusCode;
-    auditEntry.action = metadata.action;
-    auditEntry.actor = metadata.actor;
-    auditEntry.source = metadata.source;
+    _.merge(auditEntry, {
+      ..._.omitBy(metadata, _.isNil),
+      logEventType: 'audit'
+    });
     if (this._writer.prepare !== undefined) {
       await this._writer.prepare(metadata, auditEntry);
     }
