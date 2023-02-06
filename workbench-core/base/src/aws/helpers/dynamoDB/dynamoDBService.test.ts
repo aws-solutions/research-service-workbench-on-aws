@@ -3,7 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, QueryCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  QueryCommand,
+  UpdateItemCommand,
+  GetItemCommand,
+  DeleteItemCommand
+} from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import JSONValue from '../../../types/json';
@@ -237,6 +243,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toMatchObject(expectedParams);
     });
   });
+
+  describe('deleteItem', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(DeleteItemCommand).resolves({
+        Attributes: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.deleteItem({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual(unmarshalledAttributes);
+    });
+  });
+
   describe('deleter', () => {
     test('should suceed with no optional params', async () => {
       // BUILD

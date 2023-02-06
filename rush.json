@@ -140,12 +140,6 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@aws/swb-ui",
-      "projectFolder": "solutions/swb-ui/ui",
-      "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
       "packageName": "@aws/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
@@ -156,12 +150,6 @@
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/swb-ui-infrastructure",
-      "projectFolder": "solutions/swb-ui/infrastructure",
-      "reviewCategory": "production",
-      "shouldPublish": false
     }
   ]
 }
