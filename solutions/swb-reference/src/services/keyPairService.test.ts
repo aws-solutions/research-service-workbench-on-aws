@@ -90,7 +90,11 @@ describe('KeyPairService', () => {
               sk: 'USER#user-123',
               dependency: 'proj-123'
             },
-            { pk: 'SSH#ssh-456', sk: 'USER#user-123', dependency: 'proj-123' }
+            {
+              pk: 'SSH#ssh-456',
+              sk: 'USER#user-123',
+              dependency: 'proj-123'
+            }
           ]
         };
         dynamoDBService.getPaginatedItems = jest.fn((): Promise<PaginatedJsonResponse> => {
@@ -106,7 +110,7 @@ describe('KeyPairService', () => {
       });
     });
 
-    describe('when key exists', () => {
+    describe('when unique key exists', () => {
       beforeEach(() => {
         const queryResponse = { data: [{ pk: 'SSH#ssh-123', sk: 'USER#user-123', dependency: 'proj-123' }] };
         dynamoDBService.getPaginatedItems = jest.fn((): Promise<PaginatedJsonResponse> => {

@@ -12,15 +12,12 @@ describe('Delete Key Pair negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    adminSession = await setup.getDefaultAdminSession();
     expect.hasAssertions();
   });
 
-  beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-  });
-
-  afterAll(async () => {
+  afterEach(async () => {
     await setup.cleanup();
   });
 

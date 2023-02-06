@@ -18,10 +18,7 @@
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
     "<rootDir>/src/services/dataSetService.ts",
-    "<rootDir>/src/services/projectEnvTypeConfigService.ts",
-    "<rootDir>/src/errors/databaseError.ts",
-    "<rootDir>/src/errors/noKeyExistsError.ts",
-    "<rootDir>/src/errors/nonUniqueKeyError.ts"
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts"
   ],
   "coverageThreshold": {
     "global": {
