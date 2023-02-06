@@ -4,8 +4,9 @@
  */
 
 import { LoggingService } from '@aws/workbench-core-logging';
-import AuditEntry from './auditEntry';
-import Writer from './plugins/writer';
+import AuditEntry from '../auditEntry';
+import Metadata from '../metadata';
+import Writer from './writer';
 
 export default class AuditLogger implements Writer {
   private _logger: LoggingService;
@@ -13,7 +14,7 @@ export default class AuditLogger implements Writer {
     this._logger = logger;
   }
 
-  public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {
+  public async write(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
     this._logger.info(JSON.stringify(auditEntry));
   }
 }
