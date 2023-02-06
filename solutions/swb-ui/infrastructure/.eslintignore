@@ -1,7 +1,0 @@
-.eslintrc.js
-node_modules
-lib
-temp
-cdk.out
-build
-src/redirectFunction.js
