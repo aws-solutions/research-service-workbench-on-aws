@@ -29,19 +29,14 @@ describe('Delete Key Pair negative tests', () => {
 
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects
-          .project(invalidProjectId)
-          .keyPairs()
-          .keyPair(invalidProjectId)
-          .delete();
-        // await adminSession.resources.projects.project(invalidProjectId).softDelete();
+        await adminSession.resources.projects.project(invalidProjectId).keyPairs().delete();
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(404, {
             statusCode: 404,
             error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+            message: `No key exists for user ${adminSession.getUserId()} and project ${invalidProjectId}`
           })
         );
       }

@@ -4,7 +4,6 @@
  */
 import ClientSession from '../../clientSession';
 import CollectionResource from '../base/collectionResource';
-import KeyPair from './keyPair';
 
 export default class KeyPairs extends CollectionResource {
   public constructor(clientSession: ClientSession, parentApi: string = '') {
@@ -13,7 +12,7 @@ export default class KeyPairs extends CollectionResource {
     this._api = `${parentRoute}sshKeys`;
   }
 
-  public keyPair(id: string): KeyPair {
-    return new KeyPair(id, this._clientSession, this._api);
+  public async delete(): Promise<void> {
+    await this._axiosInstance.delete(this._api);
   }
 }

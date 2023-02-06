@@ -63,7 +63,8 @@ export default class KeyPairService implements KeyPairPlugin {
       index: 'getResourceByOwner',
       key: { name: 'resourceType', value: this._resourceType },
       sortKey: userId,
-      filter: `dependency = ${projectId}`
+      filter: `dependency = :projId`,
+      values: { ':projId': projectId }
     });
 
     if (queryResult.data === undefined || queryResult.data.length === 0) {
