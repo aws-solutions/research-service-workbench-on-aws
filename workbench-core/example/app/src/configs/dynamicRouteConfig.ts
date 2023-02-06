@@ -62,6 +62,28 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         }
       }
     ]
+  },
+  '/audit/write': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectId: '*',
+          subjectType: 'auditEntry'
+        }
+      }
+    ]
+  },
+  '/audit/is-audit-complete': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectId: '*',
+          subjectType: 'auditEntry'
+        }
+      }
+    ]
   }
 };
 

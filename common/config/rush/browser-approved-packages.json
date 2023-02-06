@@ -456,7 +456,7 @@
     },
     {
       "name": "fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "generate-password",
@@ -476,7 +476,7 @@
     },
     {
       "name": "jest-fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "js-yaml",
