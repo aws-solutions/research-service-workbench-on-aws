@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuditService, Metadata, MetadataParser } from '@aws/workbench-core-audit';
 import { isAuditIncompleteError } from '@aws/workbench-core-audit/lib/errors/auditIncompleteError';
 import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
