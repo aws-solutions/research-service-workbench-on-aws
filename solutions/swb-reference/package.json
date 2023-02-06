@@ -20,6 +20,7 @@
     "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
+    "cognito-tokens": "node scripts/generateCognitoTokens.js ${EMAIL} ${PASSWORD}",
     "compile": "node scripts/buildLambda.js",
     "depcheck": "depcheck",
     "integration-tests": "rushx build && jest lib/integration-tests -i",
