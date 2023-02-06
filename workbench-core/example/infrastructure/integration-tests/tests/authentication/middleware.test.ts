@@ -43,4 +43,70 @@ describe('authentication middleware integration tests', () => {
       );
     });
   });
+
+  describe('csurf', () => {
+    it('should throw 401 when the user does not provide a csrf-token header', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: true,
+          includeToken: false
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 when the user does not provide a _csrf cookie', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: false,
+          includeToken: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 when the user does not provide a _csrf cookie nor a csrf-token header', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: false,
+          includeToken: false
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 when the user provides an invalid _csrf cookie', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: true,
+          includeToken: true,
+          invalidCookie: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 when the user provides an invalid csrf-token header', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: true,
+          includeToken: true,
+          invalidToken: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 when the user provides both an invalid _csrf cookie and an invalid csrf-token header', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({
+          includeCookie: true,
+          includeToken: true,
+          invalidCookie: true,
+          invalidToken: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 403 when the user provides a valid csrf cookie and token', async () => {
+      await expect(
+        anonymousSession.resources.authentication.dummyCsurfRoute({ includeCookie: true, includeToken: true })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+  });
 });
