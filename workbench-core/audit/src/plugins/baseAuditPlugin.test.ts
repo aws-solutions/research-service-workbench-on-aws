@@ -30,11 +30,30 @@ describe('BaseAuditPlugin', () => {
   describe('.prepare', () => {
     test('Prepare audit entry', async () => {
       await baseAuditPlugin.prepare(metadata, auditEntry);
-      expect(auditEntry.logEventType).toBe('audit');
-      expect(auditEntry.action).toBe(metadata.action);
-      expect(auditEntry.source).toBe(metadata.source);
-      expect(auditEntry.statusCode).toBe(metadata.statusCode);
-      expect(auditEntry.actor).toBe(metadata.actor);
+
+      expect(auditEntry).toMatchObject({
+        statusCode: 200,
+        action: 'GET /user',
+        source: { ip: 'sampleIP' },
+        actor: { uid: 'sampleID' },
+        logEventType: 'audit'
+      });
+    });
+    test('Prepare audit entry with more metadata', async () => {
+      const moreInfo = {
+        additionalInfo: 'moreMetadata'
+      };
+      metadata.moreInfo = moreInfo;
+      await baseAuditPlugin.prepare(metadata, auditEntry);
+
+      expect(auditEntry).toMatchObject({
+        statusCode: 200,
+        action: 'GET /user',
+        source: { ip: 'sampleIP' },
+        actor: { uid: 'sampleID' },
+        logEventType: 'audit',
+        moreInfo
+      });
     });
   });
 
