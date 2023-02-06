@@ -50,8 +50,9 @@ async function init() {
   };
 
   if (process.env.LAMBDA_URL) {
-    console.log(`LAMBDA_URL = ${process.env.LAMBDA_URL}`);
-    settings.apiUrlOutput = process.env.LAMBDA_URL;
+    const lambdaUrl = process.env.LAMBDA_URL.trim();
+    console.log(`LAMBDA_URL = ${lambdaUrl}`);
+    settings.apiUrlOutput = lambdaUrl;
   }
 }
 

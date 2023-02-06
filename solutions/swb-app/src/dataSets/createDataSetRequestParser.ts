@@ -14,6 +14,7 @@ export const CreateDataSetRequestParser = z.object({
   region: z.string(),
   type: z.string(),
   owner: z.string(),
+  ownerType: z.enum(['USER', 'GROUP']),
   permissions: z.optional(z.array(DataSetPermissionParser))
 });
 

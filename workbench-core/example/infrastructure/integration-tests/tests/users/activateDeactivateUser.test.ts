@@ -92,8 +92,8 @@ describe('userManagement activate/deactivate user integration test', () => {
     );
   });
 
-  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
-    await expect(adminSession.resources.users.user(invalidUuid).deactivate()).rejects.toThrow(
+  it('should return a 403 error when activating a user with an invalid UUID', async () => {
+    await expect(adminSession.resources.users.user(invalidUuid).activate()).rejects.toThrow(
       new HttpError(403, {})
     );
   });

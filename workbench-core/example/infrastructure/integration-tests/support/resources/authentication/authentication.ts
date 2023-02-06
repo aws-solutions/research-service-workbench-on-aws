@@ -36,4 +36,46 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.get('dummyAccessTokenRoute', { headers });
   }
+
+  public async dummyCsurfRoute(config: {
+    includeCookie: boolean;
+    includeToken: boolean;
+    invalidCookie?: boolean;
+    invalidToken?: boolean;
+  }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {};
+
+    if (config.includeCookie) {
+      headers.Cookie = `_csrf=${config.invalidCookie ? 'invalidSecret' : this._csrfSecret};`;
+    }
+
+    if (config.includeToken) {
+      headers['csrf-token'] = config.invalidToken ? 'invalidToken' : this._csrfToken;
+    }
+
+    return this._axiosInstance.get('dummyCsurfRoute', { headers });
+  }
+
+  public async login(config: {
+    stateVerifier?: string;
+    codeChallenge?: string;
+    origin?: string;
+  }): Promise<AxiosResponse> {
+    const { stateVerifier, codeChallenge, origin } = config;
+
+    const params: Record<string, string> = {};
+    const headers: AxiosRequestHeaders = {};
+
+    if (stateVerifier) {
+      params.stateVerifier = stateVerifier;
+    }
+    if (codeChallenge) {
+      params.codeChallenge = codeChallenge;
+    }
+    if (origin) {
+      headers.origin = origin;
+    }
+
+    return this._axiosInstance.get('login', { params, headers });
+  }
 }
