@@ -1756,6 +1756,41 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Key Pairs",
+      "items": [
+        {
+          "name": "Delete Key Pair",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

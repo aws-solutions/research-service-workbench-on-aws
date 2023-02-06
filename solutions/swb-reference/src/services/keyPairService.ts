@@ -14,13 +14,17 @@ import {
   KeyPairPlugin,
   ListKeyPairsRequest,
   SendPublicKeyRequest,
-  SendPublicKeyResponse
+  SendPublicKeyResponse,
+  DatabaseError,
+  NoKeyExistsError,
+  NonUniqueKeyError
 } from '@aws/swb-app';
 import { DynamoDBService, PaginatedResponse } from '@aws/workbench-core-base';
 
 export default class KeyPairService implements KeyPairPlugin {
   private _dynamoDbService: DynamoDBService;
-  private _resourceType: string = 'key-pair';
+  // TODO: have this be 'keyPair' in workbench-core since SWB ref uses ssh key but other apps might use diff keys
+  private _resourceType: string = 'sshKey';
   public constructor(dynamoDbService: DynamoDBService) {
     this._dynamoDbService = dynamoDbService;
   }
@@ -31,7 +35,7 @@ export default class KeyPairService implements KeyPairPlugin {
    * @param request - a {@link GetKeyPairRequest}
    * @returns a {@link KeyPair}
    */
-  public getKeyPair(request: GetKeyPairRequest): Promise<GetKeyPairResponse> {
+  public async getKeyPair(request: GetKeyPairRequest): Promise<GetKeyPairResponse> {
     // TODO implement
     throw new Error('Method not implemented.');
   }
@@ -42,7 +46,7 @@ export default class KeyPairService implements KeyPairPlugin {
    * @param request - a {@link ListKeyPairsRequest}
    * @returns a {@link PaginatedResponse} of {@link KeyPair}s
    */
-  public listKeyPairs(request: ListKeyPairsRequest): Promise<PaginatedResponse<KeyPair>> {
+  public async listKeyPairs(request: ListKeyPairsRequest): Promise<PaginatedResponse<KeyPair>> {
     // TODO implement
     throw new Error('Method not implemented.');
   }
@@ -52,9 +56,34 @@ export default class KeyPairService implements KeyPairPlugin {
    *
    * @param request - a {@link DeleteKeyPairRequest}
    */
-  public deleteKeyPair(request: DeleteKeyPairRequest): Promise<void> {
-    // TODO implement
-    throw new Error('Method not implemented.');
+  public async deleteKeyPair(request: DeleteKeyPairRequest): Promise<void> {
+    const { userId, projectId } = request;
+    // check if project exists
+    const queryResult = await this._dynamoDbService.getPaginatedItems({
+      index: 'getResourceByOwner',
+      key: { name: 'resourceType', value: this._resourceType },
+      sortKey: userId,
+      filter: `dependency = :projId`,
+      values: { ':projId': projectId }
+    });
+
+    if (queryResult.data === undefined || queryResult.data.length === 0) {
+      throw new NoKeyExistsError(`No key exists for user ${userId} and project ${projectId}`);
+    }
+    if (queryResult.data.length > 1) {
+      throw new NonUniqueKeyError(
+        `More than one key exists for user ${userId} and project ${projectId}. Cannot determine which to delete.`
+      );
+    }
+
+    const existingKeyPair = queryResult.data[0];
+
+    // HARD delete item
+    try {
+      await this._dynamoDbService.deleteItem({ key: { pk: existingKeyPair.pk, sk: existingKeyPair.sk } });
+    } catch (e) {
+      throw new DatabaseError(e.message);
+    }
   }
 
   /**
@@ -63,7 +92,7 @@ export default class KeyPairService implements KeyPairPlugin {
    * @param request - a {@link CreateKeyPairRequest}
    * @returns a {@link CreateKeyPairResponse}
    */
-  public createKeyPair(request: CreateKeyPairRequest): Promise<CreateKeyPairResponse> {
+  public async createKeyPair(request: CreateKeyPairRequest): Promise<CreateKeyPairResponse> {
     // TODO implement
     throw new Error('Method not implemented.');
   }
@@ -73,7 +102,7 @@ export default class KeyPairService implements KeyPairPlugin {
    *
    * @param request - a {@link SendPublicKeyRequest}
    */
-  public sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
+  public async sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
     // TODO implement
     throw new Error('Method not implemented.');
   }
