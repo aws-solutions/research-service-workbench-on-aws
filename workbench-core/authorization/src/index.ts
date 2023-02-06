@@ -90,8 +90,9 @@ export { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizat
 export {
   Identity,
   IdentityPermission,
-  JSONValueParser,
-  IdentityType
+  IdentityPermissionParser,
+  IdentityType,
+  JSONValueParser
 } from './dynamicAuthorization/models/identityPermission';
 export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/models/isAuthorizedOnRoute';
 export {

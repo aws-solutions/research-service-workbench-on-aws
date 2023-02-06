@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "Fixed spelling mistake.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}

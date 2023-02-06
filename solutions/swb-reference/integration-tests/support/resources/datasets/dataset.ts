@@ -17,6 +17,15 @@ export default class Dataset extends Resource {
     return this._axiosInstance.post(`${this._api}/share`, requestBody);
   }
 
+  public async associateWithProject(
+    projectId: string,
+    accessLevel: 'read-only' | 'read-write'
+  ): Promise<AxiosResponse> {
+    return this._axiosInstance.put(`/projects/${projectId}/datasets/${this._id}/relationships`, {
+      accessLevel
+    });
+  }
+
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     const { data: resource } = await defAdminSession.resources.datasets.dataset(this._id).get();

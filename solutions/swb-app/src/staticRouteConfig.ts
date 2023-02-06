@@ -247,6 +247,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
+    {
+      PUT: [
+        {
+          action: 'UPDATE',
+          subject: 'ProjectDataSet'
+        }
+      ]
+    },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
     {
       GET: [
@@ -317,6 +326,14 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'KeyPair'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {

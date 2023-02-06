@@ -294,10 +294,7 @@ export class DataSetService {
    * @param dataSetId - the Id of the DataSet for which details are desired.
    * @returns - the DataSet object associated with that DataSet.
    */
-  public async getDataSet(
-    dataSetId: string,
-    authenticatedUser: { id: string; roles: string[] }
-  ): Promise<DataSet> {
+  public async getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.getDataSet.name,
