@@ -78,4 +78,8 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.get('login', { params, headers });
   }
+
+  public async loggedIn(): Promise<AxiosResponse> {
+    return this._axiosInstance.get('loggedIn');
+  }
 }

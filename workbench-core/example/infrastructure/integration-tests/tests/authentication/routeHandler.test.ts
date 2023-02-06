@@ -69,4 +69,12 @@ describe('authentication route handler integration tests', () => {
       ).rejects.toThrow(new HttpError(400, {}));
     });
   });
+
+  describe('isUserLoggedIn', () => {
+    it('should return the signInUrl', async () => {
+      const { data } = await anonymousSession.resources.authentication.loggedIn();
+
+      expect(data.loggedIn).toBe(false);
+    });
+  });
 });
