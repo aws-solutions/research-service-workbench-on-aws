@@ -130,7 +130,7 @@ export interface UserManagementPlugin {
   listUsersForRole(role: string): Promise<string[]>;
 
   /**
-   * List the currenlty available roles.
+   * List the currently available roles.
    *
    * @returns an array containing all available roles
    *
