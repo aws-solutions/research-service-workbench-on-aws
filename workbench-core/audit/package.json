@@ -30,7 +30,8 @@
   },
   "dependencies": {
     "@aws/workbench-core-logging": "workspace:*",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
