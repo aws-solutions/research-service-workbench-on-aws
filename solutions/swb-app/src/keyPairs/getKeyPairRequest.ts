@@ -8,7 +8,8 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const GetKeyPairRequestParser = z
   .object({
-    projectId: z.string()
+    projectId: z.string(),
+    userId: z.string()
   })
   .strict();
 

@@ -332,6 +332,12 @@ export const routesMap: RoutesMap = {
         action: 'DELETE',
         subject: 'KeyPair'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'KeyPair'
+      }
     ]
   },
   '/roles': {
