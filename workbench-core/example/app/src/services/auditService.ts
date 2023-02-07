@@ -10,3 +10,5 @@ const writer: Writer = new AuditLogger(logger);
 const baseAuditPlugin: BaseAuditPlugin = new BaseAuditPlugin(writer);
 
 export const auditService: AuditService = new AuditService(baseAuditPlugin, true);
+
+export const strictAuditService: AuditService = new AuditService(baseAuditPlugin);

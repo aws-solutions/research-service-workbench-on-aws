@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express, json } from 'express';
 import { rateLimit } from 'express-rate-limit';
+import { setupAuditRoutes } from './routes/auditRoutes';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
 import { setUpDynamicAuthorizationRoutes } from './routes/dynamicAuthorizationRoutes';
@@ -23,6 +24,7 @@ import {
   authenticationService,
   logger
 } from './services';
+import { strictAuditService } from './services/auditService';
 import { authorizationService, staticRoutesIgnored } from './services/authorizationService';
 import { dynamicAuthorizationService } from './services/dynamicAuthorizationService';
 import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
@@ -67,6 +69,10 @@ export function generateRouter(): Express {
 
   const secondRouter: Router = Router();
   setupSampleRoutes(secondRouter, dynamicAuthorizationService);
+  setupAuditRoutes(secondRouter, strictAuditService, dynamicAuthorizationService);
+
+  secondRouter.use(boomErrorHandler);
+  secondRouter.use(unknownErrorHandler);
 
   app.use('/', secondRouter);
   app.use('/', router);

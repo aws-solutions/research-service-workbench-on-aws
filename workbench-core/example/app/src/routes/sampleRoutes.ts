@@ -13,29 +13,29 @@ export function setupSampleRoutes(
 ): void {
   router.put(
     '/parentResource/:parentId/resource/:resourceId',
-    wrapAuth(async (req: Request, res: Response) => {
+    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       res.status(200).send();
-    }, dynamicAuthorizationService)
+    })
   );
 
   router.get(
     '/listAllResources',
-    wrapAuth(async (req: Request, res: Response) => {
+    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       res.status(200).send();
-    }, dynamicAuthorizationService)
+    })
   );
 
   router.get(
     '/listResources/:parentId',
-    wrapAuth(async (req: Request, res: Response) => {
+    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       res.status(200).send();
-    }, dynamicAuthorizationService)
+    })
   );
 
   router.post(
     '/createResource',
-    wrapAuth(async (req: Request, res: Response) => {
+    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       res.status(200).send();
-    }, dynamicAuthorizationService)
+    })
   );
 }
