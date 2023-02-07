@@ -79,7 +79,17 @@ export default class Authentication extends CollectionResource {
     return this._axiosInstance.get('login', { params, headers });
   }
 
-  public async loggedIn(): Promise<AxiosResponse> {
-    return this._axiosInstance.get('loggedIn');
+  public async loggedIn(config: { access: boolean; refresh: boolean }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {};
+    const invalidToken = 'invalidToken';
+
+    if (config.access) {
+      headers.Cookie = `access_token=${invalidToken};`;
+    }
+    if (config.refresh) {
+      headers.Cookie = headers.Cookie + `refresh_token=${invalidToken};`;
+    }
+
+    return this._axiosInstance.get('loggedIn', { headers });
   }
 }
