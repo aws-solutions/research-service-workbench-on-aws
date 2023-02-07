@@ -7,7 +7,6 @@ import {
   CreateKeyPairRequest,
   DeleteKeyPairRequest,
   GetKeyPairRequest,
-  ListKeyPairsRequest,
   SendPublicKeyRequest,
   DatabaseError,
   NonUniqueKeyError,
@@ -39,20 +38,6 @@ describe('KeyPairService', () => {
 
     test('should throw not implemented error', async () => {
       await expect(() => keyPairService.getKeyPair(getKeyPairRequest)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
-    });
-  });
-
-  describe('listKeyPairs', () => {
-    let listKeyPairsRequest: ListKeyPairsRequest;
-
-    beforeEach(() => {
-      listKeyPairsRequest = { userId: '' };
-    });
-
-    test('should throw not implemented error', async () => {
-      await expect(() => keyPairService.listKeyPairs(listKeyPairsRequest)).rejects.toThrow(
         new Error('Method not implemented.')
       );
     });

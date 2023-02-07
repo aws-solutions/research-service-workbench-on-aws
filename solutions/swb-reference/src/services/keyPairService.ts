@@ -12,14 +12,13 @@ import {
   KeyPair,
   KeyPairParser,
   KeyPairPlugin,
-  ListKeyPairsRequest,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
   DatabaseError,
   NoKeyExistsError,
   NonUniqueKeyError
 } from '@aws/swb-app';
-import { DynamoDBService, PaginatedResponse } from '@aws/workbench-core-base';
+import { DynamoDBService } from '@aws/workbench-core-base';
 
 export default class KeyPairService implements KeyPairPlugin {
   private _dynamoDbService: DynamoDBService;
@@ -36,17 +35,6 @@ export default class KeyPairService implements KeyPairPlugin {
    * @returns a {@link KeyPair}
    */
   public async getKeyPair(request: GetKeyPairRequest): Promise<GetKeyPairResponse> {
-    // TODO implement
-    throw new Error('Method not implemented.');
-  }
-
-  /**
-   * Lists Key Pair records
-   *
-   * @param request - a {@link ListKeyPairsRequest}
-   * @returns a {@link PaginatedResponse} of {@link KeyPair}s
-   */
-  public async listKeyPairs(request: ListKeyPairsRequest): Promise<PaginatedResponse<KeyPair>> {
     // TODO implement
     throw new Error('Method not implemented.');
   }

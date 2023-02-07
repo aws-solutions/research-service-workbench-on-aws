@@ -27,7 +27,6 @@ import { GetKeyPairRequest } from './keyPairs/getKeyPairRequest';
 import { GetKeyPairResponse } from './keyPairs/getKeyPairResponse';
 import { KeyPair, KeyPairParser } from './keyPairs/keyPair';
 import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
-import { ListKeyPairsRequest } from './keyPairs/listKeyPairsRequest';
 import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
 import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
 import {
@@ -63,7 +62,6 @@ export {
   KeyPair,
   KeyPairParser,
   KeyPairPlugin,
-  ListKeyPairsRequest,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
   DatabaseError,
