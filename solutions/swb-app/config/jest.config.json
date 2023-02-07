@@ -52,8 +52,6 @@
     "<rootDir>/src/keyPairs/getKeyPairResponse.ts",
     "<rootDir>/src/keyPairs/keyPair.ts",
     "<rootDir>/src/keyPairs/keyPairPlugin.ts",
-    "<rootDir>/src/keyPairs/listKeyPairRequest.ts",
-    "<rootDir>/src/keyPairs/listKeyPairResponse.ts",
     "<rootDir>/src/keyPairs/sendPublicKeyRequest.ts",
     "<rootDir>/src/keyPairs/sendPublicKeyResponse.ts",
 
