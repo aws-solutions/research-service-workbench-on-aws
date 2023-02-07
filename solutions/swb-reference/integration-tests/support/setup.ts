@@ -17,8 +17,7 @@ export default class Setup {
     // @ts-ignore
     this._settings = new Settings(global['__settings__']);
 
-    // Let's not setup test retries until we find that we actually need it
-    jest.retryTimes(0);
+    jest.retryTimes(1);
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {

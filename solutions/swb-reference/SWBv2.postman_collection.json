@@ -319,9 +319,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/datasets/id",
+              "raw": "{{API_URL}}/datasets/:datasetId",
               "host": ["{{API_URL}}"],
-              "path": ["datasets", "id"]
+              "path": ["datasets", ":datasetId"]
             }
           },
           "response": []
@@ -346,6 +346,30 @@
               "raw": "{{API_URL}}/datasets/",
               "host": ["{{API_URL}}"],
               "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Associate DataSet With Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
             }
           },
           "response": []
@@ -1728,6 +1752,41 @@
               }
             },
             "url": "{{API_URL}}/awsAccountTemplateUrls"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Key Pairs",
+      "items": [
+        {
+          "name": "Delete Key Pair",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projId",
+                  "value": ""
+                }
+              ]
+            }
           },
           "response": []
         }

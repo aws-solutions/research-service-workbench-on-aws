@@ -20,8 +20,9 @@ import {
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
-  S3DataSetStoragePlugin,
+  DataSetService as WorkbenchDataSetService,
   DdbDataSetMetadataPlugin,
+  S3DataSetStoragePlugin,
   WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import {
@@ -35,6 +36,7 @@ import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
 import KeyPairService from './services/keyPairService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
@@ -114,10 +116,15 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
-    logger,
-    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
-    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+    new WorkbenchDataSetService(
+      new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
+      logger,
+      new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+      new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+    ),
+    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
+    new DatabaseService(),
+    dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,

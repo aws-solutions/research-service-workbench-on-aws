@@ -7,7 +7,8 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteKeyPairRequestParser = z
   .object({
-    projectId: z.string()
+    projectId: z.string(),
+    userId: z.string()
   })
   .strict();
 
