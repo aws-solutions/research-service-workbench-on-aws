@@ -3,21 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
-import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
-import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
-import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
-import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
-import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
-import {
-  IsUserAssignedToGroupRequest,
-  IsUserAssignedToGroupResponse
-} from './dynamicAuthorizationInputs/isUserAssignedToGroup';
-import {
-  RemoveUserFromGroupRequest,
-  RemoveUserFromGroupResponse
-} from './dynamicAuthorizationInputs/removeUserFromGroup';
-import { SetGroupStatusRequest, SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
+import { AddUserToGroupRequest, AddUserToGroupResponse } from './models/addUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './models/createGroup';
+import { DeleteGroupRequest, DeleteGroupResponse } from './models/deleteGroup';
+import { DoesGroupExistRequest, DoesGroupExistResponse } from './models/doesGroupExist';
+import { GetGroupStatusRequest, GetGroupStatusResponse } from './models/getGroupStatus';
+import { GetGroupUsersRequest, GetGroupUsersResponse } from './models/getGroupUsers';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './models/getUserGroups';
+import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
+import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
+import { SetGroupStatusRequest, SetGroupStatusResponse } from './models/setGroupStatus';
 
 /**
  * Implement the `GroupManagementPlugin` interface to connect the DynamicAuthorizationService
@@ -144,4 +139,12 @@ export interface GroupManagementPlugin {
    * @throws {@link ForbiddenError} - invalid state transition
    */
   setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse>;
+
+  /**
+   * Check if a group exist
+   * @param request - {@link DoesGroupExistRequest}
+   *
+   * @returns - {@link DoesGroupExistResponse}
+   */
+  doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse>;
 }

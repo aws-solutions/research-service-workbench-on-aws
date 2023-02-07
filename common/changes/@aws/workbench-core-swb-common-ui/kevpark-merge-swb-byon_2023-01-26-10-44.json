@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "Ran linter",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

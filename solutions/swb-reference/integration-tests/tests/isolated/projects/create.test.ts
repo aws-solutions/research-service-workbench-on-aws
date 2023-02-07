@@ -6,6 +6,7 @@
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
+import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 interface CreateRequest {
@@ -17,29 +18,43 @@ interface CreateRequest {
 describe('Create Project negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  const costCenterId = setup.getSettings().get('costCenterId');
+  let costCenterId: string;
+  let existingProjectName: string;
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+  let createRequest: CreateRequest;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     expect.hasAssertions();
-  });
 
-  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: 'project integration test cost center',
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test costcenter'
+    });
+    costCenterId = costCenter.id;
+
+    existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+    await adminSession.resources.projects.create({
+      name: existingProjectName,
+      description: 'Project for TOP SECRET dragon research',
+      costCenterId
+    });
+
+    createRequest = {
+      name: 'valid name',
+      description: 'valid description',
+      costCenterId
+    };
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await setup.cleanup();
   });
 
-  describe('with invalid name values', () => {
-    const createRequest: CreateRequest = {
-      description: 'new project who dis',
-      costCenterId
-    };
-
-    describe('with name that belongs to an existing project', () => {
-      const existingProjectName = setup.getSettings().get('projectName');
-
+  describe('with a name', () => {
+    describe('that belongs to an existing project', () => {
       beforeEach(async () => {
         createRequest.name = existingProjectName;
       });
@@ -60,7 +75,7 @@ describe('Create Project negative tests', () => {
       });
     });
 
-    describe('with missing name', () => {
+    describe('that is missing', () => {
       beforeEach(async () => {
         delete createRequest.name;
       });
@@ -82,13 +97,8 @@ describe('Create Project negative tests', () => {
     });
   });
 
-  describe('with invalid description values', () => {
-    const createRequest: CreateRequest = {
-      name: 'valid input',
-      costCenterId
-    };
-
-    describe('with missing description', () => {
+  describe('with a description', () => {
+    describe('that is missing', () => {
       beforeEach(async () => {
         delete createRequest.description;
       });
@@ -110,18 +120,10 @@ describe('Create Project negative tests', () => {
     });
   });
 
-  describe('with invalid costCenterId values', () => {
-    const createRequest: CreateRequest = {
-      name: 'valid name',
-      description: 'valid description',
-      costCenterId
-    };
-
-    describe('with cost center that does not exist', () => {
-      const invalidCostCenterId = 'cc-invalid-cost-center';
-
+  describe('with a cost center', () => {
+    describe('that does not exist', () => {
       beforeEach(async () => {
-        createRequest.costCenterId = invalidCostCenterId;
+        createRequest.costCenterId = 'cc-invalid-cost-center';
       });
 
       test('it throws 404 error', async () => {
@@ -140,7 +142,7 @@ describe('Create Project negative tests', () => {
       });
     });
 
-    describe('with missing cost center', () => {
+    describe('that is missing', () => {
       beforeEach(async () => {
         delete createRequest.costCenterId;
       });

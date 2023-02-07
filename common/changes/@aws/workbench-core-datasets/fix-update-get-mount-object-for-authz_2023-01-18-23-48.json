@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Added authorization to `getDataSetMountObject` API.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

@@ -219,6 +219,16 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
     subject: 'ProjectEnvironmentTypeConfig'
   },
   {
@@ -230,6 +240,16 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'ProjectEnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'KeyPair'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'ProjectDataSet'
   }
 ];
 
@@ -283,10 +303,21 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Project'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'KeyPair'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'ProjectDataSet'
   }
 ];
 
 export const permissionsMap: PermissionsMap = {
   Admin: adminPermissions,
+  ITAdmin: adminPermissions,
   Researcher: researcherPermissions
 };

@@ -16,6 +16,7 @@ import { DataSetsAuthorizationPlugin, dataSetSubjectType } from './dataSetsAutho
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { DataSetPermission } from './models/dataSetPermission';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
 
@@ -148,87 +149,148 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     return permissionsResponse[0];
   }
 
-  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    throw new Error('Method not implemented.');
+  public async removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<PermissionsResponse> {
+    const authzResponse = await this._authorizer.deleteSubjectIdentityPermissions({
+      subjectId: datasetId,
+      subjectType: dataSetSubjectType,
+      authenticatedUser
+    });
+    const dataSetPermissions = _.filter(
+      authzResponse.data.identityPermissions,
+      (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
+    );
+
+    const permissionsResponse = this._identityPermissionsToPermissionsResponse(dataSetPermissions);
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: datasetId,
+          permissions: []
+        }
+      };
+    }
+    if (permissionsResponse.length !== 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsResponse.length}.`
+      );
+    }
+    return permissionsResponse[0];
+  }
+
+  public async isAuthorizedOnDataSet(
+    dataSetId: string,
+    accessLevel: DataSetsAccessLevel,
+    authenticatedUser: { id: string; roles: string[] }
+  ): Promise<void> {
+    await this._authorizer.isAuthorizedOnSubject({
+      authenticatedUser,
+      dynamicOperation: {
+        action: 'READ',
+        subject: {
+          subjectId: dataSetId,
+          subjectType: dataSetSubjectType
+        }
+      }
+    });
+
+    if (accessLevel === 'read-write') {
+      await this._authorizer.isAuthorizedOnSubject({
+        authenticatedUser,
+        dynamicOperation: {
+          action: 'UPDATE',
+          subject: {
+            subjectId: dataSetId,
+            subjectType: dataSetSubjectType
+          }
+        }
+      });
+    }
   }
 
   private _dataSetPermissionToIdentityPermissions(
-    dataSetPermission: AddRemoveAccessPermissionRequest
+    dataSetPermissions: AddRemoveAccessPermissionRequest
   ): IdentityPermission[] {
+    const requestPermssions = _.isArray(dataSetPermissions.permission)
+      ? dataSetPermissions.permission
+      : [dataSetPermissions.permission];
     if (
-      dataSetPermission.permission.accessLevel !== 'read-only' &&
-      dataSetPermission.permission.accessLevel !== 'read-write'
+      _.some(
+        requestPermssions,
+        (p: DataSetPermission) => p.accessLevel !== 'read-only' && p.accessLevel !== 'read-write'
+      )
     ) {
       throw new InvalidPermissionError("Access Level must be 'read-only' or 'read-write'.");
     }
 
     if (
-      dataSetPermission.permission.identityType !== 'GROUP' &&
-      dataSetPermission.permission.identityType !== 'USER'
+      _.some(
+        requestPermssions,
+        (p: DataSetPermission) => p.identityType !== 'GROUP' && p.identityType !== 'USER'
+      )
     ) {
       throw new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'.");
     }
 
+    const identityPermissions: IdentityPermission[] = [];
     const permissionsEffect: Effect = 'ALLOW';
-    const identityType: IdentityType =
-      dataSetPermission.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
+    requestPermssions.map((p: DataSetPermission) => {
+      const identityType: IdentityType = p.identityType === 'GROUP' ? 'GROUP' : 'USER';
 
-    const identityPermissions: IdentityPermission[] = [
-      {
+      identityPermissions.push({
         identityType: identityType,
-        identityId: dataSetPermission.permission.identity,
+        identityId: p.identity,
         action: 'READ',
         effect: permissionsEffect,
         subjectType: dataSetSubjectType,
-        subjectId: dataSetPermission.dataSetId,
-        description: `'${dataSetPermission.permission.accessLevel}' access on DataSet '${dataSetPermission.dataSetId}'`
-      }
-    ];
-    if (dataSetPermission.permission.accessLevel === 'read-write') {
-      identityPermissions.push({
-        identityType: identityType,
-        identityId: dataSetPermission.permission.identity,
-        action: 'UPDATE',
-        effect: permissionsEffect,
-        subjectType: dataSetSubjectType,
-        subjectId: dataSetPermission.dataSetId,
-        description: "'read-write' access on DataSet '${params.dataSetId}'"
+        subjectId: dataSetPermissions.dataSetId,
+        description: `'${p.accessLevel}' access on DataSet '${dataSetPermissions.dataSetId}'`
       });
-    }
+      if (p.accessLevel === 'read-write') {
+        identityPermissions.push({
+          identityType: identityType,
+          identityId: p.identity,
+          action: 'UPDATE',
+          effect: permissionsEffect,
+          subjectType: dataSetSubjectType,
+          subjectId: dataSetPermissions.dataSetId,
+          description: `'read-write' access on DataSet '${dataSetPermissions.dataSetId}'`
+        });
+      }
+    });
 
     return identityPermissions;
   }
 
   private _identityPermissionsToPermissionsResponse(
-    dataSetIdentityPermissions: IdentityPermission[]
+    authzPermissions: IdentityPermission[]
   ): PermissionsResponse[] {
-    const permissions: PermissionsResponse[] = [];
+    const response: PermissionsResponse[] = [];
 
     // validate
-    if (_.isEmpty(dataSetIdentityPermissions)) {
+    if (_.isEmpty(authzPermissions)) {
       // return the empty array if there is nothing to do.
-      return permissions;
+      return response;
     } else if (
-      _.some(
-        dataSetIdentityPermissions,
-        (i: IdentityPermission) => i.action !== 'READ' && i.action !== 'UPDATE'
-      )
+      _.some(authzPermissions, (i: IdentityPermission) => i.action !== 'READ' && i.action !== 'UPDATE')
     ) {
       throw new InvalidPermissionError(
         "Unsupported actions found in permissions. Only 'READ' and 'UPDATE' are currently supported."
       );
-    } else if (_.some(dataSetIdentityPermissions, (i: IdentityPermission) => i.effect !== 'ALLOW')) {
+    } else if (_.some(authzPermissions, (i: IdentityPermission) => i.effect !== 'ALLOW')) {
       throw new InvalidPermissionError("Only 'ALLOW' effect is supported.");
     }
 
-    dataSetIdentityPermissions.map((i: IdentityPermission) => {
+    authzPermissions.map((i: IdentityPermission) => {
       const dataSetPermissions: PermissionsResponse | undefined = _.find(
-        permissions,
+        response,
         (p: PermissionsResponse) => p.data.dataSetId === i.subjectId
       );
       if (!dataSetPermissions) {
         // dataset has not yet been encountered. Add it.
-        permissions.push({
+        response.push({
           data: {
             dataSetId: i.subjectId,
             permissions: [
@@ -261,6 +323,6 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
       }
     });
 
-    return permissions;
+    return response;
   }
 }

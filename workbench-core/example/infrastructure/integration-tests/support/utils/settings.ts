@@ -32,6 +32,7 @@ export interface Setting {
 
   // Derived
   mainAccountId: string;
+  rootUserId: string;
 }
 
 export type SettingKey = keyof Setting;

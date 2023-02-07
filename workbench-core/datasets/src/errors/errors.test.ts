@@ -3,10 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DataSetExistsError, isDataSetExistsError } from './dataSetExistsError';
 import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
+import { DataSetInvalidParameterError, isDataSetInvalidParameterError } from './dataSetInvalidParameterError';
 import { DataSetNotFoundError, isDataSetNotFoundError } from './dataSetNotFoundError';
-import { EndPointExistsError, isEndPointExistsError } from './endPointExistsError';
+import { EndpointExistsError, isEndpointExistsError } from './endpointExistsError';
+import { EndpointNotFoundError, isEndpointNotFoundError } from './endpointNotFoundError';
 import { InvalidArnError, isInvalidArnError } from './invalidArnError';
+import { InvalidEndpointError, isInvalidEndpointError } from './invalidEndpointError';
 import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleError';
 import { InvalidPermissionError, isInvalidPermissionError } from './invalidPermissionError';
 import { isNotAuthorizedError, NotAuthorizedError } from './notAuthorizedError';
@@ -24,13 +28,13 @@ describe('custom error tests', () => {
     expect(isDataSetHasEndpointError(error)).toBe(false);
   });
 
-  test('endPointExistsError', () => {
-    const endPointExistsError = new EndPointExistsError();
+  test('endpointExistsError', () => {
+    const endpointExistsError = new EndpointExistsError();
 
-    expect(isEndPointExistsError(endPointExistsError)).toBe(true);
+    expect(isEndpointExistsError(endpointExistsError)).toBe(true);
   });
-  test('not endPointExistsError', () => {
-    expect(isEndPointExistsError(error)).toBe(false);
+  test('not endpointExistsError', () => {
+    expect(isEndpointExistsError(error)).toBe(false);
   });
 
   test('RoleExistsOnEndPointError', () => {
@@ -69,6 +73,34 @@ describe('custom error tests', () => {
     expect(isInvalidPermissionError(error)).toBe(false);
   });
 
+  test('EndpointNotFoundError', () => {
+    const endpointNotFoundError = new EndpointNotFoundError();
+
+    expect(isEndpointNotFoundError(endpointNotFoundError)).toBe(true);
+  });
+  test('not EndpointNotFoundError', () => {
+    expect(isEndpointNotFoundError(error)).toBe(false);
+  });
+
+  test('DataSetExistsError', () => {
+    const dataSetExistsError = new DataSetExistsError();
+
+    expect(isDataSetExistsError(dataSetExistsError)).toBe(true);
+  });
+  test('not DataSetExistsError', () => {
+    expect(isDataSetExistsError(error)).toBe(false);
+  });
+
+  test('InvalidEndpointError', () => {
+    const invalidEndpointError = new InvalidEndpointError();
+
+    expect(isInvalidEndpointError(invalidEndpointError)).toBe(true);
+  });
+
+  test('not InvalidEndpointError', () => {
+    expect(isInvalidEndpointError(error)).toBe(false);
+  });
+
   test('DataSetNotFoundError', () => {
     const dataSetNotFoundError = new DataSetNotFoundError();
 
@@ -85,5 +117,14 @@ describe('custom error tests', () => {
   });
   test('not InvalidArnError', () => {
     expect(isInvalidArnError(error)).toBe(false);
+  });
+
+  test('DataSetInvalidParameterError', () => {
+    const dataSetInvalidParameterError = new DataSetInvalidParameterError();
+
+    expect(isDataSetInvalidParameterError(dataSetInvalidParameterError)).toBe(true);
+  });
+  test('not DataSetInvalidParameterError', () => {
+    expect(isDataSetInvalidParameterError(error)).toBe(false);
   });
 });

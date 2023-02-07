@@ -4,6 +4,7 @@
  */
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
+import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
   EnvironmentConnectionService,
@@ -15,6 +16,7 @@ import {
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
+import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
 export interface ApiRouteConfig {
@@ -32,6 +34,8 @@ export interface ApiRouteConfig {
   metadataService: MetadataService;
   projectEnvPlugin: ProjectEnvPlugin;
   projectEnvTypeConfigPlugin: ProjectEnvTypeConfigPlugin;
+  keyPairService: KeyPairPlugin;
+  authorizationService: DynamicAuthorizationService;
 }
 
 export interface ApiRoute {

@@ -5,6 +5,7 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
+
 import { join } from 'path';
 import {
   WorkbenchCognito,
@@ -20,7 +21,14 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import {
+  ApplicationTargetGroup,
+  ListenerCondition,
+  TargetType
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
@@ -36,10 +44,14 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
+import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
+import { SWBVpc } from './infra/SWBVpc';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -62,11 +74,14 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ID: string;
   };
 
   private _accessLogsBucket: Bucket;
   private _s3AccessLogsPrefix: string;
+  private _swbDomainNameOutputKey: string;
+  private _mainAccountLoadBalancerListenerArnOutputKey: string;
 
   public constructor(app: App) {
     const {
@@ -86,7 +101,6 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
-      UI_CLIENT_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -94,12 +108,25 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
+      VPC_ID,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
+      SWB_DOMAIN_NAME_OUTPUT_KEY,
+      MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
+      VPC_ID_OUTPUT_KEY,
+      ALB_SUBNET_IDS,
+      ECS_SUBNET_IDS,
+      ECS_SUBNET_IDS_OUTPUT_KEY,
+      ECS_SUBNET_AZS_OUTPUT_KEY,
+      HOSTED_ZONE_ID,
+      DOMAIN_NAME,
+      ALB_INTERNET_FACING,
       FIELDS_TO_MASK_WHEN_AUDITING
     } = getConstants();
 
     super(app, STACK_NAME, {
       env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
@@ -148,11 +175,14 @@ export class SWBStack extends Stack {
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       MAIN_ACCT_ID
     };
 
-    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
+    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
@@ -201,21 +231,129 @@ export class SWBStack extends Stack {
       lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
     });
 
-    this._createRestApi(apiLambda);
+    const apiGwUrl = this._createRestApi(apiLambda);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+
+    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+    new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
+      value: swbVpc.vpc.vpcId
+    });
+
+    new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
+      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+    });
+
+    new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
+      value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
+    });
+
+    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
   }
 
-  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
+    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+      vpcId,
+      albSubnetIds,
+      ecsSubnetIds
+    });
+
+    return swbVpc;
+  }
+
+  private _createLoadBalancer(
+    swbVpc: SWBVpc,
+    apiGwUrl: string,
+    domainName: string,
+    hostedZoneId: string,
+    internetFacing: boolean
+  ): void {
+    const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
+      vpc: swbVpc.vpc,
+      subnets: swbVpc.albSubnetSelection,
+      internetFacing
+    });
+
+    const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+      zoneName: domainName,
+      hostedZoneId: hostedZoneId
+    });
+
+    // Add a Route 53 alias with the Load Balancer as the target
+    new ARecord(this, 'AliasRecord', {
+      zone,
+      target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
+    });
+
+    const proxyLambda = new Function(this, 'LambdaProxy', {
+      handler: 'proxyHandlerLambda.handler',
+      code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
+      runtime: Runtime.NODEJS_16_X,
+      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
+      timeout: Duration.seconds(60),
+      memorySize: 256
+    });
+
+    new Alias(this, 'LiveProxyLambdaAlias', {
+      aliasName: 'live',
+      version: proxyLambda.currentVersion,
+      provisionedConcurrentExecutions: 1
+    });
+
+    // Add a listener on port 443 for and use the certificate for HTTPS
+    const certificate = new Certificate(this, 'SWBCertificate', {
+      domainName: domainName,
+      validation: CertificateValidation.fromDns(zone)
+    });
+    const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
+      port: 443,
+      certificates: [certificate]
+    });
+
+    const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
+      targetType: TargetType.LAMBDA,
+      targets: [new LambdaTarget(proxyLambda)]
+    });
+
+    targetGroup.setAttribute('lambda.multi_value_headers.enabled', 'true');
+
+    httpsListener.addTargetGroups('addProxyLambdaTargetGroup', {
+      priority: 1,
+      conditions: [ListenerCondition.pathPatterns(['/api/*'])],
+      targetGroups: [targetGroup]
+    });
+
+    httpsListener.addTargetGroups('addDefaultTargetGroup', {
+      targetGroups: [targetGroup]
+    });
+
+    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {
+      value: alb.applicationLoadBalancer.loadBalancerArn
+    });
+
+    new CfnOutput(this, this._swbDomainNameOutputKey, {
+      value: domainName
+    });
+
+    new CfnOutput(this, this._mainAccountLoadBalancerListenerArnOutputKey, {
+      value: alb.applicationLoadBalancer.listeners[0].listenerArn
+    });
+
+    new CfnOutput(this, 'apiUrlOutput', {
+      value: `https://${domainName}/api/`
+    });
+  }
+
+  private _createInitialOutputs(accountId: string, awsRegion: string, awsRegionName: string): void {
+    new CfnOutput(this, 'accountId', {
+      value: accountId
+    });
     new CfnOutput(this, 'awsRegion', {
       value: awsRegion
     });
     new CfnOutput(this, 'awsRegionShortName', {
       value: awsRegionName
-    });
-    new CfnOutput(this, 'uiClientURL', {
-      value: uiClientURL
     });
   }
 
@@ -298,7 +436,7 @@ export class SWBStack extends Stack {
           resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: ['arn:aws:s3:::sc-*']
         }),
         new PolicyStatement({
@@ -347,7 +485,7 @@ export class SWBStack extends Stack {
           resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
         }),
         new PolicyStatement({
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
@@ -400,7 +538,8 @@ export class SWBStack extends Stack {
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      versioned: true
     });
 
     s3Bucket.addToResourcePolicy(
@@ -492,7 +631,8 @@ export class SWBStack extends Stack {
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
-      encryptionKey: mainAcctEncryptionKey
+      encryptionKey: mainAcctEncryptionKey,
+      versioned: true
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
@@ -531,12 +671,16 @@ export class SWBStack extends Stack {
               's3:GetObject',
               's3:GetObjectVersion',
               's3:GetObjectTagging',
+              's3:GetObjectVersionTagging',
               's3:AbortMultipartUpload',
               's3:ListMultipartUploadParts',
               's3:PutObject',
               's3:PutObjectAcl',
+              's3:PutObjectVersionAcl',
               's3:PutObjectTagging',
+              's3:PutObjectVersionTagging',
               's3:ListBucket',
+              's3:ListBucketVersions',
               's3:PutAccessPointPolicy',
               's3:GetAccessPointPolicy'
             ],
@@ -608,7 +752,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           sid: 'GetObject',
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`arn:aws:s3:::${this.lambdaEnvVars.STACK_NAME}*`]
         }),
         new PolicyStatement({
@@ -646,7 +790,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           sid: 'S3Bucket',
-          actions: ['s3:GetObject'],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
           resources: [`${artifactS3Bucket.bucketArn}/*`]
         })
       ]
@@ -743,14 +887,18 @@ export class SWBStack extends Stack {
               's3:GetObject',
               's3:GetObjectVersion',
               's3:GetObjectTagging',
+              's3:GetObjectVersionTagging',
               's3:AbortMultipartUpload',
               's3:ListMultipartUploadParts',
               's3:GetBucketPolicy',
               's3:PutBucketPolicy',
               's3:PutObject',
               's3:PutObjectAcl',
+              's3:PutObjectVersionAcl',
               's3:PutObjectTagging',
+              's3:PutObjectVersionTagging',
               's3:ListBucket',
+              's3:ListBucketVersions',
               's3:PutAccessPointPolicy',
               's3:GetAccessPointPolicy',
               's3:CreateAccessPoint',
@@ -764,7 +912,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             sid: 'environmentBootstrapS3Access',
-            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+            actions: ['s3:GetObject', 's3:GetObjectVersion', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
             resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
           }),
           new PolicyStatement({
@@ -799,7 +947,7 @@ export class SWBStack extends Stack {
   }
 
   // API Gateway
-  private _createRestApi(apiLambda: Function): void {
+  private _createRestApi(apiLambda: Function): string {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: this.stackName,
@@ -832,10 +980,6 @@ export class SWBStack extends Stack {
       }
     });
 
-    new CfnOutput(this, 'apiUrlOutput', {
-      value: API.url
-    });
-
     if (process.env.LOCAL_DEVELOPMENT === 'true') {
       // SAM local start-api doesn't work with ALIAS so this is the workaround to allow us to run the code locally
       // https://github.com/aws/aws-sam-cli/issues/2227
@@ -852,6 +996,8 @@ export class SWBStack extends Stack {
         defaultIntegration: new LambdaIntegration(alias)
       });
     }
+
+    return API.url;
   }
 
   //DynamicAuth DynamoDB Table

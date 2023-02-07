@@ -14,6 +14,7 @@ import {
   IdentityPermissionCreationError,
   isIdentityPermissionCreationError
 } from './identityPermissionCreationError';
+import { isParamNotFoundError, ParamNotFoundError } from './paramNotFoundError';
 import { isPermissionNotGrantedError, PermissionNotGrantedError } from './permissionNotGrantedError';
 import { isRetryError, RetryError } from './retryError';
 import { isRouteMapError, RouteMapError } from './routeMapError';
@@ -108,5 +109,13 @@ describe('custom error tests', () => {
   });
   test('not RouteMapError', () => {
     expect(isRouteMapError(error)).toBe(false);
+  });
+
+  test('ParamNotFoundError', () => {
+    const paramNotFoundError = new ParamNotFoundError();
+    expect(isParamNotFoundError(paramNotFoundError)).toBe(true);
+  });
+  test('not ParamNotFoundError', () => {
+    expect(isParamNotFoundError(error)).toBe(false);
   });
 });

@@ -319,9 +319,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/datasets/id",
+              "raw": "{{API_URL}}/datasets/:datasetId",
               "host": ["{{API_URL}}"],
-              "path": ["datasets", "id"]
+              "path": ["datasets", ":datasetId"]
             }
           },
           "response": []
@@ -346,6 +346,30 @@
               "raw": "{{API_URL}}/datasets/",
               "host": ["{{API_URL}}"],
               "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Associate DataSet With Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
             }
           },
           "response": []
@@ -1290,6 +1314,113 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "List Project Users By Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/ProjectAdmin",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", "ProjectAdmin"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add User To Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"Researcher\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove User From Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1621,6 +1752,41 @@
               }
             },
             "url": "{{API_URL}}/awsAccountTemplateUrls"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Key Pairs",
+      "items": [
+        {
+          "name": "Delete Key Pair",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projId",
+                  "value": ""
+                }
+              ]
+            }
           },
           "response": []
         }

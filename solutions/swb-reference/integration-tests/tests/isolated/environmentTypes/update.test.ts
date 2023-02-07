@@ -76,6 +76,7 @@ describe('update environment types', () => {
       checkHttpError(
         e,
         new HttpError(403, {
+          statusCode: 403,
           error: 'User is not authorized'
         })
       );

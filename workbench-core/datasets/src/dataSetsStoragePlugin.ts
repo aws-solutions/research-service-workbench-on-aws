@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet } from './dataSet';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
 
 export interface EndpointConnectionStrings {
   /**
@@ -16,9 +16,9 @@ export interface EndpointConnectionStrings {
   endPointUrl: string;
 
   /**
-   * An optional alias which also can be used to access the storage endpoint.
+   * An alias which also can be used to access the storage endpoint.
    */
-  endPointAlias?: string;
+  endPointAlias: string;
 }
 
 /**
@@ -62,7 +62,7 @@ export interface DataSetsStoragePlugin {
    *
    * @returns a {@link AddStorageExternalEndpointResponse} object
    *
-   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link EndpointExistsError} - the endpoint already exists
    * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(

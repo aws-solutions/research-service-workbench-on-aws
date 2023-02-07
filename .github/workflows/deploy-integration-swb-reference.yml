@@ -19,6 +19,10 @@ on:
         required: true
       CYPRESS_ADMIN_USER:
         required: true
+      HOSTED_ZONE_ID:
+        required: true
+      DOMAIN_NAME:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -44,6 +48,13 @@ jobs:
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
 
+      - name: Enter config settings from GH secrets
+        shell: bash
+        run: |
+          echo "
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}
+          domainName: ${{ secrets.DOMAIN_NAME }}" >> "solutions/swb-reference/src/config/testEnv.yaml"
+
       - name: Deploy SWB-Reference
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
@@ -53,28 +64,11 @@ jobs:
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
-      - name: Deploy SWB-UI
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
-        run: |
-          cd solutions/swb-ui/ui
-          STAGE='testEnv' node ../../../common/scripts/install-run-rushx.js deploy-ui-and-api
-
       - name: Run Integration tests
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests
-
-      - name: Run End To End tests
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
-        run: |
-          cd solutions/swb-ui/ui
-          STAGE='testEnv' node ../../../common/scripts/install-run-rushx.js e2e-test
-        env:
-          # Env parameters for cypress tests need header 'CYPRESS_' or 'cypress_'
-          # Cypress will strip the header and pass it to the tests
-          CYPRESS_AdminPassword: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
-          CYPRESS_AdminUser: ${{ secrets.CYPRESS_ADMIN_USER }}
 
       - name: Slack Failure Notification
         if: failure()

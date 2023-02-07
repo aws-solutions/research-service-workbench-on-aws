@@ -17,24 +17,19 @@ import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';
 
-import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
-import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
-import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
-import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
-import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
-import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
-import {
-  IsUserAssignedToGroupRequest,
-  IsUserAssignedToGroupResponse
-} from './dynamicAuthorizationInputs/isUserAssignedToGroup';
-import {
-  RemoveUserFromGroupRequest,
-  RemoveUserFromGroupResponse
-} from './dynamicAuthorizationInputs/removeUserFromGroup';
-import { SetGroupStatusRequest, SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { GroupManagementPlugin } from './groupManagementPlugin';
+import { AddUserToGroupRequest, AddUserToGroupResponse } from './models/addUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './models/createGroup';
+import { DeleteGroupRequest, DeleteGroupResponse } from './models/deleteGroup';
+import { DoesGroupExistRequest, DoesGroupExistResponse } from './models/doesGroupExist';
 import { GetGroupMetadataParser } from './models/GetGroupMetadata';
+import { GetGroupStatusRequest, GetGroupStatusResponse } from './models/getGroupStatus';
+import { GetGroupUsersRequest, GetGroupUsersResponse } from './models/getGroupUsers';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './models/getUserGroups';
+import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
+import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 import { SetGroupMetadata } from './models/SetGroupMetadata';
+import { SetGroupStatusRequest, SetGroupStatusResponse } from './models/setGroupStatus';
 
 /**
  * A WBCGroupManagementPlugin instance that interfaces with Workbench Core's UserManagementService to provide group management.
@@ -53,12 +48,13 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     this._ddbService = config.ddbService;
     this._userGroupKeyType = config.userGroupKeyType;
   }
+
   public async createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse> {
     const { groupId } = request;
 
     try {
       const { data } = await this.getGroupStatus(request);
-      if (data.status === 'delete_pending') {
+      if (data.status === 'delete_pending' || data.status === 'active') {
         throw new GroupAlreadyExistsError(`Group '${groupId}' already exists.`);
       }
     } catch (error) {
@@ -193,47 +189,53 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   }
   public async setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse> {
     const { groupId, status: newStatus } = request;
-
+    const key = buildDynamoDBPkSk(groupId, this._userGroupKeyType);
+    const item: SetGroupMetadata = {
+      id: groupId,
+      status: newStatus
+    };
     try {
-      const statusResult = await this.getGroupStatus(request);
-      const currentStatus = statusResult.data.status;
-
-      if (currentStatus === 'delete_pending' && newStatus === 'active') {
-        throw new ForbiddenError(`Cannot set group '${groupId}' status to active. It is pending delete.`);
-      }
-      if (currentStatus === 'active' && newStatus === 'deleted') {
-        throw new ForbiddenError(
-          `Cannot set group '${groupId}' status to delete, it first must be marked for deletion.`
-        );
-      }
-    } catch (error) {
-      if (!isGroupNotFoundError(error)) {
-        throw error;
-      }
-    }
-
-    try {
-      const key = buildDynamoDBPkSk(groupId, this._userGroupKeyType);
-      if (newStatus === 'deleted') {
-        await this._ddbService.delete(key).execute();
-      } else {
-        const item: SetGroupMetadata = {
-          id: groupId,
-          status: newStatus
-        };
-
-        await this._ddbService
-          .update({
+      switch (newStatus) {
+        case 'active': {
+          const updater = this._ddbService.update({
             key,
             params: {
               item
             }
-          })
-          .execute();
+          });
+          updater.condition('attribute_not_exists(pk)');
+          await updater.execute();
+          break;
+        }
+        case 'delete_pending': {
+          const updater = this._ddbService.update({
+            key
+          });
+          updater
+            .condition('attribute_exists(pk) AND ( #status = :oldStatus OR #status = :newStatus )')
+            .names({ '#status': 'status' })
+            .values({ ':oldStatus': { S: 'active' }, ':newStatus': { S: 'delete_pending' } })
+            .set('#status = :newStatus');
+          await updater.execute();
+          break;
+        }
+        case 'deleted': {
+          const deleter = this._ddbService.delete(key);
+          deleter
+            .condition('attribute_exists(pk) AND #status = :oldStatus')
+            .names({ '#status': 'status' })
+            .values({ ':oldStatus': { S: 'delete_pending' } });
+          await deleter.execute();
+          break;
+        }
       }
-
       return { data: { status: newStatus } };
     } catch (error) {
+      if (error.name === 'ConditionalCheckFailedException') {
+        throw new ForbiddenError(
+          `Cannot set group '${groupId}' status to ${newStatus}. Incorrect status progression: ${error}`
+        );
+      }
       if (error.name === 'ResourceNotFoundException') {
         throw new PluginConfigurationError(error.message);
       }
@@ -241,6 +243,28 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
         throw new TooManyRequestsError(error.message);
       }
       throw error;
+    }
+  }
+  public async doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse> {
+    const { groupId } = request;
+    try {
+      const { data } = await this.getGroupStatus({
+        groupId
+      });
+      return {
+        data: {
+          exist: data.status === 'active'
+        }
+      };
+    } catch (err) {
+      if (isGroupNotFoundError(err)) {
+        return {
+          data: {
+            exist: false
+          }
+        };
+      }
+      throw err;
     }
   }
 }

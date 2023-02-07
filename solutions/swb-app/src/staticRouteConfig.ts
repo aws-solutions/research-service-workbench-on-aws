@@ -4,7 +4,12 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidRegExpAsString, envTypeIdRegExpString } from '@aws/workbench-core-base';
+import {
+  resourceTypeToKey,
+  validRolesRegExpAsString,
+  uuidRegExpAsString,
+  envTypeIdRegExpString
+} from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/awsAccounts': {
@@ -247,6 +252,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
+    {
+      PUT: [
+        {
+          action: 'UPDATE',
+          subject: 'ProjectDataSet'
+        }
+      ]
+    },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
     {
       GET: [
@@ -290,6 +304,38 @@ export const routesMap: RoutesMap = {
       {
         action: 'DELETE',
         subject: 'Project'
+      }
+    ]
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/users/${uuidRegExpAsString}`]:
+    {
+      POST: [
+        {
+          action: 'CREATE',
+          subject: 'AssignUserToProject'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'AssignUserToProject'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/users/${validRolesRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'Project'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'KeyPair'
       }
     ]
   },

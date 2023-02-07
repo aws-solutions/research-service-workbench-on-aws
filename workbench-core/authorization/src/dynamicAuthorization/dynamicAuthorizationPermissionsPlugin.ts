@@ -6,32 +6,29 @@
 import {
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/createIdentityPermissions';
+} from './models/createIdentityPermissions';
 import {
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteIdentityPermissions';
+} from './models/deleteIdentityPermissions';
 import {
   DeleteSubjectIdentityPermissionsRequest,
   DeleteSubjectIdentityPermissionsResponse
-} from './dynamicAuthorizationInputs/deleteSubjectIdentityPermissions';
+} from './models/deleteSubjectIdentityPermissions';
 import {
   GetDynamicOperationsByRouteRequest,
   GetDynamicOperationsByRouteResponse
-} from './dynamicAuthorizationInputs/getDynamicOperationsByRoute';
+} from './models/getDynamicOperationsByRoute';
 import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+} from './models/getIdentityPermissionsByIdentity';
 import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse
-} from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
-import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './dynamicAuthorizationInputs/isRouteIgnored';
-import {
-  IsRouteProtectedRequest,
-  IsRouteProtectedResponse
-} from './dynamicAuthorizationInputs/isRouteProtected';
+} from './models/getIdentityPermissionsBySubject';
+import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './models/isRouteIgnored';
+import { IsRouteProtectedRequest, IsRouteProtectedResponse } from './models/isRouteProtected';
 
 export interface DynamicAuthorizationPermissionsPlugin {
   /**
