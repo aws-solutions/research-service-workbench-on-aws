@@ -18,7 +18,7 @@ export const wrapAuth = (
     next: NextFunction
   ) => {
     const params = req.params;
-    const route = req.originalUrl;
+    const route: string = req.baseUrl + req.path;
     const authenticatedUser = res.locals.user;
     const method = HTTPMethodParser.parse(req.method);
     try {

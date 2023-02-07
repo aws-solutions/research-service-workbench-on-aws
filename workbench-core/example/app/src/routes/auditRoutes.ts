@@ -12,7 +12,7 @@ export function setupAuditRoutes(
   dynamicAuthorizationService: DynamicAuthorizationService
 ): void {
   router.post(
-    '/audit/write',
+    '/audit',
     wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;
@@ -39,19 +39,18 @@ export function setupAuditRoutes(
     })
   );
 
-  router.post(
+  router.get(
     '/audit/is-audit-complete',
     wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
       const authenticatedUser = res.locals.user;
       const source = {
         ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
       };
-      const statusCode: number = parseInt(req.body.statusCode, 10);
       const metadata = {
         actor: authenticatedUser,
         source,
-        action: req.body.action,
-        statusCode
+        action: req.query.action,
+        statusCode: req.query.statusCode ? parseInt(req.query.statusCode as string, 10) : undefined
       };
       const body = req.body.responseBody;
       const validatedMetadata = validateAndParse<Metadata>(MetadataParser, metadata);

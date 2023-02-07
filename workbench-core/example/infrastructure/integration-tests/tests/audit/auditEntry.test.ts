@@ -1,4 +1,5 @@
 import { IdentityPermission } from '@aws/workbench-core-authorization';
+import { fc, itProp } from 'jest-fast-check';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -26,17 +27,27 @@ describe('Audit service integration tests', () => {
     adminSession = await setup.getDefaultAdminSession();
     const { data } = await adminSession.resources.groups.create();
     const groupId = data.groupId;
-    const auditPermissionsRequired: IdentityPermission = {
-      action: 'CREATE',
-      effect: 'ALLOW',
-      identityId: groupId,
-      identityType: 'GROUP',
-      subjectId: '*',
-      subjectType: 'auditEntry'
-    };
+    const auditPermissionsRequired: IdentityPermission[] = [
+      {
+        action: 'CREATE',
+        effect: 'ALLOW',
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId: '*',
+        subjectType: 'auditEntry'
+      },
+      {
+        action: 'READ',
+        effect: 'ALLOW',
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId: '*',
+        subjectType: 'auditEntry'
+      }
+    ];
     await adminSession.resources.identityPermissions.create(
       {
-        identityPermissions: [auditPermissionsRequired]
+        identityPermissions: auditPermissionsRequired
       },
       false
     );
@@ -83,7 +94,7 @@ describe('Audit service integration tests', () => {
     });
   });
 
-  test('compeleted audit entry should return true', async () => {
+  test('completed audit entry should return true', async () => {
     const auditEntry = {
       statusCode,
       action,
@@ -95,4 +106,26 @@ describe('Audit service integration tests', () => {
       isComplete: true
     });
   });
+
+  itProp(
+    'test randomized object on isAuditEntryComplete, return false',
+    [fc.object()],
+    async (randomObject) => {
+      const response = await newAdminSession.resources.auditEntry.isAuditEntryComplete(randomObject);
+      expect(response.status).toBe(200);
+      expect(response.data).toMatchObject({
+        isComplete: false
+      });
+    }
+  );
+
+  itProp(
+    'test randomized object on write audit entry, throws 400',
+    [fc.object()],
+    async (randomizedObject) => {
+      await expect(
+        newAdminSession.resources.auditEntry.writeAuditEntry(randomizedObject)
+      ).rejects.toThrowError(new HttpError(400, {}));
+    }
+  );
 });

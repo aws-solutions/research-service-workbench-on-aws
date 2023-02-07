@@ -7,15 +7,11 @@ export default class AuditEntry extends CollectionResource {
     super(clientSession, 'auditEntry', '', '/audit');
   }
 
-  public async writeAuditEntry(
-    auditEntry?: Record<string, string | number | object>
-  ): Promise<AxiosResponse> {
-    return await this._axiosInstance.post(`${this._parentApi}/write`, auditEntry);
+  public async writeAuditEntry(auditEntry: Record<string, unknown>): Promise<AxiosResponse> {
+    return await this._axiosInstance.post(`${this._parentApi}`, auditEntry);
   }
 
-  public async isAuditEntryComplete(
-    auditEntry?: Record<string, string | number | object>
-  ): Promise<AxiosResponse> {
-    return await this._axiosInstance.post(`${this._parentApi}/is-audit-complete`, auditEntry);
+  public async isAuditEntryComplete(auditEntry: Record<string, unknown>): Promise<AxiosResponse> {
+    return await this._axiosInstance.get(`${this._parentApi}/is-audit-complete`, { params: auditEntry });
   }
 }
