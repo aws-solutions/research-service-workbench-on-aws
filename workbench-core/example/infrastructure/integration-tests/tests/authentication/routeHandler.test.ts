@@ -69,4 +69,39 @@ describe('authentication route handler integration tests', () => {
       ).rejects.toThrow(new HttpError(400, {}));
     });
   });
+
+  describe('isUserLoggedIn', () => {
+    it('should return false for an invalid refresh token', async () => {
+      const { data } = await anonymousSession.resources.authentication.loggedIn({
+        access: true,
+        refresh: false
+      });
+
+      expect(data.loggedIn).toBe(false);
+    });
+    it('should return false for an invalid access token', async () => {
+      const { data } = await anonymousSession.resources.authentication.loggedIn({
+        access: false,
+        refresh: true
+      });
+
+      expect(data.loggedIn).toBe(false);
+    });
+    it('should return false for an invalid refresh and access tokens', async () => {
+      const { data } = await anonymousSession.resources.authentication.loggedIn({
+        access: true,
+        refresh: true
+      });
+
+      expect(data.loggedIn).toBe(false);
+    });
+    it('should return false if no tokens are provided', async () => {
+      const { data } = await anonymousSession.resources.authentication.loggedIn({
+        access: false,
+        refresh: false
+      });
+
+      expect(data.loggedIn).toBe(false);
+    });
+  });
 });
