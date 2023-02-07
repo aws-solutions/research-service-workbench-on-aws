@@ -79,6 +79,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false for an invalid access token', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: false,
@@ -87,6 +88,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false for an invalid refresh and access tokens', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: true,
@@ -95,6 +97,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false if no tokens are provided', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: false,
@@ -102,6 +105,31 @@ describe('authentication route handler integration tests', () => {
       });
 
       expect(data.loggedIn).toBe(false);
+    });
+  });
+
+  describe('refreshAccessToken', () => {
+    it('should return the id token if the access token is successfully refreshed', async () => {
+      const admin = await setup.createAdminSession();
+      const { data } = await admin.resources.authentication.refresh({ includeRefreshToken: false });
+
+      expect(data.idToken).toBeDefined();
+    });
+
+    it('should throw 401 if there is no access token present', async () => {
+      await expect(
+        anonymousSession.resources.authentication.refresh({
+          includeRefreshToken: false
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 if the access token is invalid', async () => {
+      await expect(
+        anonymousSession.resources.authentication.refresh({
+          includeRefreshToken: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
     });
   });
 });

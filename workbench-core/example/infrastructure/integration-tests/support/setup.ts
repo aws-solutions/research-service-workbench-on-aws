@@ -38,7 +38,7 @@ export default class Setup {
 
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
     const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
-    const { accessToken } = await cognitoTokenService.generateCognitoToken({
+    const { accessToken, refreshToken } = await cognitoTokenService.generateCognitoToken({
       userPoolId,
       clientId,
       rootUserNameParamStorePath,
@@ -48,7 +48,7 @@ export default class Setup {
     const decodedToken: { sub: string } = jwt_decode(accessToken);
     this._settings.set('rootUserId', decodedToken.sub);
 
-    const session = this._getClientSession(accessToken);
+    const session = this._getClientSession(accessToken, refreshToken);
     this._sessions.push(session);
 
     return session;
@@ -92,7 +92,7 @@ export default class Setup {
     return this._settings;
   }
 
-  private _getClientSession(accessToken?: string): ClientSession {
-    return new ClientSession(this, accessToken);
+  private _getClientSession(accessToken?: string, refreshToken?: string): ClientSession {
+    return new ClientSession(this, accessToken, refreshToken);
   }
 }
