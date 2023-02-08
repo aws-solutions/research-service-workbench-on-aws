@@ -20,15 +20,15 @@ import { DatabaseError } from './errors/databaseError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
-import { CreateKeyPairRequest } from './keyPairs/createKeyPairRequest';
-import { CreateKeyPairResponse } from './keyPairs/createKeyPairResponse';
-import { DeleteKeyPairRequest } from './keyPairs/deleteKeyPairRequest';
-import { GetKeyPairRequest } from './keyPairs/getKeyPairRequest';
-import { GetKeyPairResponse } from './keyPairs/getKeyPairResponse';
-import { KeyPair, KeyPairParser } from './keyPairs/keyPair';
-import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
+import { CreateSshKeyRequest } from './keyPairs/createSshKeyRequest';
+import { CreateSshKeyResponse } from './keyPairs/createSshKeyResponse';
+import { DeleteSshKeyRequest } from './keyPairs/deleteSshKeyRequest';
+import { ListUserSshKeysForProjectRequest } from './keyPairs/listUserSshKeysForProjectRequest';
+import { ListUserSshKeysForProjectResponse } from './keyPairs/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
 import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
+import { SshKey, SshKeyParser } from './keyPairs/sshKey';
+import { SshKeyPlugin } from './keyPairs/sshKeyPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
@@ -54,14 +54,14 @@ export {
   PermissionsResponse,
   PermissionsResponseParser,
   ProjectEnvTypeConfigPlugin,
-  CreateKeyPairRequest,
-  CreateKeyPairResponse,
-  DeleteKeyPairRequest,
-  GetKeyPairRequest,
-  GetKeyPairResponse,
-  KeyPair,
-  KeyPairParser,
-  KeyPairPlugin,
+  CreateSshKeyRequest,
+  CreateSshKeyResponse,
+  DeleteSshKeyRequest,
+  ListUserSshKeysForProjectRequest,
+  ListUserSshKeysForProjectResponse,
+  SshKey,
+  SshKeyParser,
+  SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
   DatabaseError,

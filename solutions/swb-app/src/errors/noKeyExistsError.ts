@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// TODO: is this error needed after sshKeyService is done?
 export class NoKeyExistsError extends Error {
   public readonly isNoKeyExistsError: boolean;
 

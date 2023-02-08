@@ -4,14 +4,13 @@
  */
 
 import { z } from 'zod';
-import { KeyPairParser } from './keyPair';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const CreateKeyPairResponseParser = z
+export const ListUserSshKeysForProjectRequestParser = z
   .object({
-    keyPair: KeyPairParser,
-    privateKey: z.string()
+    projectId: z.string(),
+    userId: z.string()
   })
   .strict();
 
-export type CreateKeyPairResponse = z.infer<typeof CreateKeyPairResponseParser>;
+export type ListUserSshKeysForProjectRequest = z.infer<typeof ListUserSshKeysForProjectRequestParser>;

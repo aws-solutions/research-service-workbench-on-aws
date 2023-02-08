@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { z } from 'zod';
-import { KeyPairParser } from './keyPair';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const GetKeyPairResponseParser = z
+export const CreateSshKeyRequestParser = z
   .object({
-    keyPair: KeyPairParser
+    projectId: z.string(),
+    userId: z.string()
   })
   .strict();
 
-export type GetKeyPairResponse = z.infer<typeof GetKeyPairResponseParser>;
+export type CreateSshKeyRequest = z.infer<typeof CreateSshKeyRequestParser>;
