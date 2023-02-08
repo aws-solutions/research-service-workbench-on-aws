@@ -103,4 +103,17 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.get('refresh', { headers });
   }
+
+  public async logout(config: { origin?: string }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {
+      Cookie: `_csrf=${this._csrfSecret};`,
+      ['csrf-token']: this._csrfToken
+    };
+
+    if (config.origin) {
+      headers.origin = config.origin;
+    }
+
+    return this._axiosInstance.post('logout', undefined, { headers });
+  }
 }

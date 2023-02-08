@@ -110,8 +110,8 @@ describe('authentication route handler integration tests', () => {
 
   describe('refreshAccessToken', () => {
     it('should return the id token if the access token is successfully refreshed', async () => {
-      const admin = await setup.createAdminSession();
-      const { data } = await admin.resources.authentication.refresh({ includeRefreshToken: false });
+      const adminSession = await setup.createAdminSession();
+      const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
 
       expect(data.idToken).toBeDefined();
     });
@@ -130,6 +130,35 @@ describe('authentication route handler integration tests', () => {
           includeRefreshToken: true
         })
       ).rejects.toThrow(new HttpError(401, {}));
+    });
+  });
+
+  describe('logoutUser', () => {
+    it('should return the logout URL for a logged in user', async () => {
+      const adminSession = await setup.createAdminSession();
+      const origin = 'fakeOrigin';
+      const domain = setup.getSettings().get('ExampleCognitoDomainName');
+      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+
+      const { data } = await adminSession.resources.authentication.logout({ origin });
+
+      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
+    });
+
+    it('should return the logout URL for a logged out user', async () => {
+      const origin = 'fakeOrigin';
+      const domain = setup.getSettings().get('ExampleCognitoDomainName');
+      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+
+      const { data } = await anonymousSession.resources.authentication.logout({ origin });
+
+      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
+    });
+
+    it('should throw 400 if the origin header is not present', async () => {
+      await expect(anonymousSession.resources.authentication.logout({})).rejects.toThrow(
+        new HttpError(400, {})
+      );
     });
   });
 });
