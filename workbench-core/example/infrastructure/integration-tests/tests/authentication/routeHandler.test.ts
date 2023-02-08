@@ -161,4 +161,40 @@ describe('authentication route handler integration tests', () => {
       );
     });
   });
+
+  describe('getTokensFromAuthorizationCode', () => {
+    let code: string;
+    let codeVerifier: string;
+    let origin: string;
+
+    beforeEach(() => {
+      code = 'fakeAuthorizationCode';
+      codeVerifier = 'fakeCodeVerifier';
+      origin = 'fakeOrigin';
+    });
+
+    it('should throw 401 if the code param is invalid', async () => {
+      await expect(
+        anonymousSession.resources.authentication.token({ code, codeVerifier, origin })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 400 if the code param is missing from the request body', async () => {
+      await expect(anonymousSession.resources.authentication.token({ codeVerifier, origin })).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+
+    it('should throw 400 if the codeVerifier param is missing from the request body', async () => {
+      await expect(anonymousSession.resources.authentication.token({ code, origin })).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+
+    it('should throw 400 if the origin header is not present', async () => {
+      await expect(anonymousSession.resources.authentication.token({ code, codeVerifier })).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+  });
 });

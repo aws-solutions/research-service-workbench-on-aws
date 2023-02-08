@@ -116,4 +116,26 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.post('logout', undefined, { headers });
   }
+
+  public async token(config: {
+    code?: string;
+    codeVerifier?: string;
+    origin?: string;
+  }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {
+      Cookie: `_csrf=${this._csrfSecret};`,
+      ['csrf-token']: this._csrfToken
+    };
+
+    if (config.origin) {
+      headers.origin = config.origin;
+    }
+
+    const body = {
+      code: config.code,
+      codeVerifier: config.codeVerifier
+    };
+
+    return this._axiosInstance.post('token', body, { headers });
+  }
 }
