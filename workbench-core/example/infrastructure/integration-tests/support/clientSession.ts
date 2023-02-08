@@ -18,7 +18,7 @@ export default class ClientSession {
   private _setup: Setup;
   public resources: Resources;
 
-  public constructor(setup: Setup, accessToken?: string) {
+  public constructor(setup: Setup, accessToken?: string, refreshToken?: string) {
     this._settings = setup.getSettings();
     this._setup = setup;
     this._isAnonymousSession = accessToken === undefined;
@@ -31,11 +31,11 @@ export default class ClientSession {
     } = { 'Content-Type': 'application/json' };
 
     // For anonymous sessions, access token cookie is not required
-    if (accessToken) {
+    if (accessToken && refreshToken) {
       const csrf = new Csrf();
       const secret = csrf.secretSync();
       const token = csrf.create(secret);
-      headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
+      headers.Cookie = `access_token=${accessToken};refresh_token=${refreshToken};_csrf=${secret};`;
       headers['csrf-token'] = token;
     }
 
