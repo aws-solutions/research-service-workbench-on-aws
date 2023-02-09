@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 /**
  * This config file is used for testing of static authorization service
