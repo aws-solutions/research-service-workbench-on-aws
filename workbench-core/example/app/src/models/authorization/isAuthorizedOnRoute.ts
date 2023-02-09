@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUserParser, HTTPMethodParser } from '@aws/workbench-core-authorization';
 import { z } from 'zod';
 
