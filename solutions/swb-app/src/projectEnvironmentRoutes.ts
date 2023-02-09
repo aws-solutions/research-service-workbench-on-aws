@@ -33,8 +33,7 @@ export function setUpProjectEnvRoutes(
         const env: Environment = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
-          //eslint-disable-next-line security/detect-object-injection
-          await environments[envType].lifecycle.launch(env);
+          await environments[`${envType}`].lifecycle.launch(env);
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
@@ -76,8 +75,7 @@ export function setUpProjectEnvRoutes(
         );
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        //eslint-disable-next-line security/detect-object-injection
-        await environments[envType].lifecycle.terminate(req.params.id);
+        await environments[`${envType}`].lifecycle.terminate(req.params.id);
         res.status(204).send();
       } else {
         throw badRequest(
@@ -103,8 +101,7 @@ export function setUpProjectEnvRoutes(
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        //eslint-disable-next-line security/detect-object-injection
-        await environments[envType].lifecycle.start(req.params.id);
+        await environments[`${envType}`].lifecycle.start(req.params.id);
         res.status(204).send();
       } else {
         throw badRequest(
@@ -131,8 +128,7 @@ export function setUpProjectEnvRoutes(
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        //eslint-disable-next-line security/detect-object-injection
-        await environments[envType].lifecycle.stop(req.params.id);
+        await environments[`${envType}`].lifecycle.stop(req.params.id);
         res.status(204).send();
       } else {
         throw badRequest(
@@ -166,11 +162,12 @@ export function setUpProjectEnvRoutes(
       }
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // eslint-disable-next-line security/detect-object-injection
-        const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context);
+        const authCredResponse = await environments[`${envType}`].connection.getAuthCreds(
+          instanceName,
+          context
+        );
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // eslint-disable-next-line security/detect-object-injection
-        const instructionResponse = await environments[envType].connection.getConnectionInstruction();
+        const instructionResponse = await environments[`${envType}`].connection.getConnectionInstruction();
         const response = {
           authCredResponse,
           instructionResponse

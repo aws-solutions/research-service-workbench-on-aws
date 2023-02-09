@@ -92,14 +92,6 @@ const projectService: ProjectService = new ProjectService(
 );
 
 const apiRouteConfig: ApiRouteConfig = {
-  routes: [
-    {
-      path: '/foo',
-      serviceAction: 'launch',
-      httpMethod: 'post',
-      service: new SagemakerNotebookEnvironmentLifecycleService()
-    }
-  ],
   environments: {
     sagemakerNotebook: {
       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),

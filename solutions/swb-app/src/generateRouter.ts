@@ -23,9 +23,9 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Router, Express, Request, Response, json } from 'express';
+import express, { Router, Express, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
-import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import { ApiRouteConfig } from './apiRouteConfig';
 import SwbAuditExtractor from './audit/swbAuditExtractor';
 import SwbAuditLogger from './audit/swbAuditLogger';
 import SwbAuditPlugin from './audit/swbAuditPlugin';
@@ -100,19 +100,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
   const excludePaths: string[] = [];
   app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
-
-  // Dynamic routes
-  apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
-    // Config setting is provided by developer, and not external user request
-    // nosemgrep
-    router[apiRoute.httpMethod](apiRoute.path, async (req: Request, res: Response) => {
-      // Config setting is provided by developer, and not external user request
-      // nosemgrep
-      const response = await apiRoute.service[apiRoute.serviceAction]();
-      res.send(response);
-    });
-  });
-
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
   setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);

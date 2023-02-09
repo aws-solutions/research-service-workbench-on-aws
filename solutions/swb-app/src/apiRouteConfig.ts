@@ -20,7 +20,6 @@ import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTy
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export interface ApiRouteConfig {
-  routes: ApiRoute[];
   environments: { [key: string]: EnvironmentUtilityServices };
   account: HostingAccountService;
   environmentService: EnvironmentService;
