@@ -25,6 +25,14 @@ describe('Static authorization integration tests', () => {
         identityType: 'GROUP',
         subjectId: '*',
         subjectType: 'staticRouteConfig'
+      },
+      {
+        action: 'READ',
+        effect: 'ALLOW',
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId: '*',
+        subjectType: 'staticRouteIgnored'
       }
     ];
     await adminSession.resources.identityPermissions.create(
@@ -77,9 +85,65 @@ describe('Static authorization integration tests', () => {
       expect(response.status).toBe(200);
     });
 
+    test('test an unauthorized valid param based route should return a 403', async () => {
+      const route = '/staticSampleRoute/sampleParam';
+      const method = 'POST';
+
+      await expect(
+        newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute({
+          route,
+          method
+        })
+      ).rejects.toThrow(new HttpError(403, {}));
+    });
+    test('test an unauthorized invalid param based route should return a 403', async () => {
+      const route = '/invalidRoute/sampleParam';
+      const method = 'POST';
+
+      await expect(
+        newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute({
+          route,
+          method
+        })
+      ).rejects.toThrow(new HttpError(403, {}));
+    });
     testProp('random object should return a 400', [fc.object()], async (randomObject) => {
       await expect(
         newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute(randomObject)
+      ).rejects.toThrow(new HttpError(400, {}));
+    });
+  });
+
+  describe('isRouteIgnored', () => {
+    test('test a valid ignored route should return true', async () => {
+      const route = '/sampleStaticIgnoreRoute';
+      const method = 'POST';
+
+      const { data, status } = await newAdminSession.resources.staticAuthorization.isRouteIgnored({
+        route,
+        method
+      });
+      expect(status).toBe(200);
+      expect(data).toMatchObject({
+        ignored: true
+      });
+    });
+    test('test an invalid ingored route should return false', async () => {
+      const route = '/sampleStaticIgnoreRoute';
+      const method = 'GET';
+
+      const { data, status } = await newAdminSession.resources.staticAuthorization.isRouteIgnored({
+        route,
+        method
+      });
+      expect(status).toBe(200);
+      expect(data).toMatchObject({
+        ignored: false
+      });
+    });
+    testProp('randomized object should return 400', [fc.object()], async (randomObject) => {
+      await expect(
+        newAdminSession.resources.staticAuthorization.isRouteIgnored(randomObject)
       ).rejects.toThrow(new HttpError(400, {}));
     });
   });

@@ -10,7 +10,7 @@ export class StaticAuthorization extends CollectionResource {
     return this._axiosInstance.get(`${this._parentApi}/isAuthorizedOnRoute`, { params });
   }
 
-  public async isRouteIgnored(params: Record<string, string>): Promise<AxiosPromise> {
-    throw new Error('not Implemented');
+  public async isRouteIgnored(params: Record<string, unknown>): Promise<AxiosPromise> {
+    return this._axiosInstance.get(`${this._parentApi}/isRouteIgnored`, { params });
   }
 }

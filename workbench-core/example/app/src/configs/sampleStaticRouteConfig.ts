@@ -1,5 +1,7 @@
-import { RoutesMap } from '@aws/workbench-core-authorization';
-
+import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+/**
+ * This config file is used for testing of static authorization service
+ */
 export const sampleStaticRoutesMap: RoutesMap = {
   '/staticSampleRoute': {
     GET: [
@@ -21,6 +23,18 @@ export const sampleStaticRoutesMap: RoutesMap = {
         action: 'READ',
         subject: 'staticSampleRouteParam'
       }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'staticSampleRouteParam'
+      }
     ]
+  }
+};
+
+export const sampleStaticRouteIgnored: RoutesIgnored = {
+  '/sampleStaticIgnoreRoute': {
+    POST: true
   }
 };

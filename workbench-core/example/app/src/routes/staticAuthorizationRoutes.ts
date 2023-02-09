@@ -10,6 +10,7 @@ import {
   IsAuthorizedOnRouteRequestParser,
   IsAuthorizedOnRouteRequest
 } from '../models/authorization/isAuthorizedOnRoute';
+import { IsRouteIgnoredRequest, IsRouteIgnoredRequestParser } from '../models/authorization/isRouteIgnored';
 import { wrapAuth } from '../utilities/authWrapper';
 
 export function setupStaticAuthorizationRoutes(
@@ -39,6 +40,19 @@ export function setupStaticAuthorizationRoutes(
         }
         throw err;
       }
+    })
+  );
+
+  router.get(
+    '/staticAuthorization/isRouteIgnored',
+    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<IsRouteIgnoredRequest>(
+        IsRouteIgnoredRequestParser,
+        req.query
+      );
+      const { route, method } = validatedRequest;
+      const response = await authorizationService.isRouteIgnored(route, method);
+      res.status(200).send({ ignored: response });
     })
   );
 }

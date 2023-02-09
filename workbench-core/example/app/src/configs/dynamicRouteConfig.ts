@@ -95,6 +95,17 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         }
       }
     ]
+  },
+  '/staticAuthorization/isRouteIgnored': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectId: '*',
+          subjectType: 'staticRouteIgnored'
+        }
+      }
+    ]
   }
 };
 
