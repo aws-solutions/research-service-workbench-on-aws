@@ -206,6 +206,8 @@ importers:
       '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.212.0
       '@aws-sdk/client-dynamodb': ^3.212.0
+      '@aws-sdk/client-ec2': ^3.212.0
+      '@aws-sdk/client-ec2-instance-connect': ^3.267.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/client-s3-control': ^3.212.0
       '@aws-sdk/client-sagemaker': ^3.212.0
@@ -268,6 +270,8 @@ importers:
     dependencies:
       '@aws-sdk/client-cloudformation': 3.226.0
       '@aws-sdk/client-dynamodb': 3.226.0
+      '@aws-sdk/client-ec2': 3.226.0
+      '@aws-sdk/client-ec2-instance-connect': 3.267.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/client-s3-control': 3.226.0
       '@aws-sdk/client-service-catalog': 3.226.0
@@ -2235,7 +2239,7 @@ packages:
     dependencies:
       '@aws-crypto/ie11-detection': 2.0.0
       '@aws-crypto/supports-web-crypto': 2.0.0
-      '@aws-sdk/types': 3.254.0
+      '@aws-sdk/types': 3.267.0
       '@aws-sdk/util-locate-window': 3.55.0
       '@aws-sdk/util-utf8-browser': 3.188.0
       tslib: 1.14.1
@@ -2247,7 +2251,7 @@ packages:
       '@aws-crypto/sha256-js': 2.0.0
       '@aws-crypto/supports-web-crypto': 2.0.0
       '@aws-crypto/util': 2.0.1
-      '@aws-sdk/types': 3.254.0
+      '@aws-sdk/types': 3.267.0
       '@aws-sdk/util-locate-window': 3.55.0
       '@aws-sdk/util-utf8-browser': 3.188.0
       tslib: 1.14.1
@@ -2269,7 +2273,7 @@ packages:
     resolution: {integrity: sha512-VZY+mCY4Nmrs5WGfitmNqXzaE873fcIZDu54cbaDaaamsaTOP1DBImV9F4pICc3EHjQXujyE8jig+PFCaew9ig==}
     dependencies:
       '@aws-crypto/util': 2.0.1
-      '@aws-sdk/types': 3.254.0
+      '@aws-sdk/types': 3.267.0
       tslib: 1.14.1
 
   /@aws-crypto/sha256-js/3.0.0:
@@ -4594,6 +4598,7 @@ packages:
     engines: {node: '>=14.0.0'}
     dependencies:
       tslib: 2.4.1
+    dev: false
 
   /@aws-sdk/types/3.267.0:
     resolution: {integrity: sha512-fICTbSeIfXlTHnciQgDt37R0kXoKxgh0a3prnLWVvTcmf7NFujdZmg5YTAZT3KJJ7SuKsIgnI8azBYioVY8BVQ==}

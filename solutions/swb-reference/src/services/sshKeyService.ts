@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { EC2 } from '@aws-sdk/client-ec2';
+import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   CreateSshKeyRequest,
   CreateSshKeyResponse,
@@ -64,5 +66,35 @@ export default class SshKeyService implements SshKeyPlugin {
   public async sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
     // TODO implement
     throw new Error('Method not implemented.');
+  }
+
+  /**
+   * Get the EC2 and EC2 Instance Connect clients for the hosting account
+   *
+   * @param envMgmtRoleArn - the env management role ARN for the hosting account that has permissions
+   *                         for EC2 and EC2 Instance Connect actions
+   * @param operation - 'ListForProject' | 'Delete' | 'Create' | 'Connect' depending on the action happening
+   * @param externalId - the external id for the hosting account
+   * @param aws - the {@link AwsService} for the main account to ask for the hosting account {@link AwsService}
+   * @returns an object containing an {@link EC2} client and an {@link EC2InstanceConnect} client for the hosting account
+   */
+  private async _getEc2ClientsForHostingAccount(
+    envMgmtRoleArn: string,
+    operation: 'ListForProject' | 'Delete' | 'Create' | 'Connect',
+    externalId: string,
+    aws: AwsService
+  ): Promise<{ ec2: EC2; ec2InstanceConnect: EC2InstanceConnect }> {
+    const params = {
+      roleArn: envMgmtRoleArn,
+      roleSessionName: `${operation}-${this._resourceType}-${Date.now()}`,
+      region: process.env.AWS_REGION!,
+      externalId: externalId
+    };
+
+    const hostSdk = await aws.getAwsServiceForRole(params);
+    const ec2 = hostSdk.clients.ec2;
+    const ec2InstanceConnect = hostSdk.clients.ec2InstanceConnect;
+
+    return { ec2, ec2InstanceConnect };
   }
 }
