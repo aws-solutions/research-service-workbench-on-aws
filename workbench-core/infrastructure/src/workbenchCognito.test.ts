@@ -100,7 +100,7 @@ describe('WorkbenchCognito tests', () => {
       domainPrefix: 'test-domain',
       websiteUrls: ['https://www.example.com'],
       userPoolName: 'Sample-User-Pool-Name',
-      userPoolClientName: 'Sample-User-Pool-Client-Name',
+      userPoolClientNames: ['Sample-User-Pool-Client-Name'],
       accessTokenValidity: Duration.minutes(5),
       idTokenValidity: Duration.hours(1),
       refreshTokenValidity: Duration.hours(24),
@@ -188,7 +188,7 @@ describe('WorkbenchCognito tests', () => {
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
       ],
-      ClientName: workbenchCognitoProps.userPoolClientName
+      ClientName: workbenchCognitoProps.userPoolClientNames![0]
     });
   });
 

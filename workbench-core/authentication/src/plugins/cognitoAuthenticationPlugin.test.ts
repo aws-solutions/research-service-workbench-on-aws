@@ -31,9 +31,11 @@ import {
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
-  userPoolId: 'us-west-2_fakeId',
-  clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret'
+  webUiAppClient: {
+    userPoolId: 'us-west-2_fakeId',
+    clientId: 'fake-client-id',
+    clientSecret: 'fake-client-secret'
+  }
 } as const;
 
 const baseUrl = cognitoPluginOptions.cognitoDomain;
@@ -43,7 +45,7 @@ const validToken = 'validToken';
 const invalidToken = 'invalidToken';
 
 const encodedClientId = Buffer.from(
-  `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
+  `${cognitoPluginOptions.webUiAppClient.clientId}:${cognitoPluginOptions.webUiAppClient.clientSecret}`
 ).toString('base64');
 
 const baseDecodedAccessToken: CognitoAccessTokenPayload = {
@@ -86,7 +88,10 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('constructor tests', () => {
     it('should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
-      const badUserPoolIdConfig = { ...cognitoPluginOptions, userPoolId: 'badId' };
+      const badUserPoolIdConfig = {
+        ...cognitoPluginOptions,
+        webUiAppClient: { ...cognitoPluginOptions.webUiAppClient, userPoolId: 'badId' }
+      };
 
       expect(() => {
         new CognitoAuthenticationPlugin(badUserPoolIdConfig);
@@ -503,7 +508,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getAuthorizationCodeUrl(state, codeChallenge, websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.webUiAppClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
       );
     });
   });
@@ -513,7 +518,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getLogoutUrl(websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/logout?client_id=${cognitoPluginOptions.clientId}&logout_uri=${websiteUrl}`
+        `${baseUrl}/logout?client_id=${cognitoPluginOptions.webUiAppClient.clientId}&logout_uri=${websiteUrl}`
       );
     });
   });

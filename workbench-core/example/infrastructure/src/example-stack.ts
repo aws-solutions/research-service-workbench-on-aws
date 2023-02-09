@@ -64,8 +64,8 @@ export class ExampleStack extends Stack {
     this._exampleLambdaEnvVars = {
       COGNITO_DOMAIN: exampleCognito.cognitoDomain,
       USER_POOL_ID: exampleCognito.userPoolId,
-      CLIENT_ID: exampleCognito.userPoolClientId,
-      CLIENT_SECRET: exampleCognito.userPoolClientSecret.unsafeUnwrap(),
+      CLIENT_ID: exampleCognito.userPoolClientIds[0],
+      CLIENT_SECRET: exampleCognito.userPoolClientSecrets[0].unsafeUnwrap(),
       STACK_NAME: Aws.STACK_NAME
     };
 
@@ -708,7 +708,7 @@ export class ExampleStack extends Stack {
       domainPrefix: domainPrefix,
       websiteUrls: websiteUrls,
       userPoolName: userPoolName,
-      userPoolClientName: userPoolClientName,
+      userPoolClientNames: [userPoolClientName],
       oidcIdentityProviders: [],
       accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
       removalPolicy: RemovalPolicy.DESTROY
@@ -727,7 +727,7 @@ export class ExampleStack extends Stack {
     });
 
     new CfnOutput(this, 'ExampleCognitoUserPoolClientId', {
-      value: workbenchCognito.userPoolClientId,
+      value: workbenchCognito.userPoolClientIds[0],
       exportName: 'ExampleCognitoUserPoolClientId'
     });
 

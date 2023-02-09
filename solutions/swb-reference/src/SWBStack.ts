@@ -149,8 +149,8 @@ export class SWBStack extends Stack {
       userPoolId = USER_POOL_ID;
     } else {
       cognitoDomain = workbenchCognito.cognitoDomain;
-      clientId = workbenchCognito.userPoolClientId;
-      clientSecret = workbenchCognito.userPoolClientSecret.unsafeUnwrap();
+      clientId = workbenchCognito.userPoolClientIds[0];
+      clientSecret = workbenchCognito.userPoolClientSecrets[0].unsafeUnwrap();
       userPoolId = workbenchCognito.userPoolId;
     }
 
@@ -1105,7 +1105,7 @@ export class SWBStack extends Stack {
       domainPrefix: domainPrefix,
       websiteUrls: websiteUrls,
       userPoolName: userPoolName,
-      userPoolClientName: userPoolClientName,
+      userPoolClientNames: [userPoolClientName],
       oidcIdentityProviders: [],
       accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
     };
@@ -1117,7 +1117,7 @@ export class SWBStack extends Stack {
     });
 
     new CfnOutput(this, 'cognitoUserPoolClientId', {
-      value: workbenchCognito.userPoolClientId
+      value: workbenchCognito.userPoolClientIds[0]
     });
 
     new CfnOutput(this, 'cognitoDomainName', {

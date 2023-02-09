@@ -72,7 +72,7 @@ export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrls: string[];
   userPoolName?: string;
-  userPoolClientName?: string;
+  userPoolClientNames?: string[];
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
   accessTokenValidity?: Duration;
   idTokenValidity?: Duration;
@@ -86,19 +86,19 @@ export interface WorkbenchUserPoolOidcIdentityProvider
 
 export class WorkbenchCognito extends Construct {
   public readonly userPool: UserPool;
-  public readonly userPoolClient: UserPoolClient;
+  public readonly userPoolClients: UserPoolClient[];
   public readonly userPoolDomain: UserPoolDomain;
 
   public readonly cognitoDomain: string;
   public readonly userPoolId: string;
-  public readonly userPoolClientId: string;
-  public readonly userPoolClientSecret: SecretValue;
+  public readonly userPoolClientIds: string[];
+  public readonly userPoolClientSecrets: SecretValue[];
 
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
       domainPrefix,
       websiteUrls,
-      userPoolClientName,
+      userPoolClientNames = [],
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
@@ -141,38 +141,48 @@ export class WorkbenchCognito extends Construct {
       refreshTokenValidity: props.refreshTokenValidity
     };
     const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
-    this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
-      ...userPoolClientProps,
-      userPool: this.userPool,
-      userPoolClientName
-    });
-    this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
+    this.userPoolClients = userPoolClientNames.map(
+      (userPoolClientName) =>
+        new UserPoolClient(this, 'WorkbenchUserPoolClient', {
+          ...userPoolClientProps,
+          userPool: this.userPool,
+          userPoolClientName
+        })
+    );
+    this.userPool.identityProviders.forEach((provider) =>
+      this.userPoolClients.forEach(({ node }) => node.addDependency(provider))
+    );
 
-    const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
-      resourceType: 'Custom::DescribeCognitoUserPoolClient',
-      onCreate: {
-        region: Stack.of(this).region,
-        service: 'CognitoIdentityServiceProvider',
-        action: 'describeUserPoolClient',
-        parameters: {
-          UserPoolId: this.userPool.userPoolId,
-          ClientId: this.userPoolClient.userPoolClientId
-        },
-        physicalResourceId: PhysicalResourceId.of(this.userPoolClient.userPoolClientId)
-      },
-      policy: AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [this.userPool.userPoolArn]
-      }),
-      installLatestAwsSdk: true
-    });
+    const describeCognitoUserPoolClients = this.userPoolClients.map(
+      ({ userPoolClientId }) =>
+        new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
+          resourceType: 'Custom::DescribeCognitoUserPoolClient',
+          onCreate: {
+            region: Stack.of(this).region,
+            service: 'CognitoIdentityServiceProvider',
+            action: 'describeUserPoolClient',
+            parameters: {
+              UserPoolId: this.userPool.userPoolId,
+              ClientId: userPoolClientId
+            },
+            physicalResourceId: PhysicalResourceId.of(userPoolClientId)
+          },
+          policy: AwsCustomResourcePolicy.fromSdkCalls({
+            resources: [this.userPool.userPoolArn]
+          }),
+          installLatestAwsSdk: true
+        })
+    );
 
-    const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(
-      'UserPoolClient.ClientSecret'
+    const userPoolClientSecrets = describeCognitoUserPoolClients.map((describeCognitoUserPoolClient) =>
+      describeCognitoUserPoolClient.getResponseField('UserPoolClient.ClientSecret')
     );
 
     this.cognitoDomain = this.userPoolDomain.baseUrl();
     this.userPoolId = this.userPool.userPoolId;
-    this.userPoolClientId = this.userPoolClient.userPoolClientId;
-    this.userPoolClientSecret = SecretValue.unsafePlainText(userPoolClientSecret);
+    this.userPoolClientIds = this.userPoolClients.map(({ userPoolClientId }) => userPoolClientId);
+    this.userPoolClientSecrets = userPoolClientSecrets.map((userPoolClientSecret) =>
+      SecretValue.unsafePlainText(userPoolClientSecret)
+    );
   }
 }

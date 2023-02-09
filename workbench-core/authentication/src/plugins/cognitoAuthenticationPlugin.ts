@@ -9,7 +9,7 @@ import {
   DescribeUserPoolClientCommandInput
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
+import { CognitoJwtVerifierMultiUserPool } from 'aws-jwt-verify/cognito-verifier';
 import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
@@ -29,6 +29,24 @@ interface TokensExpiration {
   refreshToken: number; // ms
 }
 
+interface CognitoAppClient {
+  /**
+   * The Cognito app client IDs.
+   */
+  clientId: string | string[];
+  /**
+   * The Cognito user pool ID. Follows the format: "\<region\>_\<some string\>"
+   */
+  userPoolId: string;
+}
+
+interface WebUiAppClient extends CognitoAppClient {
+  /**
+   * The Cognito app client secret.
+   */
+  clientSecret: string;
+}
+
 export interface CognitoAuthenticationPluginOptions {
   /**
    * The Cognito domain. Follows the format: "https://\<domain prefix\>.auth.\<region\>.amazoncognito.com"
@@ -36,20 +54,19 @@ export interface CognitoAuthenticationPluginOptions {
   cognitoDomain: string;
 
   /**
-   * The Cognito user pool ID. Follows the format: "\<region\>_\<some string\>"
+   * Web UI Cognito App Client information.
    */
-  userPoolId: string;
+  webUiAppClient: WebUiAppClient;
 
   /**
-   * The Cognito app client ID.
+   * Auxiliary Cognito App Clients information for token validation.
    */
-  clientId: string;
-
-  /**
-   * The Cognito app client secret.
-   */
-  clientSecret: string;
+  auxiliaryAppClients?: CognitoAppClient[];
 }
+
+type CognitoJwtVerifierMultiUserPoolProps = CognitoAppClient & {
+  tokenUse: 'access';
+};
 
 /**
  * A CognitoAuthenticationPlugin instance that interfaces with the [Cognito API](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html)
@@ -57,17 +74,10 @@ export interface CognitoAuthenticationPluginOptions {
  */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _region: string;
-  private _userPoolId: string;
-  private _clientId: string;
-  private _clientSecret: string;
+  private _webUiAppClient: WebUiAppClient;
 
   private _baseUrl: string;
-  private _verifier: CognitoJwtVerifierSingleUserPool<{
-    userPoolId: string;
-    tokenUse: 'access';
-    clientId: string;
-  }>;
-
+  private _verifier: CognitoJwtVerifierMultiUserPool<CognitoJwtVerifierMultiUserPoolProps>;
   /**
    *
    * @param options - a {@link CognitoAuthenticationPluginOptions} object holding the Cognito user pool information
@@ -76,28 +86,31 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public constructor({
     cognitoDomain,
-    userPoolId,
-    clientId,
-    clientSecret
+    webUiAppClient,
+    auxiliaryAppClients = []
   }: CognitoAuthenticationPluginOptions) {
-    this._userPoolId = userPoolId;
-    this._clientId = clientId;
-    this._clientSecret = clientSecret;
+    this._webUiAppClient = webUiAppClient;
     this._baseUrl = cognitoDomain;
 
     // eslint-disable-next-line security/detect-unsafe-regex
-    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
+    const regionMatch = webUiAppClient.userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
     if (!regionMatch) {
       throw new PluginConfigurationError('Invalid Cognito user pool id');
     }
     this._region = regionMatch.groups!.region;
 
     try {
-      this._verifier = CognitoJwtVerifier.create({
-        userPoolId,
-        tokenUse: 'access',
-        clientId
-      });
+      const appClients = [webUiAppClient, ...auxiliaryAppClients];
+
+      this._verifier = CognitoJwtVerifier.create(
+        appClients.map(
+          (appClient) =>
+            ({
+              ...appClient,
+              tokenUse: 'access'
+            } as CognitoJwtVerifierMultiUserPoolProps)
+        )
+      );
     } catch (error) {
       throw new PluginConfigurationError(error.message);
     }
@@ -300,7 +313,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
-    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    return `${this._baseUrl}/oauth2/authorize?client_id=${this._webUiAppClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
   /**
@@ -368,7 +381,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getLogoutUrl(websiteUrl: string): string {
-    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${websiteUrl}`;
+    return `${this._baseUrl}/logout?client_id=${this._webUiAppClient.clientId}&logout_uri=${websiteUrl}`;
   }
 
   /**
@@ -377,7 +390,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns a string representation of the encoded client id and secret.
    */
   private _getEncodedClientId(): string {
-    return Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
+    return Buffer.from(`${this._webUiAppClient.clientId}:${this._webUiAppClient.clientSecret}`).toString(
+      'base64'
+    );
   }
 
   /**
@@ -389,8 +404,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     const client = new CognitoIdentityProviderClient({ region: this._region });
 
     const describeInput: DescribeUserPoolClientCommandInput = {
-      UserPoolId: this._userPoolId,
-      ClientId: this._clientId
+      UserPoolId: this._webUiAppClient.userPoolId,
+      ClientId:
+        typeof this._webUiAppClient.clientId === 'string'
+          ? this._webUiAppClient.clientId
+          : this._webUiAppClient.clientId[0]
     };
     const describeCommand = new DescribeUserPoolClientCommand(describeInput);
 

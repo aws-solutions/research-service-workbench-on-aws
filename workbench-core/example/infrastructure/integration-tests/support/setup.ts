@@ -29,9 +29,7 @@ export default class Setup {
     return session;
   }
 
-  public async createAdminSession(): Promise<ClientSession> {
-    const userPoolId = this._settings.get('ExampleCognitoUserPoolId');
-    const clientId = this._settings.get('ExampleCognitoUserPoolClientId');
+  public async createClientSession(userPoolId: string, clientId: string): Promise<ClientSession> {
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
     const awsRegion = this._settings.get('AwsRegion');
@@ -52,6 +50,13 @@ export default class Setup {
     this._sessions.push(session);
 
     return session;
+  }
+
+  public async createAdminSession(): Promise<ClientSession> {
+    return this.createClientSession(
+      this._settings.get('ExampleCognitoUserPoolId'),
+      this._settings.get('ExampleCognitoUserPoolClientId')
+    );
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {

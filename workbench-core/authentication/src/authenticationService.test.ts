@@ -9,9 +9,11 @@ import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticati
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
-  userPoolId: 'fake-user-pool',
-  clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret'
+  webUiAppClient: {
+    userPoolId: 'fake-user-pool',
+    clientId: 'fake-client-id',
+    clientSecret: 'fake-client-secret'
+  }
 } as const;
 
 describe('AuthenticationService tests', () => {

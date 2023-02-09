@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "support multiple clientIds and other user pools",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

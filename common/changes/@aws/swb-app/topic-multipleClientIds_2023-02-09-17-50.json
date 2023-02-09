@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Allow many client IDs",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
