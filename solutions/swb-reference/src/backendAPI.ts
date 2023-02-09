@@ -38,9 +38,9 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
-import KeyPairService from './services/keyPairService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
+import SshKeyService from './services/sshKeyService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
 const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
@@ -144,7 +144,7 @@ const apiRouteConfig: ApiRouteConfig = {
     envTypeConfigService,
     envTypeService
   ),
-  keyPairService: new KeyPairService(aws.helpers.ddb),
+  sshKeyService: new SshKeyService(aws),
   authorizationService: dynamicAuthorizationService
 };
 

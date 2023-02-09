@@ -36,10 +36,10 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
-import { setUpKeyPairRoutes } from './keyPairRoutes';
 import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
+import { setUpSshKeyRoutes } from './sshKeyRoutes';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
 import { setUpUserRoutes } from './userRoutes';
@@ -134,7 +134,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   );
   setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
-  setUpKeyPairRoutes(router, apiRouteConfig.keyPairService);
+  setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

@@ -20,21 +20,21 @@ import { DatabaseError } from './errors/databaseError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
-import { CreateKeyPairRequest } from './keyPairs/createKeyPairRequest';
-import { CreateKeyPairResponse } from './keyPairs/createKeyPairResponse';
-import { DeleteKeyPairRequest } from './keyPairs/deleteKeyPairRequest';
-import { GetKeyPairRequest } from './keyPairs/getKeyPairRequest';
-import { GetKeyPairResponse } from './keyPairs/getKeyPairResponse';
-import { KeyPair, KeyPairParser } from './keyPairs/keyPair';
-import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
-import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
-import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
+import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
+import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
+import { ListUserSshKeysForProjectRequest } from './sshKeys/listUserSshKeysForProjectRequest';
+import { ListUserSshKeysForProjectResponse } from './sshKeys/listUserSshKeysForProjectResponse';
+import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
+import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
+import { SshKey, SshKeyParser } from './sshKeys/sshKey';
+import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export {
   generateRouter,
@@ -56,14 +56,14 @@ export {
   PermissionsResponseParser,
   ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin,
-  CreateKeyPairRequest,
-  CreateKeyPairResponse,
-  DeleteKeyPairRequest,
-  GetKeyPairRequest,
-  GetKeyPairResponse,
-  KeyPair,
-  KeyPairParser,
-  KeyPairPlugin,
+  CreateSshKeyRequest,
+  CreateSshKeyResponse,
+  DeleteSshKeyRequest,
+  ListUserSshKeysForProjectRequest,
+  ListUserSshKeysForProjectResponse,
+  SshKey,
+  SshKeyParser,
+  SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
   DatabaseError,
