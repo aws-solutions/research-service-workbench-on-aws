@@ -248,6 +248,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'KeyPair'
+  },
+  {
+    effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'ProjectDataSet'
   }
@@ -307,6 +312,11 @@ const researcherPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'DELETE',
+    subject: 'KeyPair'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
     subject: 'KeyPair'
   },
   {

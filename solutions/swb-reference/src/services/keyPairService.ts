@@ -12,14 +12,13 @@ import {
   KeyPair,
   KeyPairParser,
   KeyPairPlugin,
-  ListKeyPairsRequest,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
   DatabaseError,
   NoKeyExistsError,
   NonUniqueKeyError
 } from '@aws/swb-app';
-import { DynamoDBService, PaginatedResponse } from '@aws/workbench-core-base';
+import { DynamoDBService } from '@aws/workbench-core-base';
 
 export default class KeyPairService implements KeyPairPlugin {
   private _dynamoDbService: DynamoDBService;
@@ -36,29 +35,8 @@ export default class KeyPairService implements KeyPairPlugin {
    * @returns a {@link KeyPair}
    */
   public async getKeyPair(request: GetKeyPairRequest): Promise<GetKeyPairResponse> {
-    // TODO implement
-    throw new Error('Method not implemented.');
-  }
-
-  /**
-   * Lists Key Pair records
-   *
-   * @param request - a {@link ListKeyPairsRequest}
-   * @returns a {@link PaginatedResponse} of {@link KeyPair}s
-   */
-  public async listKeyPairs(request: ListKeyPairsRequest): Promise<PaginatedResponse<KeyPair>> {
-    // TODO implement
-    throw new Error('Method not implemented.');
-  }
-
-  /**
-   * Deletes a Key Pair record
-   *
-   * @param request - a {@link DeleteKeyPairRequest}
-   */
-  public async deleteKeyPair(request: DeleteKeyPairRequest): Promise<void> {
     const { userId, projectId } = request;
-    // check if project exists
+
     const queryResult = await this._dynamoDbService.getPaginatedItems({
       index: 'getResourceByOwner',
       key: { name: 'resourceType', value: this._resourceType },
@@ -71,16 +49,28 @@ export default class KeyPairService implements KeyPairPlugin {
       throw new NoKeyExistsError(`No key exists for user ${userId} and project ${projectId}`);
     }
     if (queryResult.data.length > 1) {
-      throw new NonUniqueKeyError(
-        `More than one key exists for user ${userId} and project ${projectId}. Cannot determine which to delete.`
-      );
+      throw new NonUniqueKeyError(`More than one key exists for user ${userId} and project ${projectId}`);
     }
 
     const existingKeyPair = queryResult.data[0];
 
+    return { keyPair: this._mapDDBItemToKeyPair(existingKeyPair) };
+  }
+
+  /**
+   * Deletes a Key Pair record
+   *
+   * @param request - a {@link DeleteKeyPairRequest}
+   */
+  public async deleteKeyPair(request: DeleteKeyPairRequest): Promise<void> {
+    const { keyPair: existingKeyPair } = await this.getKeyPair(request);
+    const existingKeyPairItem = this._mapToDDBItemFromKeyPair(existingKeyPair);
+
     // HARD delete item
     try {
-      await this._dynamoDbService.deleteItem({ key: { pk: existingKeyPair.pk, sk: existingKeyPair.sk } });
+      await this._dynamoDbService.deleteItem({
+        key: { pk: existingKeyPairItem.pk, sk: existingKeyPairItem.sk }
+      });
     } catch (e) {
       throw new DatabaseError(e.message);
     }
