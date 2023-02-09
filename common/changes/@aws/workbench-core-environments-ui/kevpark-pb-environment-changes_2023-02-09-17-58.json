@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "Updated endpoints to use new project based environment routes",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

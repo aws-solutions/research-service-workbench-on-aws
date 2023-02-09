@@ -22,6 +22,7 @@ describe('list environments', () => {
   afterAll(async () => {
     await setup.cleanup();
   });
+
   test('list environments when status query is invalid', async () => {
     try {
       const queryParams = {
@@ -62,5 +63,21 @@ describe('list environments', () => {
     const { data: response } = await adminSession.resources.environments.get(queryParams);
 
     expect(Array.isArray(response.data)).toBe(true);
+  });
+
+  test('list project environments when project does not exist', async () => {
+    const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+    try {
+      await adminSession.resources.environments.listProjectEnvironments(fakeProjectId);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(404, {
+          statusCode: 404,
+          error: 'Not Found',
+          message: `Could not find project ${fakeProjectId}`
+        })
+      );
+    }
   });
 });

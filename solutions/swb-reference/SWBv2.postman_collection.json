@@ -396,9 +396,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id/terminate",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/terminate",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "terminate"],
+              "path": ["projects", ":projectId", "environments", ":id", "terminate"],
               "variable": [
                 {
                   "key": "id",
@@ -436,9 +436,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/environments",
+              "raw": "{{API_URL}}/projects/:projectId/environments",
               "host": ["{{API_URL}}"],
-              "path": ["environments"]
+              "path": ["projects", ":projectId", "environments"]
             }
           },
           "response": []
@@ -460,9 +460,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id/start",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/start",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "start"],
+              "path": ["projects", ":projectId", "environments", ":id", "start"],
               "variable": [
                 {
                   "key": "id",
@@ -491,9 +491,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id/stop",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/stop",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "stop"],
+              "path": ["projects", ":projectId", "environments", ":id", "stop"],
               "variable": [
                 {
                   "key": "id",
@@ -522,14 +522,95 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id"],
+              "path": ["projects", ":projectId", "environments", ":id"],
               "variable": [
                 {
                   "key": "id",
                   "value": null,
                   "description": "ID of environment to GET metadata"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Environments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "disabled": true
+                },
+                {
+                  "key": "name",
+                  "value": "testEnv",
+                  "disabled": true
+                },
+                {
+                  "key": "createdAtFrom",
+                  "value": "2022-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "createdAtTo",
+                  "value": "2022-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "owner",
+                  "value": "user-123",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "envType-123",
+                  "disabled": true
+                },
+                {
+                  "key": "project",
+                  "value": "project-123",
+                  "disabled": true
+                },
+                {
+                  "key": "ascending",
+                  "value": "name",
+                  "disabled": true
+                },
+                {
+                  "key": "descending",
+                  "value": "name",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "",
+                  "disabled": true
                 }
               ]
             }
@@ -634,9 +715,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id/connections",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/connections",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "connections"],
+              "path": ["projects", ":projectId", "environments", ":id", "connections"],
               "variable": [
                 {
                   "key": "id",
@@ -1752,71 +1833,6 @@
               }
             },
             "url": "{{API_URL}}/awsAccountTemplateUrls"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "key pairs",
-      "items": [
-        {
-          "name": "Delete Key Pair",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
-              "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "sshKeys"],
-              "variable": [
-                {
-                  "key": "projectId",
-                  "value": ""
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Key Pair",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
-              "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "sshKeys"],
-              "variable": [
-                {
-                  "key": "projectId",
-                  "value": ""
-                }
-              ]
-            }
           },
           "response": []
         }

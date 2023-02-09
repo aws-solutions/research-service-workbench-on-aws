@@ -37,6 +37,7 @@ describe('multiStep environment test', () => {
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
     });
+    const projectId = environmentA.projectId;
 
     //Create Environment B
     console.log('Creating Environment B');
@@ -235,9 +236,8 @@ describe('multiStep environment test', () => {
     ); //wait for environmentB to Terminate
     //Validate Environments A and B are not retrieved on get all environments call
     console.log('Check that terminated environments are not shown when listing all environments');
-    const { data: allEnvironments }: ListEnvironmentResponse = await adminSession.resources.environments.get(
-      {}
-    );
+    const { data: allEnvironments }: ListEnvironmentResponse =
+      await adminSession.resources.environments.listProjectEnvironments(projectId);
     expect(
       allEnvironments.data.filter((env) => env.id === environmentA.id || env.id === environmentB.id).length
     ).toEqual(0);

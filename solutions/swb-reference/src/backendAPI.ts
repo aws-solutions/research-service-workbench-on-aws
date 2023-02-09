@@ -38,8 +38,9 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
-import KeyPairService from './services/keyPairService';
+import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
+import SshKeyService from './services/sshKeyService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
 const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
@@ -76,6 +77,7 @@ const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuth
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
+const environmentService: EnvironmentService = new EnvironmentService(aws.helpers.ddb);
 const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
 const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
   envTypeService,
@@ -90,14 +92,6 @@ const projectService: ProjectService = new ProjectService(
 );
 
 const apiRouteConfig: ApiRouteConfig = {
-  routes: [
-    {
-      path: '/foo',
-      serviceAction: 'launch',
-      httpMethod: 'post',
-      service: new SagemakerNotebookEnvironmentLifecycleService()
-    }
-  ],
   environments: {
     sagemakerNotebook: {
       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
@@ -113,7 +107,6 @@ const apiRouteConfig: ApiRouteConfig = {
   account: new HostingAccountService(
     new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
     new WorkbenchDataSetService(
@@ -127,6 +120,7 @@ const apiRouteConfig: ApiRouteConfig = {
     dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
+  environmentService: environmentService,
   environmentTypeService: envTypeService,
   environmentTypeConfigService: envTypeConfigService,
   projectService,
@@ -135,13 +129,14 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
   metadataService: metadataService,
+  projectEnvPlugin: new ProjectEnvService(dynamicAuthorizationService, environmentService, projectService),
   projectEnvTypeConfigPlugin: new ProjectEnvTypeConfigService(
     metadataService,
     projectService,
     envTypeConfigService,
     envTypeService
   ),
-  keyPairService: new KeyPairService(aws.helpers.ddb),
+  sshKeyService: new SshKeyService(aws),
   authorizationService: dynamicAuthorizationService
 };
 
