@@ -26,7 +26,7 @@ describe('Delete Key Pair negative tests', () => {
 
     test.skip('it throws 404 error', async () => {
       try {
-        // await adminSession.resources.projects.project(invalidProjectId).keyPairs().delete();
+        // await adminSession.resources.projects.project(invalidProjectId).sshKeys().delete();
       } catch (e) {
         checkHttpError(
           e,

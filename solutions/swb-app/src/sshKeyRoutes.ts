@@ -4,6 +4,6 @@
  */
 
 import { Router } from 'express';
-import { SshKeyPlugin } from './keyPairs/sshKeyPlugin';
+import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
-export function setUpSshKeyRoutes(router: Router, keyPairService: SshKeyPlugin): void {}
+export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): void {}

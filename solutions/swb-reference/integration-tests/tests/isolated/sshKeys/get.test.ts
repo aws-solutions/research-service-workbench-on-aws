@@ -26,7 +26,7 @@ describe('Get Key Pair negative tests', () => {
 
     test.skip('it throws 404 error', async () => {
       try {
-        // await adminSession.resources.projects.project(invalidProjectId).keyPairs().keyPair();
+        // await adminSession.resources.projects.project(invalidProjectId).sshKeys().keyPair();
       } catch (e) {
         checkHttpError(
           e,

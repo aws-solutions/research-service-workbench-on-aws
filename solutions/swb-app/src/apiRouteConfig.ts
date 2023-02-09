@@ -15,8 +15,8 @@ import {
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
-import { SshKeyPlugin } from './keyPairs/sshKeyPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];

@@ -20,20 +20,20 @@ import { DatabaseError } from './errors/databaseError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
-import { CreateSshKeyRequest } from './keyPairs/createSshKeyRequest';
-import { CreateSshKeyResponse } from './keyPairs/createSshKeyResponse';
-import { DeleteSshKeyRequest } from './keyPairs/deleteSshKeyRequest';
-import { ListUserSshKeysForProjectRequest } from './keyPairs/listUserSshKeysForProjectRequest';
-import { ListUserSshKeysForProjectResponse } from './keyPairs/listUserSshKeysForProjectResponse';
-import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
-import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
-import { SshKey, SshKeyParser } from './keyPairs/sshKey';
-import { SshKeyPlugin } from './keyPairs/sshKeyPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
+import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
+import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
+import { ListUserSshKeysForProjectRequest } from './sshKeys/listUserSshKeysForProjectRequest';
+import { ListUserSshKeysForProjectResponse } from './sshKeys/listUserSshKeysForProjectResponse';
+import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
+import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
+import { SshKey, SshKeyParser } from './sshKeys/sshKey';
+import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export {
   generateRouter,
