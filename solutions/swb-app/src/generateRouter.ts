@@ -36,6 +36,7 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
 import { setUpSshKeyRoutes } from './sshKeyRoutes';
@@ -100,11 +101,11 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const excludePaths: string[] = [];
   app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
-  setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
+  setUpEnvRoutes(router, apiRouteConfig.environmentService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(
     router,
@@ -118,6 +119,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService
   );
+  setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 
