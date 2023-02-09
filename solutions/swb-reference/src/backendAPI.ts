@@ -133,7 +133,7 @@ const apiRouteConfig: ApiRouteConfig = {
     envTypeConfigService,
     envTypeService
   ),
-  sshKeyService: new SshKeyService(aws),
+  sshKeyService: new SshKeyService(aws, projectService),
   authorizationService: dynamicAuthorizationService
 };
 

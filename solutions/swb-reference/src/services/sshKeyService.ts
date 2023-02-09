@@ -13,15 +13,20 @@ import {
   ListUserSshKeysForProjectResponse,
   SshKeyPlugin,
   SendPublicKeyRequest,
-  SendPublicKeyResponse
+  SendPublicKeyResponse,
+  Ec2Error
 } from '@aws/swb-app';
+import { ProjectService } from '@aws/workbench-core-accounts';
+import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
 
 export default class SshKeyService implements SshKeyPlugin {
   private _aws: AwsService;
+  private _projectService: ProjectService;
   private _resourceType: string = 'sshkey';
-  public constructor(aws: AwsService) {
+  public constructor(aws: AwsService, projectService: ProjectService) {
     this._aws = aws;
+    this._projectService = projectService;
   }
 
   /**
@@ -43,8 +48,32 @@ export default class SshKeyService implements SshKeyPlugin {
    * @param request - a {@link DeleteSshKeyRequest}
    */
   public async deleteSshKey(request: DeleteSshKeyRequest): Promise<void> {
-    // TODO: implement
-    throw new Error('Method not implemented.');
+    const { projectId, sshKeyId, currentUserId } = request;
+
+    // Check that current user owns the key from the request
+    const sshKeyOwner = this._getOwnerOfSshKey(sshKeyId);
+    if (sshKeyOwner !== currentUserId) {
+      throw new ForbiddenError(`Current user ${currentUserId} cannot delete a key they do not own`);
+    }
+
+    // get project
+    const project = await this._projectService.getProject({ projectId });
+    const { envMgmtRoleArn, externalId } = project;
+
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'Delete',
+      externalId,
+      this._aws
+    );
+
+    // delete ssh key
+    try {
+      await ec2.deleteKeyPair({ KeyName: sshKeyId });
+    } catch (e) {
+      throw new Ec2Error(e);
+    }
   }
 
   /**
@@ -96,5 +125,11 @@ export default class SshKeyService implements SshKeyPlugin {
     const ec2InstanceConnect = hostSdk.clients.ec2InstanceConnect;
 
     return { ec2, ec2InstanceConnect };
+  }
+
+  private _getOwnerOfSshKey(sshKeyId: string): string {
+    // The sskKeyId is of form sshkey-user-<uuid>#proj-<uuid>
+    // We want user-<uuid>
+    return sshKeyId.split('#')[0].replace('sshkey-', '');
   }
 }

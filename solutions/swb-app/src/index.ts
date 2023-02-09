@@ -17,6 +17,7 @@ import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
 import { DatabaseError } from './errors/databaseError';
+import { Ec2Error } from './errors/ec2Error';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
@@ -66,5 +67,6 @@ export {
   SendPublicKeyResponse,
   DatabaseError,
   NonUniqueKeyError,
-  NoKeyExistsError
+  NoKeyExistsError,
+  Ec2Error
 };

@@ -6,20 +6,24 @@
 import {
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
+  Ec2Error,
   ListUserSshKeysForProjectRequest,
-  SendPublicKeyRequest,
-  DatabaseError,
-  NonUniqueKeyError,
   NoKeyExistsError,
+  NonUniqueKeyError,
+  SendPublicKeyRequest,
   SshKey
 } from '@aws/swb-app';
+import { Project, ProjectService } from '@aws/workbench-core-accounts';
+import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
+import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
 import SshKeyService from './sshKeyService';
 
 describe('SshKeyService', () => {
   const region = 'us-east-1';
   const aws = {} as AwsService;
-  const sshKeyService: SshKeyService = new SshKeyService(aws);
+  const projectService = {} as ProjectService;
+  const sshKeyService: SshKeyService = new SshKeyService(aws, projectService);
   let sshKey: SshKey;
 
   beforeAll(() => {
@@ -85,29 +89,85 @@ describe('SshKeyService', () => {
     let deleteSshKeyRequest: DeleteSshKeyRequest;
 
     beforeEach(() => {
-      deleteSshKeyRequest = { projectId: 'proj-123', sshKeyId: 'key-user-123#proj-123' };
+      deleteSshKeyRequest = {
+        projectId: 'proj-123',
+        sshKeyId: 'sshkey-user-123#proj-123',
+        currentUserId: 'user-123'
+      };
     });
 
-    describe('when unique key exists', () => {
-      describe('and DDB Delete call succeeds', () => {
-        test.skip('nothing fails', async () => {
+    describe('when current user does not own the key they want to delete', () => {
+      beforeEach(() => {
+        deleteSshKeyRequest.currentUserId = 'user-456';
+      });
+
+      test('it throws ForbiddenError', async () => {
+        // OPERATE n CHECK
+        await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(ForbiddenError);
+      });
+    });
+
+    describe('when current user owned the key they want to delete', () => {
+      describe('but project does not exist', () => {
+        beforeEach(() => {
+          projectService.getProject = jest.fn(() =>
+            Promise.reject(`Could not find project ${deleteSshKeyRequest.projectId}`)
+          );
+        });
+
+        test('it throws', async () => {
           // OPERATE n CHECK
-          await expect(sshKeyService.deleteSshKey(deleteSshKeyRequest)).resolves.not.toThrow();
+          await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(
+            `Could not find project ${deleteSshKeyRequest.projectId}`
+          );
         });
       });
 
-      describe('and DDB Delete call fails', () => {
-        test.skip('it fails', async () => {
-          // OPERATE n CHECK
-          await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(DatabaseError);
+      describe('and project exists', () => {
+        beforeEach(() => {
+          const project: Project = {
+            id: deleteSshKeyRequest.projectId,
+            name: '',
+            description: '',
+            costCenterId: '',
+            status: ProjectStatus.AVAILABLE,
+            createdAt: '',
+            updatedAt: '',
+            awsAccountId: '',
+            envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+            hostingAccountHandlerRoleArn: '',
+            vpcId: '',
+            subnetId: '',
+            environmentInstanceFiles: '',
+            encryptionKeyArn: '',
+            externalId: 'sampleExternalId',
+            accountId: ''
+          };
+          projectService.getProject = jest.fn(() => Promise.resolve(project));
+        });
+
+        describe('but EC2 call fails', () => {
+          beforeEach(() => {
+            aws.clients.ec2.deleteKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+          });
+
+          test('it throws Ec2Error', async () => {
+            // OPERATE n CHECK
+            await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(Ec2Error);
+          });
+        });
+
+        describe('and EC2 call succeeds', () => {
+          beforeEach(() => {
+            aws.clients.ec2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
+          });
+
+          test('it succeeds, nothing is returned', async () => {
+            // OPERATE n CHECK
+            await expect(sshKeyService.deleteSshKey(deleteSshKeyRequest)).resolves.not.toThrow();
+          });
         });
       });
-    });
-
-    test('should throw not implemented error', async () => {
-      await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
     });
   });
 
