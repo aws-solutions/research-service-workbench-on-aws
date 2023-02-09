@@ -90,13 +90,7 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     paginationToken?: string
   ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
     await this._projectService.getProject({ projectId: projectId });
-    return this._envService.listEnvironments(
-      user,
-      { project: projectId },
-      pageSize,
-      paginationToken,
-      undefined
-    );
+    return this._envService.listEnvironments(user, { project: projectId }, pageSize, paginationToken);
   }
 
   public async updateEnvironment(

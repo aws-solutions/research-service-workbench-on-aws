@@ -174,8 +174,7 @@ describe('ProjectEnvService', () => {
       expect(mockWorkbenchProjectService.getProject).toHaveBeenCalledWith({ projectId: fakeProjectId });
       expect(mockWorkbenchEnvironmentService.listEnvironments).toHaveBeenLastCalledWith(
         mockUser,
-        { projectId: fakeProjectId },
-        undefined,
+        { project: fakeProjectId },
         undefined,
         undefined
       );

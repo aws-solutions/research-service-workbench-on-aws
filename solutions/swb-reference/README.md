@@ -25,7 +25,7 @@ To test the new Service Workbench on AWS v2 r0.1.0, follow the deployment instru
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-88.81%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-79.31%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-84.84%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-88.65%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-93.53%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-92.3%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-81.25%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-93.46%25-brightgreen.svg?style=flat) |
 
 ## Requirements
 
