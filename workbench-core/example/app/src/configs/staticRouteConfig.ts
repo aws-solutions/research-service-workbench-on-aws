@@ -6,6 +6,7 @@
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
 import { dataSetPrefix, endpointPrefix } from './constants';
+import { sampleStaticRoutesMap } from './sampleStaticRouteConfig';
 
 const dataSetRegExpAsString: string = `${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`;
 const endpointRegExpAsString: string = `${endpointPrefix.toLowerCase()}-${uuidRegExpAsString}`;
@@ -342,7 +343,8 @@ export const routesMap: RoutesMap = {
         subject: 'Subject'
       }
     ]
-  }
+  },
+  ...sampleStaticRoutesMap
 };
 
 export const routesIgnored: RoutesIgnored = {
