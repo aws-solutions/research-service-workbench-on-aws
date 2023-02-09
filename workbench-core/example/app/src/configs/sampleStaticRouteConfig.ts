@@ -20,6 +20,18 @@ export const sampleStaticRoutesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'staticSampleRoutes'
       }
+    ],
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'staticSampleRoutes'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'staticSampleRoutes'
+      }
     ]
   },
   [`/staticSampleRoute/[A-Za-z0-9_]+`]: {

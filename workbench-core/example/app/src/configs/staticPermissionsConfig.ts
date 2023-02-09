@@ -180,6 +180,21 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'staticSampleRouteParam'
+  },
+  {
+    effect: 'DENY',
+    action: 'UPDATE',
+    subject: 'staticSampleRoutes'
+  },
+  {
+    effect: 'DENY',
+    action: 'DELETE',
+    subject: 'staticSampleRoutes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'staticSampleRoutes'
   }
 ];
 

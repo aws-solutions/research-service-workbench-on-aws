@@ -107,6 +107,30 @@ describe('Static authorization integration tests', () => {
         })
       ).rejects.toThrow(new HttpError(403, {}));
     });
+    test('test an unauthorized route that explicitly has DENY permissions for user should return 403', async () => {
+      const route = '/staticSampleRoute';
+      const method = 'PUT';
+
+      await expect(
+        newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute({
+          route,
+          method
+        })
+      ).rejects.toThrow(new HttpError(403, {}));
+    });
+
+    test('test an unauthorized route that explicitly has DENY and ALLOW permissions for user should return 403', async () => {
+      const route = '/staticSampleRoute';
+      const method = 'DELETE';
+
+      await expect(
+        newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute({
+          route,
+          method
+        })
+      ).rejects.toThrow(new HttpError(403, {}));
+    });
+
     testProp('random object should return a 400', [fc.object()], async (randomObject) => {
       await expect(
         newAdminSession.resources.staticAuthorization.isAuthorizedOnRoute(randomObject)
