@@ -20,7 +20,6 @@ import { DatabaseError } from './errors/databaseError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
-import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { CreateKeyPairRequest } from './keyPairs/createKeyPairRequest';
 import { CreateKeyPairResponse } from './keyPairs/createKeyPairResponse';
 import { DeleteKeyPairRequest } from './keyPairs/deleteKeyPairRequest';
@@ -31,6 +30,7 @@ import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
 import { ListKeyPairsRequest } from './keyPairs/listKeyPairsRequest';
 import { SendPublicKeyRequest } from './keyPairs/sendPublicKeyRequest';
 import { SendPublicKeyResponse } from './keyPairs/sendPublicKeyResponse';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser

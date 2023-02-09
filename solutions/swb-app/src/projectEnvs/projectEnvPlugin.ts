@@ -4,7 +4,7 @@
  */
 
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { Environment, EnvironmentStatus } from './environment';
+import { Environment, EnvironmentStatus } from '@aws/workbench-core-environments';
 
 export interface ProjectEnvPlugin {
   /**
@@ -50,7 +50,24 @@ export interface ProjectEnvPlugin {
    */
   listProjectEnvs(
     projectId: string,
-    paginationParams: string
+    user: AuthenticatedUser,
+    filter?: {
+      status?: EnvironmentStatus;
+      name?: string;
+      createdAtFrom?: string;
+      createdAtTo?: string;
+      owner?: string;
+      type?: string;
+    },
+    pageSize?: number,
+    paginationToken?: string,
+    sort?: {
+      status?: boolean;
+      name?: boolean;
+      createdAt?: boolean;
+      owner?: boolean;
+      type?: boolean;
+    }
   ): Promise<{ data: Environment[]; paginationToken: string | undefined }>;
 
   /**

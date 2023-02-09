@@ -15,13 +15,13 @@ import {
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
-import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
-  environments: { [key: string]: Environment };
+  environments: { [key: string]: EnvironmentUtilityServices };
   account: HostingAccountService;
   environmentService: EnvironmentService;
   dataSetService: DataSetPlugin;
@@ -46,7 +46,7 @@ export interface ApiRoute {
   httpMethod: HTTPMethod;
 }
 
-export interface Environment {
+export interface EnvironmentUtilityServices {
   lifecycle: EnvironmentLifecycleService;
   connection: EnvironmentConnectionService;
 }

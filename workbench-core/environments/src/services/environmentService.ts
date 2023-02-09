@@ -21,7 +21,6 @@ import {
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
-import { env } from 'process';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 
 export interface Environment {
@@ -328,8 +327,8 @@ export class EnvironmentService {
   ): Promise<Environment> {
     try {
       await this.getEnvironment(envId).then((env) => {
-        if (env.type === 'terminated_environment') {
-          throw Boom.badRequest();
+        if (env.status === 'TERMINATED') {
+          throw Boom.badRequest(`Cannot update terminated environment ${envId}`);
         }
       });
     } catch (e) {

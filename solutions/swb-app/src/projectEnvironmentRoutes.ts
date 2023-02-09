@@ -6,20 +6,21 @@
 import {
   isEnvironmentStatus,
   isSortAttribute,
-  CreateEnvironmentSchema
+  CreateEnvironmentSchema,
+  Environment
 } from '@aws/workbench-core-environments';
 import { badRequest, conflict } from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import _ from 'lodash';
-import { Environment } from './apiRouteConfig';
+import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectEnvRoutes(
   router: Router,
-  environments: { [key: string]: Environment },
+  environments: { [key: string]: EnvironmentUtilityServices },
   projectEnvironmentService: ProjectEnvPlugin
 ): void {
   const supportedEnvs = Object.keys(environments);
@@ -30,11 +31,12 @@ export function setUpProjectEnvRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateEnvironmentSchema));
       const envType = req.body.envType;
+      req.body.projectId = req.params.projectId;
       if (supportedEnvs.includes(envType)) {
         if (req.body.id) {
           throw badRequest('id cannot be passed in the request body when trying to launch a new environment');
         }
-        const env = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
+        const env: Environment = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
           //eslint-disable-next-line security/detect-object-injection
@@ -42,7 +44,7 @@ export function setUpProjectEnvRoutes(
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
-          await projectEnvironmentService.updateEnvironment(env.id!, {
+          await projectEnvironmentService.updateEnvironment(env.id!, env.projectId, {
             error: { type: 'LAUNCH', value: errorMessage },
             status: 'FAILED'
           });
@@ -61,7 +63,11 @@ export function setUpProjectEnvRoutes(
   router.put(
     '/projects/:projectId/environments/:id/terminate',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await projectEnvironmentService.getEnvironment(req.params.id, true);
+      const environment: Environment = await projectEnvironmentService.getEnvironment(
+        req.params.projectId,
+        req.params.id,
+        true
+      );
       const envType = environment.ETC.type;
       const envStatus = environment.status;
       if (['TERMINATING', 'TERMINATED'].includes(envStatus)) {
@@ -69,6 +75,10 @@ export function setUpProjectEnvRoutes(
       } else if (envStatus === 'TERMINATING_FAILED') {
         throw conflict(
           'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
+        );
+      } else if (envStatus !== 'STOPPED') {
+        throw badRequest(
+          `Environment must be STOPPED before beginning termination. ${environment.id} currently in state ${environment.status}.`
         );
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -87,7 +97,11 @@ export function setUpProjectEnvRoutes(
   router.put(
     '/projects/:projectId/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await projectEnvironmentService.getEnvironment(req.params.id, true);
+      const environment = await projectEnvironmentService.getEnvironment(
+        req.params.projectId,
+        req.params.id,
+        true
+      );
       const envType = environment.ETC.type;
       if (environment.status === 'STOPPING') {
         throw conflict('Cannot start environment while environment is currently being stopped');
@@ -110,7 +124,11 @@ export function setUpProjectEnvRoutes(
   router.put(
     '/projects/:projectId/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await projectEnvironmentService.getEnvironment(req.params.id, true);
+      const environment = await projectEnvironmentService.getEnvironment(
+        req.params.projectId,
+        req.params.id,
+        true
+      );
       const envType = environment.ETC.type;
 
       if (['PENDING', 'STARTING'].includes(environment.status)) {
@@ -134,7 +152,11 @@ export function setUpProjectEnvRoutes(
   router.get(
     '/projects/:projectId/environments/:id/connections',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await projectEnvironmentService.getEnvironment(req.params.id, true);
+      const environment = await projectEnvironmentService.getEnvironment(
+        req.params.projectId,
+        req.params.id,
+        true
+      );
       const instanceName = environment.instanceId!;
       const envType = environment.ETC.type;
 
@@ -172,12 +194,12 @@ export function setUpProjectEnvRoutes(
   router.get(
     '/projects/:projectId/environments/:id',
     wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-      const env = await projectEnvironmentService.getEnvironment(req.params.id, true);
+      const env = await projectEnvironmentService.getEnvironment(req.params.projectId, req.params.id, true);
       res.send(env);
     })
   );
 
-  // Get environments
+  // List project environments
   router.get(
     '/projects/:projectId/environments',
     wrapAsync(async (req: Request, res: Response) => {
@@ -188,7 +210,6 @@ export function setUpProjectEnvRoutes(
         createdAtTo,
         owner,
         type,
-        project,
         paginationToken,
         pageSize,
         ascending,
@@ -240,6 +261,7 @@ export function setUpProjectEnvRoutes(
         throw badRequest(`Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`);
       } else {
         const response = await projectEnvironmentService.listProjectEnvs(
+          req.params.projectId,
           res.locals.user,
           filter,
           pageSize ? Number(pageSize) : undefined,

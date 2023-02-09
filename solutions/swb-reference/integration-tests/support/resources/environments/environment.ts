@@ -10,8 +10,10 @@ import { poll, sleep } from '../../utils/utilities';
 import Resource from '../base/resource';
 
 export default class Environment extends Resource {
-  public constructor(id: string, clientSession: ClientSession, parentApi: string) {
+  public constructor(id: string, clientSession: ClientSession, parentApi: string, projectId?: string) {
     super(clientSession, 'environment', id, parentApi);
+    projectId = projectId ?? this._settings.get('projectId');
+    this._api = `projects/${projectId}/environments`;
   }
 
   public async connect(): Promise<AxiosResponse> {

@@ -11,6 +11,11 @@ import {
   envTypeIdRegExpString
 } from '@aws/workbench-core-base';
 
+const projectsIdRoutePrefix: string = `/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
+const projectsIdEnvsIdRoutePrefix: string =
+  projectsIdRoutePrefix +
+  `/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`;
+
 export const routesMap: RoutesMap = {
   '/awsAccounts': {
     POST: [
@@ -122,7 +127,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environments`]: {
+  [`${projectsIdRoutePrefix}/environments`]: {
     GET: [
       {
         action: 'READ',
@@ -136,8 +141,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
-    /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
+  [projectsIdEnvsIdRoutePrefix]: {
     GET: [
       {
         action: 'READ',
@@ -145,8 +149,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
-      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -154,8 +157,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
-      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -163,8 +165,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
-      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -172,8 +173,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
-      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',

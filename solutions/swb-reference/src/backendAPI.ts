@@ -38,8 +38,8 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
-import { ProjectEnvService } from './services/projectEnvService';
 import KeyPairService from './services/keyPairService';
+import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
@@ -128,6 +128,7 @@ const apiRouteConfig: ApiRouteConfig = {
     dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
+  environmentService: environmentService,
   environmentTypeService: envTypeService,
   environmentTypeConfigService: envTypeConfigService,
   projectService,

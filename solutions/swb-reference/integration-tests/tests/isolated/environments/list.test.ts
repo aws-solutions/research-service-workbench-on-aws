@@ -40,6 +40,24 @@ describe('list environments', () => {
     }
   });
 
+  test('list environments when status query is invalid', async () => {
+    try {
+      const queryParams = {
+        status: 'someInvalidStatus'
+      };
+      await adminSession.resources.environments.listProjectEnvironments(queryParams);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'Invalid environment status. Please try again with valid inputs.'
+        })
+      );
+    }
+  });
+
   const validEnvStatuses = [
     'PENDING',
     'COMPLETED',
