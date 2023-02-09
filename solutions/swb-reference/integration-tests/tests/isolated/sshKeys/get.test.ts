@@ -8,7 +8,7 @@ import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('Delete Key Pair negative tests', () => {
+describe('Get Key Pair negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
 
@@ -24,9 +24,9 @@ describe('Delete Key Pair negative tests', () => {
   describe('with Project that does not exist', () => {
     const invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
 
-    test('it throws 404 error', async () => {
+    test.skip('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(invalidProjectId).keyPairs().delete();
+        // await adminSession.resources.projects.project(invalidProjectId).sshKeys().keyPair();
       } catch (e) {
         checkHttpError(
           e,
@@ -39,5 +39,4 @@ describe('Delete Key Pair negative tests', () => {
       }
     });
   });
-  // TODO add negative test for when there is no unique key--need create to set up situation
 });

@@ -326,20 +326,6 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: 'KeyPair'
-      }
-    ],
-    GET: [
-      {
-        action: 'READ',
-        subject: 'KeyPair'
-      }
-    ]
-  },
   '/roles': {
     POST: [
       {
