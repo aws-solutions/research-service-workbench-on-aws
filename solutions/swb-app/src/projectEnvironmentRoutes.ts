@@ -3,16 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  isEnvironmentStatus,
-  isSortAttribute,
-  CreateEnvironmentSchema,
-  Environment
-} from '@aws/workbench-core-environments';
+import { CreateEnvironmentSchema, Environment } from '@aws/workbench-core-environments';
 import { badRequest, conflict } from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import _ from 'lodash';
 import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
@@ -203,70 +197,16 @@ export function setUpProjectEnvRoutes(
   router.get(
     '/projects/:projectId/environments',
     wrapAsync(async (req: Request, res: Response) => {
-      const {
-        status,
-        name,
-        createdAtFrom,
-        createdAtTo,
-        owner,
-        type,
-        paginationToken,
-        pageSize,
-        ascending,
-        descending
-      } = req.query;
-      // Apply filter if applicable
-      let filter: { [key: string]: string } | undefined = {};
-      if (status && isEnvironmentStatus(status)) {
-        filter = { ...filter, status };
-      }
-      if (name && typeof name === 'string') {
-        filter = { ...filter, name };
-      }
-      if (createdAtFrom && typeof createdAtFrom === 'string') {
-        filter = { ...filter, createdAtFrom };
-      }
-      if (createdAtTo && typeof createdAtTo === 'string') {
-        filter = { ...filter, createdAtTo };
-      }
-      if (owner && typeof owner === 'string') {
-        filter = { ...filter, owner };
-      }
-      if (type && typeof type === 'string') {
-        filter = { ...filter, type };
-      }
-      if (_.isEmpty(filter)) {
-        filter = undefined;
-      }
-      // Apply sort if applicable
-      let sort: { [key: string]: boolean } | undefined = {};
-      if (ascending && isSortAttribute(ascending)) {
-        sort[`${ascending}`] = true;
-      } else if (descending && isSortAttribute(descending)) {
-        sort[`${descending}`] = false;
-      }
-      if (_.isEmpty(sort)) {
-        sort = undefined;
-      }
+      const { paginationToken, pageSize } = req.query;
       // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         throw badRequest('Invalid pagination token and/or page size. Please try again with valid inputs.');
-      } else if (status && !isEnvironmentStatus(status)) {
-        throw badRequest('Invalid environment status. Please try again with valid inputs.');
-      } else if ((ascending && !isSortAttribute(ascending)) || (descending && !isSortAttribute(descending))) {
-        throw badRequest('Invalid sort attribute. Please try again with valid inputs.');
-      } else if (ascending && descending) {
-        throw badRequest('Cannot sort on two attributes. Please try again with valid inputs.');
-      } else if ((createdAtFrom && !createdAtTo) || (!createdAtFrom && createdAtTo)) {
-        throw badRequest(`Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`);
       } else {
         const response = await projectEnvironmentService.listProjectEnvs(
           req.params.projectId,
           res.locals.user,
-          filter,
           pageSize ? Number(pageSize) : undefined,
-          paginationToken,
-          sort
+          paginationToken
         );
         res.send(response);
       }

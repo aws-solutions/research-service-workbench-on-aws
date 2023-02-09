@@ -86,37 +86,17 @@ export class ProjectEnvService implements ProjectEnvPlugin {
   public async listProjectEnvs(
     projectId: string,
     user: AuthenticatedUser,
-    filter?: {
-      status?: EnvironmentStatus;
-      name?: string;
-      createdAtFrom?: string;
-      createdAtTo?: string;
-      owner?: string;
-      type?: string;
-    },
     pageSize?: number,
-    paginationToken?: string,
-    sort?: {
-      status?: boolean;
-      name?: boolean;
-      createdAt?: boolean;
-      owner?: boolean;
-      type?: boolean;
-    }
+    paginationToken?: string
   ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
     await this._projectService.getProject({ projectId: projectId });
-    interface ProjectFilter {
-      status?: EnvironmentStatus;
-      name?: string;
-      createdAtFrom?: string;
-      createdAtTo?: string;
-      owner?: string;
-      type?: string;
-      projectId: string;
-    }
-    const projectFilter: ProjectFilter = (filter ? filter : { projectId: projectId }) as ProjectFilter;
-    projectFilter.projectId = projectId;
-    return this._envService.listEnvironments(user, projectFilter, pageSize, paginationToken, sort);
+    return this._envService.listEnvironments(
+      user,
+      { project: projectId },
+      pageSize,
+      paginationToken,
+      undefined
+    );
   }
 
   public async updateEnvironment(

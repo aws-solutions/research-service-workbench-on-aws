@@ -42,32 +42,15 @@ export interface ProjectEnvPlugin {
    *
    * @param projectId - Project Id
    * @param user - User information
-   * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
-   * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    *
    */
   listProjectEnvs(
     projectId: string,
     user: AuthenticatedUser,
-    filter?: {
-      status?: EnvironmentStatus;
-      name?: string;
-      createdAtFrom?: string;
-      createdAtTo?: string;
-      owner?: string;
-      type?: string;
-    },
     pageSize?: number,
-    paginationToken?: string,
-    sort?: {
-      status?: boolean;
-      name?: boolean;
-      createdAt?: boolean;
-      owner?: boolean;
-      type?: boolean;
-    }
+    paginationToken?: string
   ): Promise<{ data: Environment[]; paginationToken: string | undefined }>;
 
   /**

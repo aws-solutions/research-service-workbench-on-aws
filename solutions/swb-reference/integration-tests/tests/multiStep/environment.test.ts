@@ -37,6 +37,7 @@ describe('multiStep environment test', () => {
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
     });
+    const projectId = environmentA.projectId;
 
     //Create Environment B
     console.log('Creating Environment B');
@@ -120,7 +121,7 @@ describe('multiStep environment test', () => {
     //Search Environment A filtering by name
     console.log('Searching for Environment A: filtering by "name"');
     const { data: environmentsNameFilter }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments({
+      await adminSession.resources.environments.get({
         name: environmentAStopped.name
       });
     expect(
@@ -130,7 +131,7 @@ describe('multiStep environment test', () => {
     //Search Environment A filtering by status
     console.log('Searching for Environment A: filtering by "status"');
     const { data: environmentsStatusFilter }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments({
+      await adminSession.resources.environments.get({
         status: environmentAStopped.status
       });
     expect(
@@ -140,7 +141,7 @@ describe('multiStep environment test', () => {
     //Search Environment A filtering by created at
     console.log('Searching for Environment A: filtering by "createdAt"');
     const { data: environmentsCreatedAtFilter }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments({
+      await adminSession.resources.environments.get({
         createdAtFrom: environmentAStopped.createdAt,
         createdAtTo: environmentAStopped.createdAt
       });
@@ -151,7 +152,7 @@ describe('multiStep environment test', () => {
     //Search Environment A filtering by owner
     console.log('Searching for Environment A: filtering by "owner"');
     const { data: environmentsOwnerFilter }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments({
+      await adminSession.resources.environments.get({
         owner: environmentAStopped.owner
       });
     expect(
@@ -235,8 +236,9 @@ describe('multiStep environment test', () => {
     ); //wait for environmentB to Terminate
     //Validate Environments A and B are not retrieved on get all environments call
     console.log('Check that terminated environments are not shown when listing all environments');
-    const { data: allEnvironments }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments({});
+    const { data: allEnvironments }: ListEnvironmentResponse = await adminSession.resources.environments.get(
+      projectId
+    );
     expect(
       allEnvironments.data.filter((env) => env.id === environmentA.id || env.id === environmentB.id).length
     ).toEqual(0);

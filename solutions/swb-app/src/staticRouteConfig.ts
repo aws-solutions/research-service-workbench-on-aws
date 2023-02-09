@@ -127,6 +127,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/environments': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Environment'
+      }
+    ]
+  },
   [`${projectsIdRoutePrefix}/environments`]: {
     GET: [
       {

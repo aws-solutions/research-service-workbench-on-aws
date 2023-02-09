@@ -225,7 +225,6 @@ importers:
       '@aws/workbench-core-infrastructure': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@aws/workbench-core-user-management': workspace:*
-      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
@@ -299,7 +298,6 @@ importers:
       '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-sagemaker': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
-      '@hapi/boom': 10.0.0
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_hwgraz45zafgr6l5obogbuv7wm
@@ -5994,9 +5992,11 @@ packages:
     resolution: {integrity: sha512-1YVs9tLHhypBqqinKQRqh7FUERIolarQApO37OWkzD+z6y6USi871Sv746zBPKcIOBuI6g6y4FrwX87mmJ90Gg==}
     dependencies:
       '@hapi/hoek': 10.0.0
+    dev: false
 
   /@hapi/hoek/10.0.0:
     resolution: {integrity: sha512-CeNFz1JcLZ5xE8Vc9aau37cgHw9bxXqSDK/D55GF2GAOv0n0XjyyjSodHtKahB7A1tV3FlgCpijp3zkSITmBdA==}
+    dev: false
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}
