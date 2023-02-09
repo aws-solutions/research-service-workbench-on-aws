@@ -2,14 +2,17 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const DeleteKeyPairRequestParser = z
+export const CreateSshKeyResponseParser = z
   .object({
     projectId: z.string(),
-    userId: z.string()
+    privateKey: z.string(),
+    sshKeyId: z.string(),
+    owner: z.string()
   })
   .strict();
 
-export type DeleteKeyPairRequest = z.infer<typeof DeleteKeyPairRequestParser>;
+export type CreateSshKeyResponse = z.infer<typeof CreateSshKeyResponseParser>;

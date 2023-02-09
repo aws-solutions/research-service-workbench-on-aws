@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "add ec2 instance connect client to aws service",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

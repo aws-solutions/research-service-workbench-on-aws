@@ -7,6 +7,7 @@ import { CloudFormation } from '@aws-sdk/client-cloudformation';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { EC2 } from '@aws-sdk/client-ec2';
+import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { IAM } from '@aws-sdk/client-iam';
 import { KMS } from '@aws-sdk/client-kms';
@@ -29,6 +30,7 @@ export default class AwsService {
     cognito: CognitoIdentityProvider;
     ssm: SSM;
     ec2: EC2;
+    ec2InstanceConnect: EC2InstanceConnect;
     eventBridge: EventBridge;
     serviceCatalog: ServiceCatalog;
     s3: S3;
@@ -54,6 +56,7 @@ export default class AwsService {
       cognito: new CognitoIdentityProvider(options),
       ssm: new SSM(options),
       ec2: new EC2(options),
+      ec2InstanceConnect: new EC2InstanceConnect(options),
       eventBridge: new EventBridge(options),
       serviceCatalog: new ServiceCatalog(options),
       s3: new S3(options),
