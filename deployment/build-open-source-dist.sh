@@ -80,6 +80,18 @@ cp $source_template_dir/../NOTICE $dist_dir/NOTICE.txt
 echo "cp $source_template_dir/../README.md $dist_dir"
 cp $source_template_dir/../README.md $dist_dir
 
+echo "cp $source_template_dir/../rush.json $dist_dir"
+cp $source_template_dir/../rush.json $dist_dir
+
+echo "cp $source_template_dir/../.npmpackagejsonlintrc.json $dist_dir"
+cp $source_template_dir/../.npmpackagejsonlintrc.json $dist_dir
+
+echo "cp $source_template_dir/../.prettierrc.js $dist_dir"
+cp $source_template_dir/../.prettierrc.js $dist_dir
+
+echo "cp $source_template_dir/../.czrc $dist_dir"
+cp $source_template_dir/../.czrc $dist_dir
+
 echo "cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir"
 cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir
 
