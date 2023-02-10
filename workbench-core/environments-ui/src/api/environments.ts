@@ -13,6 +13,7 @@ import {
 } from '../models/Environment';
 
 const useEnvironments = (
+  projectId?: string,
   params?: EnvironmentsQueryParams
 ): {
   environments: { workspaceName: string; workspaceStatus: string; project: string }[];
@@ -23,7 +24,9 @@ const useEnvironments = (
 } => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();
   queryString = queryString ? `?${queryString}` : '';
-  const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet, {
+  const envEndpoint = `environments${queryString}`;
+  const endpoint = projectId ? `projects/${projectId}/${envEndpoint}` : envEndpoint;
+  const { data, mutate, isValidating } = useSWR(endpoint, httpApiGet, {
     refreshInterval: 20000
   });
 
@@ -45,23 +48,23 @@ const useEnvironments = (
 };
 
 const createEnvironment = async (environment: CreateEnvironmentForm): Promise<void> => {
-  await httpApiPost('environments', { ...environment });
+  await httpApiPost(`projects/${environment.projectId}/environments`, { ...environment });
 };
 
-const start = async (id: string): Promise<void> => {
-  await httpApiPut(`environments/${id}/start`, {});
+const start = async (projectId: string, id: string): Promise<void> => {
+  await httpApiPut(`projects/${projectId}/environments/${id}/start`, {});
 };
 
-const stop = async (id: string): Promise<void> => {
-  await httpApiPut(`environments/${id}/stop`, {});
+const stop = async (projectId: string, id: string): Promise<void> => {
+  await httpApiPut(`projects/${projectId}/environments/${id}/stop`, {});
 };
 
-const terminate = async (id: string): Promise<void> => {
-  await httpApiPut(`environments/${id}/terminate`, {});
+const terminate = async (projectId: string, id: string): Promise<void> => {
+  await httpApiPut(`projects/${projectId}/environments/${id}/terminate`, {});
 };
 
-const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
-  return httpApiGet(`environments/${id}/connections`, {});
+const connect = async (projectId: string, id: string): Promise<EnvironmentConnectResponse> => {
+  return httpApiGet(`projects/${projectId}/environments/${id}/connections`, {});
 };
 
 export { useEnvironments, start, stop, terminate, connect, createEnvironment };

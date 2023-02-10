@@ -10,11 +10,13 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express, json } from 'express';
 import { rateLimit } from 'express-rate-limit';
+import { setupAuditRoutes } from './routes/auditRoutes';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
 import { setUpDynamicAuthorizationRoutes } from './routes/dynamicAuthorizationRoutes';
 import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
 import { setupSampleRoutes } from './routes/sampleRoutes';
+import { setupStaticAuthorizationRoutes } from './routes/staticAuthorizationRoutes';
 import { setUpUserRoutes } from './routes/userRoutes';
 import {
   userManagementService,
@@ -23,6 +25,7 @@ import {
   authenticationService,
   logger
 } from './services';
+import { strictAuditService } from './services/auditService';
 import { authorizationService, staticRoutesIgnored } from './services/authorizationService';
 import { dynamicAuthorizationService } from './services/dynamicAuthorizationService';
 import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
@@ -60,13 +63,18 @@ export function generateRouter(): Express {
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, userManagementService);
   setUpDynamicAuthorizationRoutes(router, dynamicAuthorizationService);
-  //used for testing dynamic authorization service
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);
   router.use(unknownErrorHandler);
 
+  // Routes protected by DynamicAuthorizationService
   const secondRouter: Router = Router();
+  //used for testing dynamic authorization service
   setupSampleRoutes(secondRouter, dynamicAuthorizationService);
+  setupAuditRoutes(secondRouter, strictAuditService, dynamicAuthorizationService);
+  setupStaticAuthorizationRoutes(secondRouter, dynamicAuthorizationService, authorizationService);
+  secondRouter.use(boomErrorHandler);
+  secondRouter.use(unknownErrorHandler);
 
   app.use('/', secondRouter);
   app.use('/', router);

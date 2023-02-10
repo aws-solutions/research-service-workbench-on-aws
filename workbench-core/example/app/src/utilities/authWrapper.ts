@@ -8,8 +8,8 @@ import { Request, Response, NextFunction } from 'express';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const wrapAuth = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
-  dynamicAuthorizationService: DynamicAuthorizationService
+  dynamicAuthorizationService: DynamicAuthorizationService,
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
 ): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
   // eslint-disable-next-line func-names
   const wrapper: (req: Request, res: Response, next: NextFunction) => Promise<void> = async (
@@ -18,7 +18,7 @@ export const wrapAuth = (
     next: NextFunction
   ) => {
     const params = req.params;
-    const route = req.originalUrl;
+    const route: string = req.baseUrl + req.path;
     const authenticatedUser = res.locals.user;
     const method = HTTPMethodParser.parse(req.method);
     try {

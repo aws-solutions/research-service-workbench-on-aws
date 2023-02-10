@@ -47,6 +47,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-ec2-instance-connect",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-eventbridge",
       "allowedCategories": [ "production" ]
     },
@@ -456,7 +460,7 @@
     },
     {
       "name": "fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "generate-password",
@@ -476,7 +480,7 @@
     },
     {
       "name": "jest-fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "js-yaml",

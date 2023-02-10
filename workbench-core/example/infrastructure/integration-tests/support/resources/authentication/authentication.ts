@@ -78,4 +78,64 @@ export default class Authentication extends CollectionResource {
 
     return this._axiosInstance.get('login', { params, headers });
   }
+
+  public async loggedIn(config: { access: boolean; refresh: boolean }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {};
+    const invalidToken = 'invalidToken';
+
+    if (config.access) {
+      headers.Cookie = `access_token=${invalidToken};`;
+    }
+    if (config.refresh) {
+      headers.Cookie = headers.Cookie + `refresh_token=${invalidToken};`;
+    }
+
+    return this._axiosInstance.get('loggedIn', { headers });
+  }
+
+  public async refresh(config: { includeRefreshToken: boolean }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {};
+    const invalidToken = 'invalidToken';
+
+    if (config.includeRefreshToken) {
+      headers.Cookie = `refresh_token=${invalidToken};`;
+    }
+
+    return this._axiosInstance.get('refresh', { headers });
+  }
+
+  public async logout(config: { origin?: string }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {
+      Cookie: `_csrf=${this._csrfSecret};`,
+      ['csrf-token']: this._csrfToken
+    };
+
+    if (config.origin) {
+      headers.origin = config.origin;
+    }
+
+    return this._axiosInstance.post('logout', undefined, { headers });
+  }
+
+  public async token(config: {
+    code?: string;
+    codeVerifier?: string;
+    origin?: string;
+  }): Promise<AxiosResponse> {
+    const headers: AxiosRequestHeaders = {
+      Cookie: `_csrf=${this._csrfSecret};`,
+      ['csrf-token']: this._csrfToken
+    };
+
+    if (config.origin) {
+      headers.origin = config.origin;
+    }
+
+    const body = {
+      code: config.code,
+      codeVerifier: config.codeVerifier
+    };
+
+    return this._axiosInstance.post('token', body, { headers });
+  }
 }

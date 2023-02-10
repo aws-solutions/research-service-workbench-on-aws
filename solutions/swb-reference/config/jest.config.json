@@ -17,10 +17,10 @@
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
-    "<rootDir>/src/services/dataSetService.ts",
-    "<rootDir>/src/services/projectEnvTypeConfigService.ts",
     "<rootDir>/src/services/keyPairService.ts",
-    "<rootDir>/src/mocks/mockDatabaseService.ts"
+    "<rootDir>/src/mocks/mockDatabaseService.ts",
+    "<rootDir>/src/services/databaseService.ts",
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts"
   ],
   "coverageThreshold": {
     "global": {

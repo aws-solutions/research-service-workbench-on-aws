@@ -4,6 +4,7 @@
  */
 
 import AuthorizationPlugin from './authorizationPlugin';
+import { ForbiddenError } from './errors/forbiddenError';
 import { AuthenticatedUser } from './models/authenticatedUser';
 import Operation from './models/operation';
 import Permission from './models/permission';
@@ -45,7 +46,7 @@ export default class AuthorizationService {
 
       await this._authorizationPlugin.isAuthorized(permissions, operations);
     } catch (err) {
-      throw new Error(`User is forbidden: ${err.message}`);
+      throw new ForbiddenError(`User is forbidden: ${err.message}`);
     }
   }
 

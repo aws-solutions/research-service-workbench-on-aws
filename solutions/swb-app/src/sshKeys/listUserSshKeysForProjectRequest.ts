@@ -2,14 +2,15 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
 import { z } from 'zod';
-import { KeyPairParser } from './keyPair';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const GetKeyPairResponseParser = z
+export const ListUserSshKeysForProjectRequestParser = z
   .object({
-    keyPair: KeyPairParser
+    projectId: z.string(),
+    userId: z.string()
   })
   .strict();
 
-export type GetKeyPairResponse = z.infer<typeof GetKeyPairResponseParser>;
+export type ListUserSshKeysForProjectRequest = z.infer<typeof ListUserSshKeysForProjectRequestParser>;

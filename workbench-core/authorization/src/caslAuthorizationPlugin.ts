@@ -61,11 +61,21 @@ export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
    */
   private _defineAbilitiesForUserPermissions(userPermissions: Permission[]): Ability {
     const { can, cannot, rules } = new AbilityBuilder(Ability);
+    const allowPermissions: Permission[] = [];
+    const denyPermissions: Permission[] = [];
 
     userPermissions.forEach((permission: Permission) => {
+      if (permission.effect === 'ALLOW') allowPermissions.push(permission);
+      else if (permission.effect === 'DENY') denyPermissions.push(permission);
+    });
+    //Ordering of permissions matters in CASL
+    allowPermissions.forEach((permission: Permission) => {
+      can(permission.action, permission.subject, permission.fields);
+    });
+    //Override allows with denys, prioritizing DENY
+    denyPermissions.forEach((permission: Permission) => {
       const reason: string = permission.reason ?? 'Permission Not Granted';
-      if (permission.effect === 'ALLOW') can(permission.action, permission.subject, permission.fields);
-      else cannot(permission.action, permission.subject, permission.fields).because(reason);
+      cannot(permission.action, permission.subject, permission.fields).because(reason);
     });
     return new Ability(rules);
   }
@@ -78,24 +88,36 @@ export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
   private _defineAbilitiesForIdentityPermissions(identityPermissions: IdentityPermission[]): Ability {
     const { can, cannot, rules } = new AbilityBuilder(Ability);
 
-    for (const identityPermission of identityPermissions) {
+    const allowIdentityPermissions: IdentityPermission[] = [];
+    const denyIdentityPermissions: IdentityPermission[] = [];
+
+    identityPermissions.forEach((identityPermission: IdentityPermission) => {
+      if (identityPermission.effect === 'ALLOW') allowIdentityPermissions.push(identityPermission);
+      else if (identityPermission.effect === 'DENY') denyIdentityPermissions.push(identityPermission);
+    });
+
+    allowIdentityPermissions.forEach((identityPermission: IdentityPermission) => {
       const conditions = {
         ...(identityPermission.conditions ?? {}),
         //wildcards do not count as a condition
         ...(identityPermission.subjectId === '*' ? {} : { subjectId: identityPermission.subjectId })
       };
-      if (identityPermission.effect === 'ALLOW') {
-        can(identityPermission.action, identityPermission.subjectType, identityPermission.fields, conditions);
-        continue;
-      }
+      can(identityPermission.action, identityPermission.subjectType, identityPermission.fields, conditions);
+    });
 
+    denyIdentityPermissions.forEach((identityPermission: IdentityPermission) => {
+      const conditions = {
+        ...(identityPermission.conditions ?? {}),
+        //wildcards do not count as a condition
+        ...(identityPermission.subjectId === '*' ? {} : { subjectId: identityPermission.subjectId })
+      };
       cannot(
         identityPermission.action,
         identityPermission.subjectType,
         identityPermission.fields,
         conditions
       );
-    }
+    });
     return new Ability(rules);
   }
 }
