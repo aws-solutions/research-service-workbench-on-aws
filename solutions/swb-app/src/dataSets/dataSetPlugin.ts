@@ -23,7 +23,7 @@ export interface DataSetPlugin {
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
-  listDataSets(): Promise<DataSet[]>;
+  listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
 
   addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse>;
   getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse>;
@@ -32,4 +32,5 @@ export interface DataSetPlugin {
   removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
 
   addAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse>;
+  removeAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse>;
 }

@@ -12,7 +12,7 @@ export const ProjectAccessRequestParser = z
     authenticatedUser: AuthenticatedUserParser,
     dataSetId: z.string(),
     projectId: z.string(),
-    accessLevel: z.enum(['read-write', 'read-only'])
+    accessLevel: z.enum(['read-write', 'read-only']).optional()
   })
   .strict();
 
