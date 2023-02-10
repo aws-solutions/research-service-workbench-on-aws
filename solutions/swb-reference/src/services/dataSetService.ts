@@ -181,13 +181,11 @@ export class DataSetService implements DataSetPlugin {
 
     //Make sure you're not removing the access for your project
     if (request.authenticatedUser.roles.includes(projectAdmin)) {
-      //TODO: Throw a better error
-      throw new Error("can't remove access from a project admin on a dataset they own");
+      throw new Error(`${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`);
     }
 
     const projectResearcher = getResearcherRole(request.projectId);
 
-    console.log(`removeAuthZPermissionsForDataset`);
     await this._removeAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -198,7 +196,7 @@ export class DataSetService implements DataSetPlugin {
 
     // `read-write` will cause the read and write permissions to get removed,
     // so there is no need to pass in `read-only` when removing access.
-    const accessLevel = 'read-write'
+    const accessLevel = 'read-write';
     const readWriteDeletionRequest: AddRemoveAccessPermissionRequest = {
       authenticatedUser: request.authenticatedUser,
       dataSetId: request.dataSetId,
@@ -227,7 +225,6 @@ export class DataSetService implements DataSetPlugin {
       id: request.projectId
     };
 
-    console.log(`removeAssociations`);
     await this._databaseService.removeAssociations(dataset, [project]);
 
     return response;

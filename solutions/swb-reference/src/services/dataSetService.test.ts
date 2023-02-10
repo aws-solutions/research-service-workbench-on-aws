@@ -385,7 +385,9 @@ describe('DataSetService', () => {
 
           test('it throws an error', async () => {
             await expect(dataSetService.removeAccessForProject(projectAccessRequest)).rejects.toThrow(
-              new Error("can't remove access from a project admin on a dataset they own")
+              new Error(
+                `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
+              )
             );
           });
         });

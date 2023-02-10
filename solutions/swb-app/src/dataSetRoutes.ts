@@ -136,8 +136,3 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 }
-
-//update dataset
-//delete dataset
-//getDataSetAccessPermissions ?
-//getAllDataSetAccessPermissions ?

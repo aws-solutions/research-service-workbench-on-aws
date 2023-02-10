@@ -132,6 +132,6 @@ describe('multiStep dataset integration test', () => {
       .associateWithProject(unassociatedProject.id, 'read-only');
 
     console.log('DISASSOCIATE FROM PROJECT');
-    await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id)
+    await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
   });
 });
