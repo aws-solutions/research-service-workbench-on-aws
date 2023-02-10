@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { EC2 } from '@aws-sdk/client-ec2';
 import {
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
@@ -110,9 +111,9 @@ describe('SshKeyService', () => {
     describe('when current user owned the key they want to delete', () => {
       describe('but project does not exist', () => {
         beforeEach(() => {
-          projectService.getProject = jest.fn(() =>
-            Promise.reject(`Could not find project ${deleteSshKeyRequest.projectId}`)
-          );
+          projectService.getProject = jest.fn(() => {
+            throw new Error(`Could not find project ${deleteSshKeyRequest.projectId}`);
+          });
         });
 
         test('it throws', async () => {
@@ -124,6 +125,9 @@ describe('SshKeyService', () => {
       });
 
       describe('and project exists', () => {
+        const hostSdk = { clients: {} } as AwsService;
+        const hostEc2 = {} as EC2;
+
         beforeEach(() => {
           const project: Project = {
             id: deleteSshKeyRequest.projectId,
@@ -144,11 +148,13 @@ describe('SshKeyService', () => {
             accountId: ''
           };
           projectService.getProject = jest.fn(() => Promise.resolve(project));
+          hostSdk.clients.ec2 = hostEc2;
         });
 
         describe('but EC2 call fails', () => {
           beforeEach(() => {
-            aws.clients.ec2.deleteKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+            hostEc2.deleteKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+            aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
           });
 
           test('it throws Ec2Error', async () => {
@@ -159,7 +165,7 @@ describe('SshKeyService', () => {
 
         describe('and EC2 call succeeds', () => {
           beforeEach(() => {
-            aws.clients.ec2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
+            hostEc2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
           });
 
           test('it succeeds, nothing is returned', async () => {
