@@ -71,6 +71,14 @@ export default class Setup {
     return `ExampleStack`;
   }
 
+  public getWebUiUserClientId(): string {
+    return this._settings.get('ExampleCognitoUserPoolWebUiClientId');
+  }
+
+  public getUserPoolId(): string {
+    return this._settings.get('ExampleCognitoUserPoolId');
+  }
+
   public getMainAwsClient(tableName: keyof Setting): AwsService {
     return new AwsService({
       region: this._settings.get('AwsRegion'),

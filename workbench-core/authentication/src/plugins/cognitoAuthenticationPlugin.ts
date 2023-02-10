@@ -38,13 +38,18 @@ interface CognitoAppClient {
    * The Cognito user pool ID. Follows the format: "\<region\>_\<some string\>"
    */
   userPoolId: string;
-}
 
-interface WebUiAppClient extends CognitoAppClient {
   /**
    * The Cognito app client secret.
    */
   clientSecret: string;
+}
+
+interface WebUiAppClient extends Omit<CognitoAppClient, 'clientId'> {
+  /**
+   * The Cognito app client IDs.
+   */
+  clientId: string;
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -402,13 +407,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   private async _getTokensExpirationinMS(): Promise<TokensExpiration> {
     const client = new CognitoIdentityProviderClient({ region: this._region });
+    const { userPoolId, clientId } = this._webUiAppClient;
 
     const describeInput: DescribeUserPoolClientCommandInput = {
-      UserPoolId: this._webUiAppClient.userPoolId,
-      ClientId:
-        typeof this._webUiAppClient.clientId === 'string'
-          ? this._webUiAppClient.clientId
-          : this._webUiAppClient.clientId[0]
+      UserPoolId: userPoolId,
+      ClientId: clientId
     };
     const describeCommand = new DescribeUserPoolClientCommand(describeInput);
 

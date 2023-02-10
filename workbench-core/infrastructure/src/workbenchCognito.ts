@@ -6,6 +6,7 @@
 import { Duration, RemovalPolicy, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
+  AuthFlow,
   Mfa,
   OAuthScope,
   UserPool,
@@ -68,15 +69,20 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   refreshTokenValidity: Duration.days(7)
 };
 
+export interface WorkbenchCognitoUserPoolClientProps {
+  userPoolClientName?: string;
+  authFlows?: AuthFlow;
+  accessTokenValidity?: Duration;
+  idTokenValidity?: Duration;
+  refreshTokenValidity?: Duration;
+}
+
 export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrls: string[];
   userPoolName?: string;
-  userPoolClientNames?: string[];
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
-  accessTokenValidity?: Duration;
-  idTokenValidity?: Duration;
-  refreshTokenValidity?: Duration;
+  userPoolClients?: WorkbenchCognitoUserPoolClientProps[];
   mfa?: Mfa;
   removalPolicy?: RemovalPolicy;
 }
@@ -98,7 +104,7 @@ export class WorkbenchCognito extends Construct {
     const {
       domainPrefix,
       websiteUrls,
-      userPoolClientNames = [],
+      userPoolClients = [{}],
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
@@ -131,31 +137,34 @@ export class WorkbenchCognito extends Construct {
       this.userPool.registerIdentityProvider(provider);
     });
 
-    const tempUserPoolClientProps: UserPoolClientOptions = {
-      oAuth: {
-        callbackUrls: websiteUrls,
-        logoutUrls: websiteUrls
-      },
-      accessTokenValidity: props.accessTokenValidity,
-      idTokenValidity: props.idTokenValidity,
-      refreshTokenValidity: props.refreshTokenValidity
-    };
-    const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
-    this.userPoolClients = userPoolClientNames.map(
-      (userPoolClientName) =>
-        new UserPoolClient(this, 'WorkbenchUserPoolClient', {
-          ...userPoolClientProps,
-          userPool: this.userPool,
-          userPoolClientName
-        })
-    );
+    this.userPoolClients = userPoolClients.map(({ userPoolClientName, ...props }, index) => {
+      const tempUserPoolClientProps: UserPoolClientOptions = {
+        oAuth: {
+          callbackUrls: websiteUrls,
+          logoutUrls: websiteUrls
+        },
+        ...props,
+        authFlows: {
+          ...userPoolClientDefaults.authFlows,
+          ...props.authFlows
+        }
+      };
+
+      const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
+
+      return new UserPoolClient(this, `WorkbenchUserPoolClient-${index}`, {
+        ...userPoolClientProps,
+        userPool: this.userPool,
+        userPoolClientName
+      });
+    });
     this.userPool.identityProviders.forEach((provider) =>
       this.userPoolClients.forEach(({ node }) => node.addDependency(provider))
     );
 
     const describeCognitoUserPoolClients = this.userPoolClients.map(
-      ({ userPoolClientId }) =>
-        new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
+      ({ userPoolClientId }, index) =>
+        new AwsCustomResource(this, `DescribeCognitoUserPoolClient-${index}`, {
           resourceType: 'Custom::DescribeCognitoUserPoolClient',
           onCreate: {
             region: Stack.of(this).region,

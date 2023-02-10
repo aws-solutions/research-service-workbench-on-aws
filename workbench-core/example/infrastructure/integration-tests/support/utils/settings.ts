@@ -17,6 +17,7 @@ export interface Setting {
   ExampleS3BucketExampleS3BucketDatasetsArnOutput393A6D8B: string;
   AwsRegion: string;
   ExampleCognitoUserPoolClientId: string;
+  ExampleCognitoUserPoolWebUiClientId: string;
   ExampleEncryptionKeyEncryptionKeyOutput172B0370: string;
   ExampleS3BucketAccessLogsNameOutput: string;
   ExampleRestApiEndpoint9C6D55BB: string;

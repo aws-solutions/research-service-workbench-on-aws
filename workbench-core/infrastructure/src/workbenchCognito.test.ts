@@ -100,10 +100,17 @@ describe('WorkbenchCognito tests', () => {
       domainPrefix: 'test-domain',
       websiteUrls: ['https://www.example.com'],
       userPoolName: 'Sample-User-Pool-Name',
-      userPoolClientNames: ['Sample-User-Pool-Client-Name'],
-      accessTokenValidity: Duration.minutes(5),
-      idTokenValidity: Duration.hours(1),
-      refreshTokenValidity: Duration.hours(24),
+      userPoolClients: [
+        {
+          userPoolClientName: 'Sample-User-Pool-Client-Name',
+          accessTokenValidity: Duration.minutes(5),
+          idTokenValidity: Duration.hours(1),
+          refreshTokenValidity: Duration.hours(24),
+          authFlows: {
+            adminUserPassword: false
+          }
+        }
+      ],
       mfa: Mfa.REQUIRED,
       removalPolicy: RemovalPolicy.DESTROY
     };
@@ -182,13 +189,8 @@ describe('WorkbenchCognito tests', () => {
         AccessToken: 'minutes',
         RefreshToken: 'minutes'
       },
-      ExplicitAuthFlows: [
-        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
-        'ALLOW_CUSTOM_AUTH',
-        'ALLOW_USER_SRP_AUTH',
-        'ALLOW_REFRESH_TOKEN_AUTH'
-      ],
-      ClientName: workbenchCognitoProps.userPoolClientNames![0]
+      ExplicitAuthFlows: ['ALLOW_CUSTOM_AUTH', 'ALLOW_USER_SRP_AUTH', 'ALLOW_REFRESH_TOKEN_AUTH'],
+      ClientName: workbenchCognitoProps.userPoolClients![0].userPoolClientName
     });
   });
 

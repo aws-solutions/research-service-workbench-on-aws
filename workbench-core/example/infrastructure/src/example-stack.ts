@@ -42,6 +42,8 @@ export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
     COGNITO_DOMAIN: string;
     USER_POOL_ID: string;
+    WEB_UI_CLIENT_ID: string;
+    WEB_UI_CLIENT_SECRET: string;
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     STACK_NAME: string;
@@ -58,7 +60,8 @@ export class ExampleStack extends Stack {
       `example-app-domain-${domainSuffix}`,
       ['http://localhost:3000/'],
       `example-app-userPool`,
-      `example-app-userPoolClient`
+      `example-app-userPoolClient`,
+      `example-app-userPoolClient-webUi`
     );
 
     this._exampleLambdaEnvVars = {
@@ -66,6 +69,8 @@ export class ExampleStack extends Stack {
       USER_POOL_ID: exampleCognito.userPoolId,
       CLIENT_ID: exampleCognito.userPoolClientIds[0],
       CLIENT_SECRET: exampleCognito.userPoolClientSecrets[0].unsafeUnwrap(),
+      WEB_UI_CLIENT_ID: exampleCognito.userPoolClientIds[1],
+      WEB_UI_CLIENT_SECRET: exampleCognito.userPoolClientSecrets[1].unsafeUnwrap(),
       STACK_NAME: Aws.STACK_NAME
     };
 
@@ -702,15 +707,27 @@ export class ExampleStack extends Stack {
     domainPrefix: string,
     websiteUrls: string[],
     userPoolName: string,
-    userPoolClientName: string
+    userPoolClientName: string,
+    webUiUserPoolClientName: string
   ): WorkbenchCognito {
     const props: WorkbenchCognitoProps = {
       domainPrefix: domainPrefix,
       websiteUrls: websiteUrls,
       userPoolName: userPoolName,
-      userPoolClientNames: [userPoolClientName],
+      userPoolClients: [
+        {
+          userPoolClientName,
+          accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+        },
+        {
+          userPoolClientName: webUiUserPoolClientName,
+          authFlows: {
+            // WebUI does not allow ALLOW_ADMIN_USER_PASSWORD_AUTH and requires users to log in via the Cognito hosted UI or an OIDC/SAML compliant login UI.
+            adminUserPassword: false
+          }
+        }
+      ],
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
       removalPolicy: RemovalPolicy.DESTROY
     };
 
@@ -729,6 +746,11 @@ export class ExampleStack extends Stack {
     new CfnOutput(this, 'ExampleCognitoUserPoolClientId', {
       value: workbenchCognito.userPoolClientIds[0],
       exportName: 'ExampleCognitoUserPoolClientId'
+    });
+
+    new CfnOutput(this, 'ExampleCognitoUserPoolWebUiClientId', {
+      value: workbenchCognito.userPoolClientIds[1],
+      exportName: 'ExampleCognitoUserPoolWebUiClientId'
     });
 
     new CfnOutput(this, 'ExampleCognitoDomainName', {

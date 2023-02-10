@@ -18,10 +18,17 @@ An authentication service that implements the [authorization code grant](https:/
 ```ts
 // Initialize a CognitoAuthenticationPluginOptions object
 const cognitoAuthenticationPluginOptions: CognitoAuthenticationPluginOptions = {
-  cognitoDomain: '<Cognito Hosted UI Domain>',
-  userPoolId: '<Cognito User Pool ID>',
-  clientId: '<Cognito User Pool Client ID>',
-  clientSecret: '<Cognito User Pool Client Secret>',
+  cognitoDomain: '<Cognito Hosted UI Domain>',  
+  webUiAppClient: {    
+    userPoolId: '<Cognito WebUI User Pool ID>',
+    clientId: '<Cognito WebUI User Pool Client ID>',
+    clientSecret: '<Cognito WebUI User Pool Client Secret>',
+  },
+  auxiliaryAppClients: [{
+    userPoolId: '<Optional Cognito User Pool ID for integration tests>', 
+    clientId: '<Optional Cognito User Pool Client ID for integration tests>',
+    clientSecret: '<Optional Cognito WebUI User Pool Client Secret for integration tests>',
+  }],
   websiteUrl: '<Website URL>'
 };
 

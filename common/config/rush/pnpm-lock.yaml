@@ -1224,6 +1224,7 @@ importers:
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.212.0
+      '@aws-sdk/client-cognito-identity-provider': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/client-s3-control': ^3.212.0
       '@aws-sdk/client-sagemaker': ^3.212.0
@@ -1313,6 +1314,7 @@ importers:
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_n7frpkljg2gwx3fmjmebgjuhvu
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_wq2qa5m5mvoc532wwgm4qnqnwa
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_wq2qa5m5mvoc532wwgm4qnqnwa
+      '@aws-sdk/client-cognito-identity-provider': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -8768,7 +8770,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001450
+      caniuse-lite: 1.0.30001451
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -8914,8 +8916,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001450:
-    resolution: {integrity: sha512-qMBmvmQmFXaSxexkjjfMvD5rnDL0+m+dUMZKoDYsGG8iZN29RuYh9eRoMvKsT6uMAWlyUUGDEQGJJYjzCIO9ew==}
+  /caniuse-lite/1.0.30001451:
+    resolution: {integrity: sha512-XY7UbUpGRatZzoRft//5xOa69/1iGJRBlrieH6QYrkKLIFn3m7OVEJ81dSrKoy2BnKsdbX5cLrOispZNYo9v2w==}
 
   /capture-exit/2.0.0:
     resolution: {integrity: sha512-PiT/hQmTonHhl/HFGN+Lx3JJUznrVYJ3+AQsnthneZbvW7x+f08Tk7yLJTLEOUvBTbduLeeBkxEaYXUOUrRq6g==}
@@ -13922,7 +13924,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001450
+      caniuse-lite: 1.0.30001451
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -13965,7 +13967,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001450
+      caniuse-lite: 1.0.30001451
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
