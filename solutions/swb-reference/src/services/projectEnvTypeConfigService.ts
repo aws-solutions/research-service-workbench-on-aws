@@ -167,16 +167,33 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     envTypeConfigId: string
   ): Promise<void> {
     const identityPermissions: IdentityPermission[] = [];
-    identityPermissions.push({
+    const adminIdentity = {
       ...this._identityPermissionTemplate,
       identityId: getProjectAdminRole(projectId),
       subjectId: envTypeConfigId
-    });
-    identityPermissions.push({
+    };
+    const researcherIdentity = {
       ...this._identityPermissionTemplate,
       identityId: getResearcherRole(projectId),
       subjectId: envTypeConfigId
+    };
+    identityPermissions.push(adminIdentity);
+    identityPermissions.push(researcherIdentity);
+
+    const existingIdentities = await this._dynamicAuthService.getIdentityPermissionsBySubject({
+      action: 'READ',
+      identities: [
+        { identityType: adminIdentity.identityType, identityId: adminIdentity.identityId },
+        { identityType: researcherIdentity.identityType, identityId: researcherIdentity.identityId }
+      ],
+      subjectType: adminIdentity.subjectType,
+      subjectId: adminIdentity.subjectId
     });
+
+    if (existingIdentities?.data?.identityPermissions?.length > 0)
+      //identity already exists
+      return Promise.resolve();
+
     const createRequest = CreateIdentityPermissionsRequestParser.parse({
       authenticatedUser,
       identityPermissions

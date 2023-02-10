@@ -71,7 +71,7 @@ export class EnvTypeConfigService implements EnvTypeConfigPlugin {
     );
     if (relationshipIds?.data?.length) {
       throw new ConflictError(
-        `There are ${relationshipIds.data.length} projects associated with Workspace configuration. Please dissasociate projects from configuration before deleting.`
+        `There are projects associated with Workspace configuration. Please dissasociate projects from configuration before deleting.`
       );
     }
   }
