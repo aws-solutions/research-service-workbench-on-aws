@@ -127,7 +127,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       const validatedRequest = validateAndParse<ProjectAccessRequest>(ProjectAccessRequestParser, {
         authenticatedUser: res.locals.user,
         projectId: req.params.projectId,
-        dataSetId: req.params.datasetId,
+        dataSetId: req.params.datasetId
       });
 
       await dataSetService.removeAccessForProject(validatedRequest);
@@ -136,3 +136,8 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 }
+
+//update dataset
+//delete dataset
+//getDataSetAccessPermissions ?
+//getAllDataSetAccessPermissions ?
