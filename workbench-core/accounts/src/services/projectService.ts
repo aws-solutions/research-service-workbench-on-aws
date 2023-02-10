@@ -32,6 +32,7 @@ import { CostCenter } from '../models/costCenters/costCenter';
 import { CreateProjectRequest } from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { GetProjectRequest } from '../models/projects/getProjectRequest';
+import { GetProjectsRequest } from '../models/projects/getProjectsRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
 import { Project, ProjectParser } from '../models/projects/project';
 import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
@@ -71,6 +72,26 @@ export default class ProjectService {
     }
 
     return this._mapDDBItemToProject(response);
+  }
+
+  /**
+   * Get projects
+   * @param request - the request object for getting a project
+   *
+   * @returns Project entry in DDB
+   */
+  public async getProjects(request: GetProjectsRequest): Promise<Project[]> {
+    const keys = request.projectIds.map((projectId) =>
+      buildDynamoDBPkSk(projectId, resourceTypeToKey.project)
+    );
+    const items = await this._dynamoDBService.getItems(keys);
+
+    if (items === undefined) {
+      throw Boom.notFound(`Could not find projects`);
+    } else {
+      const projects: Project[] = items.map((project) => this._mapDDBItemToProject(project));
+      return Promise.resolve(projects);
+    }
   }
 
   /**

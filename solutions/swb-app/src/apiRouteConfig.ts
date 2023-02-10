@@ -10,11 +10,11 @@ import {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
   EnvironmentService,
-  EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeService
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
 import { KeyPairPlugin } from './keyPairs/keyPairPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
@@ -26,7 +26,7 @@ export interface ApiRouteConfig {
   dataSetService: DataSetPlugin;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
-  environmentTypeConfigService: EnvironmentTypeConfigService;
+  environmentTypeConfigService: EnvTypeConfigPlugin;
   projectService: ProjectService;
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;

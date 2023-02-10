@@ -119,11 +119,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
-  setUpEnvTypeConfigRoutes(
-    router,
-    apiRouteConfig.environmentTypeConfigService,
-    apiRouteConfig.environmentService
-  );
+  setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(
     router,
     apiRouteConfig.projectService,

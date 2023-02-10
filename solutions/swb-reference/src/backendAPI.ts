@@ -38,6 +38,7 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
+import { EnvTypeConfigService } from './services/envTypeConfigService';
 import KeyPairService from './services/keyPairService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
@@ -76,6 +77,7 @@ const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuth
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
+const environmentService: EnvironmentService = new EnvironmentService(aws.helpers.ddb);
 const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
 const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
   envTypeService,
@@ -113,7 +115,7 @@ const apiRouteConfig: ApiRouteConfig = {
   account: new HostingAccountService(
     new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  environmentService: new EnvironmentService(aws.helpers.ddb),
+  environmentService,
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
     new WorkbenchDataSetService(
@@ -128,7 +130,7 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,
-  environmentTypeConfigService: envTypeConfigService,
+  environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
   projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
@@ -139,7 +141,9 @@ const apiRouteConfig: ApiRouteConfig = {
     metadataService,
     projectService,
     envTypeConfigService,
-    envTypeService
+    envTypeService,
+    environmentService,
+    dynamicAuthorizationService
   ),
   keyPairService: new KeyPairService(aws.helpers.ddb),
   authorizationService: dynamicAuthorizationService

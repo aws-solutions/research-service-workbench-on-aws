@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { ConflictError, isConflictError } from './conflictError';
 import { DatabaseError, isDatabaseError } from './databaseError';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
@@ -23,6 +24,11 @@ describe('custom error tests', () => {
     expect(isNonUniqueKeyError(nonUniqueKeyError)).toBe(true);
   });
 
+  test('conflictError', () => {
+    const conflictError = new ConflictError();
+    expect(isConflictError(conflictError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
@@ -40,6 +46,10 @@ describe('custom error tests', () => {
 
     test('not nonUniqueKeyError', () => {
       expect(isNonUniqueKeyError(error)).toBe(false);
+    });
+
+    test('not conflictError', () => {
+      expect(isConflictError(error)).toBe(false);
     });
   });
 });

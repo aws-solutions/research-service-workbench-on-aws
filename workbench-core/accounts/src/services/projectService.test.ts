@@ -1206,6 +1206,33 @@ describe('ProjectService', () => {
     });
   });
 
+  describe('getProjects', () => {
+    test('getting 1 project', async () => {
+      // BUILD
+      const getItemResponse: Record<string, JSONValue> = projItem;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest
+        .spyOn(DynamoDBService.prototype as any, 'getItems')
+        .mockImplementationOnce(() => [getItemResponse]);
+
+      // OPERATE
+      const actualResponse = await projService.getProjects({ projectIds: ['proj-123'] });
+
+      // CHECK
+      expect(actualResponse).toEqual([proj]);
+    });
+    test('getting 0 projects', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(DynamoDBService.prototype as any, 'getItems').mockImplementationOnce(() => []);
+
+      // OPERATE
+      const actualResponse = await projService.getProjects({ projectIds: ['proj-123'] });
+
+      // CHECK
+      expect(actualResponse).toEqual([]);
+    });
+  });
+
   describe('createProject', () => {
     const user: AuthenticatedUser = {
       id: 'user-456',
