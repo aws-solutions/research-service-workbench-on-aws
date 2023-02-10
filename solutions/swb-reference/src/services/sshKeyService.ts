@@ -61,15 +61,15 @@ export default class SshKeyService implements SshKeyPlugin {
     const { envMgmtRoleArn, externalId } = project;
 
     // get EC2 client
-    const { ec2 } = await this._getEc2ClientsForHostingAccount(
-      envMgmtRoleArn,
-      'Delete',
-      externalId,
-      this._aws
-    );
-
-    // delete ssh key
     try {
+      const { ec2 } = await this._getEc2ClientsForHostingAccount(
+        envMgmtRoleArn,
+        'Delete',
+        externalId,
+        this._aws
+      );
+
+      // delete ssh key
       await ec2.deleteKeyPair({ KeyName: sshKeyId });
     } catch (e) {
       throw new Ec2Error(e);

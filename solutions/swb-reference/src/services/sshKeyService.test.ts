@@ -108,7 +108,7 @@ describe('SshKeyService', () => {
       });
     });
 
-    describe('when current user owned the key they want to delete', () => {
+    describe('when current user owns the key they want to delete', () => {
       describe('but project does not exist', () => {
         beforeEach(() => {
           projectService.getProject = jest.fn(() => {
@@ -151,10 +151,9 @@ describe('SshKeyService', () => {
           hostSdk.clients.ec2 = hostEc2;
         });
 
-        describe('but EC2 call fails', () => {
+        describe('but cannot get EC2 client', () => {
           beforeEach(() => {
-            hostEc2.deleteKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
-            aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
+            aws.getAwsServiceForRole = jest.fn(() => Promise.reject('Could not get EC2 client'));
           });
 
           test('it throws Ec2Error', async () => {
@@ -163,14 +162,31 @@ describe('SshKeyService', () => {
           });
         });
 
-        describe('and EC2 call succeeds', () => {
+        describe('and successfully got EC2 client', () => {
           beforeEach(() => {
-            hostEc2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
+            aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
           });
 
-          test('it succeeds, nothing is returned', async () => {
-            // OPERATE n CHECK
-            await expect(sshKeyService.deleteSshKey(deleteSshKeyRequest)).resolves.not.toThrow();
+          describe('but EC2 call fails', () => {
+            beforeEach(() => {
+              hostEc2.deleteKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+            });
+
+            test('it throws Ec2Error', async () => {
+              // OPERATE n CHECK
+              await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(Ec2Error);
+            });
+          });
+
+          describe('and EC2 call succeeds', () => {
+            beforeEach(() => {
+              hostEc2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
+            });
+
+            test('it succeeds, nothing is returned', async () => {
+              // OPERATE n CHECK
+              await expect(sshKeyService.deleteSshKey(deleteSshKeyRequest)).resolves.not.toThrow();
+            });
           });
         });
       });
