@@ -89,6 +89,7 @@ describe('projectEnvTypeConfigService', () => {
       mockEnvironmentTypeConfigService.getEnvironmentTypeConfig = jest.fn().mockReturnValue({});
       mockMetadataService.updateRelationship = jest.fn().mockReturnValue({});
       mockDynamicAuthService.createIdentityPermissions = jest.fn().mockReturnValue({});
+      mockDynamicAuthService.getIdentityPermissionsBySubject = jest.fn().mockReturnValue({});
     });
     test('excecutes successfully', async () => {
       // OPERATE n CHECK
@@ -99,6 +100,15 @@ describe('projectEnvTypeConfigService', () => {
       // OPERATE n CHECK
       await projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest);
       expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledTimes(1);
+    });
+    test('excecutes successfully and when association already exists', async () => {
+      mockDynamicAuthService.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockReturnValue({ data: { identityPermissions: [{ id: 'mockObject' }] } });
+      // OPERATE n CHECK
+      await expect(
+        projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest)
+      ).resolves.not.toThrow();
     });
   });
 });
