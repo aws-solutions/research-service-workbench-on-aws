@@ -2,16 +2,16 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { ConflictError } from '@aws/swb-app';
+import { ProjectService } from '@aws/workbench-core-accounts';
 import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import { MetadataService } from '@aws/workbench-core-base';
 import {
   EnvironmentService,
   EnvironmentTypeConfigService,
   EnvironmentTypeService
 } from '@aws/workbench-core-environments';
-import { MetadataService } from '@aws/workbench-core-base';
-import { ConflictError } from '@aws/swb-app';
 import { ProjectEnvTypeConfigService } from './projectEnvTypeConfigService';
-import { ProjectService } from '@aws/workbench-core-accounts';
 
 describe('projectEnvTypeConfigService', () => {
   let mockDynamicAuthService: DynamicAuthorizationService;

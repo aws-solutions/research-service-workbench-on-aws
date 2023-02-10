@@ -139,7 +139,7 @@ export default class EnvironmentTypeConfigService {
       const envType = await this._envTypeService.getEnvironmentType(request.envTypeId);
       productId = envType.productId;
       provisioningArtifactId = envType.provisioningArtifactId;
-      if (envType.status != 'APPROVED') {
+      if (envType.status !== 'APPROVED') {
         throw Boom.badRequest(
           `Could not create environment type config because environment type ${request.envTypeId} is not approved`
         );

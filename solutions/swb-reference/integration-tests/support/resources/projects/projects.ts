@@ -7,9 +7,10 @@ import CollectionResource from '../base/collectionResource';
 import Project from './project';
 
 export default class Projects extends CollectionResource {
-  public constructor(clientSession: ClientSession) {
+  public constructor(clientSession: ClientSession, parentApi: string = '') {
     super(clientSession, 'projects', 'project');
-    this._api = 'projects';
+    const parentRoute = parentApi ? `${parentApi}/` : '';
+    this._api = `${parentRoute}projects`;
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention

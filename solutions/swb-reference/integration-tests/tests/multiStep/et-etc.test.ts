@@ -7,8 +7,9 @@ import ClientSession from '../../support/clientSession';
 import { EnvironmentTypeHelper } from '../../support/complex/environmentTypeHelper';
 import Setup from '../../support/setup';
 import { DEFLAKE_DELAY_IN_MILLISECONDS } from '../../support/utils/constants';
+import HttpError from '../../support/utils/HttpError';
 import { envTypeConfigRegExp } from '../../support/utils/regExpressions';
-import { sleep } from '../../support/utils/utilities';
+import { checkHttpError, sleep } from '../../support/utils/utilities';
 
 describe('multiStep environment type and environment type config test', () => {
   const setup: Setup = new Setup();
@@ -31,7 +32,23 @@ describe('multiStep environment type and environment type config test', () => {
       id: expectedId,
       status: 'NOT_APPROVED'
     });
-
+    //Throws when creating ETC with non Approved ET
+    console.log('Creating Environment Type Config with non approved Environment Type');
+    try {
+      await adminSession.resources.environmentTypes
+        .environmentType(envType.id)
+        .configurations()
+        .create({}, true);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: `Could not create environment type config because environment type ${envType.id} is not approved`
+        })
+      );
+    }
     //Approve Environment Type
     console.log('Approve Environment Type');
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
@@ -111,6 +128,7 @@ describe('multiStep environment type and environment type config test', () => {
     });
     //Delete Environment Type Config
     console.log('Delete Environment Type Config');
+    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle
     await expect(
       adminSession.resources.environmentTypes
         .environmentType(envType.id)
@@ -119,9 +137,9 @@ describe('multiStep environment type and environment type config test', () => {
         .delete()
     ).resolves;
 
-    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle and give time to ddb to soft delete ETC dependency
     //Revoke Environment Type
     console.log('Revoke Environment Type');
+    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle and give time to ddb to soft delete ETC dependency
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
       {
         status: 'NOT_APPROVED'

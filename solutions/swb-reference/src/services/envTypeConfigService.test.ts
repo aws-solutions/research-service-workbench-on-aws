@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvTypeConfigService } from './envTypeConfigService';
-import { EnvironmentTypeConfigService } from '@aws/workbench-core-environments';
-import { MetadataService } from '@aws/workbench-core-base';
 import { ConflictError } from '@aws/swb-app';
+import { MetadataService } from '@aws/workbench-core-base';
+import { EnvironmentTypeConfigService } from '@aws/workbench-core-environments';
+import { EnvTypeConfigService } from './envTypeConfigService';
 
 describe('envTypeConfigService', () => {
   let mockEnvironmentTypeConfigService: EnvironmentTypeConfigService;
@@ -23,12 +23,10 @@ describe('envTypeConfigService', () => {
   describe('delete', () => {
     const deleteRequest = { envTypeId: 'envTypeId', envTypeConfigId: 'envTypeConfigId' };
     test('throws Conflict Error when associations exist', async () => {
-      mockMetadataService.listDependentMetadata = jest
-        .fn()
-        .mockReturnValueOnce({
-          data: [{ pk: 'mockResult', sk: 'mockResult', id: 'mockResult' }],
-          paginationToken: undefined
-        });
+      mockMetadataService.listDependentMetadata = jest.fn().mockReturnValueOnce({
+        data: [{ pk: 'mockResult', sk: 'mockResult', id: 'mockResult' }],
+        paginationToken: undefined
+      });
       // OPERATE n CHECK
       await expect(() => envTypeConfigPlugin.deleteEnvTypeConfig(deleteRequest)).rejects.toThrow(
         ConflictError

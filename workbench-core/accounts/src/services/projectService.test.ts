@@ -1210,8 +1210,8 @@ describe('ProjectService', () => {
     test('getting 1 project', async () => {
       // BUILD
       const getItemResponse: Record<string, JSONValue> = projItem;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(DynamoDBService.prototype as any, 'getItems')
         .mockImplementationOnce(() => [getItemResponse]);
 
