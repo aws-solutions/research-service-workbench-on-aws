@@ -14,7 +14,7 @@ import {
   WorkbenchEncryptionKeyWithRotation
 } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -233,12 +233,82 @@ export class SWBStack extends Stack {
 
     const apiGwUrl = this._createRestApi(apiLambda);
 
+    const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node
+      .defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        },
+        {
+          id: 'W89',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        },
+        {
+          id: 'W92',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        }
+      ]
+    });
+
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
     const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
     new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
       value: swbVpc.vpc.vpcId
+    });
+
+    let childMetadataNode = swbVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W84',
+          reason: 'TODO: CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
+        }
+      ]
+    });
+
+    childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
+      .defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W33',
+          reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
+        }
+      ]
+    });
+
+    childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
+      .defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W33',
+          reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
+        }
+      ]
+    });
+
+    childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
+      .defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W33',
+          reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
+        }
+      ]
     });
 
     new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
@@ -249,7 +319,14 @@ export class SWBStack extends Stack {
       value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
-    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
+    this._createLoadBalancer(
+      swbVpc,
+      apiGwUrl,
+      DOMAIN_NAME,
+      HOSTED_ZONE_ID,
+      ALB_INTERNET_FACING,
+      this._accessLogsBucket
+    );
   }
 
   private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
@@ -267,12 +344,14 @@ export class SWBStack extends Stack {
     apiGwUrl: string,
     domainName: string,
     hostedZoneId: string,
-    internetFacing: boolean
+    internetFacing: boolean,
+    accessLogsBucket: Bucket
   ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
       subnets: swbVpc.albSubnetSelection,
-      internetFacing
+      internetFacing,
+      accessLogsBucket
     });
 
     const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
@@ -295,6 +374,26 @@ export class SWBStack extends Stack {
       memorySize: 256
     });
 
+    const childMetadataNode = proxyLambda.node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'TODO: Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO: Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO: Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
+
     new Alias(this, 'LiveProxyLambdaAlias', {
       aliasName: 'live',
       version: proxyLambda.currentVersion,
@@ -309,6 +408,17 @@ export class SWBStack extends Stack {
     const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
       port: 443,
       certificates: [certificate]
+    });
+
+    const listenerMetadataNode = httpsListener.node.defaultChild as CfnResource;
+    listenerMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W55',
+          reason: 'TODO: Elastic Load Balancer V2 Listener SslPolicy should use TLS 1.2'
+        }
+      ]
     });
 
     const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
@@ -433,7 +543,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates the product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject', 's3:GetObjectVersion'],
@@ -525,6 +635,23 @@ export class SWBStack extends Stack {
     new CfnOutput(this, launchConstraintRoleNameOutput, {
       value: iamRole.roleName
     });
+
+    const metadatanode = iamRole.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W28',
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+        },
+        {
+          id: 'W11',
+          reason: 'TODO:triage IAM role should not allow * resource on its permissions policy'
+        }
+      ]
+    });
+
     return iamRole;
   }
 
@@ -559,6 +686,17 @@ export class SWBStack extends Stack {
     new CfnOutput(this, bucketNameOutput, {
       value: s3Bucket.bucketName,
       exportName: bucketNameOutput
+    });
+
+    const metadatanode = s3Bucket.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
+        }
+      ]
     });
 
     return s3Bucket;
@@ -609,6 +747,21 @@ export class SWBStack extends Stack {
         }
       })
     );
+
+    const metadatanode = s3Bucket.policy?.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'F15',
+          reason: 'TODO:triage S3 Bucket policy should not allow * action'
+        },
+        {
+          id: 'F16',
+          reason: 'TODO:triage S3 Bucket policy should not allow * principal'
+        }
+      ]
+    });
   }
 
   private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
@@ -619,6 +772,16 @@ export class SWBStack extends Stack {
     const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
 
+    const metadatanode = bucket.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
+        }
+      ]
+    });
     new CfnOutput(this, 'DataSetsBucketName', {
       value: bucket.bucketName
     });
@@ -700,6 +863,27 @@ export class SWBStack extends Stack {
 
     new CfnOutput(this, 'StatusHandlerLambdaArnOutput', {
       value: statusHandlerLambda.functionArn
+    });
+
+    const metadatanode = statusHandlerLambda.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (statusHandlerLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
     });
 
     return statusHandlerLambda;
@@ -796,6 +980,17 @@ export class SWBStack extends Stack {
       ]
     });
 
+    const lambdaPolicyMetaDataNode = lambdaPolicy.node.defaultChild as CfnResource;
+    lambdaPolicyMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W76',
+          reason: 'TODO:triage (AccountHandlerLambdaPolicy) SPCM for IAM policy document is higher than 25'
+        }
+      ]
+    });
+
     if (!_.isEmpty(amiIdsList)) {
       lambdaPolicy.addStatements(
         new PolicyStatement({
@@ -817,6 +1012,27 @@ export class SWBStack extends Stack {
       schedule: Schedule.cron({ minute: '0/5' })
     });
     eventRule.addTarget(new targets.LambdaFunction(lambda));
+
+    const lambdaMetadataNode = lambda.node.defaultChild as CfnResource;
+    lambdaMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
 
     return lambda;
   }
@@ -943,12 +1159,58 @@ export class SWBStack extends Stack {
       value: apiLambda.role!.roleArn
     });
 
+    let childMetadataNode = apiLambda.node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'TODO:triage (ApiLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (ApiLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
+
+    childMetadataNode = this.node.findChild('apiLambdaPolicy').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W12',
+          reason: 'TODO: IAM policy should not allow * resource'
+        },
+        {
+          id: 'W76',
+          reason: 'TODO: SPCM for IAM policy document is higher than 25'
+        }
+      ]
+    });
+
     return apiLambda;
   }
 
   // API Gateway
   private _createRestApi(apiLambda: Function): string {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
+    const metadatanode = logGroup.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W84', //was 68...
+          reason: 'TODO:triage CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
+        }
+      ]
+    });
+
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: this.stackName,
       description: 'SWB API',
@@ -980,6 +1242,33 @@ export class SWBStack extends Stack {
       }
     });
 
+    let childMetadataNode = API.node.findChild('DeploymentStage.dev').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W64',
+          reason: 'TODO:triage resources should be associated with an AWS::ApiGateway::UsagePlan.'
+        },
+        {
+          id: 'W59',
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
+      ]
+    });
+
+    childMetadataNode = API.node.findChild('Deployment').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W68',
+          reason: 'TODO: Enable on Usage plan for API Gateway'
+        }
+      ]
+    });
+
     if (process.env.LOCAL_DEVELOPMENT === 'true') {
       // SAM local start-api doesn't work with ALIAS so this is the workaround to allow us to run the code locally
       // https://github.com/aws/aws-sam-cli/issues/2227
@@ -996,6 +1285,31 @@ export class SWBStack extends Stack {
         defaultIntegration: new LambdaIntegration(alias)
       });
     }
+
+    childMetadataNode = API.node.findChild('Default').node.findChild('ANY').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W59',
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
+      ]
+    });
+
+    childMetadataNode = API.node.findChild('Default').node.findChild('{proxy+}').node.findChild('ANY').node
+      .defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W59',
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
+      ]
+    });
 
     return API.url;
   }
@@ -1092,6 +1406,28 @@ export class SWBStack extends Stack {
     table.grantReadWriteData(statusHandler);
     table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
+
+    const metadatanode = table.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W28',
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+        },
+        {
+          id: 'W74',
+          reason: 'TODO:triage DynamoDB table should have encryption enabled using a CMK stored in KMS'
+        },
+        {
+          id: 'W78',
+          reason:
+            'TODO:triage DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
+        }
+      ]
+    });
+
     return table;
   }
 

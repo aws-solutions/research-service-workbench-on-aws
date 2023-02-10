@@ -3,7 +3,19 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ISubnet, IVpc, Subnet, SubnetSelection, SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import {
+  FlowLog,
+  FlowLogDestination,
+  FlowLogResourceType,
+  ISubnet,
+  IVpc,
+  Subnet,
+  SubnetSelection,
+  SubnetType,
+  Vpc
+} from 'aws-cdk-lib/aws-ec2';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
 export interface SWBVpcProps {
@@ -22,6 +34,18 @@ export class SWBVpc extends Construct {
     super(scope, id);
 
     this.vpc = vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
+
+    const logGroup = new LogGroup(this, 'VpcFlowLogGroup');
+
+    const role = new Role(this, 'VpcFlowLogRole', {
+      assumedBy: new ServicePrincipal('vpc-flow-logs.amazonaws.com')
+    });
+
+    // eslint-disable-next-line no-new
+    new FlowLog(this, 'VpcFlowLog', {
+      resourceType: FlowLogResourceType.fromVpc(this.vpc),
+      destination: FlowLogDestination.toCloudWatchLogs(logGroup, role)
+    });
 
     // if only ecs or alb subnets are defined - use them for both alb and ecs
     this.albSubnetSelection = this._getSubnetSelection(
