@@ -21,7 +21,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
-import { EnvironmentService } from './environmentService';
+import { Environment, EnvironmentService } from './environmentService';
 
 describe('EnvironmentService', () => {
   beforeAll(() => {
@@ -59,7 +59,7 @@ describe('EnvironmentService', () => {
 
   const projectId = 'proj-123';
 
-  const env = {
+  const ddbEnv = {
     pk: `ENV#${envId}`,
     sk: `ENV#${envId}`,
     id: envId,
@@ -140,7 +140,7 @@ describe('EnvironmentService', () => {
     test('includeMetadata = false', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(env),
+        Item: marshall(ddbEnv),
         $metadata: {}
       };
       ddbMock
@@ -163,7 +163,7 @@ describe('EnvironmentService', () => {
     test('includeMetadata = true', async () => {
       // BUILD
       const metaData = [datasetItem, envTypeConfigItem, projItem, endpointItem];
-      const envWithMetadata = [env, ...metaData];
+      const envWithMetadata = [ddbEnv, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
           return marshall(item);
@@ -194,7 +194,7 @@ describe('EnvironmentService', () => {
         ENDPOINTS: [endpointItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...env,
+        ...ddbEnv,
         provisionedProductId: '',
         error: undefined,
         createdBy: '',
@@ -254,7 +254,7 @@ describe('EnvironmentService', () => {
   describe('getEnvironments', () => {
     test('admin with filter by status', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -294,7 +294,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by name', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -334,7 +334,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by createdAt', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -379,7 +379,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by project', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -419,7 +419,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by owner', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -459,7 +459,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by type', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -509,7 +509,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by status', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -549,7 +549,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by name', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -589,7 +589,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by name descending', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -629,7 +629,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by createdAt', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -669,7 +669,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by project', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -709,7 +709,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by owner', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -749,7 +749,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by type', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -799,7 +799,7 @@ describe('EnvironmentService', () => {
 
     test('admin with no filter', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -832,7 +832,7 @@ describe('EnvironmentService', () => {
 
     test('non admin', async () => {
       // BUILD
-      const items = [{ ...env, ownerId: 'owner-123' }];
+      const items = [{ ...ddbEnv, ownerId: 'owner-123' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -869,7 +869,7 @@ describe('EnvironmentService', () => {
 
     test('admin with pagination token', async () => {
       // BUILD
-      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [ddbEnv, { ...ddbEnv, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -938,7 +938,7 @@ describe('EnvironmentService', () => {
     test('update environment', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(env),
+        Item: marshall(ddbEnv),
         $metadata: {}
       };
       ddbMock
@@ -953,8 +953,7 @@ describe('EnvironmentService', () => {
       ddbMock
         .on(UpdateItemCommand)
         //@ts-ignore
-        .resolves({ Attributes: marshall({ ...env, status: 'COMPLETED' }) });
-
+        .resolves({ Attributes: marshall({ ...ddbEnv, status: 'COMPLETED' }) });
       // OPERATE
       const actualResponse = await envService.updateEnvironment(envId, {
         status: 'COMPLETED'
@@ -993,7 +992,42 @@ describe('EnvironmentService', () => {
           'SET #status = :status, #createdAt = if_not_exists(#createdAt, :createdAt), #updatedAt = :updatedAt'
       });
 
-      expect(actualResponse).toEqual({ ...env, status: 'COMPLETED' });
+      expect(actualResponse).toEqual({ ...ddbEnv, status: 'COMPLETED' });
+    });
+
+    test('update environment fails when given a TERMINATED environment', async () => {
+      const terminatedEnv: Environment = {
+        id: envId,
+        cidr: '0.0.0.0/0',
+        createdAt: '2022-05-13T20:03:54.055Z',
+        description: 'test 123',
+        envTypeConfigId: 'envTypeConfig-123',
+        name: 'testEnv',
+        outputs: [],
+        owner: 'owner-123',
+        projectId: projectId,
+        status: 'TERMINATED',
+        type: envTypeConfigItem.sk,
+        updatedAt: '2022-05-13T20:03:54.055Z',
+        instanceId: 'instance-123',
+        provisionedProductId: '',
+        dependency: projectId,
+        updatedBy: 'user-123',
+        createdBy: 'user-123',
+        error: undefined
+      };
+      const mockGetEnv = jest.spyOn(envService, 'getEnvironment');
+      mockGetEnv.mockImplementation(() => {
+        return Promise.resolve(terminatedEnv);
+      });
+
+      await expect(
+        envService.updateEnvironment(envId, {
+          status: 'COMPLETED'
+        })
+      ).rejects.toThrow(Boom.badRequest(`Cannot update terminated environment ${envId}`));
+
+      mockGetEnv.mockRestore();
     });
   });
 
@@ -1044,7 +1078,7 @@ describe('EnvironmentService', () => {
 
         // Get environment from DDB
         const metaData = [datasetItem, envTypeConfigItem, projItem];
-        const envWithMetadata = [env, ...metaData];
+        const envWithMetadata = [ddbEnv, ...metaData];
         const queryItemResponse: QueryCommandOutput = {
           Items: envWithMetadata.map((item) => {
             return marshall(item);
@@ -1064,7 +1098,7 @@ describe('EnvironmentService', () => {
           ENDPOINTS: [],
           ETC: envTypeConfigItem,
           PROJ: projItem,
-          ...env,
+          ...ddbEnv,
           provisionedProductId: '',
           error: undefined,
           createdBy: '',
@@ -1127,7 +1161,7 @@ describe('EnvironmentService', () => {
 
       // Get environment from DDB
       const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
+      const envWithMetadata = [ddbEnv, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
           return marshall(item);
@@ -1153,7 +1187,7 @@ describe('EnvironmentService', () => {
 
       // Get environment from DDB
       const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
+      const envWithMetadata = [ddbEnv, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
           return marshall(item);
@@ -1177,7 +1211,7 @@ describe('EnvironmentService', () => {
 
       // Get environment from DDB
       const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
+      const envWithMetadata = [ddbEnv, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
           return marshall(item);

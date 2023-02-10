@@ -23,9 +23,9 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Router, Express, Request, Response, json } from 'express';
+import express, { Router, Express, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
-import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import { ApiRouteConfig } from './apiRouteConfig';
 import SwbAuditExtractor from './audit/swbAuditExtractor';
 import SwbAuditLogger from './audit/swbAuditLogger';
 import SwbAuditPlugin from './audit/swbAuditPlugin';
@@ -36,9 +36,10 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
-import { setUpKeyPairRoutes } from './keyPairRoutes';
+import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
+import { setUpSshKeyRoutes } from './sshKeyRoutes';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
 import { setUpUserRoutes } from './userRoutes';
@@ -99,25 +100,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
   const excludePaths: string[] = [];
   app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
-
-  // Dynamic routes
-  apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
-    // Config setting is provided by developer, and not external user request
-    // nosemgrep
-    router[apiRoute.httpMethod](apiRoute.path, async (req: Request, res: Response) => {
-      // Config setting is provided by developer, and not external user request
-      // nosemgrep
-      const response = await apiRoute.service[apiRoute.serviceAction]();
-      res.send(response);
-    });
-  });
-
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
-  setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
+  setUpEnvRoutes(router, apiRouteConfig.environmentService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(
@@ -127,8 +115,9 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService
   );
+  setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
-  setUpKeyPairRoutes(router, apiRouteConfig.keyPairService);
+  setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

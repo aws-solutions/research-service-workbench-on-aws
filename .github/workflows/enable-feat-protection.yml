@@ -11,7 +11,7 @@ on:
 jobs:
   enable-feat-branch-protection:
     if: startsWith(github.ref_name, 'feat/')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: 'Construct required_pull_request_reviews object'
         id: pr_review

@@ -221,6 +221,32 @@ Resources:
               Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
+        # For SSH Key management and connection
+        - PolicyName: describe-ssh-keys-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:DescribeKeyPairs
+              Resource: '*' # IAM does not support resource-level permissions for this action
+        - PolicyName: ssh-keys-actions-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:CreateKeyPair
+                - ec2:DeleteKeyPair
+              Resource:
+                - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:key-pair/sshkey-*' # limits creation to ssh keys following resource naming schema
+        - PolicyName: ec2-instance-connect-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2-instance-connect:SendSSHPublicKey
+              Resource:
+                - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*'
+
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
     Metadata: 
       cfn_nag:

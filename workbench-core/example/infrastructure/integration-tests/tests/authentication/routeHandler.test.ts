@@ -79,6 +79,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false for an invalid access token', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: false,
@@ -87,6 +88,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false for an invalid refresh and access tokens', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: true,
@@ -95,6 +97,7 @@ describe('authentication route handler integration tests', () => {
 
       expect(data.loggedIn).toBe(false);
     });
+
     it('should return false if no tokens are provided', async () => {
       const { data } = await anonymousSession.resources.authentication.loggedIn({
         access: false,
@@ -102,6 +105,96 @@ describe('authentication route handler integration tests', () => {
       });
 
       expect(data.loggedIn).toBe(false);
+    });
+  });
+
+  describe('refreshAccessToken', () => {
+    it('should return the id token if the access token is successfully refreshed', async () => {
+      const adminSession = await setup.createAdminSession();
+      const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
+
+      expect(data.idToken).toBeDefined();
+    });
+
+    it('should throw 401 if there is no access token present', async () => {
+      await expect(
+        anonymousSession.resources.authentication.refresh({
+          includeRefreshToken: false
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 401 if the access token is invalid', async () => {
+      await expect(
+        anonymousSession.resources.authentication.refresh({
+          includeRefreshToken: true
+        })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+  });
+
+  describe('logoutUser', () => {
+    it('should return the logout URL for a logged in user', async () => {
+      const adminSession = await setup.createAdminSession();
+      const origin = 'fakeOrigin';
+      const domain = setup.getSettings().get('ExampleCognitoDomainName');
+      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+
+      const { data } = await adminSession.resources.authentication.logout({ origin });
+
+      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
+    });
+
+    it('should return the logout URL for a logged out user', async () => {
+      const origin = 'fakeOrigin';
+      const domain = setup.getSettings().get('ExampleCognitoDomainName');
+      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+
+      const { data } = await anonymousSession.resources.authentication.logout({ origin });
+
+      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
+    });
+
+    it('should throw 400 if the origin header is not present', async () => {
+      await expect(anonymousSession.resources.authentication.logout({})).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+  });
+
+  describe('getTokensFromAuthorizationCode', () => {
+    let code: string;
+    let codeVerifier: string;
+    let origin: string;
+
+    beforeEach(() => {
+      code = 'fakeAuthorizationCode';
+      codeVerifier = 'fakeCodeVerifier';
+      origin = 'fakeOrigin';
+    });
+
+    it('should throw 401 if the code param is invalid', async () => {
+      await expect(
+        anonymousSession.resources.authentication.token({ code, codeVerifier, origin })
+      ).rejects.toThrow(new HttpError(401, {}));
+    });
+
+    it('should throw 400 if the code param is missing from the request body', async () => {
+      await expect(anonymousSession.resources.authentication.token({ codeVerifier, origin })).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+
+    it('should throw 400 if the codeVerifier param is missing from the request body', async () => {
+      await expect(anonymousSession.resources.authentication.token({ code, origin })).rejects.toThrow(
+        new HttpError(400, {})
+      );
+    });
+
+    it('should throw 400 if the origin header is not present', async () => {
+      await expect(anonymousSession.resources.authentication.token({ code, codeVerifier })).rejects.toThrow(
+        new HttpError(400, {})
+      );
     });
   });
 });
