@@ -61,12 +61,12 @@ export interface CognitoAuthenticationPluginOptions {
   /**
    * Web UI Cognito App Client information.
    */
-  webUiAppClient: WebUiAppClient;
+  webUiAppClient?: WebUiAppClient;
 
   /**
-   * Auxiliary Cognito App Clients information for token validation.
+   * Cognito App Clients information for token validation supporting ALLOW_ADMIN_USER_PASSWORD_AUTH authentication mode.
    */
-  auxiliaryAppClients?: CognitoAppClient[];
+  adminAppClients?: CognitoAppClient[];
 }
 
 type CognitoJwtVerifierMultiUserPoolProps = CognitoAppClient & {
@@ -78,8 +78,7 @@ type CognitoJwtVerifierMultiUserPoolProps = CognitoAppClient & {
  * to provide authorization code and jwt token authentication.
  */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
-  private _region: string;
-  private _webUiAppClient: WebUiAppClient;
+  private _webUiAppClient?: WebUiAppClient;
 
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierMultiUserPool<CognitoJwtVerifierMultiUserPoolProps>;
@@ -92,21 +91,26 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public constructor({
     cognitoDomain,
     webUiAppClient,
-    auxiliaryAppClients = []
+    adminAppClients = []
   }: CognitoAuthenticationPluginOptions) {
     this._webUiAppClient = webUiAppClient;
     this._baseUrl = cognitoDomain;
 
-    // eslint-disable-next-line security/detect-unsafe-regex
-    const regionMatch = webUiAppClient.userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
-    if (!regionMatch) {
-      throw new PluginConfigurationError('Invalid Cognito user pool id');
+    const appClients = [...(webUiAppClient ? [webUiAppClient] : []), ...adminAppClients];
+
+    if (appClients.length === 0) {
+      throw new PluginConfigurationError('At least one appClient must be provided');
     }
-    this._region = regionMatch.groups!.region;
+
+    const regionMatch = appClients.find(
+      // eslint-disable-next-line security/detect-unsafe-regex
+      ({ userPoolId }) => !userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/)
+    );
+    if (regionMatch) {
+      throw new PluginConfigurationError(`Invalid Cognito user pool id ${regionMatch.userPoolId}`);
+    }
 
     try {
-      const appClients = [webUiAppClient, ...auxiliaryAppClients];
-
       this._verifier = CognitoJwtVerifier.create(
         appClients.map(
           (appClient) =>
@@ -318,6 +322,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
+    if (!this._webUiAppClient) {
+      throw new PluginConfigurationError('WebUI client not configured');
+    }
     return `${this._baseUrl}/oauth2/authorize?client_id=${this._webUiAppClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
@@ -386,6 +393,10 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getLogoutUrl(websiteUrl: string): string {
+    if (!this._webUiAppClient) {
+      throw new PluginConfigurationError('WebUI client not configured');
+    }
+
     return `${this._baseUrl}/logout?client_id=${this._webUiAppClient.clientId}&logout_uri=${websiteUrl}`;
   }
 
@@ -395,6 +406,10 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns a string representation of the encoded client id and secret.
    */
   private _getEncodedClientId(): string {
+    if (!this._webUiAppClient) {
+      throw new PluginConfigurationError('WebUI client not configured');
+    }
+
     return Buffer.from(`${this._webUiAppClient.clientId}:${this._webUiAppClient.clientSecret}`).toString(
       'base64'
     );
@@ -406,8 +421,15 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns a {@link TokensExpiration} object
    */
   private async _getTokensExpirationinMS(): Promise<TokensExpiration> {
-    const client = new CognitoIdentityProviderClient({ region: this._region });
+    if (!this._webUiAppClient) {
+      throw new PluginConfigurationError('WebUI client not configured');
+    }
+
     const { userPoolId, clientId } = this._webUiAppClient;
+
+    // eslint-disable-next-line security/detect-unsafe-regex
+    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
+    const client = new CognitoIdentityProviderClient({ region: regionMatch!.groups!.region });
 
     const describeInput: DescribeUserPoolClientCommandInput = {
       UserPoolId: userPoolId,

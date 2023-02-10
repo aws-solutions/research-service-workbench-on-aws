@@ -45,7 +45,7 @@ const validToken = 'validToken';
 const invalidToken = 'invalidToken';
 
 const encodedClientId = Buffer.from(
-  `${cognitoPluginOptions.webUiAppClient.clientId}:${cognitoPluginOptions.webUiAppClient.clientSecret}`
+  `${cognitoPluginOptions.webUiAppClient!.clientId}:${cognitoPluginOptions.webUiAppClient!.clientSecret}`
 ).toString('base64');
 
 const baseDecodedAccessToken: CognitoAccessTokenPayload = {
@@ -86,11 +86,28 @@ describe('CognitoAuthenticationPlugin tests', () => {
     plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
   });
 
+  const createAdminPlugin = (): CognitoAuthenticationPlugin => {
+    return new CognitoAuthenticationPlugin({
+      ...cognitoPluginOptions,
+      webUiAppClient: undefined,
+      adminAppClients: [
+        {
+          ...cognitoPluginOptions.webUiAppClient!
+        }
+      ]
+    });
+  };
+
   describe('constructor tests', () => {
     it('should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
       const badUserPoolIdConfig = {
         ...cognitoPluginOptions,
-        webUiAppClient: { ...cognitoPluginOptions.webUiAppClient, userPoolId: 'badId' }
+        adminAppClients: [
+          {
+            ...cognitoPluginOptions.webUiAppClient!,
+            userPoolId: 'badId'
+          }
+        ]
       };
 
       expect(() => {
@@ -105,6 +122,15 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       expect(() => {
         new CognitoAuthenticationPlugin(cognitoPluginOptions);
+      }).toThrow(PluginConfigurationError);
+    });
+
+    it('should throw PluginConfigurationError when no app client is configured', () => {
+      expect(() => {
+        new CognitoAuthenticationPlugin({
+          ...cognitoPluginOptions,
+          webUiAppClient: undefined
+        });
       }).toThrow(PluginConfigurationError);
     });
   });
@@ -146,8 +172,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('validateToken tests', () => {
     it('should return the decoded token when a valid token is passed in', async () => {
-      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(baseDecodedAccessToken);
-
+      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValue(baseDecodedAccessToken);
       const decoded = await plugin.validateToken('validToken');
 
       expect(decoded).toMatchObject(baseDecodedAccessToken);
@@ -288,7 +313,10 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should return the cognito:groups claim from the decoded token', () => {
-      const userId = plugin.getUserRolesFromToken({ ...baseDecodedAccessToken, 'cognito:groups': ['Admin'] });
+      const userId = plugin.getUserRolesFromToken({
+        ...baseDecodedAccessToken,
+        'cognito:groups': ['Admin']
+      });
 
       expect(userId).toMatchObject(['Admin']);
     });
@@ -502,13 +530,22 @@ describe('CognitoAuthenticationPlugin tests', () => {
   });
 
   describe('getAuthorizationCodeUrl tests', () => {
+    const state = 'TEMP_STATE';
+    const codeChallenge = 'TEMP_CODE_CHALLENGE';
+
     it('should return the full URL of the authentication servers authorization code endpoint', () => {
-      const state = 'TEMP_STATE';
-      const codeChallenge = 'TEMP_CODE_CHALLENGE';
       const url = plugin.getAuthorizationCodeUrl(state, codeChallenge, websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.webUiAppClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+        `${baseUrl}/oauth2/authorize?client_id=${
+          cognitoPluginOptions.webUiAppClient!.clientId
+        }&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+      );
+    });
+
+    it('should throw PluginConfigurationError when webUI app client is not configured', () => {
+      expect(() => createAdminPlugin().getAuthorizationCodeUrl(state, codeChallenge, websiteUrl)).toThrow(
+        PluginConfigurationError
       );
     });
   });
@@ -518,8 +555,14 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getLogoutUrl(websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/logout?client_id=${cognitoPluginOptions.webUiAppClient.clientId}&logout_uri=${websiteUrl}`
+        `${baseUrl}/logout?client_id=${
+          cognitoPluginOptions.webUiAppClient!.clientId
+        }&logout_uri=${websiteUrl}`
       );
+    });
+
+    it('should throw PluginConfigurationError when webUI app client is not configured', () => {
+      expect(() => createAdminPlugin().getLogoutUrl(websiteUrl)).toThrow(PluginConfigurationError);
     });
   });
 
@@ -682,6 +725,10 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       expect(encodedId).toBe(encodedClientId);
     });
+
+    it('should throw PluginConfigurationError when webUI app client is not configured', () => {
+      expect(() => createAdminPlugin()['_getEncodedClientId']()).toThrow(PluginConfigurationError);
+    });
   });
 
   describe('_getTokensExpiration tests', () => {
@@ -731,6 +778,12 @@ describe('CognitoAuthenticationPlugin tests', () => {
       cognitoMock.on(DescribeUserPoolClientCommand).rejects(new Error());
 
       await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(Error);
+    });
+
+    it('should throw PluginConfigurationError when webUI app client is not configured', async () => {
+      await expect(createAdminPlugin()['_getTokensExpirationinMS']()).rejects.toThrow(
+        PluginConfigurationError
+      );
     });
   });
 });
