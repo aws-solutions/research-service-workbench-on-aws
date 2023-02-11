@@ -13,7 +13,8 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
-import { ProjectAccessRequest } from '@aws/swb-app/lib/dataSets/projectAccessRequestParser';
+import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
+import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
   Action,
   AuthenticatedUser,
@@ -129,7 +130,7 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async addAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse> {
+  public async addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse> {
     const projectAdmin = getProjectAdminRole(request.projectId);
     const projectResearcher = getResearcherRole(request.projectId);
 
@@ -147,7 +148,7 @@ export class DataSetService implements DataSetPlugin {
       permission: {
         identity: projectAdmin,
         identityType: 'GROUP',
-        accessLevel: request.accessLevel!
+        accessLevel: request.accessLevel
       }
     };
 
@@ -158,7 +159,7 @@ export class DataSetService implements DataSetPlugin {
       id: request.dataSetId,
       data: {
         id: request.projectId,
-        permission: request.accessLevel!
+        permission: request.accessLevel
       }
     };
 
@@ -167,7 +168,7 @@ export class DataSetService implements DataSetPlugin {
       id: request.projectId,
       data: {
         id: request.dataSetId,
-        permission: request.accessLevel!
+        permission: request.accessLevel
       }
     };
 
@@ -176,12 +177,14 @@ export class DataSetService implements DataSetPlugin {
     return response;
   }
 
-  public async removeAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse> {
+  public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
     const projectAdmin = getProjectAdminRole(request.projectId);
 
     //Make sure you're not removing the access for your project
     if (request.authenticatedUser.roles.includes(projectAdmin)) {
-      throw new Error(`${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`);
+      throw new Error(
+        `${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
+      );
     }
 
     const projectResearcher = getResearcherRole(request.projectId);

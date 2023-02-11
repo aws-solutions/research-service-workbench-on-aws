@@ -10,7 +10,8 @@ import {
   DataSetStoragePlugin,
   PermissionsResponse
 } from '@aws/swb-app';
-import { ProjectAccessRequest } from '@aws/swb-app/lib/dataSets/projectAccessRequestParser';
+import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
+import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
   Action,
   AuthenticatedUser,
@@ -207,7 +208,6 @@ describe('DataSetService', () => {
   });
 
   describe('dataset access management', () => {
-    let projectAccessRequest: ProjectAccessRequest;
     let dataSetId: string;
     let projectId: string;
     let accessLevel: 'read-only' | 'read-write';
@@ -216,17 +216,19 @@ describe('DataSetService', () => {
       dataSetId = 'dataSetId';
       projectId = 'projectId';
       accessLevel = 'read-write';
-
-      projectAccessRequest = {
-        authenticatedUser: mockUser,
-        dataSetId,
-        projectId,
-        accessLevel
-      };
     });
 
     describe('addAccessForProject', () => {
+      let projectAddAccessRequest: ProjectAddAccessRequest;
+
       beforeEach(() => {
+        projectAddAccessRequest = {
+          authenticatedUser: mockUser,
+          dataSetId,
+          projectId,
+          accessLevel
+        };
+
         mockDynamicAuthService.createIdentityPermissions = jest.fn(
           (request: CreateIdentityPermissionsRequest): Promise<CreateIdentityPermissionsResponse> => {
             return Promise.resolve({
@@ -254,14 +256,14 @@ describe('DataSetService', () => {
       });
 
       test('pass the request through to the datasets auth plugin', async () => {
-        await dataSetService.addAccessForProject(projectAccessRequest);
+        await dataSetService.addAccessForProject(projectAddAccessRequest);
         const permissionRequest: AddRemoveAccessPermissionRequest = {
-          authenticatedUser: projectAccessRequest.authenticatedUser,
-          dataSetId: projectAccessRequest.dataSetId,
+          authenticatedUser: projectAddAccessRequest.authenticatedUser,
+          dataSetId: projectAddAccessRequest.dataSetId,
           permission: {
             identity: 'projectId#ProjectAdmin',
             identityType: 'GROUP',
-            accessLevel: projectAccessRequest.accessLevel!
+            accessLevel: projectAddAccessRequest.accessLevel!
           }
         };
         expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
@@ -270,7 +272,7 @@ describe('DataSetService', () => {
       describe('when building the relationship between the Project and Dataset', () => {
         describe('it adds entries for', () => {
           test('Project with Dataset', async () => {
-            await dataSetService.addAccessForProject(projectAccessRequest);
+            await dataSetService.addAccessForProject(projectAddAccessRequest);
 
             const associations = await mockDatabaseService.getAssociations(
               SwbAuthZSubject.SWB_PROJECT,
@@ -290,7 +292,7 @@ describe('DataSetService', () => {
           });
 
           test('Dataset with Project', async () => {
-            await dataSetService.addAccessForProject(projectAccessRequest);
+            await dataSetService.addAccessForProject(projectAddAccessRequest);
 
             const associations = await mockDatabaseService.getAssociations(
               SwbAuthZSubject.SWB_DATASET,
@@ -313,7 +315,7 @@ describe('DataSetService', () => {
 
       describe('when updating AuthZ permission for the Dataset', () => {
         test('READ access is requested for the Project Admin and the Project Researcher', async () => {
-          await dataSetService.addAccessForProject(projectAccessRequest);
+          await dataSetService.addAccessForProject(projectAddAccessRequest);
           expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
             authenticatedUser: mockUser,
             identityPermissions: [
@@ -340,7 +342,15 @@ describe('DataSetService', () => {
     });
 
     describe('removeAccessForProject', () => {
+      let projectRemoveAccessRequest: ProjectRemoveAccessRequest;
+
       beforeEach(() => {
+        projectRemoveAccessRequest = {
+          authenticatedUser: mockUser,
+          dataSetId,
+          projectId
+        };
+
         mockDynamicAuthService.deleteIdentityPermissions = jest.fn(
           (request: DeleteIdentityPermissionsRequest): Promise<DeleteIdentityPermissionsResponse> => {
             return Promise.resolve({
@@ -375,16 +385,15 @@ describe('DataSetService', () => {
               roles: [getProjectAdminRole(projectId)]
             };
 
-            projectAccessRequest = {
+            projectRemoveAccessRequest = {
               authenticatedUser: mockUser,
               dataSetId,
-              projectId,
-              accessLevel
+              projectId
             };
           });
 
           test('it throws an error', async () => {
-            await expect(dataSetService.removeAccessForProject(projectAccessRequest)).rejects.toThrow(
+            await expect(dataSetService.removeAccessForProject(projectRemoveAccessRequest)).rejects.toThrow(
               new Error(
                 `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
               )
@@ -399,11 +408,11 @@ describe('DataSetService', () => {
               roles: [getProjectAdminRole('proj-some-other-project')]
             };
 
-            projectAccessRequest = {
+            const projectAddAccessRequest: ProjectAddAccessRequest = {
               authenticatedUser: mockUser,
               dataSetId,
               projectId,
-              accessLevel
+              accessLevel: 'read-only'
             };
 
             const permissionsResponse: PermissionsResponse = {
@@ -419,14 +428,14 @@ describe('DataSetService', () => {
               }
             };
             mockDataSetsAuthPlugin.addAccessPermission = jest.fn().mockReturnValueOnce(permissionsResponse);
-            await dataSetService.addAccessForProject(projectAccessRequest);
+            await dataSetService.addAccessForProject(projectAddAccessRequest);
           });
 
           test('pass the request through to the datasets auth plugin', async () => {
-            await dataSetService.removeAccessForProject(projectAccessRequest);
+            await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
             const permissionRequest: AddRemoveAccessPermissionRequest = {
-              authenticatedUser: projectAccessRequest.authenticatedUser,
-              dataSetId: projectAccessRequest.dataSetId,
+              authenticatedUser: projectRemoveAccessRequest.authenticatedUser,
+              dataSetId: projectRemoveAccessRequest.dataSetId,
               permission: [
                 {
                   identity: 'projectId#ProjectAdmin',
@@ -461,7 +470,7 @@ describe('DataSetService', () => {
             });
 
             test('Project with Dataset', async () => {
-              await dataSetService.removeAccessForProject(projectAccessRequest);
+              await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
 
               const associations = await mockDatabaseService.getAssociations(
                 SwbAuthZSubject.SWB_PROJECT,
@@ -472,7 +481,7 @@ describe('DataSetService', () => {
             });
 
             test('Dataset with Project', async () => {
-              await dataSetService.removeAccessForProject(projectAccessRequest);
+              await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
 
               const associations = await mockDatabaseService.getAssociations(
                 SwbAuthZSubject.SWB_DATASET,
@@ -485,7 +494,7 @@ describe('DataSetService', () => {
 
           describe('it removes authZ permissions for', () => {
             test('the Researcher and ProjectAdmin groups', async () => {
-              await dataSetService.removeAccessForProject(projectAccessRequest);
+              await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
               expect(mockDynamicAuthService.deleteIdentityPermissions).toHaveBeenCalledWith({
                 authenticatedUser: mockUser,
                 identityPermissions: [
