@@ -16,6 +16,7 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { AwsServiceError } from './errors/awsServiceError';
 import { DatabaseError } from './errors/databaseError';
 import { Ec2Error } from './errors/ec2Error';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
@@ -68,5 +69,6 @@ export {
   DatabaseError,
   NonUniqueKeyError,
   NoKeyExistsError,
-  Ec2Error
+  Ec2Error,
+  AwsServiceError
 };
