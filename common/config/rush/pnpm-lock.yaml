@@ -9,6 +9,7 @@ overrides:
   caniuse-lite: latest
   jszip: '>=3.8.0'
   http-cache-semantics: '>=4.1.1'
+  cacheable-request: '>=10.2.7 '
 
 importers:
 
