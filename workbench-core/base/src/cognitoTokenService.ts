@@ -7,12 +7,6 @@ import crypto from 'crypto';
 import AwsService from './aws/awsService';
 import { SecretsServiceInterface } from './services/secretsService';
 
-interface CognitoToken {
-  accessToken: string;
-  idToken: string;
-  refreshToken: string;
-}
-
 export default class CognitoTokenService {
   private _aws: AwsService;
   private _secretsService: SecretsServiceInterface;
@@ -22,72 +16,6 @@ export default class CognitoTokenService {
     this._secretsService = secretsService;
   }
 
-  public async generateCognitoTokenWithCredentials(
-    userPoolId: string,
-    clientId: string,
-    userName: string,
-    password: string,
-    accountType: 'USER' | 'ADMIN'
-  ): Promise<CognitoToken> {
-    const clientSecret = await this._getClientSecret(userPoolId, clientId);
-    const secretHash = crypto
-      .createHmac('SHA256', clientSecret)
-      .update(userName + clientId)
-      .digest('base64');
-
-    const authParameters = {
-      USERNAME: userName,
-      PASSWORD: password,
-      SECRET_HASH: secretHash
-    };
-
-    if (accountType === 'ADMIN') {
-      return this._getAdminToken(userPoolId, clientId, authParameters);
-    }
-
-    if (accountType === 'USER') {
-      return this._getUserToken(clientId, authParameters);
-    }
-
-    throw new Error(`accountType (${accountType}) must be 'USER' or 'ADMIN'`);
-  }
-
-  private async _getAdminToken(
-    userPoolId: string,
-    clientId: string,
-    authParameters: Record<string, string>
-  ): Promise<CognitoToken> {
-    const response = await this._aws.clients.cognito.adminInitiateAuth({
-      UserPoolId: userPoolId,
-      ClientId: clientId,
-      AuthFlow: 'ADMIN_NO_SRP_AUTH',
-      AuthParameters: authParameters
-    });
-
-    return {
-      accessToken: response.AuthenticationResult!.AccessToken!,
-      refreshToken: response.AuthenticationResult!.RefreshToken!,
-      idToken: response.AuthenticationResult!.IdToken!
-    };
-  }
-
-  private async _getUserToken(
-    clientId: string,
-    authParameters: Record<string, string>
-  ): Promise<CognitoToken> {
-    const response = await this._aws.clients.cognito.initiateAuth({
-      AuthFlow: 'USER_PASSWORD_AUTH',
-      AuthParameters: authParameters,
-      ClientId: clientId
-    });
-
-    return {
-      accessToken: response.AuthenticationResult!.AccessToken!,
-      refreshToken: response.AuthenticationResult!.RefreshToken!,
-      idToken: response.AuthenticationResult!.IdToken!
-    };
-  }
-
   public async generateCognitoToken(params: {
     userPoolId: string;
     clientId: string;
@@ -95,7 +23,11 @@ export default class CognitoTokenService {
     rootPassword?: string;
     rootUserNameParamStorePath?: string;
     rootPasswordParamStorePath?: string;
-  }): Promise<CognitoToken> {
+  }): Promise<{
+    accessToken: string;
+    idToken: string;
+    refreshToken: string;
+  }> {
     const {
       userPoolId,
       clientId,
@@ -125,7 +57,28 @@ export default class CognitoTokenService {
       userName = await this._secretsService.getSecret(rootUserNameParamStorePath);
     }
 
-    return this.generateCognitoTokenWithCredentials(userPoolId, clientId, userName, password, 'ADMIN');
+    const clientSecret = await this._getClientSecret(userPoolId, clientId);
+    const secretHash = crypto
+      .createHmac('SHA256', clientSecret)
+      .update(userName + clientId)
+      .digest('base64');
+
+    const response = await this._aws.clients.cognito.adminInitiateAuth({
+      UserPoolId: userPoolId,
+      ClientId: clientId,
+      AuthFlow: 'ADMIN_NO_SRP_AUTH',
+      AuthParameters: {
+        USERNAME: userName,
+        PASSWORD: password,
+        SECRET_HASH: secretHash
+      }
+    });
+
+    return {
+      accessToken: response.AuthenticationResult!.AccessToken!,
+      refreshToken: response.AuthenticationResult!.RefreshToken!,
+      idToken: response.AuthenticationResult!.IdToken!
+    };
   }
 
   private async _getClientSecret(userPoolId: string, clientId: string): Promise<string> {

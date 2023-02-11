@@ -13,11 +13,7 @@ import {
   CreateExternalEndpointRequestParser
 } from './dataSets/createExternalEndpointRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
-import {
-  ProjectAddAccessRequest,
-  ProjectAddAccessRequestParser
-} from './dataSets/projectAddAccessRequestParser';
-import { ProjectRemoveAccessRequest } from './dataSets/projectRemoveAccessRequestParser';
+import { ProjectAccessRequest, ProjectAccessRequestParser } from './dataSets/projectAccessRequestParser';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 
@@ -103,8 +99,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const response = await dataSetService.listDataSets(authenticatedUser);
+      const response = await dataSetService.listDataSets();
       res.send(response);
     })
   );
@@ -112,7 +107,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.put(
     '/projects/:projectId/datasets/:datasetId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<ProjectAddAccessRequest>(ProjectAddAccessRequestParser, {
+      const validatedRequest = validateAndParse<ProjectAccessRequest>(ProjectAccessRequestParser, {
         authenticatedUser: res.locals.user,
         projectId: req.params.projectId,
         dataSetId: req.params.datasetId,
@@ -120,21 +115,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       });
 
       await dataSetService.addAccessForProject(validatedRequest);
-
-      res.status(204).send();
-    })
-  );
-
-  router.delete(
-    '/projects/:projectId/datasets/:datasetId/relationships',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<ProjectRemoveAccessRequest>(ProjectAddAccessRequestParser, {
-        authenticatedUser: res.locals.user,
-        projectId: req.params.projectId,
-        dataSetId: req.params.datasetId
-      });
-
-      await dataSetService.removeAccessForProject(validatedRequest);
 
       res.status(204).send();
     })

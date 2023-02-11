@@ -18,16 +18,6 @@ export class MockDatabaseService implements DatabaseServicePlugin {
     return Promise.resolve();
   }
 
-  public removeAssociations(entity: Associable, relations: Associable[]): Promise<void> {
-    this._deleteAssociations(entity, relations);
-
-    for (const relation of relations) {
-      this._deleteAssociations(relation, [entity]);
-    }
-
-    return Promise.resolve();
-  }
-
   public getAssociations(type: string, id: string): Promise<Associable[]> {
     const entityKey = `${type}#${id}`;
     return Promise.resolve(this._associations.get(entityKey) as Associable[]);
@@ -42,16 +32,5 @@ export class MockDatabaseService implements DatabaseServicePlugin {
     const associations = this._associations.get(key) || [];
 
     this._associations.set(key, associations.concat(relations));
-  }
-
-  private _deleteAssociations(entity: Associable, relations: Associable[]): void {
-    const key = this._keyForAssociable(entity);
-    let associations = this._associations.get(key) || [];
-
-    associations = associations.filter((item) => {
-      return item.type === entity.type && item.id === entity.id;
-    });
-
-    this._associations.set(key, associations);
   }
 }

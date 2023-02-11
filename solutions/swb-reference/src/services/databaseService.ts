@@ -8,7 +8,6 @@ import { DynamoDBService, JSONValue, MetadataService } from '@aws/workbench-core
 export interface DatabaseServicePlugin {
   getAssociations(type: string, id: string): Promise<Associable[]>;
   storeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
-  removeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
 }
 
 export interface Associable {
@@ -55,27 +54,5 @@ export class DatabaseService implements DatabaseServicePlugin {
 
   public getAssociations(type: string, id: string): Promise<Associable[]> {
     return Promise.resolve([]);
-  }
-
-  public async removeAssociations(entity: Associable, relations: Associable[]): Promise<void> {
-    const relationTypeMap = new Map<string, Associable[]>();
-
-    for (const relation of relations) {
-      const relationType = relation.type;
-      const relations = relationTypeMap.get(relationType) || [];
-      relations.push(relation);
-      relationTypeMap.set(relationType, relations);
-    }
-
-    for (const relationType of relationTypeMap.keys()) {
-      const relations = relationTypeMap.get(relationType) || [];
-
-      await this._metadataService.deleteRelationships(
-        entity.type,
-        entity.id,
-        relationType,
-        relations.map((item) => item.id)
-      );
-    }
   }
 }
