@@ -245,6 +245,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKeys'
   }
 ];
 
@@ -303,6 +308,11 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKeys'
   }
 ];
 

@@ -38,8 +38,42 @@ export default class SshKeyService implements SshKeyPlugin {
   public async listUserSshKeysForProject(
     request: ListUserSshKeysForProjectRequest
   ): Promise<ListUserSshKeysForProjectResponse> {
-    // TODO: implement
-    throw new Error('Method not implemented.');
+    const { projectId, userId } = request;
+
+    // get project
+    const project = await this._projectService.getProject({ projectId });
+    const { envMgmtRoleArn, externalId } = project;
+
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'ListForProject',
+      externalId,
+      this._aws
+    );
+
+    // list user key
+    const sshKeyId = `sshkey-${userId}#${projectId}`; // TODO
+    const ec2DescribeKeyPairsParam = {
+      Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
+      IncludePublicKey: true
+    };
+    try {
+      const response = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
+      return {
+        sshKeys: [
+          {
+            projectId,
+            publicKey: response.KeyPairs.PublicKey,
+            sshKeyId: sshKeyId,
+            owner: userId,
+            createTime: response.KeyPairs.createTime
+          }
+        ]
+      };
+    } catch (e) {
+      throw new Ec2Error(e);
+    }
   }
 
   /**
