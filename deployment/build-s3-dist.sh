@@ -142,7 +142,7 @@ cleanup_temporary_generted_files()
 
     # Delete generated files: CDK Consctruct typescript transcompiled generted files
     do_cmd cd $source_dir/
-    do_cmd npm run cleanup:tsc
+    do_cmd rush purge
 
     # Delete the temporary /staging folder
     do_cmd rm -rf $staging_dist_dir
@@ -263,7 +263,7 @@ echo "${bold}[Init] Install dependencies for the cdk-solution-helper${normal}"
 echo "------------------------------------------------------------------------------"
 
 do_cmd cd $template_dir/cdk-solution-helper
-do_cmd npm install
+do_cmd rush cinstall
 
 echo "------------------------------------------------------------------------------"
 echo "${bold}[Synth] CDK Project${normal}"
