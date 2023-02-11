@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-base",
-      "comment": "adding infrastructure for generic ClientSession generation",
-      "type": "none"
+      "comment": "reverting",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-base"

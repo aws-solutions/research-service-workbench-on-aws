@@ -267,12 +267,6 @@ export const routesMap: RoutesMap = {
           action: 'UPDATE',
           subject: 'ProjectDataSet'
         }
-      ],
-      DELETE: [
-        {
-          action: 'DELETE',
-          subject: 'ProjectDataSet'
-        }
       ]
     },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:

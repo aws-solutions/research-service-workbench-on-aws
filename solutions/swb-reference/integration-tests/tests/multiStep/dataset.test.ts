@@ -128,10 +128,7 @@ describe('multiStep dataset integration test', () => {
       costCenterId
     });
     await adminSession.resources.datasets
-      .dataset(dataSet.id)
+      .dataset(dataSetDetails.id)
       .associateWithProject(unassociatedProject.id, 'read-only');
-
-    console.log('DISASSOCIATE FROM PROJECT');
-    await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
   });
 });

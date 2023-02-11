@@ -58,33 +58,6 @@ export default class Setup {
     return this._defaultAdminSession;
   }
 
-  public async getSessionForUser(userName: string, password: string): Promise<ClientSession> {
-    const accessToken = await this._getCognitoTokenForUser(userName, password);
-    const session = this._getClientSession(accessToken);
-    this._sessions.push(session);
-    return session;
-  }
-
-  private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
-    const userPoolId = this._settings.get('cognitoUserPoolId');
-    const clientId = this._settings.get('cognitoUserPoolClientId');
-    const awsRegion = this._settings.get('awsRegion');
-    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-
-    await this._loadSecrets(secretsService);
-
-    const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
-    const { accessToken } = await cognitoTokenService.generateCognitoTokenWithCredentials(
-      userPoolId,
-      clientId,
-      userName,
-      password,
-      'USER'
-    );
-
-    return accessToken;
-  }
-
   public getStackName(): string {
     return `swb-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
   }

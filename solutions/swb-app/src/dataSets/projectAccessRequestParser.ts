@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { AuthenticatedUserParser } from '../users/authenticatedUser';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const ProjectAddAccessRequestParser = z
+export const ProjectAccessRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
     dataSetId: z.string(),
@@ -16,4 +16,4 @@ export const ProjectAddAccessRequestParser = z
   })
   .strict();
 
-export type ProjectAddAccessRequest = z.infer<typeof ProjectAddAccessRequestParser>;
+export type ProjectAccessRequest = z.infer<typeof ProjectAccessRequestParser>;
