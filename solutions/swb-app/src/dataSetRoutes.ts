@@ -17,7 +17,10 @@ import {
   ProjectAddAccessRequest,
   ProjectAddAccessRequestParser
 } from './dataSets/projectAddAccessRequestParser';
-import { ProjectRemoveAccessRequest } from './dataSets/projectRemoveAccessRequestParser';
+import {
+  ProjectRemoveAccessRequest,
+  ProjectRemoveAccessRequestParser
+} from './dataSets/projectRemoveAccessRequestParser';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 
@@ -128,11 +131,14 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.delete(
     '/projects/:projectId/datasets/:datasetId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<ProjectRemoveAccessRequest>(ProjectAddAccessRequestParser, {
-        authenticatedUser: res.locals.user,
-        projectId: req.params.projectId,
-        dataSetId: req.params.datasetId
-      });
+      const validatedRequest = validateAndParse<ProjectRemoveAccessRequest>(
+        ProjectRemoveAccessRequestParser,
+        {
+          authenticatedUser: res.locals.user,
+          projectId: req.params.projectId,
+          dataSetId: req.params.datasetId
+        }
+      );
 
       await dataSetService.removeAccessForProject(validatedRequest);
 
