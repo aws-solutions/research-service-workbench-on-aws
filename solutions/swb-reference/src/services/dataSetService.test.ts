@@ -403,11 +403,6 @@ describe('DataSetService', () => {
 
         describe('to a project they do not administer', () => {
           beforeEach(async () => {
-            mockUser = {
-              id: 'userId',
-              roles: [getProjectAdminRole('proj-some-other-project')]
-            };
-
             const projectAddAccessRequest: ProjectAddAccessRequest = {
               authenticatedUser: mockUser,
               dataSetId,
