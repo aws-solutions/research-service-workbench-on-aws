@@ -3,7 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EC2 } from '@aws-sdk/client-ec2';
+import * as crypto from 'crypto';
+import { EC2, Tag } from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   CreateSshKeyRequest,
@@ -14,11 +15,13 @@ import {
   SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
-  Ec2Error
+  Ec2Error,
+  NoKeyExistsError,
+  NonUniqueKeyError
 } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 
 export default class SshKeyService implements SshKeyPlugin {
   private _aws: AwsService;
@@ -50,30 +53,61 @@ export default class SshKeyService implements SshKeyPlugin {
   public async deleteSshKey(request: DeleteSshKeyRequest): Promise<void> {
     const { projectId, sshKeyId, currentUserId } = request;
 
+    // get envMgmtRoleArn and externalId from project record
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
+
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'Delete',
+      externalId,
+      this._aws
+    );
+
+    // get ssh key
+    let keys = [];
+    try {
+      const response = await ec2.describeKeyPairs({ Filters: [{ Name: 'key-name', Values: [sshKeyId] }] });
+      console.log(response);
+      keys = response.KeyPairs || [];
+    } catch (e) {
+      throw new Ec2Error(e);
+    }
+    if (keys.length === 0) {
+      throw new NoKeyExistsError(`Key ${sshKeyId} does not exist`);
+    }
+    if (keys.length > 1) {
+      throw new NonUniqueKeyError(
+        `More than one key exists with ${sshKeyId}. Cannot determine which to delete.`
+      );
+    }
+
     // Check that current user owns the key from the request
-    const sshKeyOwner = this._getOwnerOfSshKey(sshKeyId);
-    if (sshKeyOwner !== currentUserId) {
+    const sshKeyUser = this._getUserFromTags(keys[0].Tags!);
+    if (sshKeyUser !== currentUserId) {
       throw new ForbiddenError(`Current user ${currentUserId} cannot delete a key they do not own`);
     }
 
-    // get project
-    const project = await this._projectService.getProject({ projectId });
-    const { envMgmtRoleArn, externalId } = project;
-
-    // get EC2 client
+    // delete ssh key
     try {
-      const { ec2 } = await this._getEc2ClientsForHostingAccount(
-        envMgmtRoleArn,
-        'Delete',
-        externalId,
-        this._aws
-      );
-
-      // delete ssh key
       await ec2.deleteKeyPair({ KeyName: sshKeyId });
     } catch (e) {
       throw new Ec2Error(e);
     }
+  }
+
+  // TODO: docstrings
+  private _getUserFromTags(tags: Tag[]): string | undefined {
+    return tags.filter((tag) => tag.Key === 'user')[0].Value;
+  }
+
+  // TODO: docstrings
+  private async _getEnvMgmtRoleArnAndExternalIdFromProject(
+    projectId: string
+  ): Promise<{ envMgmtRoleArn: string; externalId: string }> {
+    const project = await this._projectService.getProject({ projectId });
+    const { envMgmtRoleArn, externalId } = project;
+    return { envMgmtRoleArn, externalId };
   }
 
   /**
@@ -120,16 +154,30 @@ export default class SshKeyService implements SshKeyPlugin {
       externalId: externalId
     };
 
-    const hostSdk = await aws.getAwsServiceForRole(params);
-    const ec2 = hostSdk.clients.ec2;
-    const ec2InstanceConnect = hostSdk.clients.ec2InstanceConnect;
+    try {
+      const hostSdk = await aws.getAwsServiceForRole(params);
+      const ec2 = hostSdk.clients.ec2;
+      const ec2InstanceConnect = hostSdk.clients.ec2InstanceConnect;
 
-    return { ec2, ec2InstanceConnect };
+      return { ec2, ec2InstanceConnect };
+    } catch (e) {
+      throw new Error(`Could not get host EC2 clients using ${envMgmtRoleArn} and ${externalId}`);
+    }
   }
 
-  private _getOwnerOfSshKey(sshKeyId: string): string {
-    // The sskKeyId is of form sshkey-user-<uuid>#proj-<uuid>
-    // We want user-<uuid>
-    return sshKeyId.split('#')[0].replace('sshkey-', '');
+  /**
+   * Given the user id and the project it, hash them to create the unique ID for the SSH Key
+   *
+   * @param userId - the owner of the SSH Key
+   * @param projectId - the project that the SSH Key is bounded by
+   * @returns the string sshKeyId (aka EC2 KeyName)
+   */
+  private _getSshKeyId(userId: string, projectId: string): string {
+    const hashedUuid = crypto
+      .createHash('sha256', { outputLength: 32 })
+      .update(userId)
+      .update(projectId)
+      .digest('hex');
+    return `${resourceTypeToKey.sshKey.toLowerCase()}-${hashedUuid}`;
   }
 }
