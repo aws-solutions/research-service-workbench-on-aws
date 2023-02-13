@@ -42,14 +42,19 @@ interface CognitoAppClient {
   /**
    * The Cognito app client secret.
    */
-  clientSecret: string;
+  clientSecret?: string;
 }
 
-interface WebUiAppClient extends Omit<CognitoAppClient, 'clientId'> {
+interface WebUiAppClient extends Pick<CognitoAppClient, 'userPoolId'> {
   /**
    * The Cognito app client IDs.
    */
   clientId: string;
+
+  /**
+   * The Cognito app client secret.
+   */
+  clientSecret: string;
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -64,9 +69,9 @@ export interface CognitoAuthenticationPluginOptions {
   webUiAppClient?: WebUiAppClient;
 
   /**
-   * Cognito App Clients information for token validation supporting ALLOW_ADMIN_USER_PASSWORD_AUTH authentication mode.
+   * Additional Cognito App Clients information for token validation.
    */
-  adminAppClients?: CognitoAppClient[];
+  appClients?: CognitoAppClient[];
 }
 
 type CognitoJwtVerifierMultiUserPoolProps = CognitoAppClient & {
@@ -88,21 +93,17 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @throws {@link PluginConfigurationError} if a parameter is invalid
    */
-  public constructor({
-    cognitoDomain,
-    webUiAppClient,
-    adminAppClients = []
-  }: CognitoAuthenticationPluginOptions) {
+  public constructor({ cognitoDomain, webUiAppClient, appClients = [] }: CognitoAuthenticationPluginOptions) {
     this._webUiAppClient = webUiAppClient;
     this._baseUrl = cognitoDomain;
 
-    const appClients = [...(webUiAppClient ? [webUiAppClient] : []), ...adminAppClients];
+    const combinedAppClients = [...(webUiAppClient ? [webUiAppClient] : []), ...appClients];
 
-    if (appClients.length === 0) {
+    if (combinedAppClients.length === 0) {
       throw new PluginConfigurationError('At least one appClient must be provided');
     }
 
-    const regionMatch = appClients.find(
+    const regionMatch = combinedAppClients.find(
       // eslint-disable-next-line security/detect-unsafe-regex
       ({ userPoolId }) => !userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/)
     );
@@ -112,7 +113,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
 
     try {
       this._verifier = CognitoJwtVerifier.create(
-        appClients.map(
+        combinedAppClients.map(
           (appClient) =>
             ({
               ...appClient,

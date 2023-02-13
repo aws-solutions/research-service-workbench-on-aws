@@ -90,7 +90,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     return new CognitoAuthenticationPlugin({
       ...cognitoPluginOptions,
       webUiAppClient: undefined,
-      adminAppClients: [
+      appClients: [
         {
           ...cognitoPluginOptions.webUiAppClient!
         }
@@ -102,7 +102,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
       const badUserPoolIdConfig = {
         ...cognitoPluginOptions,
-        adminAppClients: [
+        appClients: [
           {
             ...cognitoPluginOptions.webUiAppClient!,
             userPoolId: 'badId'

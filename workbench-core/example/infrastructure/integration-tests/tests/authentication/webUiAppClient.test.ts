@@ -10,7 +10,7 @@ describe('webUi App Client', () => {
 
   it('should not support logging via username and password', async () => {
     await expect(
-      setup.createClientSession(setup.getUserPoolId(), setup.getWebUiUserClientId())
+      setup.createRootUserSession(setup.getUserPoolId(), setup.getWebUiUserClientId())
     ).rejects.toThrow(InvalidParameterException);
   });
 });

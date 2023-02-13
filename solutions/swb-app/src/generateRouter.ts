@@ -66,7 +66,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
       clientId: process.env.WEB_UI_CLIENT_ID!,
       clientSecret: process.env.WEB_UI_CLIENT_SECRET!
     },
-    adminAppClients: [
+    appClients: [
       {
         userPoolId: process.env.USER_POOL_ID!,
         clientId: process.env.CLIENT_ID!,
