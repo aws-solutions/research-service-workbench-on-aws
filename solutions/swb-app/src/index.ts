@@ -22,6 +22,7 @@ import { Ec2Error } from './errors/ec2Error';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
@@ -55,6 +56,7 @@ export {
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
+  ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin,
   CreateSshKeyRequest,
   CreateSshKeyResponse,

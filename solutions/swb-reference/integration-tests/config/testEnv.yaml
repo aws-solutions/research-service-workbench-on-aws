@@ -5,7 +5,7 @@
 # Default Env Config for launching a new environment
 envTypeId: 'et-prod-q5jnmlalb4eya,pa-lszlpvcp7wukg'
 envTypeConfigId: 'etc-7f7bd246-1d51-47e9-a5bd-a4530dd8e040'
-projectId: 'proj-98ad72ff-8352-4177-9ab7-7cb945646920'
+projectId: 'proj-8b0d7813-bd0c-41f3-80e6-67129a3d7460'
 envType: 'sagemakerNotebook'
 
 # Negative Testing

@@ -23,7 +23,7 @@ export const IdentityParser = z.object({
 });
 
 export type Identity = z.infer<typeof IdentityParser>;
-
+/* istanbul ignore next */
 export const JSONValueParser: z.ZodSchema<JSONValue> = z.lazy(() =>
   z.union([z.string(), z.number(), z.boolean(), z.record(JSONValueParser), z.array(JSONValueParser)])
 );

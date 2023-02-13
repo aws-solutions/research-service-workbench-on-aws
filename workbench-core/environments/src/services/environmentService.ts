@@ -24,7 +24,7 @@ import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 
 export interface Environment {
-  id: string | undefined;
+  id: string;
   instanceId: string | undefined;
   cidr: string;
   description: string;
@@ -326,7 +326,11 @@ export class EnvironmentService {
     }
   ): Promise<Environment> {
     try {
-      await this.getEnvironment(envId);
+      await this.getEnvironment(envId).then((env) => {
+        if (env.status === 'TERMINATED') {
+          throw Boom.badRequest(`Cannot update terminated environment ${envId}`);
+        }
+      });
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         console.log('message', e.message);

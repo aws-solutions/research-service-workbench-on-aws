@@ -40,6 +40,8 @@
     "<rootDir>/src/dataSets/permissionResponseParser.ts",
     "<rootDir>/src/dataSets/storageLocation.ts",
     "<rootDir>/src/dataSetRoutes.ts",
+    "<rootDir>/src/projectEnvironmentRoutes.ts",
+    "<rootDir>/src/projectEnvs/projectEnvPlugin.ts",
     "<rootDir>/src/projectEnvTypeConfigRoutes.ts",
     "<rootDir>/src/projectEnvTypeConfigs/environmentTypeConfig.ts",
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",

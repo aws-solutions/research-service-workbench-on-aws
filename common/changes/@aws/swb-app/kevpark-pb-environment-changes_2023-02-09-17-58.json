@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Added ProjectEnvironment routes and ProjectEnvService",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "reverting",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
