@@ -5,6 +5,7 @@
 
 import { EC2 } from '@aws-sdk/client-ec2';
 import {
+  AwsServiceError,
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
   Ec2Error,
@@ -148,7 +149,7 @@ describe('SshKeyService', () => {
         test('it throws Ec2Error', async () => {
           // OPERATE n CHECK
           await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(
-            `Could not get host EC2 clients using ${project.envMgmtRoleArn} and ${project.externalId}`
+            AwsServiceError
           );
         });
       });

@@ -17,7 +17,8 @@ import {
   SendPublicKeyResponse,
   Ec2Error,
   NoKeyExistsError,
-  NonUniqueKeyError
+  NonUniqueKeyError,
+  AwsServiceError
 } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
@@ -68,7 +69,6 @@ export default class SshKeyService implements SshKeyPlugin {
     let keys = [];
     try {
       const response = await ec2.describeKeyPairs({ Filters: [{ Name: 'key-name', Values: [sshKeyId] }] });
-      console.log(response);
       keys = response.KeyPairs || [];
     } catch (e) {
       throw new Ec2Error(e);
@@ -96,12 +96,22 @@ export default class SshKeyService implements SshKeyPlugin {
     }
   }
 
-  // TODO: docstrings
+  /**
+   * Get the user UUID from the list of tags passed or undefined if there is no user tag present.
+   *
+   * @param tags - list of {@link EC2.Tags}
+   * @returns a string user UUID or undefined if no user tag present
+   */
   private _getUserFromTags(tags: Tag[]): string | undefined {
     return tags.filter((tag) => tag.Key === 'user')[0].Value;
   }
 
-  // TODO: docstrings
+  /**
+   * Get the env mgmt role arn and external id from the project record given the project id
+   *
+   * @param projectId - the project id to get the project record for
+   * @returns an object containing two strings for the env mgmt role and external id
+   */
   private async _getEnvMgmtRoleArnAndExternalIdFromProject(
     projectId: string
   ): Promise<{ envMgmtRoleArn: string; externalId: string }> {
@@ -161,7 +171,7 @@ export default class SshKeyService implements SshKeyPlugin {
 
       return { ec2, ec2InstanceConnect };
     } catch (e) {
-      throw new Error(`Could not get host EC2 clients using ${envMgmtRoleArn} and ${externalId}`);
+      throw new AwsServiceError(`Could not get host EC2 clients using ${envMgmtRoleArn} and ${externalId}`);
     }
   }
 

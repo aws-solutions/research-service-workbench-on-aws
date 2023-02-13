@@ -13,7 +13,6 @@ export default class SshKeys extends CollectionResource {
     this._api = `${parentRoute}sshKeys`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   public sshKey(id: string): SshKey {
     return new SshKey(id, this._clientSession, this._api);
   }

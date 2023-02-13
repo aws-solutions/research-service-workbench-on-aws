@@ -30,7 +30,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
         await sshKeyService.deleteSshKey(validatedResult);
         res.status(204).send();
       } catch (e) {
-        console.log(e);
+        console.error(e);
         if (Boom.isBoom(e)) {
           throw e;
         }

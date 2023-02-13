@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
+import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Key Pair negative tests', () => {
@@ -15,17 +15,18 @@ describe('Delete Key Pair negative tests', () => {
   let currentUser: string | undefined;
   let sshKeyId: string;
   let project: { id: string };
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
+      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
 
     const { data } = await adminSession.resources.projects.create({
-      name: `TestProject-${uuidv4()}`,
+      name: randomTextGenerator.getFakeText('fakeProjectName'),
       description: 'Project for list users for project tests',
       costCenterId: costCenter.id
     });
