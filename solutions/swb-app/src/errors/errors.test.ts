@@ -4,6 +4,7 @@
  */
 
 import { AwsServiceError, isAwsServiceError } from './awsServiceError';
+import { ConflictError, isConflictError } from './conflictError';
 import { DatabaseError, isDatabaseError } from './databaseError';
 import { Ec2Error, isEc2Error } from './ec2Error';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
@@ -35,6 +36,11 @@ describe('custom error tests', () => {
     expect(isAwsServiceError(awsServiceError)).toBe(true);
   });
 
+  test('conflictError', () => {
+    const conflictError = new ConflictError();
+    expect(isConflictError(conflictError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
@@ -60,6 +66,10 @@ describe('custom error tests', () => {
 
     test('not awsServiceError', () => {
       expect(isAwsServiceError(error)).toBe(false);
+    });
+
+    test('not conflictError', () => {
+      expect(isConflictError(error)).toBe(false);
     });
   });
 });

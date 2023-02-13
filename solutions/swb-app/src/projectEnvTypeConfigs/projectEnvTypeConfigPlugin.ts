@@ -3,46 +3,56 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvironmentTypeConfig } from './environmentTypeConfig';
+import { EnvironmentTypeConfig } from '../envTypeConfigs/environmentTypeConfig';
+import { AssociateProjectEnvTypeConfigRequest } from './associateProjectEnvTypeConfigRequest';
+import { DisassociateProjectEnvTypeConfigRequest } from './disassociateProjectEnvTypeConfigRequest';
+import { GetProjectEnvTypeConfigRequest } from './getProjectEnvTypeConfigRequest';
+import { ListEnvTypeConfigProjectsRequest } from './listEnvTypeConfigProjectsRequest';
 import { ListProjectEnvTypeConfigsRequest } from './listProjectEnvTypeConfigsRequest';
+import { Project } from './project';
 
 export interface ProjectEnvTypeConfigPlugin {
   /**
    * Associate Project with Environment Type Config
    *
-   * @param projectId - Project Id to associate
-   * @param envTypeId - Environment Type Id of environment type config to associate
-   * @param envTypeConfigId - Environment Type Config Id to associate
+   * @param request - Request Object to associate
    *
    */
-  associateProjectWithEnvTypeConfig(
-    projectId: string,
-    envTypeId: string,
-    envTypeConfigId: string
-  ): Promise<void>;
+  associateProjectWithEnvTypeConfig(request: AssociateProjectEnvTypeConfigRequest): Promise<void>;
 
   /**
    * Disassociate Project and Environment Type Config
    *
-   * @param projectId - Project Id to disassociate
-   * @param envTypeId - Environment Type Id of environment type config to associate
-   * @param envTypeConfigId - Environment Type Config Id to disassociate
+   * @param request - Request Object to disassociate
    *
    */
-  disassociateProjectAndEnvTypeConfig(
-    projectId: string,
-    envTypeId: string,
-    envTypeConfigId: string
-  ): Promise<void>;
+  disassociateProjectAndEnvTypeConfig(request: DisassociateProjectEnvTypeConfigRequest): Promise<void>;
 
   /**
    * List Environment Type Configs associated with Project
    *
-   * @param projectId - Project Id
-   * @param envTypeId - Environment Type Id
+   * @param request - Request Object to filster list of associations
    *
    */
   listProjectEnvTypeConfigs(
     request: ListProjectEnvTypeConfigsRequest
   ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }>;
+
+  /**
+   * Get Environment Type Config associated with Project
+   *
+   * @param request - Request Object to get Environment Type Config
+   *
+   */
+  getEnvTypeConfig(request: GetProjectEnvTypeConfigRequest): Promise<EnvironmentTypeConfig>;
+
+  /**
+   * List Projects associated with Environment Type Config
+   *
+   * @param request - Request Object to filster list of associations
+   *
+   */
+  listEnvTypeConfigProjects(
+    request: ListEnvTypeConfigProjectsRequest
+  ): Promise<{ data: Project[]; paginationToken: string | undefined }>;
 }

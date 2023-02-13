@@ -15,6 +15,11 @@ interface Setting {
   terminatedEnvId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
+  researcherUserNameParamStorePath: string;
+  researcherPasswordParamStorePath: string;
+  projectAdminUserNameParamStorePath: string;
+  projectAdminPasswordParamStorePath: string;
+  projectForRolesTesting: string;
   costCenterId: string;
   projectName: string;
 

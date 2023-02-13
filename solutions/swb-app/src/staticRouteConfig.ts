@@ -268,9 +268,24 @@ export const routesMap: RoutesMap = {
           action: 'UPDATE',
           subject: 'ProjectDataSet'
         }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'ProjectDataSet'
+        }
       ]
     },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
@@ -291,6 +306,15 @@ export const routesMap: RoutesMap = {
         {
           action: 'DELETE',
           subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/projects`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'EnvironmentTypeConfigProject'
         }
       ]
     },

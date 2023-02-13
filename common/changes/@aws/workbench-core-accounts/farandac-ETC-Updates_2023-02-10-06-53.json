@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Update routes for ETC with project as boundary",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}
