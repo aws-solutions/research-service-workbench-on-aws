@@ -55,7 +55,7 @@ export overrideWarningsEnabled=false
 # Build Functions 
 #------------------------------------------------------------------------------
 # Echo, execute, and check the return code for a command. Exit if rc > 0
-# ex. do_cmd npm run build
+# ex. do_cmd rush build
 usage() 
 {
     echo "Usage: $0 bucket solution-name version"
@@ -285,7 +285,7 @@ if [[ $current_cdkver != $cdk_version ]]; then
     echo Required CDK version is ${cdk_version}, found ${current_cdkver}
     exit 255
 fi
-#do_cmd npm run build       # build javascript from typescript to validate the code
+#do_cmd rush build         # build javascript from typescript to validate the code
                            # cdk synth doesn't always detect issues in the typescript
                            # and may succeed using old build files. This ensures we
                            # have fresh javascript from a successful build
@@ -397,12 +397,8 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
         echo "===================================="
         cd $fname
         echo "Clean and rebuild artifacts"
-        npm run clean
-        npm ci
-        if [ "$?" = "1" ]; then
-	        echo "ERROR: Seems like package-lock.json does not exists or is out of sync with package.json. Trying npm install instead" 1>&2
-            npm install
-        fi
+        rush purge
+        rush cinstall
         cd $staging_dist_dir
         # Zip the artifact
         echo "zip -r $fname.zip $fname"
