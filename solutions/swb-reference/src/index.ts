@@ -4,10 +4,19 @@
  */
 
 /* eslint-disable no-new */
+import { WorkbenchAppRegistry } from '@aws/workbench-core-infrastructure';
 import * as cdk from 'aws-cdk-lib';
 import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-new SWBStack(app);
-
+const swbBackendStack: SWBStack = new SWBStack(app);
+new WorkbenchAppRegistry(swbBackendStack, swbBackendStack.stackId, {
+  solutionId: '',
+  solutionName: '',
+  solutionVersion: '',
+  attributeGroupName: `${swbBackendStack.stackName}-AppRegistryGroup`,
+  applicationType: '',
+  appRegistryApplicationName: `${swbBackendStack.stackName}-AppRegistryApplication`
+  //destroy: true
+});
 app.synth();
