@@ -13,7 +13,8 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
-import { ProjectAccessRequest } from '@aws/swb-app/lib/dataSets/projectAccessRequestParser';
+import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
+import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
   Action,
   AuthenticatedUser,
@@ -70,8 +71,8 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.importDataSet(request);
   }
 
-  public listDataSets(): Promise<DataSet[]> {
-    return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
+  public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
+    return this._workbenchDataSetService.listDataSets(user);
   }
 
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
@@ -129,7 +130,7 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async addAccessForProject(request: ProjectAccessRequest): Promise<PermissionsResponse> {
+  public async addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse> {
     const projectAdmin = getProjectAdminRole(request.projectId);
     const projectResearcher = getResearcherRole(request.projectId);
 
@@ -176,6 +177,62 @@ export class DataSetService implements DataSetPlugin {
     return response;
   }
 
+  public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
+    const projectAdmin = getProjectAdminRole(request.projectId);
+
+    //Make sure you're not removing the access for your project
+    if (request.authenticatedUser.roles.includes(projectAdmin)) {
+      throw new Error(
+        `${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
+      );
+    }
+
+    const projectResearcher = getResearcherRole(request.projectId);
+
+    await this._removeAuthZPermissionsForDataset(
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      request.dataSetId,
+      [projectAdmin, projectResearcher],
+      ['READ']
+    );
+
+    // `read-write` will cause the read and write permissions to get removed,
+    // so there is no need to pass in `read-only` when removing access.
+    const accessLevel = 'read-write';
+    const readWriteDeletionRequest: AddRemoveAccessPermissionRequest = {
+      authenticatedUser: request.authenticatedUser,
+      dataSetId: request.dataSetId,
+      permission: [
+        {
+          identity: projectAdmin,
+          identityType: 'GROUP',
+          accessLevel
+        },
+        {
+          identity: projectResearcher,
+          identityType: 'GROUP',
+          accessLevel
+        }
+      ]
+    };
+    const response = await this.removeAccessPermissions(readWriteDeletionRequest);
+
+    const dataset: Associable = {
+      type: SwbAuthZSubject.SWB_DATASET,
+      id: request.dataSetId
+    };
+
+    const project: Associable = {
+      type: SwbAuthZSubject.SWB_PROJECT,
+      id: request.projectId
+    };
+
+    await this._databaseService.removeAssociations(dataset, [project]);
+
+    return response;
+  }
+
   private async _addAuthZPermissionsForDataset(
     authenticatedUser: AuthenticatedUser,
     subject: string,
@@ -211,5 +268,42 @@ export class DataSetService implements DataSetPlugin {
     });
 
     await this._dynamicAuthService.createIdentityPermissions(createRequest);
+  }
+
+  private async _removeAuthZPermissionsForDataset(
+    authenticatedUser: AuthenticatedUser,
+    subject: string,
+    subjectId: string,
+    roles: string[],
+    actions: Action[]
+  ): Promise<void> {
+    const partialIdentityPermission = {
+      action: undefined,
+      effect: 'ALLOW',
+      identityId: undefined,
+      identityType: 'GROUP',
+      subjectId: subjectId,
+      subjectType: subject
+    };
+
+    const identityPermissions: IdentityPermission[] = [];
+
+    for (const role of roles) {
+      for (const action of actions) {
+        const identityPermission = IdentityPermissionParser.parse({
+          ...partialIdentityPermission,
+          identityId: role,
+          action
+        });
+        identityPermissions.push(identityPermission);
+      }
+    }
+
+    const createRequest = CreateIdentityPermissionsRequestParser.parse({
+      authenticatedUser,
+      identityPermissions
+    });
+
+    await this._dynamicAuthService.deleteIdentityPermissions(createRequest);
   }
 }

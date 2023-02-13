@@ -88,7 +88,9 @@ describe('multiStep dataset integration test', () => {
     const { data: env } = await adminSession.resources.environments.create(envBody);
 
     // Verify environment has access point for dataset
-    const { data: envDetails } = await adminSession.resources.environments.environment(env.id).get();
+    const { data: envDetails } = await adminSession.resources.environments
+      .environment(env.id, projectId)
+      .get();
     const awsRegion = settings.get('awsRegion');
     const mainAccountId = settings.get('mainAccountId');
     const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 12)}`;
@@ -126,7 +128,10 @@ describe('multiStep dataset integration test', () => {
       costCenterId
     });
     await adminSession.resources.datasets
-      .dataset(dataSetDetails.id)
+      .dataset(dataSet.id)
       .associateWithProject(unassociatedProject.id, 'read-only');
+
+    console.log('DISASSOCIATE FROM PROJECT');
+    await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
   });
 });

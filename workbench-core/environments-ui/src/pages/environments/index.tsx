@@ -66,7 +66,7 @@ const EnvironmentsPage: NextPage = () => {
     hasOpenEndPagination: true,
     pageCount: 1
   });
-  const { environments, mutate, paginationToken, areEnvironmentsLoading } = useEnvironments({
+  const { environments, mutate, paginationToken, areEnvironmentsLoading } = useEnvironments('', {
     ascending: filterParams.ascending,
     createdAtFrom: filterParams.createdAtFrom,
     createdAtTo: filterParams.createdAtTo,
@@ -183,28 +183,29 @@ const EnvironmentsPage: NextPage = () => {
     let actionLabel = 'Retrieve Workspaces Data';
     if (isOneItemSelected()) {
       const id = collectionProps.selectedItems ? collectionProps.selectedItems[0].id : '';
+      const projectId = collectionProps.selectedItems ? collectionProps.selectedItems[0].projecId : '';
       try {
         setError('');
         switch (action) {
           case 'TERMINATE':
             setTerminatingIds((prev) => new Set(prev.add(id)));
             actionLabel = 'Terminate Workspace';
-            await terminate(id);
+            await terminate(projectId, id);
             break;
           case 'STOP':
             setStoppingIds((prev) => new Set(prev.add(id)));
             actionLabel = 'Stop Workspace';
-            await stop(id);
+            await stop(projectId, id);
             break;
           case 'START':
             setstartingIds((prev) => new Set(prev.add(id)));
             actionLabel = 'Start Workspace';
-            await start(id);
+            await start(projectId, id);
             break;
           case 'CONNECT':
             const connectingEnvId = collectionProps.selectedItems ? collectionProps.selectedItems[0].id : '';
             setIsLoadingEnvConnection(true);
-            const response = await connect(connectingEnvId);
+            const response = await connect(projectId, connectingEnvId);
             setEnvConnectResponse(response);
             setIsLoadingEnvConnection(false);
             actionLabel = 'Connect to Workspace';
