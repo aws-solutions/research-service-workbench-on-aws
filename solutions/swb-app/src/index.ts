@@ -16,15 +16,37 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { CreateEnvironmentTypeConfigRequest } from './envTypeConfigs/createEnvironmentTypeConfigRequest';
+import { DeleteEnvironmentTypeConfigRequest } from './envTypeConfigs/deleteEnvironmentTypeConfigRequest';
+import { EnvironmentTypeConfig } from './envTypeConfigs/environmentTypeConfig';
+import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
+import { GetEnvironmentTypeConfigRequest } from './envTypeConfigs/getEnvironmentTypeConfigRequest';
+import { ListEnvironmentTypeConfigsRequest } from './envTypeConfigs/listEnvironmentTypeConfigsRequest';
+import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
+import { AwsServiceError } from './errors/awsServiceError';
+import { ConflictError } from './errors/conflictError';
 import { DatabaseError } from './errors/databaseError';
 import { Ec2Error } from './errors/ec2Error';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
+import { AssociateProjectEnvTypeConfigRequest } from './projectEnvTypeConfigs/associateProjectEnvTypeConfigRequest';
+import { DisassociateProjectEnvTypeConfigRequest } from './projectEnvTypeConfigs/disassociateProjectEnvTypeConfigRequest';
+import {
+  GetProjectEnvTypeConfigRequest,
+  GetProjectEnvTypeConfigRequestParser
+} from './projectEnvTypeConfigs/getProjectEnvTypeConfigRequest';
+import {
+  ListEnvTypeConfigProjectsRequest,
+  ListEnvTypeConfigProjectsRequestParser
+} from './projectEnvTypeConfigs/listEnvTypeConfigProjectsRequest';
+
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
+import { Project } from './projectEnvTypeConfigs/project';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
 import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
@@ -54,6 +76,7 @@ export {
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
+  ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
@@ -68,5 +91,21 @@ export {
   DatabaseError,
   NonUniqueKeyError,
   NoKeyExistsError,
-  Ec2Error
+  Ec2Error,
+  AwsServiceError,
+  CreateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequest,
+  DeleteEnvironmentTypeConfigRequest,
+  GetEnvironmentTypeConfigRequest,
+  ListEnvironmentTypeConfigsRequest,
+  EnvironmentTypeConfig,
+  EnvTypeConfigPlugin,
+  AssociateProjectEnvTypeConfigRequest,
+  DisassociateProjectEnvTypeConfigRequest,
+  ConflictError,
+  GetProjectEnvTypeConfigRequest,
+  GetProjectEnvTypeConfigRequestParser,
+  ListEnvTypeConfigProjectsRequest,
+  ListEnvTypeConfigProjectsRequestParser,
+  Project
 };

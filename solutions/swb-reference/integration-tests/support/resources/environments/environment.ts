@@ -10,8 +10,11 @@ import { poll, sleep } from '../../utils/utilities';
 import Resource from '../base/resource';
 
 export default class Environment extends Resource {
-  public constructor(id: string, clientSession: ClientSession, parentApi: string) {
+  private _projectId: string;
+  public constructor(id: string, clientSession: ClientSession, parentApi: string, projectId?: string) {
     super(clientSession, 'environment', id, parentApi);
+    this._projectId = projectId ?? this._settings.get('projectId');
+    this._api = `projects/${this._projectId}/environments/${id}`;
   }
 
   public async connect(): Promise<AxiosResponse> {
@@ -45,16 +48,16 @@ export default class Environment extends Resource {
     try {
       console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
       await poll(
-        async () => defAdminSession.resources.environments.environment(this._id).get(),
+        async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
         (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );
       const { data: completedResource } = await defAdminSession.resources.environments
-        .environment(this._id)
+        .environment(this._id, this._projectId)
         .get();
       envStatus = completedResource.status;
       console.log(`Terminating environment ${this._id}.`);
-      await defAdminSession.resources.environments.environment(this._id).terminate();
+      await defAdminSession.resources.environments.environment(this._id, this._projectId).terminate();
       console.log(`Deleted environment ${this._id}`);
     } catch (e) {
       console.log(

@@ -56,12 +56,17 @@ describe('CASL Authorization Plugin', () => {
           subject: 'Sample',
           effect: 'DENY',
           reason: 'User is not capable of updating'
+        },
+        {
+          action: 'UPDATE',
+          subject: 'Sample',
+          effect: 'ALLOW'
         }
       ];
 
       caslAuthorizationPlugin = new CASLAuthorizationPlugin();
     });
-    test('unauthorized user with action and subject should throws ForbiddenError with reason', async () => {
+    test('Ensure DENY takes precedence, unauthorized user with action and subject should throws ForbiddenError with reason', async () => {
       mockOperations = [
         {
           action: 'UPDATE',
@@ -164,6 +169,14 @@ describe('CASL Authorization Plugin', () => {
           conditions: { env: { $eq: 'SampleEnv' } }
         },
         {
+          effect: 'DENY',
+          action: 'UPDATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        },
+        {
           effect: 'ALLOW',
           action: 'UPDATE',
           identityType: 'GROUP',
@@ -173,11 +186,12 @@ describe('CASL Authorization Plugin', () => {
         },
         {
           effect: 'DENY',
-          action: 'UPDATE',
+          action: 'DELETE',
           identityType: 'GROUP',
           identityId: 'SampleGroup',
           subjectType: 'SampleSubject',
-          subjectId: '1234'
+          subjectId: '*',
+          conditions: { env: { $eq: 'SampleEnv' } }
         }
       ];
       caslAuthorizationPlugin = new CASLAuthorizationPlugin();
@@ -199,10 +213,10 @@ describe('CASL Authorization Plugin', () => {
             mockIdentityPermissions,
             mockDynamicOperations
           )
-      ).not.toThrow();
+      ).not.toThrow(ForbiddenError);
     });
 
-    test('Check for a invalid dynamic operations due invalid conditions', async () => {
+    test('Check for an invalid dynamic operations due invalid conditions', async () => {
       const mockDynamicOperations: DynamicOperation[] = [
         {
           action: 'CREATE',
@@ -219,6 +233,24 @@ describe('CASL Authorization Plugin', () => {
           mockDynamicOperations
         )
       ).rejects.toThrow(new ForbiddenError('Cannot execute "CREATE" on "SampleSubject"'));
+    });
+    test('Check for valid dynamic operations with invalid conditions due to DENY', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'DELETE',
+          subject: {
+            subjectType: 'SampleSubject',
+            subjectId: '1234',
+            env: 'SampleEnv'
+          }
+        }
+      ];
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        )
+      ).rejects.toThrow(ForbiddenError);
     });
     test('Ensure DENY takes precedence', async () => {
       const mockDynamicOperations: DynamicOperation[] = [

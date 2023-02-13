@@ -243,13 +243,28 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentTypeConfigProject'
+  },
+  {
+    effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'ProjectDataSet'
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
-    subject: 'SshKeys'
+    subject: 'SshKey'
   }
 ];
 
@@ -311,8 +326,23 @@ const researcherPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
-    subject: 'SshKeys'
+    subject: 'ProjectEnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKey'
   }
 ];
 

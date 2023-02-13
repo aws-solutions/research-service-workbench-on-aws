@@ -8,8 +8,14 @@ import {
   resourceTypeToKey,
   validRolesRegExpAsString,
   uuidRegExpAsString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  validSshKeyUuidRegExpAsString
 } from '@aws/workbench-core-base';
+
+const projectsIdRoutePrefix: string = `/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
+const projectsIdEnvsIdRoutePrefix: string =
+  projectsIdRoutePrefix +
+  `/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`;
 
 export const routesMap: RoutesMap = {
   '/awsAccounts': {
@@ -128,6 +134,14 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'Environment'
       }
+    ]
+  },
+  [`${projectsIdRoutePrefix}/environments`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Environment'
+      }
     ],
     POST: [
       {
@@ -136,7 +150,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
+  [projectsIdEnvsIdRoutePrefix]: {
     GET: [
       {
         action: 'READ',
@@ -144,7 +158,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -152,7 +166,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -160,7 +174,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -168,7 +182,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
+  [`${projectsIdEnvsIdRoutePrefix}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -254,9 +268,24 @@ export const routesMap: RoutesMap = {
           action: 'UPDATE',
           subject: 'ProjectDataSet'
         }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'ProjectDataSet'
+        }
       ]
     },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
@@ -277,6 +306,15 @@ export const routesMap: RoutesMap = {
         {
           action: 'DELETE',
           subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/projects`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'EnvironmentTypeConfigProject'
         }
       ]
     },
@@ -375,7 +413,16 @@ export const routesMap: RoutesMap = {
         subject: 'Role'
       }
     ]
-  }
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
+    {
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'SshKey'
+        }
+      ]
+    }
 };
 
 export const routesIgnored: RoutesIgnored = {

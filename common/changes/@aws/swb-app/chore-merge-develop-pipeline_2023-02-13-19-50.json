@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Changes from Solutions Pipeline creation",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

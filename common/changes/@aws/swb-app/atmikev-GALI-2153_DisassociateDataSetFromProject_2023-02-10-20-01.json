@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Add route to disassociate project from dataset",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

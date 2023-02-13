@@ -4,8 +4,26 @@
  */
 
 import { validateAndParse } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
+import { isConflictError } from './errors/conflictError';
+import {
+  AssociateProjectEnvTypeConfigRequest,
+  AssociateProjectEnvTypeConfigRequestParser
+} from './projectEnvTypeConfigs/associateProjectEnvTypeConfigRequest';
+import {
+  DisassociateProjectEnvTypeConfigRequest,
+  DisassociateProjectEnvTypeConfigRequestParser
+} from './projectEnvTypeConfigs/disassociateProjectEnvTypeConfigRequest';
+import {
+  GetProjectEnvTypeConfigRequest,
+  GetProjectEnvTypeConfigRequestParser
+} from './projectEnvTypeConfigs/getProjectEnvTypeConfigRequest';
+import {
+  ListEnvTypeConfigProjectsRequest,
+  ListEnvTypeConfigProjectsRequestParser
+} from './projectEnvTypeConfigs/listEnvTypeConfigProjectsRequest';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
@@ -20,11 +38,16 @@ export function setUpProjectEnvTypeConfigRoutes(
   router.put(
     '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(
-        req.params.projectId,
-        req.params.envTypeId,
-        req.params.envTypeConfigId
+      const request = validateAndParse<AssociateProjectEnvTypeConfigRequest>(
+        AssociateProjectEnvTypeConfigRequestParser,
+        {
+          projectId: req.params.projectId,
+          envTypeId: req.params.envTypeId,
+          envTypeConfigId: req.params.envTypeConfigId,
+          user: res.locals.user
+        }
       );
+      await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(request);
       res.status(201).send();
     })
   );
@@ -32,12 +55,24 @@ export function setUpProjectEnvTypeConfigRoutes(
   router.delete(
     '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      await projectEnvTypeConfigService.disassociateProjectAndEnvTypeConfig(
-        req.params.projectId,
-        req.params.envTypeId,
-        req.params.envTypeConfigId
+      const request = validateAndParse<DisassociateProjectEnvTypeConfigRequest>(
+        DisassociateProjectEnvTypeConfigRequestParser,
+        {
+          projectId: req.params.projectId,
+          envTypeId: req.params.envTypeId,
+          envTypeConfigId: req.params.envTypeConfigId,
+          user: res.locals.user
+        }
       );
-      res.status(204).send();
+      try {
+        await projectEnvTypeConfigService.disassociateProjectAndEnvTypeConfig(request);
+        res.status(204).send();
+      } catch (e) {
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+        throw e;
+      }
     })
   );
 
@@ -49,6 +84,31 @@ export function setUpProjectEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, projectId: req.params.projectId, ...req.body }
       );
       const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
+      res.status(201).send(relationships);
+    })
+  );
+
+  router.get(
+    '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const request = validateAndParse<GetProjectEnvTypeConfigRequest>(GetProjectEnvTypeConfigRequestParser, {
+        envTypeId: req.params.envTypeId,
+        projectId: req.params.projectId,
+        envTypeConfigId: req.params.envTypeConfigId
+      });
+      const relationship = await projectEnvTypeConfigService.getEnvTypeConfig(request);
+      res.status(201).send(relationship);
+    })
+  );
+
+  router.get(
+    '/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects',
+    wrapAsync(async (req: Request, res: Response) => {
+      const request = validateAndParse<ListEnvTypeConfigProjectsRequest>(
+        ListEnvTypeConfigProjectsRequestParser,
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.body }
+      );
+      const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
       res.status(201).send(relationships);
     })
   );

@@ -9,6 +9,7 @@ import Datasets from './resources/datasets/datasets';
 import Environments from './resources/environments/environments';
 import EnvironmentTypes from './resources/environmentTypes/environmentTypes';
 import Projects from './resources/projects/projects';
+import SshKeys from './resources/sshKeys/sshKeys';
 import Users from './resources/users/users';
 
 function getResources(clientSession: ClientSession): Resources {
@@ -19,7 +20,8 @@ function getResources(clientSession: ClientSession): Resources {
     users: new Users(clientSession),
     costCenters: new CostCenters(clientSession),
     environmentTypes: new EnvironmentTypes(clientSession),
-    projects: new Projects(clientSession)
+    projects: new Projects(clientSession),
+    sshKeys: new SshKeys(clientSession)
   };
 }
 
@@ -31,6 +33,7 @@ interface Resources {
   costCenters: CostCenters;
   environmentTypes: EnvironmentTypes;
   projects: Projects;
+  sshKeys: SshKeys;
 }
 
 export { getResources, Resources };

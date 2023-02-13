@@ -2,30 +2,36 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import {
-  Environment,
-  EnvironmentService,
-  EnvironmentTypeConfigService,
-  DeleteEnvironmentTypeConfigRequest,
-  DeleteEnvironmentTypeConfigRequestParser,
-  CreateEnvironmentTypeConfigRequest,
-  UpdateEnvironmentTypeConfigRequest,
-  ListEnvironmentTypeConfigsRequest,
-  CreateEnvironmentTypeConfigRequestParser,
-  UpdateEnvironmentTypeConfigRequestParser,
-  ListEnvironmentTypeConfigsRequestParser
-} from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import {
+  CreateEnvironmentTypeConfigRequest,
+  CreateEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/createEnvironmentTypeConfigRequest';
+import {
+  DeleteEnvironmentTypeConfigRequest,
+  DeleteEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/deleteEnvironmentTypeConfigRequest';
+import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
+import {
+  GetEnvironmentTypeConfigRequest,
+  GetEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/getEnvironmentTypeConfigRequest';
+import {
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
+} from './envTypeConfigs/listEnvironmentTypeConfigsRequest';
+import {
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { wrapAsync } from './errorHandlers';
+import { isConflictError } from './errors/conflictError';
 import { validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeConfigRoutes(
   router: Router,
-  environmentTypeConfigService: EnvironmentTypeConfigService,
-  environmentService: EnvironmentService
+  environmentTypeConfigService: EnvTypeConfigPlugin
 ): void {
   // Create envTypeConfig
   router.post(
@@ -35,9 +41,7 @@ export function setUpEnvTypeConfigRoutes(
         CreateEnvironmentTypeConfigRequestParser,
         { envTypeId: req.params.envTypeId, ...req.body }
       );
-      const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
-        envTypeConfigRequest
-      );
+      const envTypeConfig = await environmentTypeConfigService.createEnvTypeConfig(envTypeConfigRequest);
       res.status(201).send(envTypeConfig);
     })
   );
@@ -46,10 +50,11 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(
-        req.params.envTypeId,
-        req.params.envTypeConfigId
+      const envTypeConfigRequest = validateAndParse<GetEnvironmentTypeConfigRequest>(
+        GetEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId }
       );
+      const envTypeConfig = await environmentTypeConfigService.getEnvTypeConfig(envTypeConfigRequest);
       res.send(envTypeConfig);
     })
   );
@@ -66,38 +71,15 @@ export function setUpEnvTypeConfigRoutes(
         DeleteEnvironmentTypeConfigRequestParser,
         envTypeConfigDeleteRequest
       );
-
-      async function checkDependency(envTypeId: string, envTypeConfigId: string): Promise<void> {
-        const typeId = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
-        let paginationToken: string | undefined = undefined;
-
-        do {
-          const dependencies: { data: Environment[]; paginationToken: string | undefined } =
-            await environmentService.listEnvironments(
-              res.locals.user,
-              { type: typeId },
-              200,
-              paginationToken
-            );
-          if (dependencies?.data) {
-            const activeEnvironments = dependencies.data.filter((e) => e.status !== 'FAILED');
-            if (activeEnvironments.length > 0) {
-              const activeEnvironmentsSummary = activeEnvironments
-                .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
-                .join('\n');
-              throw Boom.conflict(
-                `There are active environments using this configuration: ${activeEnvironmentsSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
-              );
-            }
-            paginationToken = dependencies.paginationToken;
-          }
-        } while (paginationToken !== undefined);
+      try {
+        const envTypeConfig = await environmentTypeConfigService.deleteEnvTypeConfig(validatedRequest);
+        res.send(envTypeConfig);
+      } catch (e) {
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+        throw e;
       }
-      const envTypeConfig = await environmentTypeConfigService.softDeleteEnvironmentTypeConfig(
-        validatedRequest,
-        checkDependency
-      );
-      res.send(envTypeConfig);
     })
   );
 
@@ -110,9 +92,7 @@ export function setUpEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, ...req.body }
       );
 
-      const envTypeConfig = await environmentTypeConfigService.listEnvironmentTypeConfigs(
-        listEnvTypeConfigRequest
-      );
+      const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);
       res.send(envTypeConfig);
     })
   );
@@ -125,9 +105,7 @@ export function setUpEnvTypeConfigRoutes(
         UpdateEnvironmentTypeConfigRequestParser,
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.body }
       );
-      const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
-        envTypeConfigRequest
-      );
+      const envTypeConfig = await environmentTypeConfigService.updateEnvTypeConfig(envTypeConfigRequest);
       res.status(200).send(envTypeConfig);
     })
   );
