@@ -8,7 +8,8 @@ import { z } from 'zod';
 export const DeleteSshKeyRequestParser = z
   .object({
     projectId: z.string(),
-    sshKeyId: z.string()
+    sshKeyId: z.string(),
+    currentUserId: z.string()
   })
   .strict();
 

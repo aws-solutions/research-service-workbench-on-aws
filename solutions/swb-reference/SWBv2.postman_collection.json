@@ -1022,7 +1022,7 @@
               "query": [
                 {
                   "key": "paginationToken",
-                  "value": "eyJwayI6IkVUQyIsInNrIjoiRVQjNmM3MzJlMTEtODdmYi00MGU3LWFlM2ItMjU1MTY1OGQ3OGYwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9",
+                  "value": "",
                   "disabled": true
                 },
                 {
@@ -1036,6 +1036,102 @@
                   "key": "envTypeId",
                   "value": "",
                   "description": "ID of environment type associated with this config"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get EnvTypeConfig associated with Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List projects by envTypeConfig",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
                 }
               ]
             }
@@ -1833,6 +1929,45 @@
               }
             },
             "url": "{{API_URL}}/awsAccountTemplateUrls"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SSH keys",
+      "items": [
+        {
+          "name": "Delete SSH Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys/:sshKeyId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys", ":sshKeyId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "sshKeyId",
+                  "value": ""
+                }
+              ]
+            }
           },
           "response": []
         }

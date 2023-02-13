@@ -8,7 +8,8 @@ import {
   resourceTypeToKey,
   validRolesRegExpAsString,
   uuidRegExpAsString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  validSshKeyUuidRegExpAsString
 } from '@aws/workbench-core-base';
 
 const projectsIdRoutePrefix: string = `/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
@@ -284,6 +285,15 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
     {
       PUT: [
@@ -296,6 +306,15 @@ export const routesMap: RoutesMap = {
         {
           action: 'DELETE',
           subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/projects`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'EnvironmentTypeConfigProject'
         }
       ]
     },
@@ -394,7 +413,16 @@ export const routesMap: RoutesMap = {
         subject: 'Role'
       }
     ]
-  }
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
+    {
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'SshKey'
+        }
+      ]
+    }
 };
 
 export const routesIgnored: RoutesIgnored = {
