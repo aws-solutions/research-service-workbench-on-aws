@@ -23,8 +23,10 @@ import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
 import { GetEnvironmentTypeConfigRequest } from './envTypeConfigs/getEnvironmentTypeConfigRequest';
 import { ListEnvironmentTypeConfigsRequest } from './envTypeConfigs/listEnvironmentTypeConfigsRequest';
 import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
+import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
 import { DatabaseError } from './errors/databaseError';
+import { Ec2Error } from './errors/ec2Error';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
@@ -89,6 +91,8 @@ export {
   DatabaseError,
   NonUniqueKeyError,
   NoKeyExistsError,
+  Ec2Error,
+  AwsServiceError,
   CreateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequest,
   DeleteEnvironmentTypeConfigRequest,

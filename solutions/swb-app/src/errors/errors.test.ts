@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AwsServiceError, isAwsServiceError } from './awsServiceError';
 import { ConflictError, isConflictError } from './conflictError';
 import { DatabaseError, isDatabaseError } from './databaseError';
+import { Ec2Error, isEc2Error } from './ec2Error';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
 
@@ -22,6 +24,16 @@ describe('custom error tests', () => {
   test('nonUniqueKeyError', () => {
     const nonUniqueKeyError = new NonUniqueKeyError();
     expect(isNonUniqueKeyError(nonUniqueKeyError)).toBe(true);
+  });
+
+  test('ec2Error', () => {
+    const ec2Error = new Ec2Error();
+    expect(isEc2Error(ec2Error)).toBe(true);
+  });
+
+  test('awsServiceError', () => {
+    const awsServiceError = new AwsServiceError();
+    expect(isAwsServiceError(awsServiceError)).toBe(true);
   });
 
   test('conflictError', () => {
@@ -46,6 +58,14 @@ describe('custom error tests', () => {
 
     test('not nonUniqueKeyError', () => {
       expect(isNonUniqueKeyError(error)).toBe(false);
+    });
+
+    test('not ec2Error', () => {
+      expect(isEc2Error(error)).toBe(false);
+    });
+
+    test('not awsServiceError', () => {
+      expect(isAwsServiceError(error)).toBe(false);
     });
 
     test('not conflictError', () => {
