@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import * as Boom from '@hapi/boom';
 import { ZodTypeAny } from 'zod';
 import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import QueryParams from '../interfaces/queryParams';
@@ -179,5 +180,35 @@ export class MetadataService {
         addDeleteRequests: items
       })
       .execute();
+  }
+
+  /**
+   * Retrieves a single instance of dependency metadata by Ids
+   * @param mainEntityResourceType - main entity resource type
+   * @param mainEntityId - main entity id
+   * @param dependencyResourceType - dependency resource type
+   * @param dependencyId - dependency entity id
+   * @param parser - Zod parser for metadata object
+   * @returns object with metadata information
+   */
+  public async getMetadataItem<DependencyMetadata extends { pk: string; sk: string; id: string }>(
+    mainEntityResourceType: string,
+    mainEntityId: string,
+    dependencyResourceType: string,
+    dependencyId: string,
+    parser: ZodTypeAny
+  ): Promise<DependencyMetadata> {
+    const item = await this._ddbService.getItem({
+      key: {
+        pk: `${mainEntityResourceType}#${mainEntityId}`,
+        sk: `${dependencyResourceType}#${dependencyId}`
+      }
+    });
+    if (item === undefined) {
+      throw Boom.notFound('Resource not found');
+    } else {
+      const resource: DependencyMetadata = parser.parse(item);
+      return Promise.resolve(resource);
+    }
   }
 }

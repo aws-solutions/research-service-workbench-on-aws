@@ -38,6 +38,7 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
+import { EnvTypeConfigService } from './services/envTypeConfigService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 import SshKeyService from './services/sshKeyService';
@@ -120,9 +121,9 @@ const apiRouteConfig: ApiRouteConfig = {
     dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
-  environmentService: environmentService,
+  environmentService,
   environmentTypeService: envTypeService,
-  environmentTypeConfigService: envTypeConfigService,
+  environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
   projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
@@ -134,7 +135,9 @@ const apiRouteConfig: ApiRouteConfig = {
     metadataService,
     projectService,
     envTypeConfigService,
-    envTypeService
+    envTypeService,
+    environmentService,
+    dynamicAuthorizationService
   ),
   sshKeyService: new SshKeyService(aws),
   authorizationService: dynamicAuthorizationService
