@@ -8,7 +8,10 @@ import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
+import { isAwsServiceError } from './errors/awsServiceError';
 import { isEc2Error } from './errors/ec2Error';
+import { isNoKeyExistsError } from './errors/noKeyExistsError';
+import { isNonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { DeleteSshKeyRequest, DeleteSshKeyRequestParser } from './sshKeys/deleteSshKeyRequest';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
@@ -32,12 +35,16 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw e;
         }
 
-        if (isForbiddenError(e)) {
-          throw Boom.forbidden(e.message);
+        if (isNoKeyExistsError(e)) {
+          throw Boom.notFound(e.message);
         }
 
-        if (isEc2Error(e)) {
+        if (isEc2Error(e) || isAwsServiceError(e) || isNonUniqueKeyError(e)) {
           throw Boom.badImplementation(e.message);
+        }
+
+        if (isForbiddenError(e)) {
+          throw Boom.forbidden(e.message);
         }
 
         throw Boom.badImplementation(`There was a problem deleting ${validatedResult.sshKeyId}`);

@@ -90,20 +90,26 @@ describe('Delete Key Pair negative tests', () => {
   });
 
   describe('with SSH Key that does not exist', () => {
+    let nonExistentSshKeyId: string;
+
     beforeEach(() => {
-      sshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+      nonExistentSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
 
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(sshKeyId).delete();
+        await adminSession.resources.projects
+          .project(project.id)
+          .sshKeys()
+          .sshKey(nonExistentSshKeyId)
+          .delete();
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(404, {
             statusCode: 404,
             error: 'Not Found',
-            message: `Key ${sshKeyId} does not exist`
+            message: `Key ${nonExistentSshKeyId} does not exist`
           })
         );
       }
