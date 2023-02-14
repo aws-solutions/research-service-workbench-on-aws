@@ -12,7 +12,6 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('Delete Key Pair negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  let currentUser: string | undefined;
   let sshKeyId: string;
   let project: { id: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
@@ -35,7 +34,6 @@ describe('Delete Key Pair negative tests', () => {
   });
 
   beforeEach(async () => {
-    currentUser = adminSession.getUserId();
     expect.hasAssertions();
   });
 
