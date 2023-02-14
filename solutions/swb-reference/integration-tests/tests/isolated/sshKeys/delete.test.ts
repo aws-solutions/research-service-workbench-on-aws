@@ -43,23 +43,29 @@ describe('Delete Key Pair negative tests', () => {
     await setup.cleanup();
   });
 
-  // TODO: key has to exist for this test
+  // TODO: multiple user session support has to exist for this test
   describe('when current user does not own key', () => {
-    beforeEach(() => {
-      currentUser = 'user-00000000-0000-0000-0000-000000000000';
-      sshKeyId = `sshkey-`;
+    let existingSshKeyId: string;
+    let secondaryUserId: string;
+
+    beforeEach(async () => {
+      // This needs to happen in not the defaultAdminSession so the default admin does not own this key
+      // This user session must still have access to the project used
+      // const {data: existingSshKey} = await adminSession.resources.projects.project(project.id).sshKeys().create();
+      // secondaryUserId = adminSession.getUserId()!;
+      // existingSshKeyId = existingSshKey.sshKeyId;
     });
 
     test.skip('it throws 403 error', async () => {
       try {
-        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(sshKeyId).delete();
+        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(existingSshKeyId).delete();
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(403, {
             statusCode: 403,
             error: 'Forbidden',
-            message: `Current user ${currentUser} cannot delete a key they do not own`
+            message: `Current user ${secondaryUserId} cannot delete a key they do not own`
           })
         );
       }
