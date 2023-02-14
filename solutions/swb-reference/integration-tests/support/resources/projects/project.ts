@@ -6,7 +6,7 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
 import EnvironmentTypes from '../environmentTypes/environmentTypes';
-import KeyPairs from '../keyPairs/keyPairs';
+import SshKeys from '../sshKeys/sshKeys';
 
 export default class Project extends Resource {
   private _clientSession: ClientSession;
@@ -38,8 +38,8 @@ export default class Project extends Resource {
     return this._axiosInstance.put(`${this._api}/softDelete`);
   }
 
-  public keyPairs(): KeyPairs {
-    return new KeyPairs(this._clientSession, this._api);
+  public sshKeys(): SshKeys {
+    return new SshKeys(this._clientSession, this._api);
   }
 
   protected async cleanup(): Promise<void> {

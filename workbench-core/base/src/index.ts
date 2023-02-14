@@ -49,7 +49,8 @@ import {
   productIdRegExpString,
   provisionArtifactIdRegExpString,
   groupIDRegExpAsString,
-  validRolesRegExpAsString
+  validRolesRegExpAsString,
+  validSshKeyUuidRegExpAsString
 } from './utilities/textUtil';
 import { validateAndParse } from './utilities/validatorHelper';
 
@@ -99,5 +100,6 @@ export {
   RelationshipDDBItem,
   toPaginationToken,
   fromPaginationToken,
-  runInBatches
+  runInBatches,
+  validSshKeyUuidRegExpAsString
 };

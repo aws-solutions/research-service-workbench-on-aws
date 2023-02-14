@@ -10,7 +10,7 @@ export class NoKeyExistsError extends Error {
     super(message);
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
+    if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, NoKeyExistsError);
     }
 
@@ -20,5 +20,5 @@ export class NoKeyExistsError extends Error {
 }
 
 export function isNoKeyExistsError(error: unknown): error is NoKeyExistsError {
-  return Boolean(error) && (error as NoKeyExistsError).isNoKeyExistsError === true;
+  return Boolean(error) && error instanceof Error && (error as NoKeyExistsError).isNoKeyExistsError === true;
 }

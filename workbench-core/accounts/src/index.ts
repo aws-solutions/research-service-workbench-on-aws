@@ -33,6 +33,7 @@ import { CreateProjectRequest, CreateProjectRequestParser } from './models/proje
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import { Project } from './models/projects/project';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -75,5 +76,6 @@ export {
   GetAccountRequestParser,
   GetAccountRequest,
   AssignUserToProjectRequestParser,
-  AssignUserToProjectRequest
+  AssignUserToProjectRequest,
+  Project
 };

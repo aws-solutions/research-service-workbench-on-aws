@@ -10,7 +10,7 @@ export class NonUniqueKeyError extends Error {
     super(message);
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
+    if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, NonUniqueKeyError);
     }
 
@@ -20,5 +20,7 @@ export class NonUniqueKeyError extends Error {
 }
 
 export function isNonUniqueKeyError(error: unknown): error is NonUniqueKeyError {
-  return Boolean(error) && (error as NonUniqueKeyError).isNonUniqueKeyError === true;
+  return (
+    Boolean(error) && error instanceof Error && (error as NonUniqueKeyError).isNonUniqueKeyError === true
+  );
 }
