@@ -4,7 +4,7 @@
  */
 
 import * as crypto from 'crypto';
-import { EC2, Tag } from '@aws-sdk/client-ec2';
+import { DescribeKeyPairsCommandOutput, EC2, Tag } from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   CreateSshKeyRequest,
@@ -44,9 +44,8 @@ export default class SshKeyService implements SshKeyPlugin {
   ): Promise<ListUserSshKeysForProjectResponse> {
     const { projectId, userId } = request;
 
-    // get project
-    const project = await this._projectService.getProject({ projectId });
-    const { envMgmtRoleArn, externalId } = project;
+    // get envMgmtRoleArn and externalId from project record
+    const { envMgmtRoleArn, externalId } = await this._projectService.getProject({ projectId });
 
     // get EC2 client
     const { ec2 } = await this._getEc2ClientsForHostingAccount(
@@ -56,28 +55,31 @@ export default class SshKeyService implements SshKeyPlugin {
       this._aws
     );
 
-    // list user key
-    const sshKeyId = `sshkey-${userId}#${projectId}`; // TODO
-    const ec2DescribeKeyPairsParam = {
-      Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
-      IncludePublicKey: true
-    };
+    // get ssh key from ec2
+    let keyPairs = [];
+    const sshKeyId = this._getSshKeyId(userId, projectId);
     try {
-      const response = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
-      return {
-        sshKeys: [
-          {
-            projectId,
-            publicKey: response.KeyPairs.PublicKey,
-            sshKeyId: sshKeyId,
-            owner: userId,
-            createTime: response.KeyPairs.createTime
-          }
-        ]
+      const ec2DescribeKeyPairsParam = {
+        Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
+        IncludePublicKey: true
       };
+      const response: DescribeKeyPairsCommandOutput = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
+      keyPairs = response.KeyPairs || [];
     } catch (e) {
       throw new Ec2Error(e);
     }
+
+    const res: ListUserSshKeysForProjectResponse = { sshKeys: [] };
+    keyPairs.forEach((key) => {
+      res.sshKeys.push({
+        publicKey: key.PublicKey!,
+        createTime: key.CreateTime!.toISOString(),
+        projectId,
+        sshKeyId,
+        owner: userId
+      });
+    });
+    return res;
   }
 
   /**

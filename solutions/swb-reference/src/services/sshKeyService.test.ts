@@ -3,17 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EC2 } from '@aws-sdk/client-ec2';
+import { EC2, KeyPairInfo } from '@aws-sdk/client-ec2';
 import {
   AwsServiceError,
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
   Ec2Error,
   ListUserSshKeysForProjectRequest,
+  ListUserSshKeysForProjectResponse,
   NoKeyExistsError,
   NonUniqueKeyError,
-  SendPublicKeyRequest,
-  SshKey
+  SendPublicKeyRequest
 } from '@aws/swb-app';
 import { Project, ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
@@ -26,7 +26,7 @@ describe('SshKeyService', () => {
   const aws = {} as AwsService;
   const projectService = {} as ProjectService;
   const sshKeyService: SshKeyService = new SshKeyService(aws, projectService);
-  let sshKey: SshKey;
+  //let sshKey: SshKey; //TODO
 
   beforeAll(() => {
     process.env.AWS_REGION = region;
@@ -34,38 +34,24 @@ describe('SshKeyService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    sshKey = {
-      sshKeyId: 'ssh-123',
-      createTime: 'date-123',
-      projectId: 'proj-123',
-      owner: 'user-123',
-      publicKey: 'SSH#EXAMPLEKEY'
-    };
+    // sshKey = { //TODO
+    //   sshKeyId: 'ssh-123',
+    //   createTime: 'date-123',
+    //   projectId: 'proj-123',
+    //   owner: 'user-123',
+    //   publicKey: 'SSH#EXAMPLEKEY'
+    // };
   });
-
   describe('listUserSshKeysForProject', () => {
     let listUserSshKeysForProjectRequest: ListUserSshKeysForProjectRequest;
-
+    let mockSshKeyId: string;
     beforeEach(() => {
-      listUserSshKeysForProjectRequest = { projectId: 'proj-123', userId: 'user-123' };
-    });
-
-    describe('when no key exists', () => {
-      test.skip('it throws NoKeyExistsError', async () => {
-        // OPERATE n CHECK
-        await expect(() =>
-          sshKeyService.listUserSshKeysForProject(listUserSshKeysForProjectRequest)
-        ).rejects.toThrow(NoKeyExistsError);
-      });
-    });
-
-    describe('when multiple keys exists', () => {
-      test.skip('it throws NonUniqueKeyQuery', async () => {
-        // OPERATE n CHECK
-        await expect(() =>
-          sshKeyService.listUserSshKeysForProject(listUserSshKeysForProjectRequest)
-        ).rejects.toThrow(NonUniqueKeyError);
-      });
+      listUserSshKeysForProjectRequest = {
+        projectId: 'proj-123',
+        userId: 'user-123'
+      };
+      mockSshKeyId = 'sshkey-123';
+      sshKeyService['_getSshKeyId'] = jest.fn(() => mockSshKeyId);
     });
 
     describe('when project does not exist', () => {
@@ -74,14 +60,21 @@ describe('SshKeyService', () => {
           throw new Error(`Could not find project ${listUserSshKeysForProjectRequest.projectId}`);
         });
       });
+
+      test('it throws', async () => {
+        // OPERATE n CHECK
+        await expect(() =>
+          sshKeyService.listUserSshKeysForProject(listUserSshKeysForProjectRequest)
+        ).rejects.toThrow(`Could not find project ${listUserSshKeysForProjectRequest.projectId}`);
+      });
     });
 
     describe('when project exists', () => {
       const hostSdk = { clients: {} } as AwsService;
       const hostEc2 = {} as EC2;
-
+      let project: Project;
       beforeEach(() => {
-        const project: Project = {
+        project = {
           id: listUserSshKeysForProjectRequest.projectId,
           name: '',
           description: '',
@@ -102,37 +95,124 @@ describe('SshKeyService', () => {
         projectService.getProject = jest.fn(() => Promise.resolve(project));
         hostSdk.clients.ec2 = hostEc2;
       });
-      describe('but EC2 call fails', () => {
+      describe('but cannot get EC2 client', () => {
         beforeEach(() => {
-          hostEc2.describeKeyPairs = jest.fn(() => Promise.reject('Some EC2 thrown error'));
-          aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
+          aws.getAwsServiceForRole = jest.fn(() => Promise.reject('Could not get EC2 client'));
         });
 
-        test('it throws Ec2Error', async () => {
+        test('it throws AwsServiceError', async () => {
           // OPERATE n CHECK
           await expect(() =>
             sshKeyService.listUserSshKeysForProject(listUserSshKeysForProjectRequest)
-          ).rejects.toThrow(Ec2Error);
+          ).rejects.toThrow(AwsServiceError);
         });
       });
 
-      //TO DO
-      describe('and EC2 call succeeds', () => {
+      describe('and successfully got EC2 client', () => {
         beforeEach(() => {
-          // hostEc2.SendSSHPublicKey = jest.fn(() => Promise.resolve({ $metadata: {} }));
-          hostEc2.describeKeyPairs = jest.fn(() => Promise.resolve({ $metadata: {} }));
+          aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
         });
-        test('it succeeds, and return the correct values', async () => {
-          // arrange
-          const mockResponse = {
-            sshKeys: [sshKey]
-          };
-          // act
-          const actualResponse = await sshKeyService.listUserSshKeysForProject(
-            listUserSshKeysForProjectRequest
-          );
-          // assert
-          expect(actualResponse).toEqual(mockResponse);
+
+        describe('but get EC2 call fails', () => {
+          beforeEach(() => {
+            hostEc2.describeKeyPairs = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+          });
+
+          test('it throws Ec2Error', async () => {
+            // OPERATE n CHECK
+            await expect(() =>
+              sshKeyService.listUserSshKeysForProject(listUserSshKeysForProjectRequest)
+            ).rejects.toThrow(Ec2Error);
+          });
+        });
+
+        describe('and get EC2 call succeeds', () => {
+          let mockCreateTime: Date;
+          let mockPublicKey: string;
+          let mockResponse: ListUserSshKeysForProjectResponse;
+          let keyPairs: KeyPairInfo[];
+
+          beforeEach(() => {
+            mockCreateTime = new Date();
+            mockPublicKey = 'SSH#EXAMPLEKEY';
+          });
+
+          describe('and no key exist', () => {
+            beforeEach(() => {
+              keyPairs = [];
+              hostEc2.describeKeyPairs = jest.fn(() =>
+                Promise.resolve({ $metadata: {}, KeyPairs: keyPairs })
+              );
+            });
+
+            test('it succeeds, and response with an empty list of sshKeys is returned', async () => {
+              // OPERATE n CHECK
+              mockResponse = { sshKeys: [] };
+              const actualResponse = await sshKeyService.listUserSshKeysForProject(
+                listUserSshKeysForProjectRequest
+              );
+              expect(actualResponse).toEqual(mockResponse);
+            });
+          });
+
+          describe('and multiple keys exists', () => {
+            beforeEach(() => {
+              keyPairs = [
+                { PublicKey: mockPublicKey, CreateTime: mockCreateTime },
+                { PublicKey: mockPublicKey, CreateTime: mockCreateTime }
+              ];
+              hostEc2.describeKeyPairs = jest.fn(() =>
+                Promise.resolve({ $metadata: {}, KeyPairs: keyPairs })
+              );
+            });
+
+            test('it succeeds, and response with a list of mutiple sshKeys is returned', async () => {
+              // OPERATE n CHECK
+              mockResponse = { sshKeys: [] };
+              keyPairs.forEach((key) => {
+                mockResponse.sshKeys.push({
+                  sshKeyId: mockSshKeyId,
+                  createTime: mockCreateTime.toISOString(),
+                  projectId: listUserSshKeysForProjectRequest.projectId,
+                  owner: listUserSshKeysForProjectRequest.userId,
+                  publicKey: mockPublicKey
+                });
+              });
+
+              const actualResponse = await sshKeyService.listUserSshKeysForProject(
+                listUserSshKeysForProjectRequest
+              );
+              expect(actualResponse).toEqual(mockResponse);
+            });
+          });
+
+          describe('and there is one unique key', () => {
+            beforeEach(() => {
+              keyPairs = [{ PublicKey: mockPublicKey, CreateTime: mockCreateTime }];
+              hostEc2.describeKeyPairs = jest.fn(() =>
+                Promise.resolve({ $metadata: {}, KeyPairs: keyPairs })
+              );
+            });
+
+            test('it succeeds, and response with a list of one unique sshKeys is returned', async () => {
+              // OPERATE n CHECK
+              mockResponse = {
+                sshKeys: [
+                  {
+                    sshKeyId: mockSshKeyId,
+                    createTime: mockCreateTime.toISOString(),
+                    projectId: listUserSshKeysForProjectRequest.projectId,
+                    owner: listUserSshKeysForProjectRequest.userId,
+                    publicKey: mockPublicKey
+                  }
+                ]
+              };
+              const actualResponse = await sshKeyService.listUserSshKeysForProject(
+                listUserSshKeysForProjectRequest
+              );
+              expect(actualResponse).toEqual(mockResponse);
+            });
+          });
         });
       });
     });
