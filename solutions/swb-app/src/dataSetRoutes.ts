@@ -95,6 +95,30 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
+  // Add file to dataset
+  router.put(
+    '/datasets/:dataSetId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('dataSetId request parameter is invalid');
+      }
+
+      const validatedRequest = {
+        dataSetId: req.params.dataSetId,
+        fileName: req.body.fileName,
+        file: req.body.file
+      };
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+
+      await dataSetService.uploadSinglePartFile(
+        validatedRequest.dataSetId,
+        validatedRequest.fileName,
+        validatedRequest.file,
+        authenticatedUser
+      );
+    })
+  );
+
   // List dataSets
   router.get(
     '/datasets',
