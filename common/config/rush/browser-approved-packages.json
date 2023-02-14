@@ -412,7 +412,7 @@
     },
     {
       "name": "dotenv",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "esbuild",

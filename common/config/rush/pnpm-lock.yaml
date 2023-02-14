@@ -250,6 +250,7 @@ importers:
       constructs: ^10.0.0
       csrf: ^3.1.0
       depcheck: ^1.4.3
+      dotenv: ^16.0.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
       express: ^4.17.3
@@ -294,6 +295,7 @@ importers:
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       axios: 0.27.2
       csrf: 3.1.0
+      dotenv: 16.0.3
       express: 4.18.1
       js-yaml: 4.1.0
       lodash: 4.17.21
@@ -9370,7 +9372,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001451
+      caniuse-lite: 1.0.30001452
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -9516,8 +9518,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001451:
-    resolution: {integrity: sha512-XY7UbUpGRatZzoRft//5xOa69/1iGJRBlrieH6QYrkKLIFn3m7OVEJ81dSrKoy2BnKsdbX5cLrOispZNYo9v2w==}
+  /caniuse-lite/1.0.30001452:
+    resolution: {integrity: sha512-Lkp0vFjMkBB3GTpLR8zk4NwW5EdRdnitwYJHDOOKIU85x4ckYCPQ+9WlVvSVClHxVReefkUMtWZH2l9KGlD51w==}
 
   /capture-exit/2.0.0:
     resolution: {integrity: sha512-PiT/hQmTonHhl/HFGN+Lx3JJUznrVYJ3+AQsnthneZbvW7x+f08Tk7yLJTLEOUvBTbduLeeBkxEaYXUOUrRq6g==}
@@ -14524,7 +14526,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001451
+      caniuse-lite: 1.0.30001452
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -14567,7 +14569,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001451
+      caniuse-lite: 1.0.30001452
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2

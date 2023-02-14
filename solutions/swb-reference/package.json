@@ -60,6 +60,7 @@
     "aws-sdk-client-mock": "^0.6.2",
     "axios": "^0.27.1",
     "csrf": "^3.1.0",
+    "dotenv": "^16.0.3",
     "express": "^4.17.3",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
