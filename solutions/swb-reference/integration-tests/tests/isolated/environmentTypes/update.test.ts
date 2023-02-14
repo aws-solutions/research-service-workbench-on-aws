@@ -10,7 +10,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('update environment types', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  const testEnvTypeId = 'et-prod-1234567890124,pa-1234567890124';
+  const testEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   beforeEach(() => {
     expect.hasAssertions();
   });
