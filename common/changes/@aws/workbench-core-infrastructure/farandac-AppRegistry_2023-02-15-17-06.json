@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "Fix Tag names in AppRegistry",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

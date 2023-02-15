@@ -26,16 +26,16 @@ describe('WorkbenchAppRegistry Test', () => {
       Description:
         'Service Catalog application to track and manage all your resources for the solution TestApp',
       Tags: {
-        'TestApp:ApplicationType': {
+        'Solutions:ApplicationType': {
           'Fn::FindInMap': ['TestAppAppRegMap', 'Data', 'ApplicationType']
         },
-        'TestApp:SolutionID': {
+        'Solutions:SolutionID': {
           'Fn::FindInMap': ['TestAppAppRegMap', 'Data', 'ID']
         },
-        'TestApp:SolutionName': {
+        'Solutions:SolutionName': {
           'Fn::FindInMap': ['TestAppAppRegMap', 'Data', 'SolutionName']
         },
-        'TestApp:SolutionVersion': {
+        'Solutions:SolutionVersion': {
           'Fn::FindInMap': ['TestAppAppRegMap', 'Data', 'Version']
         }
       },
