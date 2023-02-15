@@ -36,7 +36,8 @@ new workbenchAppRegistry(stack, stack.stackId, {
   solutionVersion: '0.0.1',
   attributeGroupName: 'ExampleApp-Metadata',
   applicationType: 'Example',
-  appRegistryApplicationName: 'ExampleApp'
+  appRegistryApplicationName: 'ExampleApp',
+  appInsights: true // default is false, set it to true if you want to create AppInsights
 });
 
 // Example 2:

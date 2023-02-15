@@ -30,6 +30,7 @@ import { WorkbenchAssociateStackToExistingAppRegistryApplication } from './workb
 // Create a stack and associate it with existing AppRegistry Application by passing in the AppRegistry Application ARN
 const stack = new Stack();
 new WorkbenchAssociateStacksToExistingAppRegistryApplication(stack, stack.stackId, {
-  applicationArn: 'arn:aws:servicecatalog:us-east-1:111111111111:/applications/appRegApplication'
+  applicationArn: 'arn:aws:servicecatalog:us-east-1:111111111111:/applications/appRegApplication',
+  appInsights: true // default is false, set it to true if you want to create AppInsights
 });
 ```

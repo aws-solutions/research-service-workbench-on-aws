@@ -24,7 +24,7 @@ const exampleStack: ExampleStack = new ExampleStack(app, 'ExampleStack', {
 });
 
 // eslint-disable-next-line no-new
-new WorkbenchAppRegistry(exampleStack, exampleStack.stackId, {
+new WorkbenchAppRegistry(exampleStack, 'ExampleStack-AppRegistry', {
   solutionId: process.env.solutionId!,
   solutionName: process.env.solutionName!,
   solutionVersion: process.env.solutionVersion!,
