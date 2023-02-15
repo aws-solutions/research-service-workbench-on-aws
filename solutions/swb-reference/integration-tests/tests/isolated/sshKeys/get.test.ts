@@ -3,29 +3,28 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
+import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get Key Pair negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  //let adminUserId: string | undefined;
   let project: { id: string };
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
-  beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    //adminUserId = adminSession.getUserId();
+  beforeEach(async () => {
+    adminSession = await setup.getDefaultAdminSession(); //TODO: change to getPA1Session()
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
+      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
 
     const { data } = await adminSession.resources.projects.create({
-      name: `TestProject-${uuidv4()}`,
+      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
       description: 'Project for list users for project tests',
       costCenterId: costCenter.id
     });
@@ -42,9 +41,9 @@ describe('Get Key Pair negative tests', () => {
   });
 
   describe('with User that is not authorized', () => {
-    let invalidUserId: string;
+    let pa2UserId: string;
     beforeEach(() => {
-      invalidUserId = '00000000-0000-0000-0000-000000000000';
+      pa2UserId = '00000000-0000-0000-0000-000000000000';
     });
     test.skip('it throws 403 error', async () => {
       try {
@@ -57,7 +56,7 @@ describe('Get Key Pair negative tests', () => {
           new HttpError(403, {
             statusCode: 403,
             error: 'User is not authorized', //User does not have access
-            message: ` ${invalidUserId} for project ${project.id}` //TODO
+            message: ` ${pa2UserId} for project ${project.id}` //TODO
           })
         );
       }

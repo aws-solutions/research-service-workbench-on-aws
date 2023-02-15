@@ -33,19 +33,15 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
       );
 
       try {
-        await sshKeyService.listUserSshKeysForProject(validatedResult);
-        res.status(200).send();
+        const response = await sshKeyService.listUserSshKeysForProject(validatedResult);
+        res.status(200).send(response);
       } catch (e) {
         console.error(e);
         if (Boom.isBoom(e)) {
           throw e;
         }
 
-        if (isNoKeyExistsError(e)) {
-          throw Boom.notFound(e.message);
-        }
-
-        if (isEc2Error(e) || isAwsServiceError(e) || isNonUniqueKeyError(e)) {
+        if (isEc2Error(e) || isAwsServiceError(e)) {
           throw Boom.badImplementation(e.message);
         }
 

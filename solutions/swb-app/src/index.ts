@@ -52,7 +52,10 @@ import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
 import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
 import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
 import { ListUserSshKeysForProjectRequest } from './sshKeys/listUserSshKeysForProjectRequest';
-import { ListUserSshKeysForProjectResponse } from './sshKeys/listUserSshKeysForProjectResponse';
+import {
+  ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser
+} from './sshKeys/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
 import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
 import { SshKey, SshKeyParser } from './sshKeys/sshKey';
@@ -83,6 +86,7 @@ export {
   DeleteSshKeyRequest,
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser,
   SshKey,
   SshKeyParser,
   SshKeyPlugin,

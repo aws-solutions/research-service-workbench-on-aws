@@ -138,13 +138,13 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with an empty list of sshKeys is returned', async () => {
-              // arrange
+              // BUILD
               mockResponse = { sshKeys: [] };
-              // act
+              // OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
-              // assert
+              // CHECK
               expect(actualResponse).toEqual(mockResponse);
             });
           });
@@ -161,7 +161,7 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with a list of mutiple sshKeys is returned', async () => {
-              // arrange
+              // BUILD
               mockResponse = { sshKeys: [] };
               keyPairs.forEach((key) => {
                 mockResponse.sshKeys.push({
@@ -172,11 +172,11 @@ describe('SshKeyService', () => {
                   publicKey: mockPublicKey
                 });
               });
-              //act
+              //OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
-              //assert
+              //CHECK
               expect(actualResponse).toEqual(mockResponse);
             });
           });
@@ -190,7 +190,7 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with a list of one unique sshKeys is returned', async () => {
-              // arrange
+              // BUILD
               mockResponse = {
                 sshKeys: [
                   {
@@ -202,11 +202,11 @@ describe('SshKeyService', () => {
                   }
                 ]
               };
-              // act
+              // OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
-              // assert
+              // CHECK
               expect(actualResponse).toEqual(mockResponse);
             });
           });

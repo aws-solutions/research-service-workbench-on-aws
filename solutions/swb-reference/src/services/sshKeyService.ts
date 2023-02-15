@@ -12,6 +12,7 @@ import {
   DeleteSshKeyRequest,
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser,
   SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
@@ -45,8 +46,7 @@ export default class SshKeyService implements SshKeyPlugin {
     const { projectId, userId } = request;
 
     // get envMgmtRoleArn and externalId from project record
-    const { envMgmtRoleArn, externalId } = await this._projectService.getProject({ projectId });
-
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
     // get EC2 client
     const { ec2 } = await this._getEc2ClientsForHostingAccount(
       envMgmtRoleArn,
@@ -75,11 +75,11 @@ export default class SshKeyService implements SshKeyPlugin {
         publicKey: key.PublicKey!,
         createTime: key.CreateTime!.toISOString(),
         projectId,
-        sshKeyId,
+        sshKeyId: key.KeyName!,
         owner: userId
       });
     });
-    return res;
+    return ListUserSshKeysForProjectResponseParser.parse(res);
   }
 
   /**
@@ -225,11 +225,5 @@ export default class SshKeyService implements SshKeyPlugin {
       .update(projectId)
       .digest('hex');
     return `${resourceTypeToKey.sshKey.toLowerCase()}-${hashedUuid}`;
-  }
-
-  private _getOwnerOfSshKey(sshKeyId: string): string {
-    // The sskKeyId is of form sshkey-user-<uuid>#proj-<uuid>
-    // We want user-<uuid>
-    return sshKeyId.split('#')[0].replace('sshkey-', '');
   }
 }
