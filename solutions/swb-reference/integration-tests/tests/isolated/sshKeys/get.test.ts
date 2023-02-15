@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { v4 as uuidv4 } from 'uuid';
 
 describe('Get Key Pair negative tests', () => {
   const setup: Setup = new Setup();
@@ -17,6 +17,7 @@ describe('Get Key Pair negative tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    adminUserId = adminSession.getUserId();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'test cost center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
