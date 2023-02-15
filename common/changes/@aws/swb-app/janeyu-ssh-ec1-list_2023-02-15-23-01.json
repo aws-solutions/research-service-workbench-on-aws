@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "update import of index file",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
