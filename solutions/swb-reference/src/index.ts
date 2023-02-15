@@ -9,7 +9,7 @@ import * as cdk from 'aws-cdk-lib';
 import { config } from 'dotenv';
 import { SWBStack } from './SWBStack';
 
-config({ path: './src/config/appRegisrty.env' });
+config({ path: './src/config/appRegistry.env' });
 
 const app: cdk.App = new cdk.App();
 const swbBackendStack: SWBStack = new SWBStack(app);
