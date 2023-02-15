@@ -132,7 +132,6 @@ export default class AuthorizationSetup {
   private _mapActions(
     identityId: string,
     subjectType: string,
-    fields: string[] = [],
     actions: Action[] = ['CREATE', 'READ', 'UPDATE', 'DELETE']
   ): IdentityPermission[] {
     return actions.map((action) => {
@@ -142,8 +141,7 @@ export default class AuthorizationSetup {
         identityType: 'GROUP',
         subjectType,
         action,
-        identityId,
-        fields
+        identityId
       };
     });
   }
