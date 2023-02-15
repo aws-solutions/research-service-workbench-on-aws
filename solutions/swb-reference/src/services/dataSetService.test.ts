@@ -21,11 +21,13 @@ import {
   DeleteIdentityPermissionsResponse,
   DynamicAuthorizationService,
   Effect,
+  GetIdentityPermissionsBySubjectResponse,
   IdentityPermission,
   IdentityType
 } from '@aws/workbench-core-authorization';
 import {
   AddRemoveAccessPermissionRequest,
+  DataSetParser,
   DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
@@ -44,6 +46,9 @@ describe('DataSetService', () => {
   let mockDynamicAuthService: DynamicAuthorizationService;
   let mockUser: AuthenticatedUser;
 
+  let mockDataSet: DataSet;
+  let projectId: string;
+
   beforeEach(() => {
     mockStoragePlugin = {} as DataSetStoragePlugin;
     mockWorkbenchDataSetService = {} as WorkbenchDataSetService;
@@ -55,6 +60,17 @@ describe('DataSetService', () => {
       id: 'sampleId',
       roles: []
     };
+    projectId = 'proj-projectId';
+
+    mockDataSet = DataSetParser.parse({
+      id: 'dataSetId',
+      owner: `${projectId}#ProjectAdmin`,
+      name: 'mockDataSet',
+      path: 'path',
+      storageName: 'storageName',
+      storageType: 'storageType',
+      createdAt: '2023-02-14T19:18:46'
+    });
 
     dataSetService = new DataSetService(
       mockStoragePlugin,
@@ -63,16 +79,6 @@ describe('DataSetService', () => {
       mockDatabaseService,
       mockDynamicAuthService
     );
-
-    const mockDataSet: DataSet = {
-      id: 'dataSetId',
-      owner: 'projectId#ProjectAdmin',
-      name: 'mockDataSet',
-      path: 'path',
-      storageName: 'storageName',
-      storageType: 'storageType'
-    };
-    mockWorkbenchDataSetService.provisionDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
 
     mockDynamicAuthService.createIdentityPermissions = jest.fn();
     mockWorkbenchDataSetService.addDataSetAccessPermissions = jest.fn();
@@ -139,12 +145,14 @@ describe('DataSetService', () => {
           storageProvider: mockStoragePlugin,
           type: ''
         };
+
+        mockWorkbenchDataSetService.provisionDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
       });
 
       describe('Project Admin', () => {
         describe('for DATASET', () => {
           beforeEach(() => {
-            identityId = 'projectId#ProjectAdmin';
+            identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
             subjectId = 'dataSetId';
             subjectType = SwbAuthZSubject.SWB_DATASET;
@@ -175,21 +183,21 @@ describe('DataSetService', () => {
 
         describe('for DATASET_ACCESS_LEVELS', () => {
           beforeEach(() => {
-            identityId = 'projectId#ProjectAdmin';
+            identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
-            subjectId = 'projectId-dataSetId';
+            subjectId = `${projectId}-dataSetId`;
             subjectType = SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE'];
 
             identityPermissions = actions.map((action: Action) => {
               return {
-                action: action,
-                effect: effect,
-                identityId: identityId,
-                identityType: identityType,
-                subjectId: subjectId,
-                subjectType: subjectType
+                action,
+                effect,
+                identityId,
+                identityType,
+                subjectId,
+                subjectType
               };
             });
           });
@@ -200,6 +208,133 @@ describe('DataSetService', () => {
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
               identityPermissions: identityPermissions
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('removeDataSet', () => {
+    describe('when dataset id does not exists', () => {
+      let notFoundError: Error;
+
+      beforeEach(() => {
+        notFoundError = new Error('underlying workbench core DatasetService error for getDataSet call');
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockImplementation(() => {
+          throw notFoundError;
+        });
+      });
+
+      test('it throws an error', async () => {
+        await expect(dataSetService.removeDataSet('fake-id', mockUser)).rejects.toThrowError(notFoundError);
+      });
+    });
+
+    describe('when the dataset exists', () => {
+      beforeEach(() => {
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
+      });
+
+      describe('and is associated with external projects', () => {
+        beforeEach(() => {
+          const getIdentityPermissionsBySubjectResponse: GetIdentityPermissionsBySubjectResponse = {
+            data: {
+              identityPermissions: [
+                {
+                  action: 'READ',
+                  effect: 'ALLOW',
+                  identityId: `${projectId}#ProjectAdmin`,
+                  identityType: 'GROUP',
+                  subjectId: mockDataSet.id!,
+                  subjectType: SwbAuthZSubject.SWB_DATASET
+                }
+              ]
+            }
+          };
+          mockDynamicAuthService.getIdentityPermissionsBySubject = jest
+            .fn()
+            .mockReturnValueOnce(getIdentityPermissionsBySubjectResponse);
+        });
+
+        test('it throws an error', async () => {
+          await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
+            `DataSet cannot be removed because it is associated with project(s) ['${projectId}']`
+          );
+        });
+      });
+
+      describe('and is not associated with any external projects', () => {
+        beforeEach(() => {
+          const getIdentityPermissionsBySubjectResponse: GetIdentityPermissionsBySubjectResponse = {
+            data: {
+              identityPermissions: []
+            }
+          };
+          mockDynamicAuthService.getIdentityPermissionsBySubject = jest
+            .fn()
+            .mockReturnValueOnce(getIdentityPermissionsBySubjectResponse);
+          mockWorkbenchDataSetService.removeDataSet = jest.fn();
+          mockDynamicAuthService.deleteIdentityPermissions = jest.fn();
+        });
+
+        test('it delegates removal of the dataset to the workbench core DataSetService', async () => {
+          await dataSetService.removeDataSet(mockDataSet.id!, mockUser);
+          expect(mockWorkbenchDataSetService.removeDataSet).toHaveBeenCalledTimes(1);
+        });
+
+        describe('removes permissions', () => {
+          let identityPermissions: IdentityPermission[];
+
+          beforeEach(() => {
+            mockDynamicAuthService.deleteIdentityPermissions = jest.fn();
+          });
+
+          describe('for DATASET', () => {
+            beforeEach(() => {
+              const actions: Action[] = ['READ', 'UPDATE', 'DELETE'];
+              identityPermissions = actions.map((action: Action) => {
+                return {
+                  action,
+                  effect: 'ALLOW',
+                  identityId: `${projectId}#ProjectAdmin`,
+                  identityType: 'GROUP',
+                  subjectId: 'dataSetId',
+                  subjectType: SwbAuthZSubject.SWB_DATASET
+                };
+              });
+            });
+
+            test('in AuthZ', async () => {
+              await dataSetService.removeDataSet(mockDataSet.id!, mockUser);
+              expect(mockDynamicAuthService.deleteIdentityPermissions).toHaveBeenCalledWith({
+                identityPermissions,
+                authenticatedUser: mockUser
+              });
+            });
+          });
+
+          describe('for DATASET_ACCESS_LEVEL', () => {
+            beforeEach(() => {
+              const actions: Action[] = ['READ', 'UPDATE'];
+              identityPermissions = actions.map((action: Action) => {
+                return {
+                  action,
+                  effect: 'ALLOW',
+                  identityId: `${projectId}#ProjectAdmin`,
+                  identityType: 'GROUP',
+                  subjectId: `${projectId}-dataSetId`,
+                  subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL
+                };
+              });
+            });
+
+            test('in AuthZ', async () => {
+              await dataSetService.removeDataSet(mockDataSet.id!, mockUser);
+              expect(mockDynamicAuthService.deleteIdentityPermissions).toHaveBeenCalledWith({
+                identityPermissions,
+                authenticatedUser: mockUser
+              });
             });
           });
         });

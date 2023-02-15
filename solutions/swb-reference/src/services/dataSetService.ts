@@ -54,6 +54,55 @@ export class DataSetService implements DataSetPlugin {
     this._dynamicAuthService = dynamicAuthService;
   }
 
+  public async removeDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<void> {
+    const dataset = await this.getDataSet(dataSetId, authenticatedUser);
+
+    const associatedProjects = await this._associatedProjects(dataSetId);
+    if (associatedProjects.length > 0) {
+      throw Error(
+        `DataSet cannot be removed because it is associated with project(s) [${associatedProjects.join(',')}]`
+      );
+    }
+
+    const projectAdmin = dataset.owner!;
+
+    await this._workbenchDataSetService.removeDataSet(
+      dataSetId,
+      () => {
+        return Promise.resolve();
+      },
+      authenticatedUser
+    );
+
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataSetId,
+      [projectAdmin],
+      ['READ', 'UPDATE', 'DELETE']
+    );
+
+    const projectId = projectAdmin.split('#')[0];
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+      `${projectId}-${dataSetId!}`,
+      [projectAdmin],
+      ['READ', 'UPDATE']
+    );
+  }
+
+  private async _associatedProjects(dataSetId: string): Promise<string[]> {
+    const permissions = await this._dynamicAuthService.getIdentityPermissionsBySubject({
+      subjectId: dataSetId,
+      subjectType: SwbAuthZSubject.SWB_DATASET
+    });
+
+    return permissions.data.identityPermissions
+      .filter((permission) => permission.identityType === 'GROUP')
+      .map((permission) => `'${permission.identityId.split('#')[0]}'`);
+  }
+
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse> {
@@ -122,11 +171,11 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, {
-      id: '',
-      roles: []
-    });
+  public async removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, authenticatedUser);
     return PermissionsResponseParser.parse(response);
   }
 

@@ -21,6 +21,7 @@ import {
   ProjectRemoveAccessRequest,
   ProjectRemoveAccessRequestParser
 } from './dataSets/projectRemoveAccessRequestParser';
+import { RemoveDataSetRequest, RemoveDataSetRequestParser } from './dataSets/removeDataSetRequestParser';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 
@@ -141,6 +142,20 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       );
 
       await dataSetService.removeAccessForProject(validatedRequest);
+
+      res.status(204).send();
+    })
+  );
+
+  router.delete(
+    '/projects/:projectId/datasets/:datasetId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<RemoveDataSetRequest>(RemoveDataSetRequestParser, {
+        authenticatedUser: res.locals.user,
+        dataSetId: req.params.datasetId
+      });
+
+      await dataSetService.removeDataSet(validatedRequest.dataSetId, validatedRequest.authenticatedUser);
 
       res.status(204).send();
     })
