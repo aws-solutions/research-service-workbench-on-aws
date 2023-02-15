@@ -119,24 +119,20 @@ export class WorkbenchAppRegistry extends Construct {
   }
 
   private _applyTagsToApplication(): void {
+    applyTag(this._registryApplication, `Solutions:SolutionID`, this._appRegMap.findInMap('Data', 'ID'));
     applyTag(
       this._registryApplication,
-      `${this._solutionName}:SolutionID`,
-      this._appRegMap.findInMap('Data', 'ID')
-    );
-    applyTag(
-      this._registryApplication,
-      `${this._solutionName}:SolutionName`,
+      `Solutions:SolutionName`,
       this._appRegMap.findInMap('Data', 'SolutionName')
     );
     applyTag(
       this._registryApplication,
-      `${this._solutionName}:SolutionVersion`,
+      `Solutions:SolutionVersion`,
       this._appRegMap.findInMap('Data', 'Version')
     );
     applyTag(
       this._registryApplication,
-      `${this._solutionName}:ApplicationType`,
+      `Solutions:ApplicationType`,
       this._appRegMap.findInMap('Data', 'ApplicationType')
     );
   }
