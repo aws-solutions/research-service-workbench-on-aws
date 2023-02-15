@@ -13,7 +13,7 @@ describe('list environment type configs associated to project', () => {
   const envTypeId = setup.getSettings().get('envTypeId');
   const projectId = setup.getSettings().get('projectId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
-  const nonExistentEnvTypeId = 'et-prod-1234567890123,pa-1234567890123';
+  const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
 
   beforeEach(() => {
     expect.hasAssertions();

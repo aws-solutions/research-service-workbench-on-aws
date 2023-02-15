@@ -29,8 +29,9 @@ describe('multiStep environment type and environment type config test', () => {
   test('create Environment Type', async () => {
     //Create Environment A
     console.log('Creating Environment Type');
-    const envType = await envTypeHandler.createEnvironmentType('prod-1234567890123', 'pa-1234567890123');
-    const expectedId = `${resourceTypeToKey.envType.toLowerCase()}-prod-1234567890123,pa-1234567890123`;
+    const uniqueTimeId = Date.now();
+    const envType = await envTypeHandler.createEnvironmentType(`prod-${uniqueTimeId}`, `pa-${uniqueTimeId}`);
+    const expectedId = `${resourceTypeToKey.envType.toLowerCase()}-prod-${uniqueTimeId},pa-${uniqueTimeId}`;
     expect(envType).toMatchObject({
       id: expectedId,
       status: 'NOT_APPROVED'
