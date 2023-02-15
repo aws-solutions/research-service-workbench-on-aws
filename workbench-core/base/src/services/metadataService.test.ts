@@ -8,6 +8,7 @@ import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import Query from '../aws/helpers/dynamoDB/query';
 import TransactEdit from '../aws/helpers/dynamoDB/transactEdit';
 import resourceTypeToKey from '../constants/resourceTypeToKey';
+import { RelationshipDDBItemParser } from '../types/relationshipDDBItem';
 import { MetadataService } from './metadataService';
 
 describe('metadata service', () => {
@@ -200,6 +201,35 @@ describe('metadata service', () => {
       );
 
       expect(edit.execute).toBeCalledTimes(1);
+    });
+  });
+
+  describe('getMetadataItem', () => {
+    test('returns item when exists', async () => {
+      ddbService.getItem = jest.fn().mockReturnValueOnce({ pk: 'pk', sk: 'sk', id: 'id' });
+
+      const actualResponse = await metadataService.getMetadataItem(
+        'mainEntityResourceType',
+        'mainEntityId',
+        'dependencyResourceType',
+        'dependencyId',
+        RelationshipDDBItemParser
+      );
+      expect(actualResponse).toEqual({ pk: 'pk', sk: 'sk', id: 'id' });
+    });
+
+    test('throws exception when item is not found', async () => {
+      ddbService.getItem = jest.fn().mockReturnValueOnce(undefined);
+
+      await expect(
+        metadataService.getMetadataItem(
+          'mainEntityResourceType',
+          'mainEntityId',
+          'dependencyResourceType',
+          'dependencyId',
+          RelationshipDDBItemParser
+        )
+      ).rejects.toThrow('Resource not found');
     });
   });
 });

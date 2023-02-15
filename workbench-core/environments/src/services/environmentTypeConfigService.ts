@@ -38,12 +38,8 @@ export default class EnvironmentTypeConfigService {
    * @param checkDependency - check whether we can delete the envTypeConfig. The function should throw a Boom error if envTypeConfig cannot be deleted
    * @returns void
    */
-  public async softDeleteEnvironmentTypeConfig(
-    request: DeleteEnvironmentTypeConfigRequest,
-    checkDependency: (envTypeId: string, envTypeConfigId: string) => Promise<void>
-  ): Promise<void> {
+  public async softDeleteEnvironmentTypeConfig(request: DeleteEnvironmentTypeConfigRequest): Promise<void> {
     const { envTypeId, envTypeConfigId } = request;
-    await checkDependency(envTypeId, envTypeConfigId);
     await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
 
     try {
@@ -143,12 +139,18 @@ export default class EnvironmentTypeConfigService {
       const envType = await this._envTypeService.getEnvironmentType(request.envTypeId);
       productId = envType.productId;
       provisioningArtifactId = envType.provisioningArtifactId;
+      if (envType.status !== 'APPROVED') {
+        throw Boom.badRequest(
+          `Could not create environment type config because environment type ${request.envTypeId} is not approved`
+        );
+      }
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.badRequest(
           `Could not create environment type config because environment type ${request.envTypeId} does not exist`
         );
       }
+      throw e;
     }
     const envTypeConfigId = uuidWithLowercasePrefix(resourceTypeToKey.envTypeConfig);
     const currentDate = new Date().toISOString();
