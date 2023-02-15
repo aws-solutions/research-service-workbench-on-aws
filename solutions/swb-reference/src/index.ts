@@ -19,7 +19,6 @@ new WorkbenchAppRegistry(swbBackendStack, swbBackendStack.stackId, {
   solutionVersion: process.env.solutionVersion!,
   attributeGroupName: `${swbBackendStack.stackName}-AppRegistryGroup`,
   applicationType: process.env.applicationType!,
-  appRegistryApplicationName: `${swbBackendStack.stackName}-AppRegistryApplication`,
-  destroy: true
+  appRegistryApplicationName: `${swbBackendStack.stackName}-AppRegistryApplication`
 });
 app.synth();
