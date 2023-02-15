@@ -13,6 +13,7 @@ import {
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
   ListUserSshKeysForProjectResponseParser,
+  SshKey,
   SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
@@ -63,15 +64,15 @@ export default class SshKeyService implements SshKeyPlugin {
         Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
         IncludePublicKey: true
       };
-      const response: DescribeKeyPairsCommandOutput = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
-      keyPairs = response.KeyPairs || [];
+      const ec2Response: DescribeKeyPairsCommandOutput = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
+      keyPairs = ec2Response.KeyPairs || [];
     } catch (e) {
       throw new Ec2Error(e);
     }
 
-    const res: ListUserSshKeysForProjectResponse = { sshKeys: [] };
+    let sshKeys: SshKey[] = [];
     keyPairs.forEach((key) => {
-      res.sshKeys.push({
+      sshKeys.push({
         publicKey: key.PublicKey!,
         createTime: key.CreateTime!.toISOString(),
         projectId,
@@ -79,7 +80,7 @@ export default class SshKeyService implements SshKeyPlugin {
         owner: userId
       });
     });
-    return ListUserSshKeysForProjectResponseParser.parse(res);
+    return ListUserSshKeysForProjectResponseParser.parse({ sshKeys: sshKeys });
   }
 
   /**

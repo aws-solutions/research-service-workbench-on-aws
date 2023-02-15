@@ -11,9 +11,11 @@ import {
   Ec2Error,
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser,
   NoKeyExistsError,
   NonUniqueKeyError,
-  SendPublicKeyRequest
+  SendPublicKeyRequest,
+  SshKey
 } from '@aws/swb-app';
 import { Project, ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
@@ -121,12 +123,14 @@ describe('SshKeyService', () => {
         describe('and get EC2 call succeeds', () => {
           let mockCreateTime: Date;
           let mockPublicKey: string;
+          let mockKeyName: string;
           let mockResponse: ListUserSshKeysForProjectResponse;
           let keyPairs: KeyPairInfo[];
 
           beforeEach(() => {
             mockCreateTime = new Date();
             mockPublicKey = 'SSH#EXAMPLEKEY';
+            mockKeyName = 'sshkey-123';
           });
 
           describe('and no key exist', () => {
@@ -139,7 +143,7 @@ describe('SshKeyService', () => {
 
             test('it succeeds, and response with an empty list of sshKeys is returned', async () => {
               // BUILD
-              mockResponse = { sshKeys: [] };
+              mockResponse = ListUserSshKeysForProjectResponseParser.parse({ sshKeys: [] });
               // OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
@@ -152,26 +156,27 @@ describe('SshKeyService', () => {
           describe('and multiple keys exists', () => {
             beforeEach(() => {
               keyPairs = [
-                { PublicKey: mockPublicKey, CreateTime: mockCreateTime },
-                { PublicKey: mockPublicKey, CreateTime: mockCreateTime }
+                { PublicKey: mockPublicKey, CreateTime: mockCreateTime, KeyName: mockKeyName },
+                { PublicKey: mockPublicKey, CreateTime: mockCreateTime, KeyName: mockKeyName }
               ];
               hostEc2.describeKeyPairs = jest.fn(() =>
                 Promise.resolve({ $metadata: {}, KeyPairs: keyPairs })
               );
             });
 
-            test('it succeeds, and response with a list of mutiple sshKeys is returned', async () => {
+            test('it succeeds, and response with a list of multiple sshKeys is returned', async () => {
               // BUILD
-              mockResponse = { sshKeys: [] };
+              let mockSshKeys: SshKey[] = [];
               keyPairs.forEach((key) => {
-                mockResponse.sshKeys.push({
-                  sshKeyId: mockSshKeyId,
+                mockSshKeys.push({
+                  sshKeyId: mockKeyName,
                   createTime: mockCreateTime.toISOString(),
                   projectId: listUserSshKeysForProjectRequest.projectId,
                   owner: listUserSshKeysForProjectRequest.userId,
                   publicKey: mockPublicKey
                 });
               });
+              mockResponse = ListUserSshKeysForProjectResponseParser.parse({ sshKeys: mockSshKeys });
               //OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
@@ -183,7 +188,7 @@ describe('SshKeyService', () => {
 
           describe('and there is one unique key', () => {
             beforeEach(() => {
-              keyPairs = [{ PublicKey: mockPublicKey, CreateTime: mockCreateTime }];
+              keyPairs = [{ PublicKey: mockPublicKey, CreateTime: mockCreateTime, KeyName: mockKeyName }];
               hostEc2.describeKeyPairs = jest.fn(() =>
                 Promise.resolve({ $metadata: {}, KeyPairs: keyPairs })
               );
@@ -191,17 +196,16 @@ describe('SshKeyService', () => {
 
             test('it succeeds, and response with a list of one unique sshKeys is returned', async () => {
               // BUILD
-              mockResponse = {
-                sshKeys: [
-                  {
-                    sshKeyId: mockSshKeyId,
-                    createTime: mockCreateTime.toISOString(),
-                    projectId: listUserSshKeysForProjectRequest.projectId,
-                    owner: listUserSshKeysForProjectRequest.userId,
-                    publicKey: mockPublicKey
-                  }
-                ]
-              };
+              let mockSshKeys: SshKey[] = [
+                {
+                  sshKeyId: mockKeyName,
+                  createTime: mockCreateTime.toISOString(),
+                  projectId: listUserSshKeysForProjectRequest.projectId,
+                  owner: listUserSshKeysForProjectRequest.userId,
+                  publicKey: mockPublicKey
+                }
+              ];
+              mockResponse = ListUserSshKeysForProjectResponseParser.parse({ sshKeys: mockSshKeys });
               // OPERATE
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
