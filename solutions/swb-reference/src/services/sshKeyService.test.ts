@@ -19,13 +19,15 @@ import { Project, ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
+import { EnvironmentService } from '@aws/workbench-core-environments';
 import SshKeyService from './sshKeyService';
 
 describe('SshKeyService', () => {
   const region = 'us-east-1';
   const aws = {} as AwsService;
   const projectService = {} as ProjectService;
-  const sshKeyService: SshKeyService = new SshKeyService(aws, projectService);
+  const environmentService = {} as EnvironmentService;
+  const sshKeyService: SshKeyService = new SshKeyService(aws, projectService, environmentService);
   let sshKey: SshKey;
 
   beforeAll(() => {
@@ -266,7 +268,7 @@ describe('SshKeyService', () => {
     let sendPublicKeyRequest: SendPublicKeyRequest;
 
     beforeEach(() => {
-      sendPublicKeyRequest = { environmentId: '' };
+      sendPublicKeyRequest = { environmentId: '', userId: '' };
     });
 
     test('should throw not implemented error', async () => {

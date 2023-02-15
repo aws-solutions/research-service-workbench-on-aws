@@ -7,7 +7,8 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const SendPublicKeyRequestParser = z
   .object({
-    environmentId: z.string()
+    environmentId: z.string(),
+    userId: z.string()
   })
   .strict();
 

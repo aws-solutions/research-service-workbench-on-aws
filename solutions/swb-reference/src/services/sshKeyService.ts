@@ -4,7 +4,7 @@
  */
 
 import * as crypto from 'crypto';
-import { EC2, Tag } from '@aws-sdk/client-ec2';
+import { EC2, KeyPairInfo, Tag } from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   CreateSshKeyRequest,
@@ -23,14 +23,21 @@ import {
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import { EnvironmentService } from '@aws/workbench-core-environments';
 
 export default class SshKeyService implements SshKeyPlugin {
   private _aws: AwsService;
   private _projectService: ProjectService;
+  private _environmentService: EnvironmentService;
   private _resourceType: string = 'sshkey';
-  public constructor(aws: AwsService, projectService: ProjectService) {
+  public constructor(
+    aws: AwsService,
+    projectService: ProjectService,
+    environmentService: EnvironmentService
+  ) {
     this._aws = aws;
     this._projectService = projectService;
+    this._environmentService = environmentService;
   }
 
   /**
@@ -66,24 +73,10 @@ export default class SshKeyService implements SshKeyPlugin {
     );
 
     // get ssh key
-    let keys = [];
-    try {
-      const response = await ec2.describeKeyPairs({ Filters: [{ Name: 'key-name', Values: [sshKeyId] }] });
-      keys = response.KeyPairs || [];
-    } catch (e) {
-      throw new Ec2Error(e);
-    }
-    if (keys.length === 0) {
-      throw new NoKeyExistsError(`Key ${sshKeyId} does not exist`);
-    }
-    if (keys.length > 1) {
-      throw new NonUniqueKeyError(
-        `More than one key exists with ${sshKeyId}. Cannot determine which to delete.`
-      );
-    }
+    const key = await this._getSshKey(sshKeyId, projectId);
 
     // Check that current user owns the key from the request
-    const sshKeyUser = this._getUserFromTags(keys[0].Tags!);
+    const sshKeyUser = this._getUserFromTags(key.Tags!);
     if (sshKeyUser !== currentUserId) {
       throw new ForbiddenError(`Current user ${currentUserId} cannot delete a key they do not own`);
     }
@@ -137,8 +130,65 @@ export default class SshKeyService implements SshKeyPlugin {
    * @param request - a {@link SendPublicKeyRequest}
    */
   public async sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
+    const { environmentId, userId } = request;
+
+    // get environment instanceId and projectId
+    const { instanceId, projectId } = await this._environmentService.getEnvironment(environmentId);
+
+    // get the key for the user and given project
+    const sshKeyId = this._getSshKeyId(userId, projectId);
+    const key = await this._getSshKey(sshKeyId, projectId);
+
+    // get envMgmtRoleArn and externalId from project
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
+
+    // get the EC2 clients
+    const { ec2, ec2InstanceConnect } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'Connect',
+      externalId,
+      this._aws
+    );
+
+    // get instance metadata
+    try {
+      const response = await ec2.describeInstances({ InstanceIds: [instanceId!] });
+    } catch (e) {
+      throw new Ec2Error(e.message);
+    }
+
+    // send ssh public key
+
+    // return network info
     // TODO implement
     throw new Error('Method not implemented.');
+  }
+
+  private async _getSshKey(sshKeyId: string, projectId: string): Promise<KeyPairInfo> {
+    // get envMgmtRoleArn and externalId from project record
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
+
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(envMgmtRoleArn, 'Get', externalId, this._aws);
+
+    // get ssh key
+    let keys = [];
+    try {
+      const response = await ec2.describeKeyPairs({ Filters: [{ Name: 'key-name', Values: [sshKeyId] }] });
+      keys = response.KeyPairs || [];
+    } catch (e) {
+      throw new Ec2Error(e);
+    }
+    if (keys.length === 0) {
+      throw new NoKeyExistsError(`Key ${sshKeyId} does not exist`);
+    }
+    if (keys.length > 1) {
+      throw new NonUniqueKeyError(
+        `More than one key exists with ${sshKeyId}. Cannot determine which to delete.`
+      );
+    }
+    // must only be 1 key
+    return keys[0];
   }
 
   /**
@@ -153,7 +203,7 @@ export default class SshKeyService implements SshKeyPlugin {
    */
   private async _getEc2ClientsForHostingAccount(
     envMgmtRoleArn: string,
-    operation: 'ListForProject' | 'Delete' | 'Create' | 'Connect',
+    operation: 'ListForProject' | 'Delete' | 'Create' | 'Connect' | 'Get',
     externalId: string,
     aws: AwsService
   ): Promise<{ ec2: EC2; ec2InstanceConnect: EC2InstanceConnect }> {
