@@ -21,6 +21,7 @@ import {
   SendPublicKeyResponse,
   SshKeyPlugin
 } from '@aws/swb-app';
+import { CreateSshKeyResponseParser } from '@aws/swb-app/lib/sshKeys/createSshKeyResponse';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
@@ -164,7 +165,12 @@ export default class SshKeyService implements SshKeyPlugin {
           }
         ]
       });
-      return { projectId, privateKey: createKeyPairResponse.KeyMaterial!, sshKeyId, owner: userId };
+      return CreateSshKeyResponseParser.parse({
+        projectId,
+        privateKey: createKeyPairResponse.KeyMaterial!,
+        id: sshKeyId,
+        owner: userId
+      });
     } catch (e) {
       if (e.Code === 'InvalidKeyPair.Duplicate') {
         throw new DuplicateKeyError(e.message);

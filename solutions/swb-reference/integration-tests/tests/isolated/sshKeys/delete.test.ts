@@ -16,7 +16,8 @@ describe('Delete Key Pair negative tests', () => {
   let project: { id: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    expect.hasAssertions();
     adminSession = await setup.getDefaultAdminSession();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: randomTextGenerator.getFakeText('fakeCostCenterName'),
@@ -31,10 +32,6 @@ describe('Delete Key Pair negative tests', () => {
     });
 
     project = data;
-  });
-
-  beforeEach(async () => {
-    expect.hasAssertions();
   });
 
   afterEach(async () => {

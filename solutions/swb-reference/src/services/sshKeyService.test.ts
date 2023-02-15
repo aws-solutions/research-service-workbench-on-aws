@@ -3,6 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+const mockSshKeyId = 'mockvalues';
+jest.mock('crypto', () => {
+  return {
+    createHash: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    digest: jest.fn(() => mockSshKeyId)
+  };
+});
+
 import { EC2 } from '@aws-sdk/client-ec2';
 import {
   AwsServiceError,
@@ -251,12 +260,9 @@ describe('SshKeyService', () => {
 
   describe('createSshKey', () => {
     let createSshKeyRequest: CreateSshKeyRequest;
-    let mockSshKeyId: string;
 
     beforeEach(() => {
-      mockSshKeyId = 'sshkey-mockvalues';
       createSshKeyRequest = { projectId: 'proj-123', userId: '1234' };
-      sshKeyService['_getSshKeyId'] = jest.fn(() => mockSshKeyId);
     });
 
     describe('when project does not exist', () => {
@@ -331,7 +337,7 @@ describe('SshKeyService', () => {
           });
         });
 
-        describe('but EC2 create call succeeds', () => {
+        describe('and EC2 create call succeeds', () => {
           let mockKeyMaterial: string;
           beforeEach(() => {
             mockKeyMaterial = '--begin private RSA key--...';
@@ -345,7 +351,7 @@ describe('SshKeyService', () => {
             const expectedResponse = {
               projectId: createSshKeyRequest.projectId,
               privateKey: mockKeyMaterial,
-              sshKeyId: mockSshKeyId,
+              sshKeyId: `sshkey-${mockSshKeyId}`,
               owner: createSshKeyRequest.userId
             };
 

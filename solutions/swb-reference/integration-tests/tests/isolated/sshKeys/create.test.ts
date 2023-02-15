@@ -15,7 +15,8 @@ describe('cannot create SSH key', () => {
   let project: { id: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    expect.hasAssertions();
     adminSession = await setup.getDefaultAdminSession();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: randomTextGenerator.getFakeText('fakeCostCenterName'),
@@ -32,15 +33,11 @@ describe('cannot create SSH key', () => {
     project = data;
   });
 
-  beforeEach(async () => {
-    expect.hasAssertions();
-  });
-
   afterEach(async () => {
     await setup.cleanup();
   });
 
-  describe('for a project when the user already has a key for that project', () => {
+  describe('when the user already has a key for that project', () => {
     let existingSshKeyId: string;
 
     beforeEach(async () => {
@@ -48,10 +45,10 @@ describe('cannot create SSH key', () => {
         .project(project.id)
         .sshKeys()
         .create();
-      existingSshKeyId = existingSshKey.sshKeyId;
+      existingSshKeyId = existingSshKey.id;
     });
 
-    test.skip('it throws 400 error', async () => {
+    test('it throws 400 error', async () => {
       try {
         await adminSession.resources.projects.project(project.id).sshKeys().create();
       } catch (e) {
@@ -59,8 +56,8 @@ describe('cannot create SSH key', () => {
           e,
           new HttpError(400, {
             statusCode: 400,
-            error: 'BadRequest',
-            message: `The keypair '${existingSshKeyId}' already exists`
+            error: 'Bad Request',
+            message: `The keypair '${existingSshKeyId}' already exists.`
           })
         );
       }
