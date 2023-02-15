@@ -49,7 +49,7 @@ describe('Get Key Pair negative tests', () => {
     test.skip('it throws 403 error', async () => {
       try {
         //TODO:
-        // get auth await adminSession.resources.projects.project(project.id).get()
+        // get auth :await adminSession.resources.projects.project(project.id).get()
       } catch (e) {
         // console.error(e)
         checkHttpError(
