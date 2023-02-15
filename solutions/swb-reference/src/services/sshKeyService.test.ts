@@ -26,7 +26,6 @@ describe('SshKeyService', () => {
   const aws = {} as AwsService;
   const projectService = {} as ProjectService;
   const sshKeyService: SshKeyService = new SshKeyService(aws, projectService);
-  //let sshKey: SshKey; //TODO
 
   beforeAll(() => {
     process.env.AWS_REGION = region;
@@ -34,13 +33,6 @@ describe('SshKeyService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // sshKey = { //TODO
-    //   sshKeyId: 'ssh-123',
-    //   createTime: 'date-123',
-    //   projectId: 'proj-123',
-    //   owner: 'user-123',
-    //   publicKey: 'SSH#EXAMPLEKEY'
-    // };
   });
   describe('listUserSshKeysForProject', () => {
     let listUserSshKeysForProjectRequest: ListUserSshKeysForProjectRequest;
@@ -146,11 +138,13 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with an empty list of sshKeys is returned', async () => {
-              // OPERATE n CHECK
+              // arrange
               mockResponse = { sshKeys: [] };
+              // act
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
+              // assert
               expect(actualResponse).toEqual(mockResponse);
             });
           });
@@ -167,7 +161,7 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with a list of mutiple sshKeys is returned', async () => {
-              // OPERATE n CHECK
+              // arrange
               mockResponse = { sshKeys: [] };
               keyPairs.forEach((key) => {
                 mockResponse.sshKeys.push({
@@ -178,10 +172,11 @@ describe('SshKeyService', () => {
                   publicKey: mockPublicKey
                 });
               });
-
+              //act
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
+              //assert
               expect(actualResponse).toEqual(mockResponse);
             });
           });
@@ -195,7 +190,7 @@ describe('SshKeyService', () => {
             });
 
             test('it succeeds, and response with a list of one unique sshKeys is returned', async () => {
-              // OPERATE n CHECK
+              // arrange
               mockResponse = {
                 sshKeys: [
                   {
@@ -207,9 +202,11 @@ describe('SshKeyService', () => {
                   }
                 ]
               };
+              // act
               const actualResponse = await sshKeyService.listUserSshKeysForProject(
                 listUserSshKeysForProjectRequest
               );
+              // assert
               expect(actualResponse).toEqual(mockResponse);
             });
           });
