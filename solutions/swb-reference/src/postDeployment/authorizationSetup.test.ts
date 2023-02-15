@@ -8,14 +8,22 @@ import {
   AuthorizationPlugin,
   DynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
-  GroupManagementPlugin
+  GroupManagementPlugin,
+  GroupAlreadyExistsError,
+  IdentityPermissionCreationError
 } from '@aws/workbench-core-authorization';
 import { SwbAuthZSubject } from '../constants';
 import AuthorizationSetup from './authorizationSetup';
 
 describe('AuthorizationSetup', () => {
-  test('run: Create new group, assign permissions', async () => {
-    const mockGroupManagementPlugin: GroupManagementPlugin = {
+  let mockGroupManagementPlugin: GroupManagementPlugin;
+  let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
+  let auditService: AuditService;
+  let mockAuthorizationPlugin: AuthorizationPlugin;
+  let authService: DynamicAuthorizationService;
+  let authSetup: AuthorizationSetup;
+  beforeEach(() => {
+    mockGroupManagementPlugin = {
       createGroup: jest.fn(),
       deleteGroup: jest.fn(),
       getUserGroups: jest.fn(),
@@ -28,7 +36,7 @@ describe('AuthorizationSetup', () => {
       doesGroupExist: jest.fn()
     };
 
-    const mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin = {
+    mockDynamicAuthorizationPermissionsPlugin = {
       isRouteIgnored: jest.fn(),
       isRouteProtected: jest.fn(),
       getDynamicOperationsByRoute: jest.fn(),
@@ -39,18 +47,18 @@ describe('AuthorizationSetup', () => {
       deleteSubjectIdentityPermissions: jest.fn()
     };
 
-    const auditService = new AuditService(
+    auditService = new AuditService(
       new BaseAuditPlugin({
         write: jest.fn()
       })
     );
 
-    const mockAuthorizationPlugin: AuthorizationPlugin = {
+    mockAuthorizationPlugin = {
       isAuthorized: jest.fn(),
       isAuthorizedOnDynamicOperations: jest.fn()
     };
 
-    const authService = new DynamicAuthorizationService({
+    authService = new DynamicAuthorizationService({
       auditService,
       authorizationPlugin: mockAuthorizationPlugin,
       dynamicAuthorizationPermissionsPlugin: mockDynamicAuthorizationPermissionsPlugin,
@@ -58,8 +66,9 @@ describe('AuthorizationSetup', () => {
     });
     authService.createGroup = jest.fn();
     authService.createIdentityPermissions = jest.fn();
-    const authSetup = new AuthorizationSetup(authService, { ROOT_USER_EMAIL: 'test' });
-
+    authSetup = new AuthorizationSetup(authService, { ROOT_USER_EMAIL: 'test' });
+  });
+  test('run: Create new group, assign permissions', async () => {
     await authSetup.run();
 
     expect(authService.createGroup).toBeCalledTimes(1);
@@ -70,6 +79,7 @@ describe('AuthorizationSetup', () => {
       expect.objectContaining({
         identityPermissions: expect.arrayContaining([
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
@@ -79,5 +89,65 @@ describe('AuthorizationSetup', () => {
         ])
       })
     );
+  });
+
+  test('Should not throw an error if ITAdmin role already exists', async () => {
+    authService.createGroup = jest.fn().mockRejectedValue(new GroupAlreadyExistsError());
+    await authSetup.run();
+
+    expect(authService.createGroup).toBeCalledTimes(1);
+    expect(authService.createGroup).toBeCalledWith(expect.objectContaining({ groupId: 'ITAdmin' }));
+
+    expect(authService.createIdentityPermissions).toBeCalledTimes(1);
+    expect(authService.createIdentityPermissions).toBeCalledWith(
+      expect.objectContaining({
+        identityPermissions: expect.arrayContaining([
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT })
+        ])
+      })
+    );
+  });
+
+  test('Should not throw an error if ITAdmin identity permissions already exists', async () => {
+    authService.createIdentityPermissions = jest
+      .fn()
+      .mockRejectedValue(new IdentityPermissionCreationError());
+    await authSetup.run();
+
+    expect(authService.createGroup).toBeCalledTimes(1);
+    expect(authService.createGroup).toBeCalledWith(expect.objectContaining({ groupId: 'ITAdmin' }));
+
+    expect(authService.createIdentityPermissions).toBeCalledTimes(1);
+    expect(authService.createIdentityPermissions).toBeCalledWith(
+      expect.objectContaining({
+        identityPermissions: expect.arrayContaining([
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT })
+        ])
+      })
+    );
+  });
+
+  test('Non GroupAlreadyExistsError should be thrown', async () => {
+    authService.createGroup = jest.fn().mockRejectedValue(new Error());
+    await expect(authSetup.run()).rejects.toThrow(Error);
+  });
+
+  test('Non IdentityPermissionCreationError should be thrown', async () => {
+    authService.createIdentityPermissions = jest.fn().mockRejectedValue(new Error());
+    await expect(authSetup.run()).rejects.toThrow(Error);
   });
 });

@@ -33,15 +33,25 @@ export default class AuthorizationSetup {
     //IT Admin Permissions
     const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
     const userPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_USER);
+    const environmentPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT, [
+      'READ',
+      'UPDATE',
+      'DELETE'
+    ]);
     const environmentTypePermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT_TYPE);
     const environmentTypeConfigPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ETC);
-    const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET);
+    const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, [
+      'READ',
+      'UPDATE',
+      'DELETE'
+    ]);
     const costCenterPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_COST_CENTER);
     const awsAccountPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_AWS_ACCOUNT);
 
     await this.createIdentityPermissions(
       [
         ...projectPermissions,
+        ...environmentPermissions,
         ...environmentTypePermissions,
         ...environmentTypeConfigPermissions,
         ...datasetPermissions,
