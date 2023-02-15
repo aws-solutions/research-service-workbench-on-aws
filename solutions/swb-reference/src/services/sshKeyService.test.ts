@@ -351,7 +351,7 @@ describe('SshKeyService', () => {
             const expectedResponse = {
               projectId: createSshKeyRequest.projectId,
               privateKey: mockKeyMaterial,
-              sshKeyId: `sshkey-${mockSshKeyId}`,
+              id: `sshkey-${mockSshKeyId}`,
               owner: createSshKeyRequest.userId
             };
 
