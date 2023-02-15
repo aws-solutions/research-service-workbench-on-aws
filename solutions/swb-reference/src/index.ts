@@ -6,19 +6,17 @@
 /* eslint-disable no-new */
 import { WorkbenchAppRegistry } from '@aws/workbench-core-infrastructure';
 import * as cdk from 'aws-cdk-lib';
-import { config } from 'dotenv';
+import { ApplicationType, SolutionId, SolutionName, SolutionVersion } from './constants';
 import { SWBStack } from './SWBStack';
-
-config({ path: './src/config/appRegistry.env' });
 
 const app: cdk.App = new cdk.App();
 const swbBackendStack: SWBStack = new SWBStack(app);
 new WorkbenchAppRegistry(swbBackendStack, swbBackendStack.stackId, {
-  solutionId: process.env.solutionId!,
-  solutionName: process.env.solutionName!,
-  solutionVersion: process.env.solutionVersion!,
+  solutionId: SolutionId,
+  solutionName: SolutionName,
+  solutionVersion: SolutionVersion,
   attributeGroupName: `${swbBackendStack.stackName}-AppRegistryGroup`,
-  applicationType: process.env.applicationType!,
+  applicationType: ApplicationType,
   appRegistryApplicationName: `${swbBackendStack.stackName}-AppRegistryApplication`
 });
 app.synth();

@@ -250,7 +250,6 @@ importers:
       constructs: ^10.0.0
       csrf: ^3.1.0
       depcheck: ^1.4.3
-      dotenv: ^16.0.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
       express: ^4.17.3
@@ -295,7 +294,6 @@ importers:
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       axios: 0.27.2
       csrf: 3.1.0
-      dotenv: 16.0.3
       express: 4.18.1
       js-yaml: 4.1.0
       lodash: 4.17.21
