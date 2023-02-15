@@ -111,7 +111,7 @@ export class WorkbenchAppRegistry extends Construct {
       createAppInsightsConfiguration(stack);
     }
 
-    new CfnOutput(this, `AppRegistryApplicationArn`, {
+    new CfnOutput(this, `${id}-AppRegistryApplicationArn`, {
       value: application.applicationArn
     });
 
@@ -119,7 +119,7 @@ export class WorkbenchAppRegistry extends Construct {
   }
 
   private _createMap(stack: Stack, id: string): CfnMapping {
-    const map = new CfnMapping(stack, `${id}-AppRegMap`);
+    const map = new CfnMapping(stack, `${id}-Solution`);
     map.setValue('Data', 'ID', this._solutionId);
     map.setValue('Data', 'Version', this._solutionVersion);
     map.setValue('Data', 'AppRegistryApplicationName', this._appRegistryApplicationName);

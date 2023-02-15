@@ -24,14 +24,15 @@ const exampleStack: ExampleStack = new ExampleStack(app, 'ExampleStack', {
 });
 
 // eslint-disable-next-line no-new
-new WorkbenchAppRegistry(exampleStack, 'ExampleStack-AppRegistry', {
+new WorkbenchAppRegistry(exampleStack, 'ExampleStack', {
   solutionId: process.env.solutionId!,
   solutionName: process.env.solutionName!,
   solutionVersion: process.env.solutionVersion!,
   attributeGroupName: process.env.attributeGroupName!,
   applicationType: process.env.applicationType!,
   appRegistryApplicationName: process.env.appRegistryApplicationName!,
-  destroy: true
+  destroy: true,
+  appInsights: true
 });
 
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

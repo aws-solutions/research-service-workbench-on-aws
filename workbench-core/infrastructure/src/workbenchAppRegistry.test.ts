@@ -12,7 +12,7 @@ describe('WorkbenchAppRegistry Test', () => {
     const stack = new Stack();
     new WorkbenchAppRegistry(stack, 'TestStack', {
       solutionId: 'T001',
-      solutionName: 'TestApp',
+      solutionName: 'Test App',
       solutionVersion: '0.0.1',
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
@@ -24,19 +24,19 @@ describe('WorkbenchAppRegistry Test', () => {
     template.resourceCountIs('AWS::RAM::ResourceShare', 0);
     template.hasResourceProperties('AWS::ServiceCatalogAppRegistry::Application', {
       Description:
-        'Service Catalog application to track and manage all your resources for the solution TestApp',
+        'Service Catalog application to track and manage all your resources for the solution Test App',
       Tags: {
         'Solutions:ApplicationType': {
-          'Fn::FindInMap': ['TestStackAppRegMap', 'Data', 'ApplicationType']
+          'Fn::FindInMap': ['TestStackSolution', 'Data', 'ApplicationType']
         },
         'Solutions:SolutionID': {
-          'Fn::FindInMap': ['TestStackAppRegMap', 'Data', 'ID']
+          'Fn::FindInMap': ['TestStackSolution', 'Data', 'ID']
         },
         'Solutions:SolutionName': {
-          'Fn::FindInMap': ['TestStackAppRegMap', 'Data', 'SolutionName']
+          'Fn::FindInMap': ['TestStackSolution', 'Data', 'SolutionName']
         },
         'Solutions:SolutionVersion': {
-          'Fn::FindInMap': ['TestStackAppRegMap', 'Data', 'Version']
+          'Fn::FindInMap': ['TestStackSolution', 'Data', 'Version']
         }
       },
       Name: {
@@ -44,7 +44,7 @@ describe('WorkbenchAppRegistry Test', () => {
           '-',
           [
             {
-              'Fn::FindInMap': ['TestStackAppRegMap', 'Data', 'AppRegistryApplicationName']
+              'Fn::FindInMap': ['TestStackSolution', 'Data', 'AppRegistryApplicationName']
             },
             {
               Ref: 'AWS::Region'
@@ -71,7 +71,7 @@ describe('WorkbenchAppRegistry Test', () => {
     const stack = new Stack();
     new WorkbenchAppRegistry(stack, 'TestStack', {
       solutionId: 'T001',
-      solutionName: 'TestApp',
+      solutionName: 'Test App',
       solutionVersion: '0.0.1',
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
@@ -101,7 +101,7 @@ describe('WorkbenchAppRegistry Test', () => {
     const stack = new Stack();
     new WorkbenchAppRegistry(stack, 'TestStack', {
       solutionId: 'T001',
-      solutionName: 'TestApp',
+      solutionName: 'Test App',
       solutionVersion: '0.0.1',
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
@@ -128,7 +128,7 @@ describe('WorkbenchAppRegistry Test', () => {
     const stack = new Stack();
     new WorkbenchAppRegistry(stack, 'TestStack', {
       solutionId: 'T001',
-      solutionName: 'TestApp',
+      solutionName: 'Test App',
       solutionVersion: '0.0.1',
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
@@ -153,7 +153,7 @@ describe('WorkbenchAppRegistry Test', () => {
     const testStack2 = new Stack();
     const testAppRegistry = new WorkbenchAppRegistry(testStack1, 'TestStack', {
       solutionId: 'T001',
-      solutionName: 'TestApp',
+      solutionName: 'Test App',
       solutionVersion: '0.0.1',
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
