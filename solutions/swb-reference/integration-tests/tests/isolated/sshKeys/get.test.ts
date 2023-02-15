@@ -12,12 +12,12 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('Get Key Pair negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  let adminUserId: string | undefined;
+  //let adminUserId: string | undefined;
   let project: { id: string };
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    adminUserId = adminSession.getUserId();
+    //adminUserId = adminSession.getUserId();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'test cost center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
@@ -49,7 +49,7 @@ describe('Get Key Pair negative tests', () => {
     test.skip('it throws 403 error', async () => {
       try {
         //TODO:
-        // get auth :await adminSession.resources.projects.project(project.id).get()
+        // get auth :git await adminSession.resources.projects.project(project.id).get()
       } catch (e) {
         // console.error(e)
         checkHttpError(
