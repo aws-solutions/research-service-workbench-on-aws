@@ -10,7 +10,7 @@ import { WorkbenchAssociateStackToExistingAppRegistryApplication } from './workb
 describe('WorkbenchAppRegistry Test', () => {
   test('default values', () => {
     const stack = new Stack();
-    new WorkbenchAssociateStackToExistingAppRegistryApplication(stack, stack.stackId, {
+    new WorkbenchAssociateStackToExistingAppRegistryApplication(stack, 'TestStack', {
       applicationArn: 'arn:aws:servicecatalog:us-east-1:111111111111:/applications/appRegApplication'
     });
 
@@ -23,6 +23,24 @@ describe('WorkbenchAppRegistry Test', () => {
         Ref: 'AWS::StackId'
       },
       ResourceType: 'CFN_STACK'
+    });
+  });
+
+  test('AppInsights is created', () => {
+    const stack = new Stack();
+    new WorkbenchAssociateStackToExistingAppRegistryApplication(stack, 'TestStack', {
+      applicationArn: 'arn:aws:servicecatalog:us-east-1:111111111111:/applications/appRegApplication',
+      appInsights: true
+    });
+
+    const template = Template.fromStack(stack);
+
+    template.resourceCountIs('AWS::ApplicationInsights::Application', 1);
+    template.hasResourceProperties('AWS::ApplicationInsights::Application', {
+      ResourceGroupName: 'AWS_CloudFormation_Stack-Default',
+      AutoConfigurationEnabled: true,
+      CWEMonitorEnabled: true,
+      OpsCenterEnabled: true
     });
   });
 });

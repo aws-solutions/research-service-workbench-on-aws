@@ -52,10 +52,12 @@ solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivat
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
-#Fake account ID used for workbenchAppRegistry tests
+# Fake account ID used for workbenchAppRegistry tests
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:110
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:109
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:136
+workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:161
 # Fake emails for user to project integ tests
 solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:108
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:49
