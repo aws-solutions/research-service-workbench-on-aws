@@ -27,7 +27,7 @@ export default class CognitoTokenService {
     clientId: string,
     userName: string,
     password: string,
-    accountType: 'USER' | 'ADMIN'
+    accountType: 'USER' | 'ITADMIN'
   ): Promise<CognitoToken> {
     const clientSecret = await this._getClientSecret(userPoolId, clientId);
     const secretHash = crypto
@@ -41,7 +41,7 @@ export default class CognitoTokenService {
       SECRET_HASH: secretHash
     };
 
-    if (accountType === 'ADMIN') {
+    if (accountType === 'ITADMIN') {
       return this._getAdminToken(userPoolId, clientId, authParameters);
     }
 
@@ -49,7 +49,7 @@ export default class CognitoTokenService {
       return this._getUserToken(clientId, authParameters);
     }
 
-    throw new Error(`accountType (${accountType}) must be 'USER' or 'ADMIN'`);
+    throw new Error(`accountType (${accountType}) must be 'USER' or 'ITADMIN'`);
   }
 
   private async _getAdminToken(
@@ -125,7 +125,7 @@ export default class CognitoTokenService {
       userName = await this._secretsService.getSecret(rootUserNameParamStorePath);
     }
 
-    return this.generateCognitoTokenWithCredentials(userPoolId, clientId, userName, password, 'ADMIN');
+    return this.generateCognitoTokenWithCredentials(userPoolId, clientId, userName, password, 'ITADMIN');
   }
 
   private async _getClientSecret(userPoolId: string, clientId: string): Promise<string> {

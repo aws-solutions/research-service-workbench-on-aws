@@ -27,7 +27,7 @@ describe('Authorization Service', () => {
     errorMessage = 'Permission is not granted';
     mockAdmin = {
       id: 'sampleUID',
-      roles: ['admin']
+      roles: ['itadmin']
     };
     mockGuest = {
       id: 'sampleUID',

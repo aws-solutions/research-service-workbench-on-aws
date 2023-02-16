@@ -16,7 +16,7 @@ export class MockPermissionsPlugin implements PermissionsPlugin {
   private _routesIgnored: RoutesIgnored = { '/login': { GET: true }, '/sample/*': { GET: true } };
 
   public async getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]> {
-    if (user.roles.includes('admin')) {
+    if (user.roles.includes('itadmin')) {
       return mockAdminPermissions;
     } else {
       return mockGuestPermissions;

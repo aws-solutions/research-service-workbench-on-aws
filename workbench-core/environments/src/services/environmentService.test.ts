@@ -284,7 +284,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { status: 'PENDING' }
       );
 
@@ -324,7 +324,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { name: 'testEnv' }
       );
 
@@ -369,7 +369,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { createdAtFrom: '2022-05-13T20:03:54.055Z', createdAtTo: '2022-05-13T20:03:54.055Z' }
       );
 
@@ -409,7 +409,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { project: projectId }
       );
 
@@ -449,7 +449,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { owner: 'owner-123' }
       );
 
@@ -489,7 +489,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         { type: 'envType-123' }
       );
 
@@ -501,7 +501,7 @@ describe('EnvironmentService', () => {
       // OPERATE n CHECK
       await expect(
         envService.listEnvironments(
-          { roles: ['Admin'], id: 'owner-123' },
+          { roles: ['ITAdmin'], id: 'owner-123' },
           { type: 'envType-123', owner: 'owner-123' }
         )
       ).rejects.toThrow('Cannot apply more than one filter.');
@@ -536,7 +536,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -576,7 +576,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -616,7 +616,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -656,7 +656,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -696,7 +696,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -736,7 +736,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -776,7 +776,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -790,10 +790,16 @@ describe('EnvironmentService', () => {
     test('should fail with too many sort attributes', async () => {
       // OPERATE n CHECK
       await expect(
-        envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' }, undefined, undefined, undefined, {
-          type: true,
-          owner: true
-        })
+        envService.listEnvironments(
+          { roles: ['ITAdmin'], id: 'owner-123' },
+          undefined,
+          undefined,
+          undefined,
+          {
+            type: true,
+            owner: true
+          }
+        )
       ).rejects.toThrow('Cannot sort by more than one attribute.');
     });
 
@@ -824,7 +830,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' });
+      const actualResponse = await envService.listEnvironments({ roles: ['ITAdmin'], id: 'owner-123' });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -910,7 +916,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { roles: ['Admin'], id: 'owner-123' },
+        { roles: ['ITAdmin'], id: 'owner-123' },
         undefined,
         limit,
         paginationToken
@@ -929,7 +935,12 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(
-        envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' }, undefined, limit, paginationToken)
+        envService.listEnvironments(
+          { roles: ['ITAdmin'], id: 'owner-123' },
+          undefined,
+          limit,
+          paginationToken
+        )
       ).rejects.toThrow('Invalid paginationToken');
     });
   });
@@ -1044,7 +1055,7 @@ describe('EnvironmentService', () => {
       datasetIds: ['dataset-123'],
       status: 'PENDING'
     };
-    const authenticateUser = { roles: ['Admin'], id: 'owner-123' };
+    const authenticateUser = { roles: ['ITAdmin'], id: 'owner-123' };
 
     function getBatchItemsWith(resourceTypes: string[]): Partial<BatchGetItemCommandOutput> {
       const resources = [
