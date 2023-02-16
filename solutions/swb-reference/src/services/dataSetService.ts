@@ -4,6 +4,7 @@
  */
 
 import {
+  ConflictError,
   DataSet,
   DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
@@ -59,8 +60,10 @@ export class DataSetService implements DataSetPlugin {
 
     const associatedProjects = await this._associatedProjects(dataset);
     if (associatedProjects.length > 0) {
-      throw Error(
-        `DataSet cannot be removed because it is associated with project(s) [${associatedProjects.join(',')}]`
+      throw new ConflictError(
+        `DataSet ${dataSetId} cannot be removed because it is associated with project(s) [${associatedProjects.join(
+          ','
+        )}]`
       );
     }
 
@@ -97,10 +100,12 @@ export class DataSetService implements DataSetPlugin {
       subjectType: SwbAuthZSubject.SWB_DATASET
     });
 
-    return permissions.data.identityPermissions
+    const projectIds = permissions.data.identityPermissions
       .filter((permission) => permission.identityType === 'GROUP')
       .filter((permission) => permission.identityId !== dataset.owner!)
-      .map((permission) => `'${permission.identityId}'`);
+      .map((permission) => `'${permission.identityId.split('#')[0]}'`);
+
+    return Array.from(new Set(projectIds));
   }
 
   public addDataSetExternalEndpoint(

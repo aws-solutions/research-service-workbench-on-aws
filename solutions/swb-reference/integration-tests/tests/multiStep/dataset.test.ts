@@ -16,7 +16,6 @@ describe('multiStep dataset integration test', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let dataSetName: string;
   let projectId: string;
   let costCenterId: string;
