@@ -8,7 +8,8 @@ import {
   resourceTypeToKey,
   validRolesRegExpAsString,
   uuidRegExpAsString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  validSshKeyUuidRegExpAsString
 } from '@aws/workbench-core-base';
 
 const projectsIdRoutePrefix: string = `/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
@@ -410,6 +411,23 @@ export const routesMap: RoutesMap = {
       {
         action: 'UPDATE',
         subject: 'Role'
+      }
+    ]
+  },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
+    {
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'SshKey'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'SshKey'
       }
     ]
   }

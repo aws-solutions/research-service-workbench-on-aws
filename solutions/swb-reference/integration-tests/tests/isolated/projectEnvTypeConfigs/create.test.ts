@@ -14,7 +14,7 @@ describe('Associate Project with EnvTypeConfig', () => {
   const projectId = setup.getSettings().get('projectId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
-  const nonExistentEnvTypeId = 'et-prod-1234567890123,pa-1234567890123';
+  const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   const nonExistentEnvTypeConfigId = 'etc-12345678-1234-1234-1234-123456789012';
 
   beforeEach(() => {
