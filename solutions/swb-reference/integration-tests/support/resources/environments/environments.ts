@@ -43,7 +43,6 @@ export default class Environments extends CollectionResource {
 
   public async listProjectEnvironments(projectId?: string): Promise<AxiosResponse> {
     projectId = projectId ?? this._settings.get('projectId');
-    console.log(`kvpark ${projectId}`);
     this._api = `projects/${projectId}/environments`;
     const response = super.get();
     this._api = 'environments';
