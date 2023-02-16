@@ -30,19 +30,21 @@ import { WorkbenchAppRegistry } from '@aws/workbench-core-infrastructure';
 // Create a stack and associate it with AppRegistry
 const stack = new Stack();
 // This will automatically associate stack with AppRegistry Application
-new workbenchAppRegistry(stack, stack.stackId, {
+new workbenchAppRegistry(stack, 'ExampleStack', {
   solutionId: 'Example001',
   solutionName: 'ExampleApp',
   solutionVersion: '0.0.1',
   attributeGroupName: 'ExampleApp-Metadata',
   applicationType: 'Example',
-  appRegistryApplicationName: 'ExampleApp'
+  appRegistryApplicationName: 'ExampleApp',
+  // default is false, set it to true if you want to create AppInsights. If you set it to true, AppInsights fails to create when you deploy it for the first time due to this [defect](https://t.corp.amazon.com/V746742507/communication). If it fails, you can try to deploy it again and it should succeed
+  appInsights: true
 });
 
 // Example 2:
 // Share AppRegistry Application and AttributeGroups with multiple accounts
 const stack = new Stack();
-new workbenchAppRegistry(stack, stack.stackId, {
+new workbenchAppRegistry(stack, 'ExampleStack', {
   solutionId: 'Example001',
   solutionName: 'ExampleApp',
   solutionVersion: '0.0.1',
@@ -58,7 +60,7 @@ const stack1 = new Stack();
 const stack2 = new Stack();
 const stack3 = new Stack();
 // This will automatically associate stack1 with AppRegistry
-const appRegistry = new workbenchAppRegistry(stack1, stack1.stackId, {
+const appRegistry = new workbenchAppRegistry(stack1, 'ExampleStack', {
   solutionId: 'Example001',
   solutionName: 'ExampleApp',
   solutionVersion: '0.0.1',
