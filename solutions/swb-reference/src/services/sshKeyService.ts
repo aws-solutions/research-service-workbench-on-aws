@@ -70,7 +70,7 @@ export default class SshKeyService implements SshKeyPlugin {
       throw new Ec2Error(e);
     }
 
-    let sshKeys: SshKey[] = [];
+    const sshKeys: SshKey[] = [];
     keyPairs.forEach((key) => {
       sshKeys.push({
         publicKey: key.PublicKey!,
