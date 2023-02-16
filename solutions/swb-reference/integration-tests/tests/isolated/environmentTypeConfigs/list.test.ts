@@ -42,7 +42,6 @@ describe('list environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(403, {
-          statusCode: 403,
           error: 'User is not authorized'
         })
       );
