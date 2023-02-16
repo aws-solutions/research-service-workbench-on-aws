@@ -9,9 +9,11 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { isAwsServiceError } from './errors/awsServiceError';
+import { isDuplicateKeyError } from './errors/duplicateKeyError';
 import { isEc2Error } from './errors/ec2Error';
 import { isNoKeyExistsError } from './errors/noKeyExistsError';
 import { isNonUniqueKeyError } from './errors/nonUniqueKeyError';
+import { CreateSshKeyRequest, CreateSshKeyRequestParser } from './sshKeys/createSshKeyRequest';
 import { DeleteSshKeyRequest, DeleteSshKeyRequestParser } from './sshKeys/deleteSshKeyRequest';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
@@ -48,6 +50,39 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
         }
 
         throw Boom.badImplementation(`There was a problem deleting ${validatedResult.sshKeyId}`);
+      }
+    })
+  );
+
+  // Create SSH Key
+  router.post(
+    '/projects/:projectId/sshKeys',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedResult = validateAndParse<CreateSshKeyRequest>(CreateSshKeyRequestParser, {
+        projectId: req.params.projectId,
+        userId: res.locals.user.id
+      });
+
+      try {
+        const response = await sshKeyService.createSshKey(validatedResult);
+        res.status(201).send(response);
+      } catch (e) {
+        console.error(e);
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isEc2Error(e) || isAwsServiceError(e)) {
+          throw Boom.badImplementation(e.message);
+        }
+
+        if (isDuplicateKeyError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem creating a SSH Key for user ${validatedResult.userId} and project ${validatedResult.projectId}`
+        );
       }
     })
   );

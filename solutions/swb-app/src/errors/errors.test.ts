@@ -6,6 +6,7 @@
 import { AwsServiceError, isAwsServiceError } from './awsServiceError';
 import { ConflictError, isConflictError } from './conflictError';
 import { DatabaseError, isDatabaseError } from './databaseError';
+import { DuplicateKeyError, isDuplicateKeyError } from './duplicateKeyError';
 import { Ec2Error, isEc2Error } from './ec2Error';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
@@ -41,6 +42,11 @@ describe('custom error tests', () => {
     expect(isConflictError(conflictError)).toBe(true);
   });
 
+  test('duplicateKeyError', () => {
+    const duplicateKeyError = new DuplicateKeyError();
+    expect(isDuplicateKeyError(duplicateKeyError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
@@ -70,6 +76,10 @@ describe('custom error tests', () => {
 
     test('not conflictError', () => {
       expect(isConflictError(error)).toBe(false);
+    });
+
+    test('not duplicateKeyError', () => {
+      expect(isDuplicateKeyError(error)).toBe(false);
     });
   });
 });
