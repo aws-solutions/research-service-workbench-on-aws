@@ -16,7 +16,7 @@ export class ConnectionInfoNotDefinedError extends Error {
   }
 }
 
-export function isConnectionInfoNotDefined(error: unknown): error is ConnectionInfoNotDefinedError {
+export function isConnectionInfoNotDefinedError(error: unknown): error is ConnectionInfoNotDefinedError {
   return (
     Boolean(error) &&
     error instanceof Error &&

@@ -308,9 +308,7 @@ export default class SshKeyService implements SshKeyPlugin {
       throw new NoKeyExistsError(`Key ${sshKeyId} does not exist`);
     }
     if (keys.length > 1) {
-      throw new NonUniqueKeyError(
-        `More than one key exists with ${sshKeyId}. Cannot determine which to delete.`
-      );
+      throw new NonUniqueKeyError(`More than one key exists with ${sshKeyId}.`);
     }
     // must only be 1 key
     return keys[0];

@@ -414,7 +414,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
+  [`${projectsIdRoutePrefix}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
     {
       DELETE: [
         {
@@ -423,7 +423,7 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+  [`${projectsIdRoutePrefix}/sshKeys`]: {
     GET: [
       {
         action: 'READ',
@@ -434,6 +434,14 @@ export const routesMap: RoutesMap = {
       {
         action: 'CREATE',
         subject: 'SshKey'
+      }
+    ]
+  },
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'EnvironmentSshKey'
       }
     ]
   }

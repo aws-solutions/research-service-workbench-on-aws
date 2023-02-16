@@ -2030,6 +2030,36 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Send SSH Public Key",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environments/:environmentId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":environmentId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "environmentId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
