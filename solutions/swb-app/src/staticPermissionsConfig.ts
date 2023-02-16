@@ -263,6 +263,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'SshKey'
   }
@@ -337,6 +342,11 @@ const researcherPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'DELETE',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
     subject: 'SshKey'
   },
   {
