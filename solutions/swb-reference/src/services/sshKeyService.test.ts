@@ -3,6 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+const mockSshKeyId = 'mockvalues';
+jest.mock('crypto', () => {
+  return {
+    createHash: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    digest: jest.fn(() => mockSshKeyId)
+  };
+});
+
 import { EC2, KeyPairInfo } from '@aws-sdk/client-ec2';
 import {
   AwsServiceError,
@@ -36,14 +45,11 @@ describe('SshKeyService', () => {
   });
   describe('listUserSshKeysForProject', () => {
     let listUserSshKeysForProjectRequest: ListUserSshKeysForProjectRequest;
-    let mockSshKeyId: string;
     beforeEach(() => {
       listUserSshKeysForProjectRequest = {
         projectId: 'proj-123',
         userId: 'user-123'
       };
-      mockSshKeyId = 'sshkey-123';
-      sshKeyService['_getSshKeyId'] = jest.fn(() => mockSshKeyId);
     });
 
     describe('when project does not exist', () => {
@@ -128,7 +134,7 @@ describe('SshKeyService', () => {
           beforeEach(() => {
             mockCreateTime = new Date();
             mockPublicKey = 'SSH#EXAMPLEKEY';
-            mockKeyName = 'sshkey-123';
+            mockKeyName = `sshkey-${mockSshKeyId}`;
           });
 
           describe('and no key exist', () => {
@@ -196,7 +202,7 @@ describe('SshKeyService', () => {
               mockResponse = {
                 sshKeys: [
                   {
-                    sshKeyId: mockSshKeyId,
+                    sshKeyId: `sshkey-${mockSshKeyId}`,
                     createTime: mockCreateTime.toISOString(),
                     projectId: listUserSshKeysForProjectRequest.projectId,
                     owner: listUserSshKeysForProjectRequest.userId,
@@ -276,7 +282,7 @@ describe('SshKeyService', () => {
           aws.getAwsServiceForRole = jest.fn(() => Promise.reject('Could not get EC2 client'));
         });
 
-        test('it throws Ec2Error', async () => {
+        test('it throws AwsServiceError', async () => {
           // OPERATE n CHECK
           await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(
             AwsServiceError
@@ -330,7 +336,7 @@ describe('SshKeyService', () => {
               );
             });
 
-            test('it throws NoKeyExistsError', async () => {
+            test('it throws NonUniqueKeyError', async () => {
               // OPERATE n CHECK
               await expect(() => sshKeyService.deleteSshKey(deleteSshKeyRequest)).rejects.toThrow(
                 NonUniqueKeyError
@@ -367,6 +373,7 @@ describe('SshKeyService', () => {
               beforeEach(() => {
                 hostEc2.deleteKeyPair = jest.fn(() => Promise.resolve({ $metadata: {} }));
               });
+
               test('it succeeds, nothing is returned', async () => {
                 // OPERATE n CHECK
                 await expect(sshKeyService.deleteSshKey(deleteSshKeyRequest)).resolves.not.toThrow();
@@ -382,13 +389,107 @@ describe('SshKeyService', () => {
     let createSshKeyRequest: CreateSshKeyRequest;
 
     beforeEach(() => {
-      createSshKeyRequest = { projectId: '', userId: '' };
+      createSshKeyRequest = { projectId: 'proj-123', userId: '1234' };
     });
 
-    test('should throw not implemented error', async () => {
-      await expect(() => sshKeyService.createSshKey(createSshKeyRequest)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
+    describe('when project does not exist', () => {
+      beforeEach(() => {
+        projectService.getProject = jest.fn(() => {
+          throw new Error(`Could not find project ${createSshKeyRequest.projectId}`);
+        });
+      });
+
+      test('it throws', async () => {
+        // OPERATE n CHECK
+        await expect(() => sshKeyService.createSshKey(createSshKeyRequest)).rejects.toThrow(
+          `Could not find project ${createSshKeyRequest.projectId}`
+        );
+      });
+    });
+
+    describe('when project exists', () => {
+      const hostSdk = { clients: {} } as AwsService;
+      const hostEc2 = {} as EC2;
+      let project: Project;
+
+      beforeEach(() => {
+        project = {
+          id: createSshKeyRequest.projectId,
+          name: '',
+          description: '',
+          costCenterId: '',
+          status: ProjectStatus.AVAILABLE,
+          createdAt: '',
+          updatedAt: '',
+          awsAccountId: '',
+          envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+          hostingAccountHandlerRoleArn: '',
+          vpcId: '',
+          subnetId: '',
+          environmentInstanceFiles: '',
+          encryptionKeyArn: '',
+          externalId: 'sampleExternalId',
+          accountId: ''
+        };
+        projectService.getProject = jest.fn(() => Promise.resolve(project));
+        hostSdk.clients.ec2 = hostEc2;
+      });
+
+      describe('but cannot get EC2 client', () => {
+        beforeEach(() => {
+          aws.getAwsServiceForRole = jest.fn(() => Promise.reject('Could not get EC2 client'));
+        });
+
+        test('it throws AwsServiceError', async () => {
+          // OPERATE n CHECK
+          await expect(() => sshKeyService.createSshKey(createSshKeyRequest)).rejects.toThrow(
+            AwsServiceError
+          );
+        });
+      });
+
+      describe('and successfully got EC2 client', () => {
+        beforeEach(() => {
+          aws.getAwsServiceForRole = jest.fn(() => Promise.resolve(hostSdk));
+        });
+
+        describe('but EC2 create call fails', () => {
+          beforeEach(() => {
+            hostEc2.createKeyPair = jest.fn(() => Promise.reject('Some EC2 thrown error'));
+          });
+
+          test('it throws Ec2Error', async () => {
+            // OPERATE n CHECK
+            await expect(() => sshKeyService.createSshKey(createSshKeyRequest)).rejects.toThrow(Ec2Error);
+          });
+        });
+
+        describe('and EC2 create call succeeds', () => {
+          let mockKeyMaterial: string;
+          beforeEach(() => {
+            mockKeyMaterial = '--begin private RSA key--...';
+            hostEc2.createKeyPair = jest.fn(() =>
+              Promise.resolve({ $metadata: {}, KeyMaterial: mockKeyMaterial })
+            );
+          });
+
+          test('private key and other information is returned', async () => {
+            // BUILD
+            const expectedResponse = {
+              projectId: createSshKeyRequest.projectId,
+              privateKey: mockKeyMaterial,
+              id: `sshkey-${mockSshKeyId}`,
+              owner: createSshKeyRequest.userId
+            };
+
+            // OPERATE
+            const response = await sshKeyService.createSshKey(createSshKeyRequest);
+
+            // CHECK
+            expect(response).toEqual(expectedResponse);
+          });
+        });
+      });
     });
   });
 

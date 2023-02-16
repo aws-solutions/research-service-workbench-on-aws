@@ -10,9 +10,12 @@ import { createAppInsightsConfiguration } from './helpers';
 
 export interface WorkbenchAssociateStackToExistingAppRegistryApplicationProps {
   applicationArn: string;
+  appInsights?: boolean;
 }
 
 export class WorkbenchAssociateStackToExistingAppRegistryApplication extends Construct {
+  private _appInsights: boolean;
+
   public constructor(
     scope: Construct,
     id: string,
@@ -20,6 +23,7 @@ export class WorkbenchAssociateStackToExistingAppRegistryApplication extends Con
   ) {
     super(scope, id);
     const stack: Stack = scope as Stack;
+    this._appInsights = props.appInsights ? props.appInsights : false;
 
     this._associateApplicationWithStack(props.applicationArn, stack, id);
   }
@@ -32,6 +36,9 @@ export class WorkbenchAssociateStackToExistingAppRegistryApplication extends Con
     );
 
     importedApplication.associateApplicationWithStack(stack);
-    createAppInsightsConfiguration(stack);
+
+    if (this._appInsights) {
+      createAppInsightsConfiguration(stack);
+    }
   }
 }
