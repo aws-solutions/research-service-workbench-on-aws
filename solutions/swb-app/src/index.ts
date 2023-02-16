@@ -25,8 +25,10 @@ import { ListEnvironmentTypeConfigsRequest } from './envTypeConfigs/listEnvironm
 import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
+import { ConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { DatabaseError } from './errors/databaseError';
 import { Ec2Error } from './errors/ec2Error';
+import { NoInstanceFoundError } from './errors/noInstanceFoundError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
@@ -107,5 +109,7 @@ export {
   GetProjectEnvTypeConfigRequestParser,
   ListEnvTypeConfigProjectsRequest,
   ListEnvTypeConfigProjectsRequestParser,
-  Project
+  Project,
+  NoInstanceFoundError,
+  ConnectionInfoNotDefinedError
 };
