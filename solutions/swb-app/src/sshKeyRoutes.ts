@@ -15,9 +15,44 @@ import { isNoKeyExistsError } from './errors/noKeyExistsError';
 import { isNonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { CreateSshKeyRequest, CreateSshKeyRequestParser } from './sshKeys/createSshKeyRequest';
 import { DeleteSshKeyRequest, DeleteSshKeyRequestParser } from './sshKeys/deleteSshKeyRequest';
+import {
+  ListUserSshKeysForProjectRequest,
+  ListUserSshKeysForProjectRequestParser
+} from './sshKeys/listUserSshKeysForProjectRequest';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): void {
+  // List User SSH Keys
+  router.get(
+    '/projects/:projectId/sshKeys',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedResult = validateAndParse<ListUserSshKeysForProjectRequest>(
+        ListUserSshKeysForProjectRequestParser,
+        {
+          projectId: req.params.projectId,
+          userId: res.locals.user.id
+        }
+      );
+
+      try {
+        const response = await sshKeyService.listUserSshKeysForProject(validatedResult);
+        res.status(200).send(response);
+      } catch (e) {
+        console.error(e);
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isEc2Error(e) || isAwsServiceError(e)) {
+          throw Boom.badImplementation(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing keys in project ${validatedResult.projectId}`
+        );
+      }
+    })
+  );
   // Delete SSH Key
   router.delete(
     '/projects/:projectId/sshKeys/:sshKeyId',
