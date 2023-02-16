@@ -438,9 +438,7 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'SshKey'
       }
-    ]
-  },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/sshKeys`]: {
+    ],
     POST: [
       {
         action: 'CREATE',
