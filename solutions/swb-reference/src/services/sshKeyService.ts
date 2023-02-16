@@ -4,7 +4,7 @@
  */
 
 import * as crypto from 'crypto';
-import { EC2, KeyPairInfo, Tag } from '@aws-sdk/client-ec2';
+import { EC2, KeyPairInfo, Reservation, Tag } from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   CreateSshKeyRequest,
@@ -18,7 +18,9 @@ import {
   Ec2Error,
   NoKeyExistsError,
   NonUniqueKeyError,
-  AwsServiceError
+  AwsServiceError,
+  NoInstanceFoundError,
+  ConnectionInfoNotDefinedError
 } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
@@ -133,7 +135,19 @@ export default class SshKeyService implements SshKeyPlugin {
     const { environmentId, userId } = request;
 
     // get environment instanceId and projectId
-    const { instanceId, projectId } = await this._environmentService.getEnvironment(environmentId);
+    const { instanceId, projectId, status } = await this._environmentService.getEnvironment(environmentId);
+    if (!instanceId) {
+      // getEnvironment could return an environment before the instance is spun up
+      throw new NoInstanceFoundError(
+        `Instance Id is not defined for environment ${environmentId} yet. Try again later.`
+      );
+    }
+    if (status !== 'COMPLETED') {
+      // getEnvironment could return an environment before the instance is available
+      throw new ConnectionInfoNotDefinedError(
+        `The environment ${environmentId} is not available yet. Try again later.`
+      );
+    }
 
     // get the key for the user and given project
     const sshKeyId = this._getSshKeyId(userId, projectId);
@@ -151,17 +165,35 @@ export default class SshKeyService implements SshKeyPlugin {
     );
 
     // get instance metadata
+    let response;
     try {
-      const response = await ec2.describeInstances({ InstanceIds: [instanceId!] });
+      response = await ec2.describeInstances({ InstanceIds: [instanceId!] });
     } catch (e) {
       throw new Ec2Error(e.message);
     }
 
     // send ssh public key
+    try {
+      const { Success: success } = await ec2InstanceConnect.sendSSHPublicKey({
+        InstanceId: instanceId,
+        InstanceOSUser: 'ec2-user',
+        SSHPublicKey: key.PublicKey
+      });
+      if (!success) {
+        throw new Ec2Error(`Could not send SSH Public Key to environment ${environmentId}`);
+      }
+    } catch (e) {
+      throw new Ec2Error(e.message);
+    }
 
     // return network info
-    // TODO implement
-    throw new Error('Method not implemented.');
+    const reservations = response.Reservations;
+    if (!reservations || reservations.length !== 1) {
+      throw new NoInstanceFoundError('No instance found');
+    }
+
+    const reservation = reservations[0];
+    return this._getConnectionInfoFromReservation(reservation);
   }
 
   private async _getSshKey(sshKeyId: string, projectId: string): Promise<KeyPairInfo> {
@@ -189,6 +221,38 @@ export default class SshKeyService implements SshKeyPlugin {
     }
     // must only be 1 key
     return keys[0];
+  }
+
+  /**
+   * Gets the connection info (public DNS name, public IP address, private DNS name, private IP address)
+   * from an EC2 {@link Reservation} for a single instance
+   *
+   * @param reservation - a {@link Reservation} for a single instance
+   * @returns {@link SendPublicKeyResponse} that contains the connection info
+   */
+  private _getConnectionInfoFromReservation(reservation: Reservation): SendPublicKeyResponse {
+    const instances = reservation.Instances;
+    if (!instances || instances.length !== 1) {
+      throw new NoInstanceFoundError('No instance found');
+    }
+
+    const instance = instances[0];
+    const {
+      PublicDnsName: publicDnsName,
+      PublicIpAddress: publicIp,
+      PrivateDnsName: privateDnsName,
+      PrivateIpAddress: privateIp
+    } = instance;
+    if (!(publicDnsName && publicIp && privateDnsName && privateIp)) {
+      throw new ConnectionInfoNotDefinedError('Some connection info is not defined');
+    }
+
+    return {
+      publicDnsName,
+      publicIp,
+      privateDnsName,
+      privateIp
+    };
   }
 
   /**
