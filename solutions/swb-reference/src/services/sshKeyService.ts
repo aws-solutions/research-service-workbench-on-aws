@@ -4,24 +4,36 @@
  */
 
 import * as crypto from 'crypto';
-import { EC2, KeyPairInfo, Reservation, Tag } from '@aws-sdk/client-ec2';
+import {
+  DescribeKeyPairsCommandOutput,
+  EC2,
+  KeyFormat,
+  KeyType,
+  KeyPairInfo,
+  Reservation,
+  Tag
+} from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
+  AwsServiceError,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
   DeleteSshKeyRequest,
+  DuplicateKeyError,
+  Ec2Error,
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
-  SshKeyPlugin,
-  SendPublicKeyRequest,
-  SendPublicKeyResponse,
-  Ec2Error,
+  ListUserSshKeysForProjectResponseParser,
   NoKeyExistsError,
   NonUniqueKeyError,
-  AwsServiceError,
+  SendPublicKeyRequest,
+  SendPublicKeyResponse,
+  SshKey,
+  SshKeyPlugin,
   NoInstanceFoundError,
   ConnectionInfoNotDefinedError
 } from '@aws/swb-app';
+import { CreateSshKeyResponseParser } from '@aws/swb-app/lib/sshKeys/createSshKeyResponse';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
@@ -51,8 +63,43 @@ export default class SshKeyService implements SshKeyPlugin {
   public async listUserSshKeysForProject(
     request: ListUserSshKeysForProjectRequest
   ): Promise<ListUserSshKeysForProjectResponse> {
-    // TODO: implement
-    throw new Error('Method not implemented.');
+    const { projectId, userId } = request;
+
+    // get envMgmtRoleArn and externalId from project record
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'ListForProject',
+      externalId,
+      this._aws
+    );
+
+    // get ssh key from ec2
+    let keyPairs = [];
+    const sshKeyId = this._getSshKeyId(userId, projectId);
+    try {
+      const ec2DescribeKeyPairsParam = {
+        Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
+        IncludePublicKey: true
+      };
+      const ec2Response: DescribeKeyPairsCommandOutput = await ec2.describeKeyPairs(ec2DescribeKeyPairsParam);
+      keyPairs = ec2Response.KeyPairs || [];
+    } catch (e) {
+      throw new Ec2Error(e);
+    }
+
+    const sshKeys: SshKey[] = [];
+    keyPairs.forEach((key) => {
+      sshKeys.push({
+        publicKey: key.PublicKey!,
+        createTime: key.CreateTime!.toISOString(),
+        projectId,
+        sshKeyId: key.KeyName!,
+        owner: userId
+      });
+    });
+    return ListUserSshKeysForProjectResponseParser.parse({ sshKeys: sshKeys });
   }
 
   /**
@@ -122,8 +169,54 @@ export default class SshKeyService implements SshKeyPlugin {
    * @returns a {@link CreateSshKeyResponse}
    */
   public async createSshKey(request: CreateSshKeyRequest): Promise<CreateSshKeyResponse> {
-    // TODO: implement
-    throw new Error('Method not implemented.');
+    const { projectId, userId } = request;
+    const sshKeyId = this._getSshKeyId(userId, projectId);
+
+    // get envMgmtRoleArn and externalId from project record
+    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
+
+    // get EC2 client
+    const { ec2 } = await this._getEc2ClientsForHostingAccount(
+      envMgmtRoleArn,
+      'Create',
+      externalId,
+      this._aws
+    );
+
+    // create key
+    try {
+      const createKeyPairResponse = await ec2.createKeyPair({
+        KeyFormat: KeyFormat.pem,
+        KeyName: sshKeyId,
+        KeyType: KeyType.rsa,
+        TagSpecifications: [
+          {
+            ResourceType: 'key-pair',
+            Tags: [
+              {
+                Key: 'user',
+                Value: userId
+              },
+              {
+                Key: 'project',
+                Value: projectId
+              }
+            ]
+          }
+        ]
+      });
+      return CreateSshKeyResponseParser.parse({
+        projectId,
+        privateKey: createKeyPairResponse.KeyMaterial!,
+        id: sshKeyId,
+        owner: userId
+      });
+    } catch (e) {
+      if (e.Code === 'InvalidKeyPair.Duplicate') {
+        throw new DuplicateKeyError(e.message);
+      }
+      throw new Ec2Error(e.message);
+    }
   }
 
   /**

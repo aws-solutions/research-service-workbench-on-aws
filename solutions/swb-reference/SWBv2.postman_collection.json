@@ -1938,6 +1938,36 @@
       "name": "SSH keys",
       "items": [
         {
+          "name": "List User SSH Keys for Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Delete SSH Key",
           "request": {
             "method": "DELETE",
@@ -1964,6 +1994,36 @@
                 },
                 {
                   "key": "sshKeyId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create SSH Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projectId",
                   "value": ""
                 }
               ]

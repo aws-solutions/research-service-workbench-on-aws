@@ -27,6 +27,7 @@ import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
 import { ConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { DatabaseError } from './errors/databaseError';
+import { DuplicateKeyError } from './errors/duplicateKeyError';
 import { Ec2Error } from './errors/ec2Error';
 import { NoInstanceFoundError } from './errors/noInstanceFoundError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
@@ -54,7 +55,10 @@ import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
 import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
 import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
 import { ListUserSshKeysForProjectRequest } from './sshKeys/listUserSshKeysForProjectRequest';
-import { ListUserSshKeysForProjectResponse } from './sshKeys/listUserSshKeysForProjectResponse';
+import {
+  ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser
+} from './sshKeys/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
 import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
 import { SshKey, SshKeyParser } from './sshKeys/sshKey';
@@ -85,6 +89,7 @@ export {
   DeleteSshKeyRequest,
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectResponse,
+  ListUserSshKeysForProjectResponseParser,
   SshKey,
   SshKeyParser,
   SshKeyPlugin,
@@ -111,5 +116,6 @@ export {
   ListEnvTypeConfigProjectsRequestParser,
   Project,
   NoInstanceFoundError,
-  ConnectionInfoNotDefinedError
+  ConnectionInfoNotDefinedError,
+  DuplicateKeyError
 };
