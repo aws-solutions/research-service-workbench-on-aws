@@ -261,6 +261,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/softDelete`]:
+    {
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'ProjectDataSet'
+        }
+      ]
+    },
   [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
     {
       PUT: [

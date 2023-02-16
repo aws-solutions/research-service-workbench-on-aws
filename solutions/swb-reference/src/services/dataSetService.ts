@@ -57,14 +57,12 @@ export class DataSetService implements DataSetPlugin {
   public async removeDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<void> {
     const dataset = await this.getDataSet(dataSetId, authenticatedUser);
 
-    const associatedProjects = await this._associatedProjects(dataSetId);
+    const associatedProjects = await this._associatedProjects(dataset);
     if (associatedProjects.length > 0) {
       throw Error(
         `DataSet cannot be removed because it is associated with project(s) [${associatedProjects.join(',')}]`
       );
     }
-
-    const projectAdmin = dataset.owner!;
 
     await this._workbenchDataSetService.removeDataSet(
       dataSetId,
@@ -74,6 +72,7 @@ export class DataSetService implements DataSetPlugin {
       authenticatedUser
     );
 
+    const projectAdmin = dataset.owner!;
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -92,15 +91,16 @@ export class DataSetService implements DataSetPlugin {
     );
   }
 
-  private async _associatedProjects(dataSetId: string): Promise<string[]> {
+  private async _associatedProjects(dataset: DataSet): Promise<string[]> {
     const permissions = await this._dynamicAuthService.getIdentityPermissionsBySubject({
-      subjectId: dataSetId,
+      subjectId: dataset.id!,
       subjectType: SwbAuthZSubject.SWB_DATASET
     });
 
     return permissions.data.identityPermissions
       .filter((permission) => permission.identityType === 'GROUP')
-      .map((permission) => `'${permission.identityId.split('#')[0]}'`);
+      .filter((permission) => permission.identityId !== dataset.owner!)
+      .map((permission) => `'${permission.identityId}'`);
   }
 
   public addDataSetExternalEndpoint(
