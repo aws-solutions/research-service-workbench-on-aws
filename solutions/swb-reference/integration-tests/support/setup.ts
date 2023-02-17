@@ -63,10 +63,9 @@ export default class Setup {
   ): Promise<ClientSession> {
     const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
     const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
-
     const awsRegion = this._settings.get('awsRegion');
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-    // await this._loadSecrets(secretsService);
+
     const userName = await secretsService.getSecret(userNameParamStorePath);
     const password = await secretsService.getSecret(userPasswordParamStorePath);
     return this.getSessionForUser(userName, password);

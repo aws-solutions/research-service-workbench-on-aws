@@ -6,7 +6,7 @@ import ClientSession from '../clientSession';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
 
-export interface PaabResources {
+interface PaabResources {
   adminSession: ClientSession;
   pa1Session: ClientSession;
   pa2Session: ClientSession;
