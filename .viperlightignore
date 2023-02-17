@@ -10,7 +10,7 @@ build
 lib
 
 # NOTICE files
-.\*/NOTICE
+.*/NOTICE
 
 # Test files
 #SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
