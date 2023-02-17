@@ -28,7 +28,6 @@ describe('Delete Cost Center negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Could not find cost center ${invalidId}`
           })

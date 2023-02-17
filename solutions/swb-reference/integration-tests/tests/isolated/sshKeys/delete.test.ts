@@ -58,7 +58,6 @@ describe('Delete Key Pair negative tests', () => {
         checkHttpError(
           e,
           new HttpError(403, {
-            statusCode: 403,
             error: 'Forbidden',
             message: `Current user ${secondaryUserId} cannot delete a key they do not own`
           })
@@ -82,7 +81,6 @@ describe('Delete Key Pair negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Could not find project ${invalidProjectId}`
           })
@@ -109,7 +107,6 @@ describe('Delete Key Pair negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Key ${nonExistentSshKeyId} does not exist`
           })

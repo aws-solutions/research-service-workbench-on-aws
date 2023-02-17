@@ -66,7 +66,6 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: `Project name "${existingProjectName}" is in use by a non deleted project. Please use another name.`
             })
@@ -87,7 +86,6 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: 'name: Required'
             })
@@ -110,7 +108,6 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: 'description: Required'
             })
@@ -133,7 +130,6 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(404, {
-              statusCode: 404,
               error: 'Not Found',
               message: `Could not find cost center cc-invalid-cost-center`
             })
@@ -154,7 +150,6 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: 'costCenterId: Required'
             })
