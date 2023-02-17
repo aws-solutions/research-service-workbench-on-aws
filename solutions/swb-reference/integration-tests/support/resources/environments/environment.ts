@@ -41,23 +41,40 @@ export default class Environment extends Resource {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
     let envStatus: EnvironmentStatus = resource.status;
-    if (['TERMINATED', 'TERMINATING'].includes(envStatus)) {
+    if (['TERMINATED'].includes(envStatus)) {
       // Exit early because environment has already been terminated
       return;
     }
+
     try {
       console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
       await poll(
         async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
-        (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
+        (env) => !['PENDING', 'STOPPING', 'STARTING'].includes(env?.data?.status),
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );
+
+      if (!['STOPPED'].includes(envStatus)) {
+        console.log(`Environment must be stopped to terminate. Currently in state ${envStatus}.`);
+        await defAdminSession.resources.environments.environment(this._id, this._projectId).stop();
+        await poll(
+          async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
+          (env) => env?.data?.status === 'STOPPED',
+          ENVIRONMENT_START_MAX_WAITING_SECONDS
+        );
+      }
+
       const { data: completedResource } = await defAdminSession.resources.environments
         .environment(this._id, this._projectId)
         .get();
       envStatus = completedResource.status;
       console.log(`Terminating environment ${this._id}.`);
       await defAdminSession.resources.environments.environment(this._id, this._projectId).terminate();
+      await poll(
+        async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
+        (env) => env?.data?.status === 'TERMINATED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      );
       console.log(`Deleted environment ${this._id}`);
     } catch (e) {
       console.log(

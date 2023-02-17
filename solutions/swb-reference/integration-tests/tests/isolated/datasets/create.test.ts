@@ -31,7 +31,6 @@ describe('datasets create negative tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            statusCode: 400,
             error: 'Bad Request',
             message:
               'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. type: Required. owner: Required. ownerType: Required'

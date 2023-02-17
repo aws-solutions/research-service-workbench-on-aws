@@ -40,7 +40,6 @@ describe('Cost Center negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: "requires property 'name'"
             })
@@ -60,7 +59,6 @@ describe('Cost Center negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: "requires property 'description'"
             })
@@ -80,7 +78,6 @@ describe('Cost Center negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: "requires property 'accountId'"
             })

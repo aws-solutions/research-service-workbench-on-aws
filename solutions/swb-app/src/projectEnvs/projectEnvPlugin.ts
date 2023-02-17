@@ -31,11 +31,11 @@ export interface ProjectEnvPlugin {
 
   /**
    *
-   * @param envId - Environment Id
    * @param projectId - Project Id
+   * @param envId - Environment Id
    * @param includeMetadata - If true we get all entries where pk = envId, instead of just the entry where pk = envId and sk = envId
    */
-  getEnvironment(envId: string, projectId: string, includeMetadata: boolean): Promise<Environment>;
+  getEnvironment(projectId: string, envId: string, includeMetadata: boolean): Promise<Environment>;
 
   /**
    * List Environments associated with Project
@@ -56,13 +56,13 @@ export interface ProjectEnvPlugin {
   /**
    * Update Environment associated with Project
    *
-   * @param envId - Environment Id
    * @param projectId - Project Id
+   * @param envId - Environment Id
    * @param updatedValues - Key Value pairs to be updated
    */
   updateEnvironment(
-    envId: string,
     projectId: string,
+    envId: string,
     updatedValues: {
       [key: string]:
         | string
