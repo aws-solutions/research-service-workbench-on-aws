@@ -37,7 +37,7 @@ export function setUpProjectEnvRoutes(
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
-          await projectEnvironmentService.updateEnvironment(env.id!, env.projectId, {
+          await projectEnvironmentService.updateEnvironment(env.projectId, env.id!, {
             error: { type: 'LAUNCH', value: errorMessage },
             status: 'FAILED'
           });
