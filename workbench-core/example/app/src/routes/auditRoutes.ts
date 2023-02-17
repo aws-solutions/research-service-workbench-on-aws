@@ -5,20 +5,15 @@
 
 import { AuditService, Metadata, MetadataParser } from '@aws/workbench-core-audit';
 import { isAuditIncompleteError } from '@aws/workbench-core-audit/lib/errors/auditIncompleteError';
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { wrapAuth } from '../utilities/authWrapper';
+import { wrapAsync } from '../utilities/errorHandlers';
 
-export function setupAuditRoutes(
-  router: Router,
-  auditService: AuditService,
-  dynamicAuthorizationService: DynamicAuthorizationService
-): void {
+export function setupAuditRoutes(router: Router, auditService: AuditService): void {
   router.post(
     '/audit',
-    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
+    wrapAsync(async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;
         const source = {
@@ -46,7 +41,7 @@ export function setupAuditRoutes(
 
   router.get(
     '/audit/is-audit-complete',
-    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
+    wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = res.locals.user;
       const source = {
         ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
