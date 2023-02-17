@@ -32,7 +32,6 @@ describe('Update Cost Center negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Could not find cost center ${invalidId}`
           })
@@ -51,7 +50,6 @@ describe('Update Cost Center negative tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            statusCode: 400,
             error: 'Bad Request',
             message: 'name: Expected string, received number'
           })
@@ -68,7 +66,6 @@ describe('Update Cost Center negative tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            statusCode: 400,
             error: 'Bad Request',
             message: 'description: Expected string, received number'
           })

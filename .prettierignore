@@ -98,3 +98,6 @@ lib
 *.yml
 *.tools
 **/temp*
+
+# Viperlight
+.viperlightignore
