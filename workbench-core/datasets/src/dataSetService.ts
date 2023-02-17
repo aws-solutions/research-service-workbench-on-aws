@@ -145,10 +145,7 @@ export class DataSetService {
   public async removeDataSet(
     dataSetId: string,
     checkDependency: (dataSetId: string) => Promise<void>,
-    authenticatedUser: {
-      id: string;
-      roles: string[];
-    }
+    authenticatedUser: AuthenticatedUser
   ): Promise<DataSet> {
     const metadata: Metadata = {
       actor: authenticatedUser,
