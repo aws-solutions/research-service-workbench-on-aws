@@ -126,7 +126,8 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     if (!dynamicOperations) throw new RouteNotFoundError();
     return {
       data: {
-        dynamicOperations
+        dynamicOperations,
+        pathParams: payload.params
       }
     };
   }
