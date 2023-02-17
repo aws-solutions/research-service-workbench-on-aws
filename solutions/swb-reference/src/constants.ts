@@ -203,7 +203,7 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
 }
 
 const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
-const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
+const SolutionName: string = 'Service Workbench v2.0 on AWS'; //TODO: retrieve value dynamically
 const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
 const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
 
