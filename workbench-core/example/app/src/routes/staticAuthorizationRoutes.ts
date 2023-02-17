@@ -3,11 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  AuthorizationService,
-  DynamicAuthorizationService,
-  isForbiddenError
-} from '@aws/workbench-core-authorization';
+import { AuthorizationService, isForbiddenError } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -16,16 +12,15 @@ import {
   IsAuthorizedOnRouteRequest
 } from '../models/authorization/isAuthorizedOnRoute';
 import { IsRouteIgnoredRequest, IsRouteIgnoredRequestParser } from '../models/authorization/isRouteIgnored';
-import { wrapAuth } from '../utilities/authWrapper';
+import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setupStaticAuthorizationRoutes(
   router: Router,
-  dynamicAuthorizationService: DynamicAuthorizationService,
   authorizationService: AuthorizationService
 ): void {
   router.get(
     '/staticAuthorization/isAuthorizedOnRoute',
-    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
+    wrapAsync(async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;
         const validatedRequest = validateAndParse<IsAuthorizedOnRouteRequest>(
@@ -50,7 +45,7 @@ export function setupStaticAuthorizationRoutes(
 
   router.get(
     '/staticAuthorization/isRouteIgnored',
-    wrapAuth(dynamicAuthorizationService, async (req: Request, res: Response) => {
+    wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<IsRouteIgnoredRequest>(
         IsRouteIgnoredRequestParser,
         req.query
