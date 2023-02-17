@@ -55,7 +55,9 @@ export default class Environment extends Resource {
       );
 
       if (!['STOPPED'].includes(envStatus)) {
-        console.log(`Environment must be stopped to terminate. Currently in state ${envStatus}.`);
+        console.log(
+          `Environment must be stopped to terminate. Currently in state ${envStatus}. Stopping environment ${this._id}.`
+        );
         await defAdminSession.resources.environments.environment(this._id, this._projectId).stop();
         await poll(
           async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),

@@ -49,6 +49,7 @@ import {
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { Project } from './projectEnvTypeConfigs/project';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { ProjectPlugin } from './projects/projectPlugin';
 import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
 import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
 import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
@@ -82,6 +83,7 @@ export {
   PermissionsResponseParser,
   ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin,
+  ProjectPlugin,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
   DeleteSshKeyRequest,
