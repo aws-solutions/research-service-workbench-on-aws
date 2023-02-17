@@ -44,7 +44,6 @@ describe('awsAccounts create negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message:
                 'name: Required. awsAccountId: Required. envMgmtRoleArn: Required. hostingAccountHandlerRoleArn: Required. externalId: Required'
@@ -66,7 +65,6 @@ describe('awsAccounts create negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message:
                 'This AWS Account was found in DDB. Please provide the correct id value in request body'

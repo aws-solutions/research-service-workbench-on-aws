@@ -38,7 +38,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'name: Required'
         })
@@ -60,7 +59,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'type: Required'
         })
@@ -82,7 +80,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'params: Required'
         })
@@ -106,7 +103,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: ": Unrecognized key(s) in object: 'invalidProp'"
         })
@@ -132,7 +128,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `Could not create environment type config because environment type et-prod-0123456789012,pa-0123456789012 does not exist`
         })
@@ -158,7 +153,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(403, {
-          statusCode: 403,
           error: 'User is not authorized'
         })
       );

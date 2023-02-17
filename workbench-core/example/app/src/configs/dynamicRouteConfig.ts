@@ -4,6 +4,7 @@
  */
 
 import { DynamicRoutesMap, RoutesIgnored } from '@aws/workbench-core-authorization';
+import { routesUsedByStaticAuthorization } from './dynamicRoutesIgnored';
 
 export const dynamicRoutesMap: DynamicRoutesMap = {
   '/helloworld': {
@@ -124,5 +125,6 @@ export const routesIgnored: RoutesIgnored = {
   },
   '/loggedIn': {
     GET: true
-  }
+  },
+  ...routesUsedByStaticAuthorization
 };

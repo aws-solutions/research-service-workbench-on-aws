@@ -274,14 +274,10 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
         method: 'DELETE'
       });
       expect(data.dynamicOperations).toStrictEqual(sampleDynamicRouteDelete);
-    });
-
-    test(`get operations by route ${sampleDynamicRouteName}`, async () => {
-      const { data } = await dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
-        route: '/dynamic/sampleSubjectType/sampleSubjectId',
-        method: 'DELETE'
+      expect(data.pathParams).toStrictEqual({
+        id: sampleSubjectId,
+        type: sampleSubjectType
       });
-      expect(data.dynamicOperations).toStrictEqual(sampleDynamicRouteDelete);
     });
 
     itProp(

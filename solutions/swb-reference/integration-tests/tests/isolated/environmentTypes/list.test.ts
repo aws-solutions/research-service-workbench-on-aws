@@ -58,7 +58,6 @@ describe('list environment types', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: "filter: Unrecognized key(s) in object: 'someProperty'"
         })
@@ -80,7 +79,6 @@ describe('list environment types', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'Cannot apply a filter and sort to different properties at the same time'
         })
