@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "new send ssh public key GET route",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
