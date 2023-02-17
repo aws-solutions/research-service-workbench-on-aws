@@ -101,16 +101,26 @@ async function setupEnvironmentTypes(awsService: AwsService, portfolioName: stri
   await envTypeHandler.run(portfolioName);
 }
 
-async function uploadOnboardAccountCfnToS3(awsService: AwsService): Promise<void> {
-  console.log('Uploading onboard-account.cfn.yaml to S3');
-  const onboardAccountFilePath = join(__dirname, '../../src/templates/onboard-account.cfn.yaml');
+async function uploadTemplateFileToS3(awsService: AwsService, templateFileName: string): Promise<void> {
+  console.log(`Uploading ${templateFileName} to S3`);
+  const onboardAccountFilePath = join(__dirname, `../../src/templates/${templateFileName}`);
   const onboardAccountFile = fs.readFileSync(onboardAccountFilePath);
   const s3Service = awsService.helpers.s3;
   const s3ArtifactBucketArn = await getS3BucketArn(awsService);
   await s3Service.uploadFiles(s3ArtifactBucketArn, [
-    { fileContent: onboardAccountFile, fileName: 'onboard-account.cfn.yaml', s3Prefix: '' }
+    { fileContent: onboardAccountFile, fileName: templateFileName, s3Prefix: '' }
   ]);
-  console.log('Finished uploading onboard-account.cfn.yaml to S3');
+  console.log(`Finished uploading ${templateFileName} to S3`);
+}
+
+async function uploadOnboardAccountCfnToS3(awsService: AwsService): Promise<void> {
+  console.log('Uploading template files to S3');
+  await Promise.all([
+    uploadTemplateFileToS3(awsService, 'onboard-account.cfn.yaml'),
+    uploadTemplateFileToS3(awsService, 'onboard-account-byon.cfn.yaml'),
+    uploadTemplateFileToS3(awsService, 'onboard-account-tgw.cfn.yaml')
+  ]);
+  console.log('Finished uploading template files to S3');
 }
 
 async function uploadBootstrapScriptsToS3(awsService: AwsService): Promise<void> {
