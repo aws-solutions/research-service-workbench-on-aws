@@ -28,6 +28,7 @@ import {
   NonUniqueKeyError,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
+  SendPublicKeyResponseParser,
   SshKey,
   SshKeyPlugin,
   NoInstanceFoundError,
@@ -286,7 +287,7 @@ export default class SshKeyService implements SshKeyPlugin {
     }
 
     const reservation = reservations[0];
-    return this._getConnectionInfoFromReservation(reservation);
+    return SendPublicKeyResponseParser.parse(this._getConnectionInfoFromReservation(reservation));
   }
 
   /**

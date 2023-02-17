@@ -60,7 +60,7 @@ import {
   ListUserSshKeysForProjectResponseParser
 } from './sshKeys/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
-import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
+import { SendPublicKeyResponse, SendPublicKeyResponseParser } from './sshKeys/sendPublicKeyResponse';
 import { SshKey, SshKeyParser } from './sshKeys/sshKey';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
@@ -117,5 +117,6 @@ export {
   Project,
   NoInstanceFoundError,
   ConnectionInfoNotDefinedError,
-  DuplicateKeyError
+  DuplicateKeyError,
+  SendPublicKeyResponseParser
 };
