@@ -465,7 +465,8 @@ describe('DynamicAuthorizationService', () => {
         .fn()
         .mockResolvedValueOnce({
           data: {
-            dynamicOperations
+            dynamicOperations,
+            pathParams: mockParams
           }
         });
       mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
@@ -478,8 +479,7 @@ describe('DynamicAuthorizationService', () => {
       const params = {
         authenticatedUser: mockUser,
         route: mockRoute,
-        method: mockMethod,
-        params: mockParams
+        method: mockMethod
       };
       mockAuthorizationPlugin.isAuthorizedOnDynamicOperations = jest.fn();
       await expect(dynamicAuthzService.isAuthorizedOnRoute(params)).resolves.not.toThrow();
