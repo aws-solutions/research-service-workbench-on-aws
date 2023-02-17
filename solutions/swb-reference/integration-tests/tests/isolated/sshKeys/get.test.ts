@@ -3,33 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper, paabResources } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get Key Pair negative tests', () => {
-  const setup: Setup = new Setup();
-  let adminSession: ClientSession;
-  let project: { id: string };
-  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+  const paabHelper = new PaabHelper();
+  let paabResources: paabResources;
 
   beforeEach(async () => {
-    adminSession = await setup.getDefaultAdminSession(); //TODO: change to getPA1Session()
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
-      description: 'Project for list users for project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
+    paabResources = await paabHelper.createResources();
   });
 
   beforeEach(async () => {
@@ -37,26 +20,26 @@ describe('Get Key Pair negative tests', () => {
   });
 
   afterEach(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('with User that is not authorized', () => {
-    let pa2UserId: string;
     beforeEach(() => {
-      pa2UserId = '00000000-0000-0000-0000-000000000000';
+      //const pa2UserId = pa2Session.getUserId();
     });
     test.skip('it throws 403 error', async () => {
       try {
-        //TODO:
-        // get auth :git await adminSession.resources.projects.project(project.id).get()
+        const response = await paabResources.pa1Session.resources.projects
+          .project(paabResources.project2.id)
+          .sshKeys()
+          .get();
+        console.log('response', response);
       } catch (e) {
-        // console.error(e)
+        //console.error('actualError', e)
         checkHttpError(
           e,
           new HttpError(403, {
-            statusCode: 403,
-            error: 'User is not authorized', //User does not have access
-            message: ` ${pa2UserId} for project ${project.id}` //TODO
+            error: 'User is not authorized' //User does not have access
           })
         );
       }
@@ -71,7 +54,7 @@ describe('Get Key Pair negative tests', () => {
     });
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(invalidProjectId).sshKeys().get();
+        await paabResources.adminSession.resources.projects.project(invalidProjectId).sshKeys().get();
       } catch (e) {
         checkHttpError(
           e,
