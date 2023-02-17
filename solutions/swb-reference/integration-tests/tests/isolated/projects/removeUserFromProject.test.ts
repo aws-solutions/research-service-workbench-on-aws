@@ -48,7 +48,6 @@ describe('remove user from project negative tests', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find user ${fakeUserId}`
         })
@@ -66,7 +65,6 @@ describe('remove user from project negative tests', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find project ${projectId}`
         })

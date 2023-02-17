@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Remove status code from error payload",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
