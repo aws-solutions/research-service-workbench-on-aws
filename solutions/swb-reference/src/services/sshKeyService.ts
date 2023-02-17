@@ -289,6 +289,13 @@ export default class SshKeyService implements SshKeyPlugin {
     return this._getConnectionInfoFromReservation(reservation);
   }
 
+  /**
+   * Private method to get a single SSH Key from EC2
+   *
+   * @param sshKeyId - the KeyName of the SSH Key to get
+   * @param projectId - the project the key belongs to
+   * @returns {@link KeyPairInfo} with the SSH Key info
+   */
   private async _getSshKey(sshKeyId: string, projectId: string): Promise<KeyPairInfo> {
     // get envMgmtRoleArn and externalId from project record
     const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArnAndExternalIdFromProject(projectId);
