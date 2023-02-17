@@ -49,7 +49,6 @@ describe('list users for project tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Could not find project ${projectId}`
           })
@@ -64,7 +63,6 @@ describe('list users for project tests', () => {
         checkHttpError(
           e,
           new HttpError(403, {
-            statusCode: 403,
             error: 'User is not authorized'
           })
         );

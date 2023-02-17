@@ -35,7 +35,6 @@ describe('update environment types', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: ": Unrecognized key(s) in object: 'invalidProp'"
         })
@@ -56,7 +55,6 @@ describe('update environment types', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find environment type ${testEnvTypeId} to update`
         })
@@ -76,7 +74,6 @@ describe('update environment types', () => {
       checkHttpError(
         e,
         new HttpError(403, {
-          statusCode: 403,
           error: 'User is not authorized'
         })
       );

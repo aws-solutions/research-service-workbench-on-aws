@@ -181,7 +181,6 @@ export async function handler(event: any) {
     const error = new HttpError(
       err.response!.status,
       JSON.stringify({
-        statusCode: err.response!.status,
         error: err.response!.data.error,
         message: err.response!.data.message
       }),
