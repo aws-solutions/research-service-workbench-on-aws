@@ -12,14 +12,10 @@ describe('listUserSshKeysForProject negative tests', () => {
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
-  let pa2Session: ClientSession;
-  let rs1Session: ClientSession;
-  let project1: { id: string };
   let project2: { id: string };
 
   beforeEach(async () => {
-    ({ adminSession, pa1Session, pa2Session, rs1Session, project1, project2 } =
-      await paabHelper.createResources());
+    ({ adminSession, pa1Session, project2 } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
