@@ -116,17 +116,17 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
       const validatedRequest = validateAndParse<DataSetFileUploadRequest>(DataSetFileUploadRequestParser, {
         dataSetId: req.params.dataSetId,
-        fileNames: req.query.filenames
+        filenames: req.query.filenames
       });
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
 
-      if (typeof validatedRequest.fileNames === 'string') {
-        validatedRequest.fileNames = [validatedRequest.fileNames];
+      if (typeof validatedRequest.filenames === 'string') {
+        validatedRequest.filenames = [validatedRequest.filenames];
       }
 
       const urls = await Promise.all(
-        validatedRequest.fileNames.map((fileName) =>
-          dataSetService.getSinglePartFileUploadUrl(validatedRequest.dataSetId, fileName, authenticatedUser)
+        validatedRequest.filenames.map((filename) =>
+          dataSetService.getSinglePartFileUploadUrl(validatedRequest.dataSetId, filename, authenticatedUser)
         )
       );
 
