@@ -199,7 +199,8 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(
       datasetBucket,
       artifactS3Bucket,
-      FIELDS_TO_MASK_WHEN_AUDITING
+      FIELDS_TO_MASK_WHEN_AUDITING,
+      mainAcctEncryptionKey
     );
 
     // Application DynamoDB Encryption Key
@@ -1042,7 +1043,8 @@ export class SWBStack extends Stack {
   private _createAPILambda(
     datasetBucket: Bucket,
     artifactS3Bucket: Bucket,
-    fieldsToMaskWhenAuditing: string[]
+    fieldsToMaskWhenAuditing: string[],
+    accountEncryptionKey: Key
   ): Function {
     const { AWS_REGION } = getConstants();
 
@@ -1086,8 +1088,16 @@ export class SWBStack extends Stack {
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
-            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
+            actions: [
+              'kms:GetKeyPolicy',
+              'kms:PutKeyPolicy',
+              'kms:GenerateDataKey',
+              'kms:Decrypt',
+              'kms:Encrypt',
+              'kms:DescribeKey',
+              'kms:ReEncrypt*'
+            ],
+            resources: [accountEncryptionKey.keyArn],
             sid: 'KMSAccess'
           }),
           new PolicyStatement({

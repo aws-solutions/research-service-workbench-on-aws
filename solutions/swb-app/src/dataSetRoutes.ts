@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
@@ -25,7 +26,9 @@ import {
   ProjectRemoveAccessRequest,
   ProjectRemoveAccessRequestParser
 } from './dataSets/projectRemoveAccessRequestParser';
+import { RemoveDataSetRequest, RemoveDataSetRequestParser } from './dataSets/removeDataSetRequestParser';
 import { wrapAsync } from './errorHandlers';
+import { isConflictError } from './errors/conflictError';
 import { validateAndParse } from './validatorHelper';
 
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
@@ -175,6 +178,38 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       await dataSetService.removeAccessForProject(validatedRequest);
 
       res.status(204).send();
+    })
+  );
+
+  router.delete(
+    '/projects/:projectId/datasets/:datasetId/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<RemoveDataSetRequest>(RemoveDataSetRequestParser, {
+        authenticatedUser: res.locals.user,
+        dataSetId: req.params.datasetId
+      });
+
+      try {
+        await dataSetService.removeDataSet(validatedRequest.dataSetId, validatedRequest.authenticatedUser);
+
+        res.status(204).send();
+      } catch (e) {
+        console.error(e);
+
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetHasEndpointError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetNotFoundError(e)) {
+          throw Boom.notFound();
+        }
+
+        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+      }
     })
   );
 }
