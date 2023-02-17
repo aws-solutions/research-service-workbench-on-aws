@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PaabHelper, paabResources } from '../../../support/complex/paabHelper';
+import { PaabHelper, PaabResources } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get Key Pair negative tests', () => {
   const paabHelper = new PaabHelper();
-  let paabResources: paabResources;
+  let paabResources: PaabResources;
 
   beforeEach(async () => {
     paabResources = await paabHelper.createResources();
@@ -35,7 +35,7 @@ describe('Get Key Pair negative tests', () => {
           .get();
         console.log('response', response);
       } catch (e) {
-        //console.error('actualError', e)
+        // console.error('actualError', e)
         checkHttpError(
           e,
           new HttpError(403, {

@@ -6,7 +6,7 @@ import ClientSession from '../clientSession';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
 
-export interface paabResources {
+export interface PaabResources {
   adminSession: ClientSession;
   pa1Session: ClientSession;
   pa2Session: ClientSession;
@@ -24,7 +24,7 @@ export class PaabHelper {
     this._randomTextGenerator = new RandomTextGenerator(this._setup.getSettings().get('runId'));
   }
 
-  public async createResources(): Promise<paabResources> {
+  public async createResources(): Promise<PaabResources> {
     // create IT admin session
     const adminSession: ClientSession = await this._setup.getDefaultAdminSession();
 
