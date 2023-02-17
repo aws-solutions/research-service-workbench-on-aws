@@ -21,6 +21,7 @@ export {
 } from './models/routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
+export { default as withDynamicAuth } from './dynamicAuthorization/dynamicAuthorizationMiddleware';
 export { AuthenticatedUser, AuthenticatedUserParser } from './models/authenticatedUser';
 export { ForbiddenError, isForbiddenError } from './errors/forbiddenError';
 export {
