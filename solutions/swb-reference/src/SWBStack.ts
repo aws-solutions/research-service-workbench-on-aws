@@ -1088,12 +1088,9 @@ export class SWBStack extends Stack {
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
-            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
-            sid: 'KMSAccess'
-          }),
-          new PolicyStatement({
             actions: [
+              'kms:GetKeyPolicy',
+              'kms:PutKeyPolicy',
               'kms:GenerateDataKey',
               'kms:Decrypt',
               'kms:Encrypt',
@@ -1101,7 +1098,7 @@ export class SWBStack extends Stack {
               'kms:ReEncrypt*'
             ],
             resources: [accountEncryptionKey.keyArn],
-            sid: 'AccountKMSAccess'
+            sid: 'KMSAccess'
           }),
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
