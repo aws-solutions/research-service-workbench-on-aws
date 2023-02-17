@@ -70,7 +70,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
       }
     }
     if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
-    throw new RouteNotSecuredError(`Route ${JSON.stringify(method)} ${route} has not been secured`);
+    throw new RouteNotSecuredError(`Route ${method} ${route} has not been secured`);
   }
   /**
    * Checks if a route is being ignored for Authorization.

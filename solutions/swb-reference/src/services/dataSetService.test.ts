@@ -237,6 +237,7 @@ describe('DataSetService', () => {
       });
 
       describe('and is associated with external projects', () => {
+        const externalProjectId = 'proj-external';
         beforeEach(() => {
           const getIdentityPermissionsBySubjectResponse: GetIdentityPermissionsBySubjectResponse = {
             data: {
@@ -244,7 +245,7 @@ describe('DataSetService', () => {
                 {
                   action: 'READ',
                   effect: 'ALLOW',
-                  identityId: `${projectId}#ProjectAdmin`,
+                  identityId: `${externalProjectId}#ProjectAdmin`,
                   identityType: 'GROUP',
                   subjectId: mockDataSet.id!,
                   subjectType: SwbAuthZSubject.SWB_DATASET
@@ -259,7 +260,7 @@ describe('DataSetService', () => {
 
         test('it throws an error', async () => {
           await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
-            `DataSet cannot be removed because it is associated with project(s) ['${projectId}']`
+            `DataSet ${mockDataSet.id!} cannot be removed because it is associated with project(s) ['${externalProjectId}']`
           );
         });
       });
