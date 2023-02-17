@@ -202,6 +202,11 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
   return response.Parameter!.Value!;
 }
 
+const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
+const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
+const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
+const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
+
 const dataSetPrefix: string = 'DATASET';
 const endPointPrefix: string = 'ENDPOINT';
 const authorizationGroupPrefix: string = 'GROUP';
@@ -224,5 +229,9 @@ export {
   dataSetPrefix,
   endPointPrefix,
   authorizationGroupPrefix,
-  SwbAuthZSubject
+  SwbAuthZSubject,
+  SolutionId,
+  SolutionName,
+  SolutionVersion,
+  ApplicationType
 };

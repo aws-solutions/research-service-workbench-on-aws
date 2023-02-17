@@ -46,7 +46,6 @@ describe('environments launch negative tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            statusCode: 400,
             error: 'Bad Request',
             message: "requires property 'name'"
           })
@@ -64,7 +63,6 @@ describe('environments launch negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: "requires property 'envTypeId'"
         })
@@ -78,7 +76,6 @@ describe('environments launch negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message:
             "requires property 'name'. requires property 'description'. requires property 'envTypeId'. requires property 'envTypeConfigId'. requires property 'envType'. requires property 'datasetIds'"
@@ -95,7 +92,6 @@ describe('environments launch negative tests', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find project ${fakeProjectId}`
         })

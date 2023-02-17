@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "expose READ route",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

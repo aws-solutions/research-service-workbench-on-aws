@@ -201,6 +201,11 @@ export class DynamicAuthorizationService {
         throw new RouteNotSecuredError('Route is not secured');
       const { data: dynamicOperationsData } =
         await this._dynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute({ route, method });
+      // combine path params found with provided params, prioritizing provided params
+      const combinedParams = {
+        ...dynamicOperationsData.pathParams,
+        ...params
+      };
       const dynamicOperations = _.cloneDeep(dynamicOperationsData.dynamicOperations);
       // Inject subject's variable based params
       const paramRegex = /\${([^{]+)}/g;
@@ -210,7 +215,7 @@ export class DynamicAuthorizationService {
             dynamicOperation.subject,
             subjectKey,
             subjectValue.replace(paramRegex, (ignore, key) => {
-              const response = _.get(params, key);
+              const response = _.get(combinedParams, key);
               if (!response) throw new ParamNotFoundError('Missing parameter');
               return _.escapeRegExp(response);
             })
