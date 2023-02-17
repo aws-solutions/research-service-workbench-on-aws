@@ -114,7 +114,7 @@ describe('StaticPermissionsPlugin', () => {
         expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(RouteNotSecuredError);
-        expect(err.message).toBe('Route has not been secured');
+        expect(err.message).toBe('Route POST /user has not been secured');
       }
     });
 
