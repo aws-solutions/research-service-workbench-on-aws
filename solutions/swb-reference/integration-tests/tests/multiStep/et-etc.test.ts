@@ -47,7 +47,6 @@ describe('multiStep environment type and environment type config test', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `Could not create environment type config because environment type ${envType.id} is not approved`
         })
@@ -187,7 +186,6 @@ describe('multiStep environment type and environment type config test', () => {
       checkHttpError(
         e,
         new HttpError(409, {
-          statusCode: 409,
           error: 'Conflict',
           message: `There are projects associated with Workspace configuration. Please dissasociate projects from configuration before deleting.`
         })
@@ -219,7 +217,6 @@ describe('multiStep environment type and environment type config test', () => {
       checkHttpError(
         e,
         new HttpError(409, {
-          statusCode: 409,
           error: 'Conflict',
           message: `Unable to reovke environment type: ${envType.id}, Environment Type has active configurations`
         })
