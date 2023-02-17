@@ -4,7 +4,7 @@
  */
 
 import { csurf, verifyToken } from '@aws/workbench-core-authentication';
-import { withAuth } from '@aws/workbench-core-authorization';
+import { withAuth, withDynamicAuth } from '@aws/workbench-core-authorization';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -57,6 +57,8 @@ export function generateRouter(): Express {
   app.use(csurf('none'));
 
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
+  app.use(withDynamicAuth(dynamicAuthorizationService, { logger }));
+
   router.use(withAuth(authorizationService, { logger: logger }));
   setupHelloWorldRoutes(router);
   setUpDSRoutes(router, dataSetService, dataSetsStoragePlugin);
@@ -69,10 +71,12 @@ export function generateRouter(): Express {
 
   // Routes protected by DynamicAuthorizationService
   const secondRouter: Router = Router();
+
   //used for testing dynamic authorization service
-  setupSampleRoutes(secondRouter, dynamicAuthorizationService);
-  setupAuditRoutes(secondRouter, strictAuditService, dynamicAuthorizationService);
-  setupStaticAuthorizationRoutes(secondRouter, dynamicAuthorizationService, authorizationService);
+  setupSampleRoutes(secondRouter);
+
+  setupAuditRoutes(secondRouter, strictAuditService);
+  setupStaticAuthorizationRoutes(secondRouter, authorizationService);
   secondRouter.use(boomErrorHandler);
   secondRouter.use(unknownErrorHandler);
 
