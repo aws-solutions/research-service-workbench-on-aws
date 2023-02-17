@@ -342,11 +342,6 @@ const { data: response } = await adminSession.resources.environments.get({status
 Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
 ## Obtain Access Token for making authenticated API requests
-
-### Prerequisite
-
-Follow the instructions [here](../swb-ui/ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. Navigate to the website and login with the username and temporary password received after the post deployment step. Reset the password.
-
 1. Go to `swb-reference/scripts` folder
 2. Pull down all required dependencies by running `rushx build`
 3. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
