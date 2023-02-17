@@ -299,7 +299,10 @@ export default class SshKeyService implements SshKeyPlugin {
     // get ssh key
     let keys = [];
     try {
-      const response = await ec2.describeKeyPairs({ Filters: [{ Name: 'key-name', Values: [sshKeyId] }] });
+      const response = await ec2.describeKeyPairs({
+        Filters: [{ Name: 'key-name', Values: [sshKeyId] }],
+        IncludePublicKey: true
+      });
       keys = response.KeyPairs || [];
     } catch (e) {
       throw new Ec2Error(e);
