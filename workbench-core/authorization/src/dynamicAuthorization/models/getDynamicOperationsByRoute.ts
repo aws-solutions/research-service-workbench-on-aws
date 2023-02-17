@@ -34,5 +34,10 @@ export interface GetDynamicOperationsByRouteResponse {
      * {@link DynamicOperation} associated to the route
      */
     dynamicOperations: DynamicOperation[];
+
+    /**
+     * Optional path params found
+     */
+    pathParams?: Record<string, string>;
   };
 }
