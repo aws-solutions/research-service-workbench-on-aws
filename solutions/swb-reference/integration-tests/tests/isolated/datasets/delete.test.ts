@@ -78,7 +78,6 @@ describe('datasets delete negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Not Found`
           })
@@ -138,7 +137,6 @@ describe('datasets delete negative tests', () => {
           checkHttpError(
             e,
             new HttpError(409, {
-              statusCode: 409,
               error: 'Conflict',
               message: `External endpoints found on Dataset must be removed before DataSet can be removed.`
             })
@@ -169,7 +167,6 @@ describe('datasets delete negative tests', () => {
           checkHttpError(
             e,
             new HttpError(409, {
-              statusCode: 409,
               error: 'Conflict',
               message: `DataSet ${dataSet.id} cannot be removed because it is associated with project(s) ['${associatedProjectId}']`
             })

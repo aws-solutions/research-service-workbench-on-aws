@@ -15,6 +15,15 @@
 #rootUserNameParamStorePath: ''
 #rootPasswordParamStorePath: ''
 
+#projectAdmin1UserNameParamStorePath: ''
+#projectAdmin1PasswordParamStorePath: ''
+
+#projectAdmin2UserNameParamStorePath: ''
+#projectAdmin2PasswordParamStorePath: ''
+
+#researcher1UserNameParamStorePath: ''
+#researcher1PasswordParamStorePath: ''
+
 ## Default Hosting Account
 #defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 

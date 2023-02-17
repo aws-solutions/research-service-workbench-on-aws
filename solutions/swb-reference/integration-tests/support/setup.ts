@@ -58,6 +58,19 @@ export default class Setup {
     return this._defaultAdminSession;
   }
 
+  public async getSessionForUserType(
+    userType: 'projectAdmin1' | 'projectAdmin2' | 'researcher1'
+  ): Promise<ClientSession> {
+    const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
+    const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+
+    const userName = await secretsService.getSecret(userNameParamStorePath);
+    const password = await secretsService.getSecret(userPasswordParamStorePath);
+    return this.getSessionForUser(userName, password);
+  }
+
   public async getSessionForUser(userName: string, password: string): Promise<ClientSession> {
     const accessToken = await this._getCognitoTokenForUser(userName, password);
     const session = this._getClientSession(accessToken);
