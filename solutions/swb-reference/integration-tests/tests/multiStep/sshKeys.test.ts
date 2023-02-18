@@ -5,7 +5,7 @@ import { checkHttpError } from '../../support/utils/utilities';
 
 describe('sshKeys API multiStep integration test', () => {
   const paabHelper = new PaabHelper();
-  // let adminSession: ClientSession;
+  let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let rs1Session: ClientSession;
@@ -14,7 +14,7 @@ describe('sshKeys API multiStep integration test', () => {
 
   beforeEach(async () => {
     ({
-      // adminSession,
+      adminSession,
       pa1Session,
       pa2Session,
       rs1Session,
@@ -87,9 +87,16 @@ describe('sshKeys API multiStep integration test', () => {
       },
       {
         userName1: 'projectAdmin1',
-        userName2: 'projectAdmin2',
+        userName2: 'researcher1',
         session1: pa1Session,
-        session2: pa2Session,
+        session2: rs1Session,
+        project1Id: project1Id
+      },
+      {
+        userName1: 'researcher1',
+        userName2: 'projectAdmin1',
+        session1: rs1Session,
+        session2: pa1Session,
         project1Id: project1Id
       }
     ];
@@ -98,17 +105,27 @@ describe('sshKeys API multiStep integration test', () => {
     testBundle.forEach(({ userName1, userName2, session1, session2, project1Id }) => {
       describe(`iterate over misaligned resources`, () => {
         test(`test of for ${userName1}, ${userName2}`, async () => {
-          console.log('${userName1} creating a key');
+          console.log(`${userName1} creating a key`);
           const { data: createdSshKey } = await session1.resources.projects
             .project(project1Id)
             .sshKeys()
             .create();
 
-          console.log(
-            `${userName2} fails to retrieve the key by listUserKeysForProject created by ${userName1}`
-          );
+          console.log(`${userName2} fails to retrieve ${userName1}'s key by listUserSshKeysForProject`);
           try {
-            await session2.resources.projects.project(project1Id).sshKeys().sshKey(createdSshKey.id);
+            await session2.resources.projects.project(project1Id).sshKeys().get(); // NEED TO CONFIRM it's from collectionResources
+          } catch (e) {
+            checkHttpError(
+              e,
+              new HttpError(403, {
+                error: 'User is not authorized' //User does not have access
+              })
+            );
+          }
+
+          console.log(`${userName2} fails to delete the ${userName1}'s key`);
+          try {
+            await session2.resources.projects.project(project1Id).sshKeys().sshKey(createdSshKey.id).delete();
           } catch (e) {
             checkHttpError(
               e,

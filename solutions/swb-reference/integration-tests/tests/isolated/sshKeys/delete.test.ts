@@ -4,38 +4,26 @@
  */
 
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Key Pair negative tests', () => {
-  const setup: Setup = new Setup();
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
   let sshKeyId: string;
-  let project: { id: string };
-  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
   beforeEach(async () => {
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
     expect.hasAssertions();
-    adminSession = await setup.getDefaultAdminSession();
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: randomTextGenerator.getFakeText('fakeProjectName'),
-      description: 'Project for list users for project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
   });
 
   afterEach(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   // TODO: multiple user session support has to exist for this test
@@ -53,7 +41,7 @@ describe('Delete Key Pair negative tests', () => {
 
     test.skip('it throws 403 error', async () => {
       try {
-        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(existingSshKeyId).delete();
+        await adminSession.resources.projects.project(project2Id).sshKeys().sshKey(existingSshKeyId).delete();
       } catch (e) {
         checkHttpError(
           e,
@@ -95,23 +83,34 @@ describe('Delete Key Pair negative tests', () => {
     beforeEach(() => {
       nonExistentSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
-
-    test('it throws 404 error', async () => {
-      try {
-        await adminSession.resources.projects
-          .project(project.id)
-          .sshKeys()
-          .sshKey(nonExistentSshKeyId)
-          .delete();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Key ${nonExistentSshKeyId} does not exist`
-          })
-        );
+    const testBundle = [
+      {
+        userName: 'ProjectAdmin1',
+        session: pa1Session,
+        projectId: project1Id
+      },
+      {
+        userName: 'researcher1',
+        session: rs1Session,
+        projectId: project1Id
       }
+    ];
+
+    testBundle.forEach(({ userName, session, projectId }) => {
+      test(`it throws 404 error for ${userName}`, async () => {
+        try {
+          await session.resources.projects.project(projectId).sshKeys().sshKey(nonExistentSshKeyId).delete();
+        } catch (e) {
+          console.error(e);
+          checkHttpError(
+            e,
+            new HttpError(404, {
+              error: 'Not Found',
+              message: `Key ${nonExistentSshKeyId} does not exist`
+            })
+          );
+        }
+      });
     });
   });
 });
