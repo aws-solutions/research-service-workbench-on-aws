@@ -21,10 +21,11 @@ describe('datasets delete negative tests', () => {
   let projectId: string;
   let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-  const dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+  let dataSetName: string;
 
   beforeEach(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: `${dataSetName} cost center`,
