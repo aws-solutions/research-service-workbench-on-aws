@@ -770,11 +770,11 @@ describe('HostingAccountLifecycleService', () => {
     });
 
     expect(actual).toBeDefined();
-    expect(_.get(actual, 'onboard-account.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
-    expect(_.get(actual, 'onboard-account.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
-    expect(_.get(actual, 'onboard-account-byon.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
-    expect(_.get(actual, 'onboard-account-byon.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
-    expect(_.get(actual, 'onboard-account-tgw.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
-    expect(_.get(actual, 'onboard-account-tgw.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
+    expect(_.get(actual, 'onboard-account')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account')?.updateUrl).toEqual(expectedUpdateUrl);
+    expect(_.get(actual, 'onboard-account-byon')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account-byon')?.updateUrl).toEqual(expectedUpdateUrl);
+    expect(_.get(actual, 'onboard-account-tgw')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account-tgw')?.updateUrl).toEqual(expectedUpdateUrl);
   });
 });

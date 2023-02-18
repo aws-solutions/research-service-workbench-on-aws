@@ -100,8 +100,8 @@ export default class HostingAccountLifecycleService {
     const updateUrls = {};
     await Promise.all(
       templateTypes.map(async (t): Promise<void> => {
-        const fileName = `onboard-account${t}.cfn.yaml`;
-        const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, fileName, 15 * 60);
+        const fileName = `onboard-account${t}`;
+        const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, `${fileName}.cfn.yaml`, 15 * 60);
         _.set(updateUrls, fileName, this._constructCreateAndUpdateUrls(templateParameters, signedUrl));
       })
     );
