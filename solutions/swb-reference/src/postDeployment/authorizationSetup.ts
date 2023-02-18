@@ -50,6 +50,11 @@ export default class AuthorizationSetup {
       'UPDATE',
       'DELETE'
     ]);
+    const awsAccountTemplateUrlsPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL,
+      ['CREATE']
+    );
     const costCenterPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_COST_CENTER);
     const awsAccountPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_AWS_ACCOUNT);
 
@@ -63,7 +68,8 @@ export default class AuthorizationSetup {
         ...userPermissions,
         ...costCenterPermissions,
         ...awsAccountPermissions,
-        ...projectToUserAssociationPermissions
+        ...projectToUserAssociationPermissions,
+        ...awsAccountTemplateUrlsPermissions
       ],
       adminUser
     );

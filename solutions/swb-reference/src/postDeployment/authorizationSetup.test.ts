@@ -85,7 +85,9 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
-          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT })
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL })
         ])
       })
     );
@@ -109,7 +111,9 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
-          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT })
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL })
         ])
       })
     );
@@ -135,7 +139,9 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
-          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT })
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL })
         ])
       })
     );
