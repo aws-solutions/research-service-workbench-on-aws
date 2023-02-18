@@ -42,6 +42,7 @@ import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
+import _ from 'lodash';
 import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 
@@ -737,6 +738,23 @@ describe('HostingAccountLifecycleService', () => {
         (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
           expect(s3BucketName).toEqual(sampleArtifactsBucketName);
           expect(key).toEqual('onboard-account.cfn.yaml');
+          expect(expirationMinutes).toEqual(15 * 60);
+          return Promise.resolve(testUrl);
+        }
+      )
+      .mockImplementationOnce(
+        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
+          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
+          expect(key).toEqual('onboard-account-byon.cfn.yaml');
+          expect(expirationMinutes).toEqual(15 * 60);
+          return Promise.resolve(testUrl);
+        }
+      )
+      .mockImplementationOnce(
+        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
+          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
+          expect(key).toEqual('onboard-account-tgw.cfn.yaml');
+          expect(expirationMinutes).toEqual(15 * 60);
           return Promise.resolve(testUrl);
         }
       );
@@ -751,7 +769,12 @@ describe('HostingAccountLifecycleService', () => {
       externalId
     });
 
-    expect(actual.createUrl).toEqual(expectedCreateUrl);
-    expect(actual.updateUrl).toEqual(expectedUpdateUrl);
+    expect(actual).toBeDefined();
+    expect(_.get(actual, 'onboard-account.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
+    expect(_.get(actual, 'onboard-account-byon.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account-byon.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
+    expect(_.get(actual, 'onboard-account-tgw.cfn.yaml')?.createUrl).toEqual(expectedCreateUrl);
+    expect(_.get(actual, 'onboard-account-tgw.cfn.yaml')?.updateUrl).toEqual(expectedUpdateUrl);
   });
 });
