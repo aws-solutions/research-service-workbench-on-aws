@@ -86,7 +86,7 @@ Parameters:
 
   AvailabilityZones:
     Description: "List of Availability Zones to use for the subnets in the VPC."
-      Type: CommaDelimitedList
+    Type: CommaDelimitedList
 
   NumberofAZs:
     AllowedValues:
