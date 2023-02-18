@@ -48,7 +48,6 @@ describe('awsAccounts update negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              statusCode: 400,
               error: 'Bad Request',
               message: 'name: Expected string, received number'
             })

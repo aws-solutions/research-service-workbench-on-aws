@@ -4,6 +4,7 @@
  */
 
 import {
+  ConflictError,
   DataSet,
   DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
@@ -52,6 +53,59 @@ export class DataSetService implements DataSetPlugin {
     this._dataSetsAuthService = dataSetAuthService;
     this._databaseService = databaseService;
     this._dynamicAuthService = dynamicAuthService;
+  }
+
+  public async removeDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<void> {
+    const dataset = await this.getDataSet(dataSetId, authenticatedUser);
+
+    const associatedProjects = await this._associatedProjects(dataset);
+    if (associatedProjects.length > 0) {
+      throw new ConflictError(
+        `DataSet ${dataSetId} cannot be removed because it is associated with project(s) [${associatedProjects.join(
+          ','
+        )}]`
+      );
+    }
+
+    await this._workbenchDataSetService.removeDataSet(
+      dataSetId,
+      () => {
+        return Promise.resolve();
+      },
+      authenticatedUser
+    );
+
+    const projectAdmin = dataset.owner!;
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataSetId,
+      [projectAdmin],
+      ['READ', 'UPDATE', 'DELETE']
+    );
+
+    const projectId = projectAdmin.split('#')[0];
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+      `${projectId}-${dataSetId!}`,
+      [projectAdmin],
+      ['READ', 'UPDATE']
+    );
+  }
+
+  private async _associatedProjects(dataset: DataSet): Promise<string[]> {
+    const permissions = await this._dynamicAuthService.getIdentityPermissionsBySubject({
+      subjectId: dataset.id!,
+      subjectType: SwbAuthZSubject.SWB_DATASET
+    });
+
+    const projectIds = permissions.data.identityPermissions
+      .filter((permission) => permission.identityType === 'GROUP')
+      .filter((permission) => permission.identityId !== dataset.owner!)
+      .map((permission) => `'${permission.identityId.split('#')[0]}'`);
+
+    return Array.from(new Set(projectIds));
   }
 
   public addDataSetExternalEndpoint(
@@ -122,11 +176,11 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, {
-      id: '',
-      roles: []
-    });
+  public async removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, authenticatedUser);
     return PermissionsResponseParser.parse(response);
   }
 
