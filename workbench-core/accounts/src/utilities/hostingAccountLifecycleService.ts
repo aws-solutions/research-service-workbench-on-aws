@@ -67,7 +67,7 @@ export default class HostingAccountLifecycleService {
    */
   public async buildTemplateUrlsForAccount(
     request: AwsAccountTemplateUrlsRequest
-  ): Promise<TemplateResponse> {
+  ): Promise<Record<string, TemplateResponse>> {
     // Share the artifacts bucket with the new hosting account
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
@@ -94,13 +94,21 @@ export default class HostingAccountLifecycleService {
       statusHandlerRole: statusHandlerRoleArn
     };
 
-    const key = 'onboard-account.cfn.yaml'; // TODO: Make this part configurable incase BYON need to provide a different template
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
+    const templateTypes = ['', '-byon', '-tgw'];
+    const updateUrls = {};
+    await Promise.all(
+      templateTypes.map(async (t): Promise<void> => {
+        const fileName = `onboard-account${t}`;
+        const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, `${fileName}.cfn.yaml`, 15 * 60);
+        _.set(updateUrls, fileName, this._constructCreateAndUpdateUrls(templateParameters, signedUrl));
+      })
+    );
 
-    const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, key, 15 * 60);
-    return this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
+    return updateUrls;
   }
+
   /**
    * Links hosting account with main account policies for cross account communication
    * @param accountMetadata - the attributes of the given hosting account from the onboarded CFN stack outputs
