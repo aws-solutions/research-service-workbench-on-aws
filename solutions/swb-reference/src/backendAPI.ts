@@ -13,6 +13,8 @@ import {
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import {
+  DynamicRoutesMap,
+  RoutesIgnored,
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
@@ -34,6 +36,7 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
+import * as DynamicRouteConfig from './dynamicRouteConfig';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
@@ -66,9 +69,13 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
   ddbService: dynamicAuthAws.helpers.ddb,
   userGroupKeyType: authorizationGroupPrefix
 });
+const dynamicRoutesMap: DynamicRoutesMap = DynamicRouteConfig.dynamicRoutesMap;
+const routesIgnored: RoutesIgnored = DynamicRouteConfig.routesIgnored;
 const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
   new DDBDynamicAuthorizationPermissionsPlugin({
-    dynamoDBService: dynamicAuthAws.helpers.ddb
+    dynamoDBService: dynamicAuthAws.helpers.ddb,
+    dynamicRoutesMap,
+    routesIgnored
   });
 const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
@@ -138,7 +145,8 @@ const apiRouteConfig: ApiRouteConfig = {
   projectPlugin: new SWBProjectService(dynamicAuthorizationService, projectService),
   projectService: projectService,
   sshKeyService: new SshKeyService(aws, projectService),
-  authorizationService: dynamicAuthorizationService
+  authorizationService: dynamicAuthorizationService,
+  routesIgnored: DynamicRouteConfig.routesIgnored
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

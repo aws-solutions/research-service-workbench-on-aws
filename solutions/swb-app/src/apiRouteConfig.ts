@@ -4,7 +4,7 @@
  */
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import { DynamicAuthorizationService, RoutesIgnored } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
   EnvironmentConnectionService,
@@ -37,6 +37,7 @@ export interface ApiRouteConfig {
   projectService: ProjectService;
   sshKeyService: SshKeyPlugin;
   authorizationService: DynamicAuthorizationService;
+  routesIgnored: RoutesIgnored;
 }
 
 export interface ApiRoute {

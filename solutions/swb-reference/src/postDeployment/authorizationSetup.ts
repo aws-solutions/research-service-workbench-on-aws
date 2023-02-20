@@ -33,6 +33,11 @@ export default class AuthorizationSetup {
     //IT Admin Permissions
     const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
     const userPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_USER);
+    const projectToUserAssociationPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
+      ['CREATE', 'DELETE']
+    );
     const environmentPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT, [
       'READ',
       'UPDATE',
@@ -45,6 +50,11 @@ export default class AuthorizationSetup {
       'UPDATE',
       'DELETE'
     ]);
+    const awsAccountTemplateUrlsPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL,
+      ['CREATE']
+    );
     const costCenterPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_COST_CENTER);
     const awsAccountPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_AWS_ACCOUNT);
 
@@ -57,7 +67,9 @@ export default class AuthorizationSetup {
         ...datasetPermissions,
         ...userPermissions,
         ...costCenterPermissions,
-        ...awsAccountPermissions
+        ...awsAccountPermissions,
+        ...projectToUserAssociationPermissions,
+        ...awsAccountTemplateUrlsPermissions
       ],
       adminUser
     );
