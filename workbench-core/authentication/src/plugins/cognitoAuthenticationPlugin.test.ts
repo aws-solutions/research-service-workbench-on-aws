@@ -285,10 +285,10 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should return the cognito:groups claim from the decoded token', () => {
       const userId = plugin.getUserRolesFromToken({
         ...baseDecodedAccessToken,
-        'cognito:groups': ['ITAdmin']
+        'cognito:groups': ['Admin']
       });
 
-      expect(userId).toMatchObject(['ITAdmin']);
+      expect(userId).toMatchObject(['Admin']);
     });
 
     it('should throw InvalidJWTError when the decoded token doesnt have the cognito:groups claim', () => {

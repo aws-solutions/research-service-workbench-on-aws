@@ -54,7 +54,7 @@ describe('authorization middleware', () => {
   beforeEach(() => {
     mockAdmin = {
       id: 'sampleAdminUID',
-      roles: ['itadmin']
+      roles: ['admin']
     };
     mockGuest = {
       id: 'sampleGuestUID',
