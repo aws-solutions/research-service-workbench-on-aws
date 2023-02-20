@@ -46,7 +46,7 @@ export class SWBProjectService implements ProjectPlugin {
    * @returns Project object of new project
    */
   public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
-    const createProjectResponse = await this._projectService.createProject(params, user);
+    const createProjectResponse = await this._projectService.createProject(params);
     const projectId = createProjectResponse.id;
     const paRole = getProjectAdminRole(projectId);
     const researcherRole = getResearcherRole(projectId);
@@ -75,7 +75,7 @@ export class SWBProjectService implements ProjectPlugin {
     );
 
     const createIdentityPermissionsRequest = CreateIdentityPermissionsRequestParser.parse({
-      user,
+      authenticatedUser: user,
       identityPermissions: [...paIdentityPermissions, ...researcherIdentityPermissions]
     });
 
@@ -253,9 +253,7 @@ export class SWBProjectService implements ProjectPlugin {
     conditions?: object
   ): IdentityPermission[] {
     let partialIdentityPermission = {
-      action: undefined,
       effect: 'ALLOW',
-      identityId: undefined,
       identityType: 'GROUP',
       subjectId: subjectId,
       subjectType: subjectType

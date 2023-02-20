@@ -6,7 +6,6 @@
 /* eslint-disable security/detect-object-injection */
 
 import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   buildDynamoDBPkSk,
   QueryParams,
@@ -185,7 +184,7 @@ export default class ProjectService {
    * @param user - authenticated user creating the project
    * @returns Project object of new project
    */
-  public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
+  public async createProject(params: CreateProjectRequest): Promise<Project> {
     // Verify project name is unique and cost center exists
     const resultsFromValidityChecks = await Promise.all([
       this._isProjectNameInUse(params.name),

@@ -1191,11 +1191,6 @@ describe('ProjectService', () => {
   });
 
   describe('createProject', () => {
-    const user: AuthenticatedUser = {
-      id: 'user-456',
-      roles: []
-    };
-
     test('create a project with valid name', async () => {
       // BUILD
       const params = {
@@ -1263,7 +1258,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.createProject(params, user);
+      const actualResponse = await projService.createProject(params);
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1319,7 +1314,7 @@ describe('ProjectService', () => {
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow(
+      await expect(projService.createProject(params)).rejects.toThrow(
         'Project name "Example project" is in use by a non deleted project. Please use another name.'
       );
     });
@@ -1369,9 +1364,7 @@ describe('ProjectService', () => {
         .resolves({});
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow(
-        'Could not find cost center cc-123'
-      );
+      await expect(projService.createProject(params)).rejects.toThrow('Could not find cost center cc-123');
     });
 
     test('fail on update to DDB call', async () => {
@@ -1426,7 +1419,7 @@ describe('ProjectService', () => {
       ddbMock.on(UpdateItemCommand).rejects('Failed to update DDB');
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow('Failed to create project');
+      await expect(projService.createProject(params)).rejects.toThrow('Failed to create project');
     });
   });
 
