@@ -103,8 +103,7 @@ describe('CostCenterService', () => {
             Item: marshall(
               {
                 ...expectedCostCenter,
-                dependency: accountId,
-                resourceType: 'costCenter'
+                dependency: accountId
               },
               {
                 removeUndefinedValues: true
@@ -275,9 +274,7 @@ describe('CostCenterService', () => {
             id: costCenterId,
             status: CostCenterStatus.AVAILABLE
           };
-          ddbMock
-            .on(UpdateItemCommand)
-            .resolves({ Attributes: marshall({ ...costCenter, resourceType: 'costCenter' }) });
+          ddbMock.on(UpdateItemCommand).resolves({ Attributes: marshall(costCenter) });
         });
 
         test('it returns a CostCenter object with the associated Account metadata', async () => {
