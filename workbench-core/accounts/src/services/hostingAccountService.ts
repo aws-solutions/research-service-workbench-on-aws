@@ -30,7 +30,7 @@ export default class HostingAccountService {
 
   public async buildTemplateUrlsForAccount(
     request: AwsAccountTemplateUrlsRequest
-  ): Promise<TemplateResponse> {
+  ): Promise<Record<string, TemplateResponse>> {
     return await this._lifecycleService.buildTemplateUrlsForAccount(request);
   }
 
