@@ -32,6 +32,7 @@ import {
 import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
+import { GetProjectsRequest, GetProjectsRequestParser } from './models/projects/getProjectsRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
 import { Project } from './models/projects/project';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
@@ -57,6 +58,8 @@ export {
   UpdateProjectRequestParser,
   GetProjectRequest,
   GetProjectRequestParser,
+  GetProjectsRequest,
+  GetProjectsRequestParser,
   DeleteProjectRequest,
   DeleteProjectRequestParser,
   ListCostCentersRequest,

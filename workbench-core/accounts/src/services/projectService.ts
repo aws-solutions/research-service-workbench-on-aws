@@ -6,11 +6,7 @@
 /* eslint-disable security/detect-object-injection */
 
 import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import {
-  AuthenticatedUser,
-  DynamicAuthorizationService,
-  IdentityPermission
-} from '@aws/workbench-core-authorization';
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   buildDynamoDBPkSk,
   QueryParams,
@@ -45,11 +41,7 @@ export default class ProjectService {
 
   private _costCenterService: CostCenterService;
 
-  public constructor(
-    dynamoDBService: DynamoDBService,
-    dynamicAuthZService: DynamicAuthorizationService,
-    costCenterService: CostCenterService
-  ) {
+  public constructor(dynamoDBService: DynamoDBService, costCenterService: CostCenterService) {
     this._dynamoDBService = dynamoDBService;
     this._costCenterService = costCenterService;
   }

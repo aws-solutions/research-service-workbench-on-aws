@@ -42,6 +42,7 @@ import { EnvTypeConfigService } from './services/envTypeConfigService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 import SshKeyService from './services/sshKeyService';
+import { SWBProjectService } from './services/swbProjectService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
 const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
@@ -86,11 +87,7 @@ const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeCo
 );
 const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
 const costCenterService: CostCenterService = new CostCenterService(aws.helpers.ddb);
-const projectService: ProjectService = new ProjectService(
-  aws.helpers.ddb,
-  dynamicAuthorizationService,
-  costCenterService
-);
+const projectService: ProjectService = new ProjectService(aws.helpers.ddb, costCenterService);
 
 const apiRouteConfig: ApiRouteConfig = {
   environments: {
@@ -124,7 +121,6 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService,
   environmentTypeService: envTypeService,
   environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
-  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
@@ -139,6 +135,8 @@ const apiRouteConfig: ApiRouteConfig = {
     environmentService,
     dynamicAuthorizationService
   ),
+  projectPlugin: new SWBProjectService(dynamicAuthorizationService, projectService),
+  projectService: projectService,
   sshKeyService: new SshKeyService(aws, projectService),
   authorizationService: dynamicAuthorizationService
 };

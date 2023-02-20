@@ -4,16 +4,16 @@
  */
 
 import { ProjectPlugin } from '@aws/swb-app';
-import { UpdateProjectRequest } from '@aws/workbench-core-accounts';
 import {
   CreateProjectRequest,
   DeleteProjectRequest,
   GetProjectRequest,
+  GetProjectsRequest,
   ListProjectsRequest,
   Project,
-  ProjectService
+  ProjectService,
+  UpdateProjectRequest
 } from '@aws/workbench-core-accounts';
-import { GetProjectsRequest } from '@aws/workbench-core-accounts/lib/models/projects/getProjectsRequest';
 import {
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,

@@ -110,7 +110,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(
     router,
-    apiRouteConfig.projectService,
+    apiRouteConfig.projectPlugin,
     apiRouteConfig.environmentService,
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService

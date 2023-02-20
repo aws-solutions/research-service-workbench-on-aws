@@ -17,6 +17,7 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { ProjectPlugin } from './projects/projectPlugin';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export interface ApiRouteConfig {
@@ -27,12 +28,13 @@ export interface ApiRouteConfig {
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvTypeConfigPlugin;
-  projectService: ProjectService;
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;
   metadataService: MetadataService;
   projectEnvPlugin: ProjectEnvPlugin;
   projectEnvTypeConfigPlugin: ProjectEnvTypeConfigPlugin;
+  projectPlugin: ProjectPlugin;
+  projectService: ProjectService;
   sshKeyService: SshKeyPlugin;
   authorizationService: DynamicAuthorizationService;
 }
