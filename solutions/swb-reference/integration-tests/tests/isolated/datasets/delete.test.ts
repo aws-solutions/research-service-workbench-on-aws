@@ -21,10 +21,11 @@ describe('datasets delete negative tests', () => {
   let projectId: string;
   let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-  const dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+  let dataSetName: string;
 
   beforeEach(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: `${dataSetName} cost center`,
@@ -78,7 +79,6 @@ describe('datasets delete negative tests', () => {
         checkHttpError(
           e,
           new HttpError(404, {
-            statusCode: 404,
             error: 'Not Found',
             message: `Not Found`
           })
@@ -138,7 +138,6 @@ describe('datasets delete negative tests', () => {
           checkHttpError(
             e,
             new HttpError(409, {
-              statusCode: 409,
               error: 'Conflict',
               message: `External endpoints found on Dataset must be removed before DataSet can be removed.`
             })
@@ -169,7 +168,6 @@ describe('datasets delete negative tests', () => {
           checkHttpError(
             e,
             new HttpError(409, {
-              statusCode: 409,
               error: 'Conflict',
               message: `DataSet ${dataSet.id} cannot be removed because it is associated with project(s) ['${associatedProjectId}']`
             })
