@@ -346,7 +346,8 @@ export default class SshKeyService implements SshKeyPlugin {
       PrivateIpAddress: privateIp
     } = instance;
     if (!(publicDnsName && publicIp && privateDnsName && privateIp)) {
-      throw new ConnectionInfoNotDefinedError('Some connection info is not defined');
+      const notDefined = [publicDnsName, publicIp, privateDnsName, privateIp].filter((val) => !val);
+      throw new ConnectionInfoNotDefinedError(`Some connection info is not defined: ${notDefined}`);
     }
 
     return SendPublicKeyResponseParser.parse({
