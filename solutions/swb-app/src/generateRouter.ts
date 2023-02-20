@@ -11,7 +11,7 @@ import {
   CognitoAuthenticationPluginOptions,
   CognitoAuthenticationPlugin
 } from '@aws/workbench-core-authentication';
-import { withDynamicAuth, RoutesIgnored } from '@aws/workbench-core-authorization';
+import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -32,7 +32,6 @@ import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
 import { setUpSshKeyRoutes } from './sshKeyRoutes';
-import * as StaticRoutesConfig from './staticRouteConfig';
 import { setUpUserRoutes } from './userRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
@@ -62,10 +61,14 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     new CognitoAuthenticationPlugin(cognitoPluginOptions)
   );
 
-  const staticRoutesIgnored: RoutesIgnored = StaticRoutesConfig.routesIgnored;
   const logger: LoggingService = new LoggingService();
 
-  app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
+  app.use(
+    verifyToken(authenticationService, {
+      ignoredRoutes: apiRouteConfig.routesIgnored,
+      loggingService: logger
+    })
+  );
   app.use(withDynamicAuth(apiRouteConfig.authorizationService, { logger: logger }));
 
   // Auditing

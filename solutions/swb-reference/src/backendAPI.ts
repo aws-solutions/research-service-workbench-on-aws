@@ -147,7 +147,8 @@ const apiRouteConfig: ApiRouteConfig = {
     dynamicAuthorizationService
   ),
   sshKeyService: new SshKeyService(aws, projectService),
-  authorizationService: dynamicAuthorizationService
+  authorizationService: dynamicAuthorizationService,
+  routesIgnored: DynamicRouteConfig.routesIgnored
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);
