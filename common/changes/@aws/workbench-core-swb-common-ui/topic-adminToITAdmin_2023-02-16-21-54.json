@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "Changing Admin to ITAdmin",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}
