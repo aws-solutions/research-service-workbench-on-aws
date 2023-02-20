@@ -91,10 +91,10 @@ describe('multiStep users integration test', () => {
       id: userId
     });
 
-    await adminSession.resources.users.user(userId).update({ roles: ['Admin'] }, true);
+    await adminSession.resources.users.user(userId).update({ roles: ['ITAdmin'] }, true);
     const { data: adminUser } = await adminSession.resources.users.user(userId).get();
     expect(adminUser).toMatchObject({
-      roles: ['Admin'],
+      roles: ['ITAdmin'],
       id: userId
     });
   });
