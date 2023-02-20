@@ -34,6 +34,10 @@ export default class Dataset extends Resource {
     return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/relationships`);
   }
 
+  public async listAccessPermissions(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`/datasets/${this._id}/permissions`);
+  }
+
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     const { data: resource } = await defAdminSession.resources.datasets.dataset(this._id).get();

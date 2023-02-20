@@ -14,6 +14,7 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
@@ -127,6 +128,18 @@ export class DataSetService implements DataSetPlugin {
 
   public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
     return this._workbenchDataSetService.listDataSets(user);
+  }
+
+  public async listDataSetAccessPermissions(
+    request: ListDataSetAccessPermissionsRequest
+  ): Promise<PermissionsResponse> {
+    const response = await this._workbenchDataSetService.getAllDataSetAccessPermissions(
+      request.dataSetId,
+      request.authenticatedUser,
+      request.paginationToken
+    );
+
+    return PermissionsResponseParser.parse(response);
   }
 
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {

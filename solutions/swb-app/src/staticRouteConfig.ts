@@ -112,6 +112,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'DatasetPermission'
+      }
+    ]
+  },
   '/datasets/import': {
     POST: [
       {

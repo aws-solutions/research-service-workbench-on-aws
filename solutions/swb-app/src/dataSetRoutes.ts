@@ -15,6 +15,10 @@ import {
 } from './dataSets/createExternalEndpointRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import {
+  ListDataSetAccessPermissionsRequest,
+  ListDataSetAccessPermissionsRequestParser
+} from './dataSets/listDataSetAccessPermissionsRequestParser';
+import {
   ProjectAddAccessRequest,
   ProjectAddAccessRequestParser
 } from './dataSets/projectAddAccessRequestParser';
@@ -146,6 +150,21 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       await dataSetService.removeAccessForProject(validatedRequest);
 
       res.status(204).send();
+    })
+  );
+
+  router.get(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<ListDataSetAccessPermissionsRequest>(
+        ListDataSetAccessPermissionsRequestParser,
+        {
+          ...req.query,
+          authenticatedUser: res.locals.user,
+          dataSetId: req.params.datasetId
+        }
+      );
+      res.send(await dataSetService.listDataSetAccessPermissions(validatedRequest));
     })
   );
 

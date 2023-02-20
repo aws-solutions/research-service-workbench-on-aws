@@ -113,6 +113,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetPermission'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Environment'
   },
