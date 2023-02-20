@@ -120,6 +120,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/upload-requests`]: {
+    GET: [
+      {
+        action: 'UPDATE',
+        subject: 'Dataset'
+      }
+    ]
+  },
   '/datasets/import': {
     POST: [
       {

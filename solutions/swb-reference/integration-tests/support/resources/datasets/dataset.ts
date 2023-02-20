@@ -37,6 +37,9 @@ export default class Dataset extends Resource {
   public async listAccessPermissions(): Promise<AxiosResponse> {
     return this._axiosInstance.get(`/datasets/${this._id}/permissions`);
   }
+  public async getFileUploadUrls(filenames?: string | string[]): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/upload-requests`, { params: { filenames } });
+  }
 
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();

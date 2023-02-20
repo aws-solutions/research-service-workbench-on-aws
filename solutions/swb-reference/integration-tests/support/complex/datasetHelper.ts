@@ -35,6 +35,12 @@ export class DatasetHelper {
     if (listedObjects.IsTruncated) await this.deleteS3Resources(bucket, dir);
   }
 
+  public async getS3ObjectNames(bucket: string, dir: string): Promise<string[]> {
+    const listedObjects = await this._awsSdk.clients.s3.listObjectsV2({ Bucket: bucket, Prefix: dir });
+
+    return listedObjects.Contents?.map((object) => object.Key!) ?? [];
+  }
+
   public async deleteDdbRecords(dataSetId: string): Promise<void> {
     await this._awsSdk.helpers.ddb
       .delete({ pk: `DATASET#${dataSetId}`, sk: `DATASET#${dataSetId}` })

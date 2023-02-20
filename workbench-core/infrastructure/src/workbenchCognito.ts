@@ -59,6 +59,7 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   authFlows: {
     adminUserPassword: true,
     userSrp: true,
+    userPassword: true,
     custom: true
   },
   preventUserExistenceErrors: true,
