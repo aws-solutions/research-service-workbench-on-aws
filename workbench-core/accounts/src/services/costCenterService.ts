@@ -17,13 +17,9 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
-import _ from 'lodash';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';
-import {
-  CostCenter,
-  CostCenterWithResourceType,
-  CostCenterWithResourceTypeParser
-} from '../models/costCenters/costCenter';
+import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
 import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
@@ -55,7 +51,7 @@ export default class CostCenterService {
       await this._dynamoDbService.updateExecuteAndFormat({
         key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
         params: {
-          item: { resourceType: `${this._resourceType}_deleted` }
+          item: { status: CostCenterStatus.DELETED }
         }
       });
     } catch (e) {
@@ -70,6 +66,7 @@ export default class CostCenterService {
    */
   public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
     await this.getCostCenter(request.id);
+
     const currentDate = new Date().toISOString();
     const updatedCostCenter = {
       name: request.name,
@@ -88,7 +85,7 @@ export default class CostCenterService {
       throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
     }
     if (response.Attributes) {
-      return _.omit(this._mapDDBItemToCostCenter(response.Attributes), 'resourceType');
+      return this._mapDDBItemToCostCenter(response.Attributes);
     }
     throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
   }
@@ -113,7 +110,7 @@ export default class CostCenterService {
 
     return {
       data: response.data.map((item) => {
-        return _.omit(this._mapDDBItemToCostCenter(item), 'resourceType');
+        return this._mapDDBItemToCostCenter(item);
       }),
       paginationToken: response.paginationToken
     };
@@ -129,13 +126,7 @@ export default class CostCenterService {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    const costCenter = this._mapDDBItemToCostCenter(response.Item);
-
-    if (costCenter.resourceType.endsWith('_deleted')) {
-      throw Boom.notFound(`Cost center ${costCenterId} was deleted`);
-    }
-
-    return _.omit(costCenter, 'resourceType');
+    return this._mapDDBItemToCostCenter(response.Item);
   }
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
@@ -158,7 +149,8 @@ export default class CostCenterService {
       subnetId: account.subnetId!,
       vpcId: account.vpcId!,
       environmentInstanceFiles: account.environmentInstanceFiles!,
-      externalId: account.externalId
+      externalId: account.externalId,
+      status: CostCenterStatus.AVAILABLE
     };
 
     const dynamoItem: { [key: string]: string } = {
@@ -178,15 +170,15 @@ export default class CostCenterService {
       }
     });
     if (response.Attributes) {
-      return _.omit(this._mapDDBItemToCostCenter(response.Attributes), 'resourceType');
+      return this._mapDDBItemToCostCenter(response.Attributes);
     }
     throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
   }
 
-  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenterWithResourceType {
+  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
     const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
     // parse will remove pk and sk from the DDB item
-    return CostCenterWithResourceTypeParser.parse(costCenter);
+    return CostCenterParser.parse(costCenter);
   }
 
   private async _getAccount(accountId: string): Promise<Account> {

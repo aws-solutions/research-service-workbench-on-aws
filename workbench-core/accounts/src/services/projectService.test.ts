@@ -36,6 +36,7 @@ import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { Project } from '../models/projects/project';
@@ -200,7 +201,7 @@ describe('ProjectService', () => {
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3',
-    resourceType: 'costCenter'
+    status: CostCenterStatus.AVAILABLE
   };
 
   const noUserGroupsFunction = jest.fn((request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
@@ -1483,7 +1484,7 @@ describe('ProjectService', () => {
 
       // mock getCostCenter call
       const getCostCenterGetItemResponse: GetItemCommandOutput = {
-        Item: marshall({ ...costCenterItem, resourceType: 'costCenter_deleted' }),
+        Item: marshall({ ...costCenterItem, status: CostCenterStatus.DELETED }),
         $metadata: {}
       };
       ddbMock

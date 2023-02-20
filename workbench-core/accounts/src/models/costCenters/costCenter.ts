@@ -4,9 +4,10 @@
  */
 
 import { z } from 'zod';
+import { CostCenterStatus } from '../../constants/costCenterStatus';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const CostCenterWithResourceTypeParser = z.object({
+export const CostCenterParser = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
@@ -22,11 +23,7 @@ export const CostCenterWithResourceTypeParser = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   dependency: z.string(),
-  resourceType: z.enum(['costCenter', 'costCenter_deleted'])
+  status: z.nativeEnum(CostCenterStatus)
 });
 
-// eslint-disable-next-line @rushstack/typedef-var
-export const CostCenterParser = CostCenterWithResourceTypeParser.omit({ resourceType: true });
-
-export type CostCenterWithResourceType = z.infer<typeof CostCenterWithResourceTypeParser>;
 export type CostCenter = z.infer<typeof CostCenterParser>;
