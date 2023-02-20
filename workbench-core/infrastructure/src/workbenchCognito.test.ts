@@ -87,6 +87,7 @@ describe('WorkbenchCognito tests', () => {
         RefreshToken: 'minutes'
       },
       ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
         'ALLOW_ADMIN_USER_PASSWORD_AUTH',
         'ALLOW_CUSTOM_AUTH',
         'ALLOW_USER_SRP_AUTH',
@@ -183,6 +184,7 @@ describe('WorkbenchCognito tests', () => {
         RefreshToken: 'minutes'
       },
       ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
         'ALLOW_ADMIN_USER_PASSWORD_AUTH',
         'ALLOW_CUSTOM_AUTH',
         'ALLOW_USER_SRP_AUTH',
