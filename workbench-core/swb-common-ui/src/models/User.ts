@@ -32,7 +32,7 @@ export const adminUser: UserItem = {
   email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
-  role: 'itadmin'
+  role: 'ITAdmin'
 };
 
 export interface CreateUserForm {
