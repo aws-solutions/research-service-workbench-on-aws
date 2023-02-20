@@ -367,7 +367,6 @@ const researcherPermissions: Permission[] = [
 ];
 
 export const permissionsMap: PermissionsMap = {
-  Admin: adminPermissions,
   ITAdmin: adminPermissions,
   Researcher: researcherPermissions
 };

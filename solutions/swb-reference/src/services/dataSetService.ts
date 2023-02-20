@@ -34,6 +34,8 @@ import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
+const timeToLiveSeconds: number = 60 * 15; // 15 min
+
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
   private _dataSetsAuthService: DataSetsAuthorizationPlugin;
@@ -152,6 +154,20 @@ export class DataSetService implements DataSetPlugin {
     );
 
     return dataset;
+  }
+
+  public async getSinglePartFileUploadUrl(
+    dataSetId: string,
+    fileName: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<string> {
+    return this._workbenchDataSetService.getPresignedSinglePartUploadUrl(
+      dataSetId,
+      fileName,
+      timeToLiveSeconds,
+      this.storagePlugin,
+      authenticatedUser
+    );
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {

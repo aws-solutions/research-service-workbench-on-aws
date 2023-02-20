@@ -189,7 +189,7 @@ export class EnvironmentService {
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 
-    if (user.roles.includes('Admin')) {
+    if (user.roles.includes('ITAdmin')) {
       if (filter) {
         if (filter.status) {
           // if admin and status is selected in the filter, use GSI getResourceByStatus
