@@ -15,6 +15,15 @@ terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environme
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
 
+projectAdmin1UserNameParamStorePath: '/swb/testEnv/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/testEnv/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/testEnv/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/testEnv/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/testEnv/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/testEnv/researcher1/password'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
 
