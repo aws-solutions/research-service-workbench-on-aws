@@ -39,7 +39,7 @@ export default function Navigation({
   const { user } = useAuthentication();
   const userRole = user ? user.role : 'researcher';
   let navDisplay: typeof adminNavItems | typeof userNavItems = adminNavItems;
-  if (userRole === 'Admin') {
+  if (userRole === 'ITAdmin') {
     navDisplay = adminNavItems;
   } else {
     navDisplay = userNavItems;
