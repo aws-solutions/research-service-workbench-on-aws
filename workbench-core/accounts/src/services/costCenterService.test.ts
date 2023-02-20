@@ -27,7 +27,12 @@ describe('CostCenterService', () => {
   const accountId = 'acc-someId';
   const ddbMock = mockClient(DynamoDBClient);
   const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
-  type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
+  type CostCenterJson = Omit<CostCenter, 'accountId'> & {
+    pk: string;
+    sk: string;
+    dependency: string;
+    resourceType: string;
+  };
 
   beforeEach(() => {
     jest.resetModules();
@@ -97,7 +102,8 @@ describe('CostCenterService', () => {
             Item: marshall(
               {
                 ...expectedCostCenter,
-                dependency: accountId
+                dependency: accountId,
+                resourceType: 'costCenter'
               },
               {
                 removeUndefinedValues: true
@@ -121,6 +127,23 @@ describe('CostCenterService', () => {
         test('it throws an error', async () => {
           await expect(costCenterService.getCostCenter(costCenterId)).rejects.toThrow(
             `Could not find cost center ${costCenterId}`
+          );
+        });
+      });
+
+      describe('and cost center has been deleted', () => {
+        beforeEach(() => {
+          ddbMock.on(GetItemCommand).resolves({
+            Item: marshall({
+              ...expectedCostCenter,
+              resourceType: 'costCenter_deleted'
+            })
+          });
+        });
+
+        test('it throws an error', async () => {
+          await expect(costCenterService.getCostCenter(costCenterId)).rejects.toThrow(
+            `Cost center ${costCenterId} was deleted`
           );
         });
       });
@@ -149,7 +172,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        resourceType: 'costCenter'
       };
       expectedCostCenter = {
         ...costCenterJson,
@@ -266,7 +290,9 @@ describe('CostCenterService', () => {
             accountId: accountId,
             id: costCenterId
           };
-          ddbMock.on(UpdateItemCommand).resolves({ Attributes: marshall(costCenter) });
+          ddbMock
+            .on(UpdateItemCommand)
+            .resolves({ Attributes: marshall({ ...costCenter, resourceType: 'costCenter' }) });
         });
 
         test('it returns a CostCenter object with the associated Account metadata', async () => {
@@ -315,7 +341,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        resourceType: 'costCenter'
       };
       // Mock getting projects associated with cost center
       ddbMock.on(QueryCommand).resolves({
@@ -400,7 +427,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        resourceType: 'costCenter'
       };
       ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
     });
@@ -474,7 +502,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        resourceType: 'costCenter'
       };
       // Mock getting projects associated with cost center
       ddbMock.on(QueryCommand).resolves({
@@ -559,7 +588,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        resourceType: 'costCenter'
       };
       ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
     });

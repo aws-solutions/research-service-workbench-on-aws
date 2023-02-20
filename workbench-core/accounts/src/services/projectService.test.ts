@@ -199,7 +199,8 @@ describe('ProjectService', () => {
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
-    vpcId: 'vpc-0b0bc7ae01d82e7b3'
+    vpcId: 'vpc-0b0bc7ae01d82e7b3',
+    resourceType: 'costCenter'
   };
 
   const noUserGroupsFunction = jest.fn((request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
@@ -1445,6 +1446,58 @@ describe('ProjectService', () => {
       await expect(projService.createProject(params, user)).rejects.toThrow(
         'Could not find cost center cc-123'
       );
+    });
+
+    test('fail on create a project with deleted cost center', async () => {
+      // BUILD
+      const params = {
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
+      };
+
+      // mock isProjectNameInUse call
+      const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
+        Count: 0,
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#name': 'name'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':name': {
+              S: 'Example project'
+            }
+          }
+        })
+        .resolves(isProjectNameValidQueryItemResponse);
+
+      // mock getCostCenter call
+      const getCostCenterGetItemResponse: GetItemCommandOutput = {
+        Item: marshall({ ...costCenterItem, resourceType: 'costCenter_deleted' }),
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: 'exampleDDBTable',
+          Key: marshall({
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
+          })
+        })
+        .resolves(getCostCenterGetItemResponse);
+
+      // OPERATE n CHECK
+      await expect(projService.createProject(params, user)).rejects.toThrow('Cost center cc-123 was deleted');
     });
 
     test('fail on update to DDB call', async () => {

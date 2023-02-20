@@ -6,7 +6,7 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const CostCenterParser = z.object({
+export const CostCenterWithResourceTypeParser = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
@@ -21,7 +21,12 @@ export const CostCenterParser = z.object({
   accountId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  dependency: z.string()
+  dependency: z.string(),
+  resourceType: z.enum(['costCenter', 'costCenter_deleted'])
 });
 
+// eslint-disable-next-line @rushstack/typedef-var
+export const CostCenterParser = CostCenterWithResourceTypeParser.omit({ resourceType: true });
+
+export type CostCenterWithResourceType = z.infer<typeof CostCenterWithResourceTypeParser>;
 export type CostCenter = z.infer<typeof CostCenterParser>;

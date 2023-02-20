@@ -157,5 +157,37 @@ describe('Create Project negative tests', () => {
         }
       });
     });
+
+    describe('that was deleted', () => {
+      beforeEach(async () => {
+        const { data: costCenter } = await adminSession.resources.costCenters.create({
+          name: 'project integration test cost center',
+          accountId: setup.getSettings().get('defaultHostingAccountId'),
+          description: 'a test costcenter'
+        });
+        costCenterId = costCenter.id;
+
+        await adminSession.resources.costCenters.costCenter(costCenterId).softDelete();
+      });
+
+      test('it throws 400 error', async () => {
+        try {
+          existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+          await adminSession.resources.projects.create({
+            name: existingProjectName,
+            description: 'Project for TOP SECRET dragon research',
+            costCenterId
+          });
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(404, {
+              error: 'Not Found',
+              message: `Cost center ${costCenterId} was deleted`
+            })
+          );
+        }
+      });
+    });
   });
 });

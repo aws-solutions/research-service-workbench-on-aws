@@ -17,8 +17,13 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
+import _ from 'lodash';
 import { Account } from '../models/accounts/account';
-import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import {
+  CostCenter,
+  CostCenterWithResourceType,
+  CostCenterWithResourceTypeParser
+} from '../models/costCenters/costCenter';
 import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
 import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
@@ -83,7 +88,7 @@ export default class CostCenterService {
       throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
     }
     if (response.Attributes) {
-      return this._mapDDBItemToCostCenter(response.Attributes);
+      return _.omit(this._mapDDBItemToCostCenter(response.Attributes), 'resourceType');
     }
     throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
   }
@@ -108,7 +113,7 @@ export default class CostCenterService {
 
     return {
       data: response.data.map((item) => {
-        return this._mapDDBItemToCostCenter(item);
+        return _.omit(this._mapDDBItemToCostCenter(item), 'resourceType');
       }),
       paginationToken: response.paginationToken
     };
@@ -117,13 +122,20 @@ export default class CostCenterService {
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     const response = (await this._dynamoDbService
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
+      .strong()
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    return this._mapDDBItemToCostCenter(response.Item);
+    const costCenter = this._mapDDBItemToCostCenter(response.Item);
+
+    if (costCenter.resourceType.endsWith('_deleted')) {
+      throw Boom.notFound(`Cost center ${costCenterId} was deleted`);
+    }
+
+    return _.omit(costCenter, 'resourceType');
   }
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
@@ -166,15 +178,15 @@ export default class CostCenterService {
       }
     });
     if (response.Attributes) {
-      return this._mapDDBItemToCostCenter(response.Attributes);
+      return _.omit(this._mapDDBItemToCostCenter(response.Attributes), 'resourceType');
     }
     throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
   }
 
-  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
+  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenterWithResourceType {
     const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
     // parse will remove pk and sk from the DDB item
-    return CostCenterParser.parse(costCenter);
+    return CostCenterWithResourceTypeParser.parse(costCenter);
   }
 
   private async _getAccount(accountId: string): Promise<Account> {
