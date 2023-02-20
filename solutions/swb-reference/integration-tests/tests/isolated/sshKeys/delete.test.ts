@@ -14,11 +14,10 @@ describe('Delete Key Pair negative tests', () => {
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
   let project1Id: string;
-  let project2Id: string;
   let sshKeyId: string;
 
   beforeEach(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id } = await paabHelper.createResources());
     expect.hasAssertions();
   });
 
@@ -26,28 +25,37 @@ describe('Delete Key Pair negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  // TODO: multiple user session support has to exist for this test
-  describe('when current user does not own key', () => {
-    let existingSshKeyId: string;
-    let secondaryUserId: string;
+  describe('when key does not exist', () => {
+    let invalidSshKeyId: string;
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session
+      }
+    ];
 
-    beforeEach(async () => {
-      // This needs to happen in not the defaultAdminSession so the default admin does not own this key
-      // This user session must still have access to the project used
-      // const {data: existingSshKey} = await adminSession.resources.projects.project(project.id).sshKeys().create();
-      // secondaryUserId = adminSession.getUserId()!;
-      // existingSshKeyId = existingSshKey.sshKeyId;
+    beforeEach(() => {
+      invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
 
-    test.skip('it throws 403 error', async () => {
+    test.each(testBundle)('within a valid project', async (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      const session = sessionFunc();
+
+      console.log(`as ${username}`);
+
       try {
-        await adminSession.resources.projects.project(project2Id).sshKeys().sshKey(existingSshKeyId).delete();
+        await session.resources.projects.project(project1Id).sshKeys().sshKey(invalidSshKeyId).delete();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(403, {
-            error: 'Forbidden',
-            message: `Current user ${secondaryUserId} cannot delete a key they do not own`
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Key ${invalidSshKeyId} does not exist`
           })
         );
       }
@@ -74,43 +82,6 @@ describe('Delete Key Pair negative tests', () => {
           })
         );
       }
-    });
-  });
-
-  describe('with SSH Key that does not exist', () => {
-    let nonExistentSshKeyId: string;
-
-    beforeEach(() => {
-      nonExistentSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
-    });
-    const testBundle = [
-      {
-        userName: 'ProjectAdmin1',
-        session: pa1Session,
-        projectId: project1Id
-      },
-      {
-        userName: 'researcher1',
-        session: rs1Session,
-        projectId: project1Id
-      }
-    ];
-
-    testBundle.forEach(({ userName, session, projectId }) => {
-      test(`it throws 404 error for ${userName}`, async () => {
-        try {
-          await session.resources.projects.project(projectId).sshKeys().sshKey(nonExistentSshKeyId).delete();
-        } catch (e) {
-          console.error(e);
-          checkHttpError(
-            e,
-            new HttpError(404, {
-              error: 'Not Found',
-              message: `Key ${nonExistentSshKeyId} does not exist`
-            })
-          );
-        }
-      });
     });
   });
 });
