@@ -46,8 +46,7 @@ export class PaabHelper {
         description: `${projectName} for integ tests`,
         costCenterId: costCenter.id
       });
-      projectIds.push(projectResponse.data);
-      //console.log("projectResponse", projectResponse)
+      projectIds.push(projectResponse.data.id);
     }
     const [project1Id, project2Id] = projectIds;
 
