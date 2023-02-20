@@ -69,6 +69,10 @@ describe('datasets delete negative tests', () => {
     dataSet = newDataSet;
   });
 
+  afterEach(async () => {
+    await setup.cleanup();
+  });
+
   describe('when the dataset does not exist', () => {
     test('it returns a 404', async () => {
       try {
