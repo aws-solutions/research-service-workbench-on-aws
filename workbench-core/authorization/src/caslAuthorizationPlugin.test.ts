@@ -4,13 +4,24 @@
  */
 
 import { fc, itProp } from 'jest-fast-check';
-import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError } from '.';
+import {
+  Operation,
+  Permission,
+  CASLAuthorizationPlugin,
+  ForbiddenError,
+  IdentityPermission,
+  DynamicOperation
+} from '.';
 
 describe('CASL Authorization Plugin', () => {
   let caslAuthorizationPlugin: CASLAuthorizationPlugin;
   let mockAdminPermissions: Permission[];
   let mockGuestPermissions: Permission[];
   let mockOperations: Operation[];
+
+  beforeEach(() => {
+    expect.hasAssertions();
+  });
 
   describe('isAuthorized', () => {
     beforeEach(() => {
@@ -45,25 +56,27 @@ describe('CASL Authorization Plugin', () => {
           subject: 'Sample',
           effect: 'DENY',
           reason: 'User is not capable of updating'
+        },
+        {
+          action: 'UPDATE',
+          subject: 'Sample',
+          effect: 'ALLOW'
         }
       ];
 
       caslAuthorizationPlugin = new CASLAuthorizationPlugin();
     });
-    test('unauthorized user with action and subject should throws ForbiddenError with reason', async () => {
+    test('Ensure DENY takes precedence, unauthorized user with action and subject should throws ForbiddenError with reason', async () => {
       mockOperations = [
         {
           action: 'UPDATE',
           subject: 'Sample'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('User is not capable of updating');
-      }
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError('User is not capable of updating'));
     });
     test('authorized user with action and subject', async () => {
       mockOperations = [
@@ -85,13 +98,9 @@ describe('CASL Authorization Plugin', () => {
           field: 'id'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations);
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe('Permission Not Granted');
-      }
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError('Permission Not Granted'));
     });
 
     test('authorized user with action, subject, and field', async () => {
@@ -122,13 +131,10 @@ describe('CASL Authorization Plugin', () => {
           field: 'id'
         }
       ];
-      try {
-        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenError);
-        expect(err.message).toBe(`Cannot execute "${testAction}" on "${testSubject}"`);
-      }
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorized(mockGuestPermissions, mockOperations)
+      ).rejects.toThrowError(new ForbiddenError(`Cannot execute "${testAction}" on "${testSubject}"`));
     });
 
     test('authorized with no action', async () => {
@@ -142,16 +148,127 @@ describe('CASL Authorization Plugin', () => {
       'Random array should throw error',
       [fc.uniqueArray(fc.anything()), fc.uniqueArray(fc.anything(), { minLength: 1 })],
       async (userPermissions, operations) => {
-        try {
-          await caslAuthorizationPlugin.isAuthorized(
-            userPermissions as Permission[],
-            operations as Operation[]
-          );
-          expect.hasAssertions();
-        } catch (err) {
-          // eslint-disable-next-line no-empty
-        }
+        await expect(
+          caslAuthorizationPlugin.isAuthorized(userPermissions as Permission[], operations as Operation[])
+        ).rejects.toThrow();
       }
     );
+  });
+
+  describe('isAuthorizedOnDynamicOperations', () => {
+    let mockIdentityPermissions: IdentityPermission[];
+    beforeEach(() => {
+      mockIdentityPermissions = [
+        {
+          effect: 'ALLOW',
+          action: 'CREATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '*',
+          conditions: { env: { $eq: 'SampleEnv' } }
+        },
+        {
+          effect: 'DENY',
+          action: 'UPDATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        },
+        {
+          effect: 'ALLOW',
+          action: 'UPDATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        },
+        {
+          effect: 'DENY',
+          action: 'DELETE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '*',
+          conditions: { env: { $eq: 'SampleEnv' } }
+        }
+      ];
+      caslAuthorizationPlugin = new CASLAuthorizationPlugin();
+    });
+    test('Check for valid dynamic operations with valid conditions', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'CREATE',
+          subject: {
+            subjectType: 'SampleSubject',
+            subjectId: '1',
+            env: 'SampleEnv'
+          }
+        }
+      ];
+      expect(
+        async () =>
+          await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+            mockIdentityPermissions,
+            mockDynamicOperations
+          )
+      ).not.toThrow(ForbiddenError);
+    });
+
+    test('Check for an invalid dynamic operations due invalid conditions', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'CREATE',
+          subject: {
+            subjectType: 'SampleSubject',
+            subjectId: '1'
+          }
+        }
+      ];
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        )
+      ).rejects.toThrow(new ForbiddenError('Cannot execute "CREATE" on "SampleSubject"'));
+    });
+    test('Check for valid dynamic operations with invalid conditions due to DENY', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'DELETE',
+          subject: {
+            subjectType: 'SampleSubject',
+            subjectId: '1234',
+            env: 'SampleEnv'
+          }
+        }
+      ];
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        )
+      ).rejects.toThrow(ForbiddenError);
+    });
+    test('Ensure DENY takes precedence', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'UPDATE',
+          subject: {
+            subjectType: 'SampleSubject',
+            subjectId: '1234'
+          }
+        }
+      ];
+
+      await expect(
+        caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        )
+      ).rejects.toThrow(new ForbiddenError('Cannot execute "UPDATE" on "SampleSubject"'));
+    });
   });
 });

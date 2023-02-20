@@ -4,6 +4,9 @@
  */
 
 import ClientSession from './clientSession';
+import AuditEntry from './resources/audit/auditEntry';
+import Authentication from './resources/authentication/authentication';
+import { StaticAuthorization } from './resources/authorization/staticAuthorization';
 import Datasets from './resources/datasets/datasets';
 import Groups from './resources/dynamicAuthorization/groups';
 import IdentityPermissions from './resources/dynamicAuthorization/identityPermissions';
@@ -18,7 +21,10 @@ function getResources(clientSession: ClientSession): Resources {
     groups: new Groups(clientSession),
     identityPermissions: new IdentityPermissions(clientSession),
     roles: new Roles(clientSession),
-    routesProtection: new RoutesProtection(clientSession)
+    routesProtection: new RoutesProtection(clientSession),
+    auditEntry: new AuditEntry(clientSession),
+    authentication: new Authentication(clientSession),
+    staticAuthorization: new StaticAuthorization(clientSession)
   };
 }
 
@@ -29,6 +35,9 @@ interface Resources {
   groups: Groups;
   identityPermissions: IdentityPermissions;
   routesProtection: RoutesProtection;
+  auditEntry: AuditEntry;
+  authentication: Authentication;
+  staticAuthorization: StaticAuthorization;
 }
 
 export { getResources, Resources };

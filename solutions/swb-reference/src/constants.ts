@@ -29,19 +29,31 @@ interface Constants {
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
-  UI_CLIENT_URL: string;
   COGNITO_DOMAIN: string;
   WEBSITE_URLS: string[];
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
+  VPC_ID: string;
   S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
+  SWB_DOMAIN_NAME_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
+  VPC_ID_OUTPUT_KEY: string;
+  ALB_SUBNET_IDS: string[];
+  ECS_SUBNET_IDS: string[];
+  ECS_SUBNET_IDS_OUTPUT_KEY: string;
+  ECS_SUBNET_AZS_OUTPUT_KEY: string;
+  ALB_INTERNET_FACING: boolean;
+  HOSTED_ZONE_ID: string;
+  DOMAIN_NAME: string;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
 interface SecretConstants {
   ROOT_USER_EMAIL: string;
+  DYNAMIC_AUTH_TABLE_NAME: string;
 }
 
 //CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
@@ -56,8 +68,6 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const uiClientURL = getUiClientUrl();
-  if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
@@ -65,6 +75,12 @@ function getConstants(): Constants {
   const USER_POOL_ID = config.userPoolId || '';
   const CLIENT_ID = config.clientId || '';
   const CLIENT_SECRET = config.clientSecret || '';
+  const VPC_ID = config.vpcId || '';
+  const ALB_SUBNET_IDS = config.albSubnetIds || [];
+  const ECS_SUBNET_IDS = config.ecsSubnetIds || [];
+  const ALB_INTERNET_FACING = config.albInternetFacing || false;
+  const HOSTED_ZONE_ID = config.hostedZoneId || '';
+  const DOMAIN_NAME = config.domainName || '';
 
   const FIELDS_TO_MASK_WHEN_AUDITING: string[] = config.fieldsToMaskWhenAuditing;
 
@@ -72,7 +88,7 @@ function getConstants(): Constants {
 
   // These are the OutputKey for the SWB Main Account CFN stack
   const SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
-  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = `${config.stage}-S3BucketAccessLogsNameOutput`;
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   const S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
@@ -81,6 +97,12 @@ function getConstants(): Constants {
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3DatasetsEncryptionKeyOutput';
   const S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3ArtifactEncryptionKeyOutput';
+  const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
+  const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
+  const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
+  const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
+  const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
+  const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
 
   return {
     STAGE: config.stage,
@@ -100,7 +122,6 @@ function getConstants(): Constants {
     USER_POOL_NAME,
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
     AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
-    UI_CLIENT_URL: uiClientURL,
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
@@ -109,8 +130,20 @@ function getConstants(): Constants {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
+    VPC_ID,
     S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
+    SWB_DOMAIN_NAME_OUTPUT_KEY,
+    MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
+    VPC_ID_OUTPUT_KEY,
+    HOSTED_ZONE_ID,
+    DOMAIN_NAME,
+    ALB_SUBNET_IDS,
+    ECS_SUBNET_IDS,
+    ECS_SUBNET_IDS_OUTPUT_KEY,
+    ECS_SUBNET_AZS_OUTPUT_KEY,
+    ALB_INTERNET_FACING,
     FIELDS_TO_MASK_WHEN_AUDITING
   };
 }
@@ -122,7 +155,7 @@ async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   const rootUserParamStorePath = config.rootUserEmailParamStorePath;
 
   const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
-  return { ...getConstants(), ROOT_USER_EMAIL };
+  return { ...getConstants(), ROOT_USER_EMAIL, DYNAMIC_AUTH_TABLE_NAME: getDynamicAuthTableName() };
 }
 
 interface Config {
@@ -135,9 +168,14 @@ interface Config {
   userPoolId?: string;
   clientId?: string;
   clientSecret?: string;
+  vpcId?: string;
+  albSubnetIds?: string[];
+  ecsSubnetIds?: string[];
+  albInternetFacing?: boolean;
+  hostedZoneId?: string;
+  domainName?: string;
   fieldsToMaskWhenAuditing: string[];
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getConfig(): Config {
   return yaml.load(
     // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
@@ -145,6 +183,17 @@ function getConfig(): Config {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
   ) as unknown as Config;
+}
+
+function getDynamicAuthTableName(): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const outputs: any = JSON.parse(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
+  );
+  const stackName = Object.entries(outputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+  // eslint-disable-next-line security/detect-object-injection
+  return outputs[stackName].dynamicAuthDDBTableName;
 }
 
 async function getSSMParamValue(awsService: AwsService, ssmParamName: string): Promise<string> {
@@ -156,26 +205,10 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
   return response.Parameter!.Value!;
 }
 
-function getUiClientUrl(): string {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uiClientOutput: any = JSON.parse(
-      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-      // correct file
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.readFileSync(
-        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
-        'utf8'
-      ) // nosemgrep
-    );
-    const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
-    // eslint-disable-next-line security/detect-object-injection
-    return uiClientOutput[uiClientStackName].WebsiteURL;
-  } catch {
-    console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
-    return '';
-  }
-}
+const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
+const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
+const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
+const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
 
 const dataSetPrefix: string = 'DATASET';
 const endPointPrefix: string = 'ENDPOINT';
@@ -183,7 +216,9 @@ const authorizationGroupPrefix: string = 'GROUP';
 
 const enum SwbAuthZSubject {
   SWB_DATASET = 'SWB_DATASET',
+  SWB_DATASET_ACCESS_LEVEL = 'SWB_DATASET_ACCESS_LEVEL',
   SWB_ENVIRONMENT = 'SWB_ENVIRONMENT',
+  SWB_ENVIRONMENT_CONNECTION = 'SWB_ENVIRONMENT_CONNECTION',
   SWB_ENVIRONMENT_TYPE = 'SWB_ENVIRONMENT_TYPE',
   SWB_ETC = 'SWB_ETC',
   SWB_PROJECT = 'SWB_PROJECT',
@@ -197,5 +232,9 @@ export {
   dataSetPrefix,
   endPointPrefix,
   authorizationGroupPrefix,
-  SwbAuthZSubject
+  SwbAuthZSubject,
+  SolutionId,
+  SolutionName,
+  SolutionVersion,
+  ApplicationType
 };

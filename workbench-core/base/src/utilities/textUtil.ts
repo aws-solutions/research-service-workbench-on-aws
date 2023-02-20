@@ -27,6 +27,10 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
 }
 
+const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
+
+const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
+
 export {
   uuidWithLowercasePrefix,
   uuidRegExp,
@@ -35,5 +39,7 @@ export {
   productIdRegExpString,
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
-  groupIDRegExpAsString
+  validRolesRegExpAsString,
+  groupIDRegExpAsString,
+  validSshKeyUuidRegExpAsString
 };

@@ -5,10 +5,10 @@
 
 import { LoggingService } from '@aws/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
-import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationService from './authorizationService';
 import { AuthenticatedUserNotFoundError } from './errors/authenticatedUserNotFoundError';
-import { HTTPMethod, HTTPMethodParser } from './routesMap';
+import { AuthenticatedUser } from './models/authenticatedUser';
+import { HTTPMethod, HTTPMethodParser } from './models/routesMap';
 /**
  * Checks to ensure user object is an instance of {@link AuthenticatedUser}.
  * @param user - object that is suppose to represent the user.

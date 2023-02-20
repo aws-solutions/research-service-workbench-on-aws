@@ -16,24 +16,26 @@ import { DatasetHelper } from '../../complex/datasetHelper';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import Resource from '../base/resource';
 import IdentityPermission from '../dynamicAuthorization/identityPermission';
-import Endpoint, { EndpointCreateParams } from './endpoint';
+import Endpoint from './endpoint';
 
 export default class Dataset extends Resource {
   private _awsAccountId: string;
-  private _children: Map<string, Endpoint>;
   private _permissions: Map<string, IdentityPermission>;
-  private _clientSession: ClientSession;
   public storageName: string;
   public storagePath: string;
+  public owner?: string;
+  public ownerType?: string;
+  public children: Map<string, Endpoint>;
 
   public constructor(params: DataSetCreateParams) {
     super(params.clientSession, 'dataset', params.id, params.parentApi);
     this._awsAccountId = params.awsAccountId;
     this.storageName = params.storageName;
     this.storagePath = params.storagePath;
-    this._clientSession = params.clientSession;
-    this._children = new Map<string, Endpoint>();
+    this.children = new Map<string, Endpoint>();
     this._permissions = new Map<string, IdentityPermission>();
+    this.owner = params.owner;
+    this.ownerType = params.ownerType;
   }
 
   public identityPermission(
@@ -45,8 +47,13 @@ export default class Dataset extends Resource {
     return new IdentityPermission(identityPermission, clientSession, parentApi, id);
   }
 
-  public endpoint(params: EndpointCreateParams): Endpoint {
-    return new Endpoint(params);
+  public endpoint(params: EndpointCreateRequest): Endpoint {
+    return new Endpoint({
+      ...params,
+      clientSession: this._clientSession,
+      parentApi: `${this._api}/share`,
+      awsAccountId: this._awsAccountId
+    });
   }
 
   public async getAllAccess(): Promise<PermissionsResponse> {
@@ -69,15 +76,9 @@ export default class Dataset extends Resource {
     return validateAndParse(PermissionsResponseParser, response.data);
   }
 
-  public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
+  public generateDataSetPermissions(permissionObjects: DataSetPermission[]): void {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
-    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
-    const permissionsCreated: PermissionsResponse = validateAndParse(
-      PermissionsResponseParser,
-      response.data
-    );
-
-    const permissions: Permission[] = permissionsCreated.data.permissions.map((p: DataSetPermission) => {
+    const permissions: Permission[] = permissionObjects.map((p: DataSetPermission) => {
       return {
         action: p.accessLevel === 'read-only' ? 'READ' : 'UPDATE',
         effect: 'ALLOW',
@@ -94,7 +95,15 @@ export default class Dataset extends Resource {
       this._permissions.set(resourceNode.id, resourceNode);
       this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
     });
+  }
 
+  public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
+    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
+    const permissionsCreated: PermissionsResponse = validateAndParse(
+      PermissionsResponseParser,
+      response.data
+    );
+    this.generateDataSetPermissions(permissionsCreated.data.permissions);
     return permissionsCreated;
   }
 
@@ -145,17 +154,14 @@ export default class Dataset extends Resource {
       userId: requestBody.userId
     });
 
-    const endPointParams: EndpointCreateParams = {
-      id: response.data.endpointId,
-      clientSession: this._clientSession,
-      parentApi: this._api,
-      awsAccountId: this._awsAccountId,
+    const endPointParams: EndpointCreateRequest = {
+      id: response.data.mountObject.endpointId,
       externalEndpointName: endPointName
     };
 
     const taskid = `endpoint-${endPointParams.id}`;
     const resourceNode: Endpoint = this.endpoint(endPointParams);
-    this._children.set(resourceNode.id, resourceNode);
+    this.children.set(resourceNode.id, resourceNode);
 
     this._clientSession.addCleanupTask({ id: taskid, task: async () => resourceNode.cleanup() });
 
@@ -185,4 +191,11 @@ export interface DataSetCreateParams {
   awsAccountId: string;
   storageName: string;
   storagePath: string;
+  owner?: string;
+  ownerType?: string;
+}
+
+interface EndpointCreateRequest {
+  id: string;
+  externalEndpointName: string;
 }

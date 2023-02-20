@@ -15,12 +15,14 @@ import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-
 import {
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
-  DDBDynamicAuthorizationPermissionsPlugin
+  DDBDynamicAuthorizationPermissionsPlugin,
+  CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
-  S3DataSetStoragePlugin,
+  DataSetService as WorkbenchDataSetService,
   DdbDataSetMetadataPlugin,
+  S3DataSetStoragePlugin,
   WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import {
@@ -34,8 +36,12 @@ import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
+import { EnvTypeConfigService } from './services/envTypeConfigService';
+import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
+import SshKeyService from './services/sshKeyService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
 const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
@@ -63,32 +69,30 @@ const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissio
   new DDBDynamicAuthorizationPermissionsPlugin({
     dynamoDBService: dynamicAuthAws.helpers.ddb
   });
+const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
-  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+  authorizationPlugin: caslAuthorizationPlugin
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
+const environmentService: EnvironmentService = new EnvironmentService(aws.helpers.ddb);
 const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
 const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
   envTypeService,
   aws.helpers.ddb
 );
 const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
-const projectService: ProjectService = new ProjectService({
-  TABLE_NAME: process.env.STACK_NAME!
-});
+const costCenterService: CostCenterService = new CostCenterService(aws.helpers.ddb);
+const projectService: ProjectService = new ProjectService(
+  aws.helpers.ddb,
+  dynamicAuthorizationService,
+  costCenterService
+);
 
 const apiRouteConfig: ApiRouteConfig = {
-  routes: [
-    {
-      path: '/foo',
-      serviceAction: 'launch',
-      httpMethod: 'post',
-      service: new SagemakerNotebookEnvironmentLifecycleService()
-    }
-  ],
   environments: {
     sagemakerNotebook: {
       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
@@ -104,29 +108,39 @@ const apiRouteConfig: ApiRouteConfig = {
   account: new HostingAccountService(
     new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
-    logger,
-    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
-    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+    new WorkbenchDataSetService(
+      new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
+      logger,
+      new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+      new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
+    ),
+    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
+    new DatabaseService(),
+    dynamicAuthorizationService
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
+  environmentService,
   environmentTypeService: envTypeService,
-  environmentTypeConfigService: envTypeConfigService,
-  projectService: projectService,
+  environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
+  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
   metadataService: metadataService,
+  projectEnvPlugin: new ProjectEnvService(dynamicAuthorizationService, environmentService, projectService),
   projectEnvTypeConfigPlugin: new ProjectEnvTypeConfigService(
     metadataService,
     projectService,
     envTypeConfigService,
-    envTypeService
-  )
+    envTypeService,
+    environmentService,
+    dynamicAuthorizationService
+  ),
+  sshKeyService: new SshKeyService(aws, projectService),
+  authorizationService: dynamicAuthorizationService
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

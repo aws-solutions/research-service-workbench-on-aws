@@ -31,9 +31,24 @@ describe('environment terminate negative tests', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find environment ${fakeEnvId}`
+        })
+      );
+    }
+  });
+
+  test('project does not exist', async () => {
+    const fakeEnvId = getFakeEnvId();
+    const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+    try {
+      await adminSession.resources.environments.environment(fakeEnvId, fakeProjectId).terminate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find project ${fakeProjectId}`
         })
       );
     }

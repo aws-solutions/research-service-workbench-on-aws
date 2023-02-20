@@ -11,6 +11,7 @@ import { AuditConfig, WithAudit } from './auditMiddleware';
 import AuditPlugin from './auditPlugin';
 import AuditService from './auditService';
 import { BaseExtractor } from './baseExtractor';
+import { Extractor } from './extractor';
 
 describe('Audit Middleware', () => {
   const mockRequest: Request = {} as Request;
@@ -60,5 +61,22 @@ describe('Audit Middleware', () => {
     expect(next).toBeCalledTimes(1);
 
     expect(auditService.write).toBeCalledWith(mockMetadata);
+  });
+
+  test('Use a different extractor', async () => {
+    const extractor: Extractor = {
+      getMetadata: jest.fn().mockResolvedValue(mockMetadata)
+    };
+    auditConfig = {
+      auditService,
+      excludePaths,
+      extractor
+    };
+    auditMiddleware = WithAudit(auditConfig);
+
+    await auditMiddleware(mockRequest, mockResponse, next);
+
+    expect(extractor.getMetadata).toBeCalledWith(mockRequest, mockResponse);
+    expect(next).toBeCalledTimes(1);
   });
 });

@@ -4,16 +4,19 @@
  */
 
 import { csurf, verifyToken } from '@aws/workbench-core-authentication';
-import { withAuth } from '@aws/workbench-core-authorization';
+import { withAuth, withDynamicAuth } from '@aws/workbench-core-authorization';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express, json } from 'express';
 import { rateLimit } from 'express-rate-limit';
+import { setupAuditRoutes } from './routes/auditRoutes';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
 import { setUpDynamicAuthorizationRoutes } from './routes/dynamicAuthorizationRoutes';
 import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
+import { setupSampleRoutes } from './routes/sampleRoutes';
+import { setupStaticAuthorizationRoutes } from './routes/staticAuthorizationRoutes';
 import { setUpUserRoutes } from './routes/userRoutes';
 import {
   userManagementService,
@@ -22,6 +25,7 @@ import {
   authenticationService,
   logger
 } from './services';
+import { strictAuditService } from './services/auditService';
 import { authorizationService, staticRoutesIgnored } from './services/authorizationService';
 import { dynamicAuthorizationService } from './services/dynamicAuthorizationService';
 import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
@@ -53,19 +57,30 @@ export function generateRouter(): Express {
   app.use(csurf('none'));
 
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
-  app.use(withAuth(authorizationService, { logger: logger }));
+  app.use(withDynamicAuth(dynamicAuthorizationService, { logger }));
 
+  router.use(withAuth(authorizationService, { logger: logger }));
   setupHelloWorldRoutes(router);
   setUpDSRoutes(router, dataSetService, dataSetsStoragePlugin);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, userManagementService);
   setUpDynamicAuthorizationRoutes(router, dynamicAuthorizationService);
-
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);
   router.use(unknownErrorHandler);
 
-  app.use('/', router);
+  // Routes protected by DynamicAuthorizationService
+  const secondRouter: Router = Router();
 
+  //used for testing dynamic authorization service
+  setupSampleRoutes(secondRouter);
+
+  setupAuditRoutes(secondRouter, strictAuditService);
+  setupStaticAuthorizationRoutes(secondRouter, authorizationService);
+  secondRouter.use(boomErrorHandler);
+  secondRouter.use(unknownErrorHandler);
+
+  app.use('/', secondRouter);
+  app.use('/', router);
   return app;
 }

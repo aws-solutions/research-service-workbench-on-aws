@@ -38,7 +38,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'name: Required'
         })
@@ -60,7 +59,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'type: Required'
         })
@@ -82,7 +80,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'params: Required'
         })
@@ -106,7 +103,6 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: ": Unrecognized key(s) in object: 'invalidProp'"
         })
@@ -117,7 +113,7 @@ describe('create environment type configs', () => {
   test('fails when trying to create with invalid environment Type Id', async () => {
     try {
       await adminSession.resources.environmentTypes
-        .environmentType('et-prod-1234567890124,pa-1234567890124')
+        .environmentType('et-prod-0123456789012,pa-0123456789012')
         .configurations()
         .create(
           {
@@ -132,9 +128,8 @@ describe('create environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
-          message: `Could not create environment type config because environment type et-prod-1234567890124,pa-1234567890124 does not exist`
+          message: `Could not create environment type config because environment type et-prod-0123456789012,pa-0123456789012 does not exist`
         })
       );
     }

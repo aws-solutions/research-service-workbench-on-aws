@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
@@ -12,7 +14,17 @@ import {
   CreateExternalEndpointRequestParser
 } from './dataSets/createExternalEndpointRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import {
+  ProjectAddAccessRequest,
+  ProjectAddAccessRequestParser
+} from './dataSets/projectAddAccessRequestParser';
+import {
+  ProjectRemoveAccessRequest,
+  ProjectRemoveAccessRequestParser
+} from './dataSets/projectRemoveAccessRequestParser';
+import { RemoveDataSetRequest, RemoveDataSetRequestParser } from './dataSets/removeDataSetRequestParser';
 import { wrapAsync } from './errorHandlers';
+import { isConflictError } from './errors/conflictError';
 import { validateAndParse } from './validatorHelper';
 
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
@@ -29,6 +41,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
         owner: validatedRequest.owner,
+        ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
         permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
@@ -80,13 +93,15 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Get dataset
   router.get(
-    '/datasets/:id',
+    '/datasets/:dataSetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('dataSetId request parameter is invalid');
       }
-      const ds = await dataSetService.getDataSet(req.params.id);
-      res.send(ds);
+
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const dataset = await dataSetService.getDataSet(req.params.dataSetId, authenticatedUser);
+      res.send(dataset);
     })
   );
 
@@ -94,8 +109,75 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      const response = await dataSetService.listDataSets();
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const response = await dataSetService.listDataSets(authenticatedUser);
       res.send(response);
+    })
+  );
+
+  router.put(
+    '/projects/:projectId/datasets/:datasetId/relationships',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<ProjectAddAccessRequest>(ProjectAddAccessRequestParser, {
+        authenticatedUser: res.locals.user,
+        projectId: req.params.projectId,
+        dataSetId: req.params.datasetId,
+        accessLevel: req.body.accessLevel
+      });
+
+      await dataSetService.addAccessForProject(validatedRequest);
+
+      res.status(204).send();
+    })
+  );
+
+  router.delete(
+    '/projects/:projectId/datasets/:datasetId/relationships',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<ProjectRemoveAccessRequest>(
+        ProjectRemoveAccessRequestParser,
+        {
+          authenticatedUser: res.locals.user,
+          projectId: req.params.projectId,
+          dataSetId: req.params.datasetId
+        }
+      );
+
+      await dataSetService.removeAccessForProject(validatedRequest);
+
+      res.status(204).send();
+    })
+  );
+
+  router.delete(
+    '/projects/:projectId/datasets/:datasetId/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<RemoveDataSetRequest>(RemoveDataSetRequestParser, {
+        authenticatedUser: res.locals.user,
+        dataSetId: req.params.datasetId
+      });
+
+      try {
+        await dataSetService.removeDataSet(validatedRequest.dataSetId, validatedRequest.authenticatedUser);
+
+        res.status(204).send();
+      } catch (e) {
+        console.error(e);
+
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetHasEndpointError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetNotFoundError(e)) {
+          throw Boom.notFound();
+        }
+
+        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+      }
     })
   );
 }

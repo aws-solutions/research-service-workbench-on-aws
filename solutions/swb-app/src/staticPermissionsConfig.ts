@@ -219,6 +219,16 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
     subject: 'ProjectEnvironmentTypeConfig'
   },
   {
@@ -230,6 +240,36 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'ProjectEnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentTypeConfigProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'SshKey'
   }
 ];
 
@@ -283,10 +323,41 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Project'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'ProjectDataSet'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'ProjectEnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'SshKey'
   }
 ];
 
 export const permissionsMap: PermissionsMap = {
   Admin: adminPermissions,
+  ITAdmin: adminPermissions,
   Researcher: researcherPermissions
 };

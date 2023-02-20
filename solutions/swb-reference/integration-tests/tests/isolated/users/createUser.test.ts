@@ -54,7 +54,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(409, {
-          statusCode: 409,
           error: 'Conflict',
           message: 'User with this email already exist.'
         })
@@ -69,7 +68,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: 'Invalid parameter: Invalid email address format.'
         })
@@ -86,7 +84,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `requires property 'email'`
         })
@@ -103,7 +100,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `email is not of a type(s) string`
         })
@@ -120,7 +116,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `requires property 'firstName'`
         })
@@ -137,7 +132,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `firstName is not of a type(s) string`
         })
@@ -154,7 +148,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `requires property 'lastName'`
         })
@@ -171,7 +164,6 @@ describe('create user negative tests', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: `lastName is not of a type(s) string`
         })

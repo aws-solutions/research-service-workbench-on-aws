@@ -78,6 +78,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetMountObject'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Role'
   },
@@ -160,6 +165,36 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Routes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Subject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'staticSampleRoutes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'staticSampleRouteParam'
+  },
+  {
+    effect: 'DENY',
+    action: 'UPDATE',
+    subject: 'staticSampleRoutes'
+  },
+  {
+    effect: 'DENY',
+    action: 'DELETE',
+    subject: 'staticSampleRoutes'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'staticSampleRoutes'
   }
 ];
 

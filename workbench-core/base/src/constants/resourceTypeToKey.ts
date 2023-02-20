@@ -14,6 +14,7 @@ const resourceTypeToKey: {
   awsAccount: string;
   account: string;
   costCenter: string;
+  sshKey: string;
 } = {
   environment: 'ENV',
   project: 'PROJ',
@@ -24,7 +25,8 @@ const resourceTypeToKey: {
   instance: 'INID',
   awsAccount: 'AWSACC',
   account: 'ACC',
-  costCenter: 'CC'
+  costCenter: 'CC',
+  sshKey: 'SSHKEY'
 };
 
 export default resourceTypeToKey;

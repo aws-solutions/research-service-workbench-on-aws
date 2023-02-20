@@ -162,7 +162,8 @@ export class WorkbenchCognito extends Construct {
       },
       policy: AwsCustomResourcePolicy.fromSdkCalls({
         resources: [this.userPool.userPoolArn]
-      })
+      }),
+      installLatestAwsSdk: true
     });
 
     const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(

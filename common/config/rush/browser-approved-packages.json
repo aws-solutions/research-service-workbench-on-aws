@@ -27,6 +27,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@aws-cdk/aws-servicecatalogappregistry-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -40,6 +44,10 @@
     },
     {
       "name": "@aws-sdk/client-ec2",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ec2-instance-connect",
       "allowedCategories": [ "production" ]
     },
     {
@@ -73,6 +81,10 @@
     {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog-appregistry",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-ssm",
@@ -324,7 +336,7 @@
     },
     {
       "name": "aws-jwt-verify",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-lambda",
@@ -399,6 +411,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "dotenv",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "esbuild",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -444,7 +460,7 @@
     },
     {
       "name": "fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "generate-password",
@@ -464,7 +480,7 @@
     },
     {
       "name": "jest-fast-check",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "js-yaml",
@@ -476,7 +492,7 @@
     },
     {
       "name": "jwt-decode",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "license-check-and-add",
@@ -528,6 +544,10 @@
     },
     {
       "name": "pkce-challenge",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "qs",
       "allowedCategories": [ "production" ]
     },
     {

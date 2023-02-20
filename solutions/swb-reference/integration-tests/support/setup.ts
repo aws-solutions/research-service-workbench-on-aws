@@ -17,8 +17,7 @@ export default class Setup {
     // @ts-ignore
     this._settings = new Settings(global['__settings__']);
 
-    // Let's not setup test retries until we find that we actually need it
-    jest.retryTimes(0);
+    jest.retryTimes(1);
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
@@ -57,6 +56,46 @@ export default class Setup {
       this._defaultAdminSession = session;
     }
     return this._defaultAdminSession;
+  }
+
+  public async getSessionForUserType(
+    userType: 'projectAdmin1' | 'projectAdmin2' | 'researcher1'
+  ): Promise<ClientSession> {
+    const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
+    const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+
+    const userName = await secretsService.getSecret(userNameParamStorePath);
+    const password = await secretsService.getSecret(userPasswordParamStorePath);
+    return this.getSessionForUser(userName, password);
+  }
+
+  public async getSessionForUser(userName: string, password: string): Promise<ClientSession> {
+    const accessToken = await this._getCognitoTokenForUser(userName, password);
+    const session = this._getClientSession(accessToken);
+    this._sessions.push(session);
+    return session;
+  }
+
+  private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
+    const userPoolId = this._settings.get('cognitoUserPoolId');
+    const clientId = this._settings.get('cognitoUserPoolClientId');
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+
+    await this._loadSecrets(secretsService);
+
+    const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
+    const { accessToken } = await cognitoTokenService.generateCognitoTokenWithCredentials(
+      userPoolId,
+      clientId,
+      userName,
+      password,
+      'USER'
+    );
+
+    return accessToken;
   }
 
   public getStackName(): string {

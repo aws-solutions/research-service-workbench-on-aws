@@ -16,6 +16,7 @@
     "<rootDir>/src/environmentTypeRoutes.ts",
     "<rootDir>/src/generateRouter.ts",
     "<rootDir>/src/index.ts",
+    "<rootDir>/src/sshKeyRoutes.ts",
     "<rootDir>/src/projectRoutes.ts",
     "<rootDir>/src/staticPermissionsConfig.ts",
     "<rootDir>/src/staticRouteConfig.ts",
@@ -39,13 +40,38 @@
     "<rootDir>/src/dataSets/permissionResponseParser.ts",
     "<rootDir>/src/dataSets/storageLocation.ts",
     "<rootDir>/src/dataSetRoutes.ts",
+    "<rootDir>/src/projectEnvironmentRoutes.ts",
+    "<rootDir>/src/projectEnvs/projectEnvPlugin.ts",
     "<rootDir>/src/projectEnvTypeConfigRoutes.ts",
     "<rootDir>/src/projectEnvTypeConfigs/environmentTypeConfig.ts",
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigRoutes.ts",
 
+    "<rootDir>/src/sshKeys/createSshKeyRequest.ts",
+    "<rootDir>/src/sshKeys/createSshKeyResponse.ts",
+    "<rootDir>/src/sshKeys/deleteSshKeyRequest.ts",
+    "<rootDir>/src/sshKeys/listUserSshKeysForProjectRequest.ts",
+    "<rootDir>/src/sshKeys/listUserSshKeysForProjectResponse.ts",
+    "<rootDir>/src/sshKeys/sshKey.ts",
+    "<rootDir>/src/sshKeys/sshKeyPlugin.ts",
+    "<rootDir>/src/sshKeys/sendPublicKeyRequest.ts",
+    "<rootDir>/src/sshKeys/sendPublicKeyResponse.ts",
+
     "<rootDir>/src/validatorHelper.ts",
-    "<rootDir>/src/errorHandlers.ts"
+    "<rootDir>/src/errorHandlers.ts",
+
+    "<rootDir>/src/envTypeConfigs/createEnvironmentTypeConfigRequest.ts",
+    "<rootDir>/src/envTypeConfigs/deleteEnvironmentTypeConfigRequest.ts",
+    "<rootDir>/src/envTypeConfigs/environmentTypeConfig.ts",
+    "<rootDir>/src/envTypeConfigs/envTypeConfigPlugin.ts",
+    "<rootDir>/src/envTypeConfigs/getEnvironmentTypeConfigRequest.ts",
+    "<rootDir>/src/envTypeConfigs/updateEnvironmentTypeConfigsRequest.ts",
+
+    "<rootDir>/src/projectEnvTypeConfigs/associateProjectEnvTypeConfigRequest.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/disassociateProjectEnvTypeConfigRequest.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/getProjectEnvTypeConfigRequest.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/project.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts"
   ],
   "coverageThreshold": {
     "global": {

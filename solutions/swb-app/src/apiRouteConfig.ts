@@ -4,32 +4,37 @@
  */
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
+import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
   EnvironmentService,
-  EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeService
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export interface ApiRouteConfig {
-  routes: ApiRoute[];
-  environments: { [key: string]: Environment };
+  environments: { [key: string]: EnvironmentUtilityServices };
   account: HostingAccountService;
   environmentService: EnvironmentService;
   dataSetService: DataSetPlugin;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
-  environmentTypeConfigService: EnvironmentTypeConfigService;
+  environmentTypeConfigService: EnvTypeConfigPlugin;
   projectService: ProjectService;
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;
   metadataService: MetadataService;
+  projectEnvPlugin: ProjectEnvPlugin;
   projectEnvTypeConfigPlugin: ProjectEnvTypeConfigPlugin;
+  sshKeyService: SshKeyPlugin;
+  authorizationService: DynamicAuthorizationService;
 }
 
 export interface ApiRoute {
@@ -40,7 +45,7 @@ export interface ApiRoute {
   httpMethod: HTTPMethod;
 }
 
-export interface Environment {
+export interface EnvironmentUtilityServices {
   lifecycle: EnvironmentLifecycleService;
   connection: EnvironmentConnectionService;
 }

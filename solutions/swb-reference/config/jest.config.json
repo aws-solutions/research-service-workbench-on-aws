@@ -12,11 +12,13 @@
     "<rootDir>/src/index.ts",
     "<rootDir>/src/environment/workflow.ts",
     "<rootDir>/src/accountHandlerLambda.ts",
+    "<rootDir>/src/proxyHandlerLambda.ts",
     "<rootDir>/src/environment/statusHandlerLambda.ts",
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
-    "<rootDir>/src/services/dataSetService.ts",
+    "<rootDir>/src/mocks/mockDatabaseService.ts",
+    "<rootDir>/src/services/databaseService.ts",
     "<rootDir>/src/services/projectEnvTypeConfigService.ts"
   ],
   "coverageThreshold": {
@@ -27,5 +29,8 @@
       "statements": 70
     }
   },
-  "coverageReporters": ["json-summary", "json"]
+  "coverageReporters": ["json-summary", "json"],
+  "moduleNameMapper": {
+    "#node-web-compat": "./node-web-compat-node.js"
+  }
 }

@@ -5,12 +5,12 @@
 
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
-import { AuthenticatedUser } from './authenticatedUser';
 import { RouteNotSecuredError } from './errors/routeNotSecuredError';
-import Operation from './operation';
-import Permission, { PermissionsMap } from './permission';
+import { AuthenticatedUser } from './models/authenticatedUser';
+import Operation from './models/operation';
+import Permission, { PermissionsMap } from './models/permission';
+import RoutesMap, { HTTPMethod, RoutesIgnored } from './models/routesMap';
 import PermissionsPlugin from './permissionsPlugin';
-import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';
 
 /**
  * Static Permissions Plugin.
@@ -70,7 +70,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
       }
     }
     if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
-    throw new RouteNotSecuredError('Route has not been secured');
+    throw new RouteNotSecuredError(`Route ${method} ${route} has not been secured`);
   }
   /**
    * Checks if a route is being ignored for Authorization.

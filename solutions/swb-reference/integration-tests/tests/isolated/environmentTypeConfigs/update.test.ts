@@ -41,7 +41,6 @@ describe('update environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(400, {
-          statusCode: 400,
           error: 'Bad Request',
           message: ": Unrecognized key(s) in object: 'invalidProp'"
         })
@@ -65,7 +64,6 @@ describe('update environment type configs', () => {
       checkHttpError(
         e,
         new HttpError(404, {
-          statusCode: 404,
           error: 'Not Found',
           message: `Could not find envType ${envTypeId} with envTypeConfig etc-12345678-1234-1234-1234-123456789012 to update`
         })

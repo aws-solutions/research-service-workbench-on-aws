@@ -15,6 +15,13 @@ interface Setting {
   terminatedEnvId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
+  researcher1UserNameParamStorePath: string;
+  researcher1PasswordParamStorePath: string;
+  projectAdmin1UserNameParamStorePath: string;
+  projectAdmin1PasswordParamStorePath: string;
+  projectAdmin2UserNameParamStorePath: string;
+  projectAdmin2PasswordParamStorePath: string;
+  projectForRolesTesting: string;
   costCenterId: string;
   projectName: string;
 
@@ -26,6 +33,8 @@ interface Setting {
   awsRegion: string;
   DataSetsBucketName: string;
   apiUrlOutput: string;
+  MainAccountLoadBalancerArnOutput: string;
+  MainAccountLoadBalancerDnsNameOutput: string;
   S3BucketArtifactsArnOutput: string;
   uiClientURL: string;
   LaunchConstraintIamRoleNameOutput: string;

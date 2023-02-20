@@ -5,7 +5,7 @@
 # Default Env Config for launching a new environment
 envTypeId: 'et-prod-q5jnmlalb4eya,pa-lszlpvcp7wukg'
 envTypeConfigId: 'etc-7f7bd246-1d51-47e9-a5bd-a4530dd8e040'
-projectId: 'proj-98ad72ff-8352-4177-9ab7-7cb945646920'
+projectId: 'proj-8b0d7813-bd0c-41f3-80e6-67129a3d7460'
 envType: 'sagemakerNotebook'
 
 # Negative Testing
@@ -15,9 +15,14 @@ terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environme
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
 
-## For running project integration tests
-costCenterId: 'cc-90c8466a-d7d9-4da8-a128-07eb270487f0'
-projectName: 'Integration Test Project'
+projectAdmin1UserNameParamStorePath: '/swb/testEnv/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/testEnv/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/testEnv/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/testEnv/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/testEnv/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/testEnv/researcher1/password'
 
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'

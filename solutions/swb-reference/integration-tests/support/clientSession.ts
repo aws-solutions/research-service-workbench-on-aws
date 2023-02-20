@@ -5,7 +5,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import Csrf from 'csrf';
 import _ from 'lodash';
-import * as Qs from 'qs';
+import { stringify } from 'qs';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
 import HttpError from './utils/HttpError';
@@ -17,6 +17,7 @@ export default class ClientSession {
   private _isAnonymousSession: boolean;
   private _axiosInstance: AxiosInstance;
   private _setup: Setup;
+  private _userId?: string;
   public resources: Resources;
 
   public constructor(setup: Setup, accessToken?: string) {
@@ -38,6 +39,7 @@ export default class ClientSession {
       const token = csrf.create(secret);
       headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
       headers['csrf-token'] = token;
+      this._userId = this._getUserIdFromToken(accessToken ?? '');
     }
 
     this._axiosInstance = axios.create({
@@ -48,7 +50,7 @@ export default class ClientSession {
 
     this._axiosInstance.interceptors.request.use((config) => {
       config.paramsSerializer = (params) => {
-        return Qs.stringify(params);
+        return stringify(params);
       };
 
       return config;
@@ -61,7 +63,9 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
-          return Promise.reject(new HttpError(error.response.status, error.response.data));
+          const httpError = new HttpError(error.response.status, error.response.data);
+          console.error(JSON.stringify(httpError));
+          return Promise.reject(httpError);
         }
         return Promise.reject(error);
       }
@@ -107,6 +111,17 @@ export default class ClientSession {
 
   public getSetup(): Setup {
     return this._setup;
+  }
+
+  public getUserId(): string | undefined {
+    return this._userId;
+  }
+
+  private _getUserIdFromToken(accessToken: string): string {
+    const mainPart = Buffer.from(accessToken.split('.')[1], 'base64').toString('binary');
+    const parsed = JSON.parse(mainPart);
+
+    return parsed.username;
   }
 }
 
