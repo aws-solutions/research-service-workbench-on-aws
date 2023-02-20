@@ -26,6 +26,11 @@ export interface DataSetPlugin {
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
   listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
+  getSinglePartFileUploadUrl(
+    dataSetId: string,
+    fileName: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<string>;
 
   addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse>;
   getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse>;
