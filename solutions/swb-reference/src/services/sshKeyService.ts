@@ -287,7 +287,7 @@ export default class SshKeyService implements SshKeyPlugin {
     }
 
     const reservation = reservations[0];
-    return SendPublicKeyResponseParser.parse(this._getConnectionInfoFromReservation(reservation));
+    return this._getConnectionInfoFromReservation(reservation);
   }
 
   /**
@@ -349,12 +349,12 @@ export default class SshKeyService implements SshKeyPlugin {
       throw new ConnectionInfoNotDefinedError('Some connection info is not defined');
     }
 
-    return {
+    return SendPublicKeyResponseParser.parse({
       publicDnsName,
       publicIp,
       privateDnsName,
       privateIp
-    };
+    });
   }
 
   /**
