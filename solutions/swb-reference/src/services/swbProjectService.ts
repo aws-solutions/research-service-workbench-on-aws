@@ -189,22 +189,26 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ETC, ['READ'], paRole, {
         projectId: { $eq: projectId }
       }),
+      // Adding a permission for ListProjects so that as soon as a Project Admin gets added to their first project
+      // they can begin to call ListProjects
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT, ['READ'], paRole),
+      // Access for GetProject and GetProjects
       ...this._generateIdentityPermissions(
         projectId,
         SwbAuthZSubject.SWB_PROJECT,
         ['READ', 'UPDATE', 'DELETE'],
         paRole
       ),
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_SSH_KEY, ['CREATE', 'READ'], paRole, {
-        projectId: { $eq: projectId }
-      }),
       ...this._generateIdentityPermissions(
         '*',
         SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
         ['CREATE', 'READ'],
         paRole,
         { projectId: { $eq: projectId } }
-      )
+      ),
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_SSH_KEY, ['CREATE', 'READ'], paRole, {
+        projectId: { $eq: projectId }
+      })
     ];
   }
 
@@ -229,6 +233,10 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ETC, ['READ'], researcherRole, {
         projectId: { $eq: projectId }
       }),
+      // Adding a permission for ListProjects so that as soon as a Researcher gets added to their first project
+      // they can begin to call ListProjects
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT, ['READ'], researcherRole),
+      // Access for GetProject and GetProjects
       ...this._generateIdentityPermissions(projectId, SwbAuthZSubject.SWB_PROJECT, ['READ'], researcherRole),
       ...this._generateIdentityPermissions(
         '*',
