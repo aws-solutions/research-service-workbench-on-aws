@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import {
+  DEFAULT_API_PAGE_SIZE,
   uuidRegExpAsString,
   uuidWithLowercasePrefixRegExp,
   validateAndParse
@@ -250,7 +251,7 @@ export function setUpDSRoutes(
     '/datasets/storage',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const pageSize = toNumber(req.query.pageSize) || 100;
+      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
 
       const locations = await dataSetService.listStorageLocations(
@@ -288,7 +289,7 @@ export function setUpDSRoutes(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const pageSize = toNumber(req.query.pageSize) || 100;
+      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
 
       const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
