@@ -51,7 +51,7 @@ export default class CostCenterService {
       await this._dynamoDbService.updateExecuteAndFormat({
         key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
         params: {
-          item: { status: CostCenterStatus.DELETED }
+          item: { status: CostCenterStatus.DELETED, resourceType: `${this._resourceType}_deleted` }
         }
       });
     } catch (e) {

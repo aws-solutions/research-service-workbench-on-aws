@@ -130,7 +130,7 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              error: 'Not Found',
+              error: 'Bad Request',
               message: `Could not find cost center cc-invalid-cost-center`
             })
           );
@@ -182,7 +182,7 @@ describe('Create Project negative tests', () => {
           checkHttpError(
             e,
             new HttpError(400, {
-              error: 'Not Found',
+              error: 'Bad Request',
               message: `Cost center ${costCenterId} was deleted`
             })
           );
