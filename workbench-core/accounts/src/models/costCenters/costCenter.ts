@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { CostCenterStatus } from '../../constants/costCenterStatus';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CostCenterParser = z.object({
@@ -21,7 +22,8 @@ export const CostCenterParser = z.object({
   accountId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  dependency: z.string()
+  dependency: z.string(),
+  status: z.nativeEnum(CostCenterStatus)
 });
 
 export type CostCenter = z.infer<typeof CostCenterParser>;
