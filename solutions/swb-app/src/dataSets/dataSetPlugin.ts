@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
 import { AuthenticatedUser } from '../users/authenticatedUser';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
@@ -26,7 +27,11 @@ export interface DataSetPlugin {
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
-  listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
+  listDataSets(
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>>;
   listDataSetAccessPermissions(request: ListDataSetAccessPermissionsRequest): Promise<PermissionsResponse>;
   getSinglePartFileUploadUrl(
     dataSetId: string,

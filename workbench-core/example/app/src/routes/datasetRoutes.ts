@@ -31,6 +31,7 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { toNumber } from 'lodash';
 import { dataSetPrefix, endpointPrefix, groupIdRegExAsString } from '../configs/constants';
 import {
   AddRemoveAccessPermissionRequest,
@@ -249,8 +250,14 @@ export function setUpDSRoutes(
     '/datasets/storage',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const pageSize = toNumber(req.query.pageSize) || 100;
+      const paginationToken = req.query.paginationToken?.toString();
 
-      const locations = await dataSetService.listStorageLocations(authenticatedUser);
+      const locations = await dataSetService.listStorageLocations(
+        authenticatedUser,
+        pageSize,
+        paginationToken
+      );
       res.send(locations);
     })
   );
@@ -281,8 +288,10 @@ export function setUpDSRoutes(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const pageSize = toNumber(req.query.pageSize) || 100;
+      const paginationToken = req.query.paginationToken?.toString();
 
-      const response = await dataSetService.listDataSets(authenticatedUser);
+      const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
       res.status(200).send(response);
     })
   );

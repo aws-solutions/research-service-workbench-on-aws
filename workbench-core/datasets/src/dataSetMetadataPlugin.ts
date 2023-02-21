@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { CreateDataSet, DataSet } from './models/dataSet';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { StorageLocation } from './models/storageLocation';
@@ -13,7 +14,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns an array of DataSets.
    */
-  listDataSets(): Promise<DataSet[]>;
+  listDataSets(pageSize: number, paginationToken: string | undefined): Promise<PaginatedResponse<DataSet>>;
 
   /**
    * Gets the metadata associated with an overall dataset. This differs from
@@ -111,5 +112,8 @@ export interface DataSetMetadataPlugin {
    *
    * @returns - a list of {@link StorageLocation}s
    */
-  listStorageLocations(): Promise<StorageLocation[]>;
+  listStorageLocations(
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<StorageLocation>>;
 }
