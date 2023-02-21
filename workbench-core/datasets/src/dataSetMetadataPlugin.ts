@@ -3,12 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PaginatedResponse } from '@aws/workbench-core-base';
+import { JSONValue, PaginatedResponse } from '@aws/workbench-core-base';
 import { CreateDataSet, DataSet } from './models/dataSet';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { StorageLocation } from './models/storageLocation';
 
 export interface DataSetMetadataPlugin {
+  /**
+   * Calculates the pagination token based on the DataSet id
+   * @param dataSetId - the dataSetId
+   *
+   * @returns the pagination token for this item.
+   */
+  getPaginationToken(dataSetId: string): string;
+
   /**
    * Lists the DataSets in the database backend.
    *

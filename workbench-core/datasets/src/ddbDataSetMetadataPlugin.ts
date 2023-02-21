@@ -11,6 +11,7 @@ import {
   buildDynamoDBPkSk,
   PaginatedResponse,
   QueryParams,
+  toPaginationToken,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -225,5 +226,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       key: buildDynamoDBPkSk(dataSet.id, this._dataSetKeyType),
       params: { item: dataSetItem }
     });
+  }
+
+  public getPaginationToken(dataSetId: string): string {
+    return toPaginationToken(buildDynamoDBPkSk(dataSetId, this._dataSetKeyType));
   }
 }

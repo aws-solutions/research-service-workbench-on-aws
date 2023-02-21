@@ -298,8 +298,7 @@ export class DataSetService {
 
       if (authedDataSets.length > pageSize) {
         sortedDataSets = sortedDataSets.slice(0, pageSize);
-        const lastKey = buildDynamoDBPkSk(sortedDataSets[pageSize - 1].id, resourceTypeToKey.dataset);
-        lastPaginationToken = toPaginationToken(lastKey);
+        lastPaginationToken = this._dbProvider.getPaginationToken(sortedDataSets[pageSize - 1].id);
       }
 
       const response = {
