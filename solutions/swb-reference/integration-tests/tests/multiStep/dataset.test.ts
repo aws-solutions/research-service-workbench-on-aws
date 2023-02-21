@@ -142,13 +142,13 @@ describe('multiStep dataset integration test', () => {
     );
     const expected: DataSetPermission[] = [
       {
-        accessLevel: 'read-write',
-        identity: `${projectId}#Researcher`,
+        accessLevel: 'read-only',
+        identity: `${unassociatedProject.id}#ProjectAdmin`,
         identityType: 'GROUP'
       },
       {
-        accessLevel: 'read-only',
-        identity: `${unassociatedProject.id}#ProjectAdmin`,
+        accessLevel: 'read-write',
+        identity: `${projectId}#Researcher`,
         identityType: 'GROUP'
       }
     ];
