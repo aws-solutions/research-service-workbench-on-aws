@@ -107,12 +107,12 @@ VpcSubnet
 ```
 ### Configuring App Registry applications limits
 
-Service workbench uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to resources created.
-By using App Registry, Service workbench is able to organize its resources and track their dependencies more efficiently.
-Every resource created in service workbench is associated to an App Registry Application including all workspaces.
-App registry currently has a defailt limit of 1000 resources per application.
+Service Workbench uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to resources created.
+By using App Registry, Service Workbench is able to organize its resources and track their dependencies more efficiently.
+Every resource created in Service Workbench is associated to an App Registry application including all workspaces.
+App Registry currently has a default limit of 1000 resources per application.
 
-If you are estimating to have more than 999 Workspaces created in your service workbench instance a service quota increase will be needed.
+If you are estimating to have more than 999 Workspaces created in your Service Workbench instance a service quota increase will be needed.
 Follow the next steps to request a quota increase for App Registry application resources:
 
 1. Sign in to your Hosting Account AWS Management Console and open the Service Quotas console at https://console.aws.amazon.com/servicequotas/home.
