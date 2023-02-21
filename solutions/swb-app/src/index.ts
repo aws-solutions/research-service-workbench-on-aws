@@ -25,9 +25,11 @@ import { ListEnvironmentTypeConfigsRequest } from './envTypeConfigs/listEnvironm
 import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
+import { ConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { DatabaseError } from './errors/databaseError';
 import { DuplicateKeyError } from './errors/duplicateKeyError';
 import { Ec2Error } from './errors/ec2Error';
+import { NoInstanceFoundError } from './errors/noInstanceFoundError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
@@ -59,7 +61,7 @@ import {
   ListUserSshKeysForProjectResponseParser
 } from './sshKeys/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
-import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
+import { SendPublicKeyResponse, SendPublicKeyResponseParser } from './sshKeys/sendPublicKeyResponse';
 import { SshKey, SshKeyParser } from './sshKeys/sshKey';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
@@ -115,5 +117,8 @@ export {
   ListEnvTypeConfigProjectsRequest,
   ListEnvTypeConfigProjectsRequestParser,
   Project,
-  DuplicateKeyError
+  NoInstanceFoundError,
+  ConnectionInfoNotDefinedError,
+  DuplicateKeyError,
+  SendPublicKeyResponseParser
 };
