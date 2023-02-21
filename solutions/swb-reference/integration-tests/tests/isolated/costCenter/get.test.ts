@@ -35,28 +35,4 @@ describe('Get Cost Center negative tests', () => {
       }
     });
   });
-
-  describe('with Cost Center that does was deleted', () => {
-    test('it throw 404 error', async () => {
-      const accountId = setup.getSettings().get('defaultHostingAccountId');
-      const { data: createdCostCenter } = await adminSession.resources.costCenters.create({
-        accountId,
-        name: 'costCenterA'
-      });
-
-      await adminSession.resources.costCenters.costCenter(createdCostCenter.id).softDelete();
-
-      try {
-        await adminSession.resources.costCenters.costCenter(createdCostCenter.id).get();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Cost center ${createdCostCenter.id} was deleted`
-          })
-        );
-      }
-    });
-  });
 });

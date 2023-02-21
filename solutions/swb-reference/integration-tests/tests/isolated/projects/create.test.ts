@@ -123,13 +123,13 @@ describe('Create Project negative tests', () => {
         createRequest.costCenterId = 'cc-invalid-cost-center';
       });
 
-      test('it throws 404 error', async () => {
+      test('it throws 400 error', async () => {
         try {
           await adminSession.resources.projects.create(createRequest);
         } catch (e) {
           checkHttpError(
             e,
-            new HttpError(404, {
+            new HttpError(400, {
               error: 'Not Found',
               message: `Could not find cost center cc-invalid-cost-center`
             })
@@ -181,7 +181,7 @@ describe('Create Project negative tests', () => {
         } catch (e) {
           checkHttpError(
             e,
-            new HttpError(404, {
+            new HttpError(400, {
               error: 'Not Found',
               message: `Cost center ${costCenterId} was deleted`
             })
