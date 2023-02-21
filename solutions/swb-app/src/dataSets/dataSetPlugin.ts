@@ -11,6 +11,7 @@ import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpoint
 import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
+import { ListDataSetAccessPermissionsRequest } from './listDataSetAccessPermissionsRequestParser';
 import { PermissionsResponse } from './permissionsResponseParser';
 import { ProjectAddAccessRequest } from './projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from './projectRemoveAccessRequestParser';
@@ -26,6 +27,7 @@ export interface DataSetPlugin {
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
   listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
+  listDataSetAccessPermissions(request: ListDataSetAccessPermissionsRequest): Promise<PermissionsResponse>;
   getSinglePartFileUploadUrl(
     dataSetId: string,
     fileName: string,

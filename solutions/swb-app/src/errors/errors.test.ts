@@ -5,9 +5,14 @@
 
 import { AwsServiceError, isAwsServiceError } from './awsServiceError';
 import { ConflictError, isConflictError } from './conflictError';
+import {
+  ConnectionInfoNotDefinedError,
+  isConnectionInfoNotDefinedError
+} from './connectionInfoNotDefinedError';
 import { DatabaseError, isDatabaseError } from './databaseError';
 import { DuplicateKeyError, isDuplicateKeyError } from './duplicateKeyError';
 import { Ec2Error, isEc2Error } from './ec2Error';
+import { isNoInstanceFoundError, NoInstanceFoundError } from './noInstanceFoundError';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
 
@@ -47,6 +52,16 @@ describe('custom error tests', () => {
     expect(isDuplicateKeyError(duplicateKeyError)).toBe(true);
   });
 
+  test('connectionInfoNotDefinedError', () => {
+    const connectionInfoNotDefinedError = new ConnectionInfoNotDefinedError();
+    expect(isConnectionInfoNotDefinedError(connectionInfoNotDefinedError)).toBe(true);
+  });
+
+  test('noInstanceFoundError', () => {
+    const noInstanceFoundError = new NoInstanceFoundError();
+    expect(isNoInstanceFoundError(noInstanceFoundError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
@@ -80,6 +95,14 @@ describe('custom error tests', () => {
 
     test('not duplicateKeyError', () => {
       expect(isDuplicateKeyError(error)).toBe(false);
+    });
+
+    test('not connectionInfoNotDefinedError', () => {
+      expect(isConnectionInfoNotDefinedError(error)).toBe(false);
+    });
+
+    test('not noInstanceFoundError', () => {
+      expect(isNoInstanceFoundError(error)).toBe(false);
     });
   });
 });
