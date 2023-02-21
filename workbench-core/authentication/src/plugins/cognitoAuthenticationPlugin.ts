@@ -202,16 +202,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param decodedToken - a decoded Id or access token from which to find the user's role(s)
    * @returns list of roles included in the jwt token
-   *
-   * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
   public getUserRolesFromToken(decodedToken: CognitoAccessTokenPayload): string[] {
-    const roles = decodedToken['cognito:groups'];
-    if (!roles) {
-      // jwt does not have a cognito:roles claim
-      throw new InvalidJWTError('no cognito:roles claim');
-    }
-    return roles;
+    return decodedToken['cognito:groups'] ?? [];
   }
 
   /**
