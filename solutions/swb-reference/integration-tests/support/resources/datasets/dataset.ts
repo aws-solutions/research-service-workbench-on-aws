@@ -34,6 +34,9 @@ export default class Dataset extends Resource {
     return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/relationships`);
   }
 
+  public async listAccessPermissions(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`/datasets/${this._id}/permissions`);
+  }
   public async getFileUploadUrls(filenames?: string | string[]): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/upload-requests`, { params: { filenames } });
   }
