@@ -283,7 +283,10 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should return the cognito:groups claim from the decoded token', () => {
-      const userId = plugin.getUserRolesFromToken({ ...baseDecodedAccessToken, 'cognito:groups': ['Admin'] });
+      const userId = plugin.getUserRolesFromToken({
+        ...baseDecodedAccessToken,
+        'cognito:groups': ['Admin']
+      });
 
       expect(userId).toMatchObject(['Admin']);
     });
