@@ -13,6 +13,10 @@ import {
   CreateExternalEndpointRequest,
   CreateExternalEndpointRequestParser
 } from './dataSets/createExternalEndpointRequestParser';
+import {
+  DataSetFileUploadRequest,
+  DataSetFileUploadRequestParser
+} from './dataSets/DataSetFileUploadRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import {
   ProjectAddAccessRequest,
@@ -102,6 +106,34 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
       const dataset = await dataSetService.getDataSet(req.params.dataSetId, authenticatedUser);
       res.send(dataset);
+    })
+  );
+
+  // Add file to dataset
+  router.get(
+    '/datasets/:dataSetId/upload-requests',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('dataSetId request parameter is invalid');
+      }
+
+      const validatedRequest = validateAndParse<DataSetFileUploadRequest>(DataSetFileUploadRequestParser, {
+        dataSetId: req.params.dataSetId,
+        filenames: req.query.filenames
+      });
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+
+      if (typeof validatedRequest.filenames === 'string') {
+        validatedRequest.filenames = [validatedRequest.filenames];
+      }
+
+      const urls = await Promise.all(
+        validatedRequest.filenames.map((filename) =>
+          dataSetService.getSinglePartFileUploadUrl(validatedRequest.dataSetId, filename, authenticatedUser)
+        )
+      );
+
+      res.status(200).json({ urls });
     })
   );
 

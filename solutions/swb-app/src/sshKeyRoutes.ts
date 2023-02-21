@@ -9,8 +9,10 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { isAwsServiceError } from './errors/awsServiceError';
+import { isConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { isDuplicateKeyError } from './errors/duplicateKeyError';
 import { isEc2Error } from './errors/ec2Error';
+import { isNoInstanceFoundError } from './errors/noInstanceFoundError';
 import { isNoKeyExistsError } from './errors/noKeyExistsError';
 import { isNonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { CreateSshKeyRequest, CreateSshKeyRequestParser } from './sshKeys/createSshKeyRequest';
@@ -19,6 +21,7 @@ import {
   ListUserSshKeysForProjectRequest,
   ListUserSshKeysForProjectRequestParser
 } from './sshKeys/listUserSshKeysForProjectRequest';
+import { SendPublicKeyRequest, SendPublicKeyRequestParser } from './sshKeys/sendPublicKeyRequest';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
 export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): void {
@@ -117,6 +120,43 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
 
         throw Boom.badImplementation(
           `There was a problem creating a SSH Key for user ${validatedResult.userId} and project ${validatedResult.projectId}`
+        );
+      }
+    })
+  );
+
+  // Send SSH Public Key
+  router.get(
+    '/environments/:environmentId/sshKeys',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedResult = validateAndParse<SendPublicKeyRequest>(SendPublicKeyRequestParser, {
+        environmentId: req.params.environmentId,
+        userId: res.locals.user.id
+      });
+
+      try {
+        const response = await sshKeyService.sendPublicKey(validatedResult);
+        res.status(200).send(response);
+      } catch (e) {
+        console.error(e);
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isEc2Error(e) || isAwsServiceError(e) || isNonUniqueKeyError(e)) {
+          throw Boom.badImplementation(e.message);
+        }
+
+        if (isNoInstanceFoundError(e) || isConnectionInfoNotDefinedError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        if (isNoKeyExistsError(e)) {
+          throw Boom.notFound(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem sending the SSH Public Key to environment ${validatedResult.environmentId}`
         );
       }
     })

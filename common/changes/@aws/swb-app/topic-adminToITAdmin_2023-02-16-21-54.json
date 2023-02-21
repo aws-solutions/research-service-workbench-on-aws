@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Changing Admin to ITAdmin",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
