@@ -270,6 +270,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'CREATE',
     subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentSshKey'
   }
 ];
 
@@ -353,11 +358,15 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'CREATE',
     subject: 'SshKey'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentSshKey'
   }
 ];
 
 export const permissionsMap: PermissionsMap = {
-  Admin: adminPermissions,
   ITAdmin: adminPermissions,
   Researcher: researcherPermissions
 };

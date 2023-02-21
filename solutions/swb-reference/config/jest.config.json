@@ -17,6 +17,7 @@
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
+    "<rootDir>/src/dynamicRouteConfig.ts",
     "<rootDir>/src/mocks/mockDatabaseService.ts",
     "<rootDir>/src/services/databaseService.ts",
     "<rootDir>/src/services/projectEnvTypeConfigService.ts"
@@ -29,7 +30,7 @@
       "statements": 70
     }
   },
-  "coverageReporters": ["json-summary", "json"],
+  "coverageReporters": ["json-summary", "json", "lcov", "text"],
   "moduleNameMapper": {
     "#node-web-compat": "./node-web-compat-node.js"
   }

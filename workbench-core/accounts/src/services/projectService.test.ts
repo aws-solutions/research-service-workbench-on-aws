@@ -18,17 +18,7 @@ import {
   UpdateItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import {
-  AuthenticatedUser,
-  CreateGroupRequest,
-  CreateGroupResponse,
-  CreateIdentityPermissionsRequest,
-  CreateIdentityPermissionsResponse,
-  DynamicAuthorizationService,
-  GetUserGroupsRequest,
-  GetUserGroupsResponse,
-  IdentityPermission
-} from '@aws/workbench-core-authorization';
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import { UpdateUnmarshalledOutput } from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/interfaces/updateUnmarshalledOutput';
@@ -50,9 +40,8 @@ describe('ProjectService', () => {
     region: process.env.AWS_REGION!,
     table: TABLE_NAME
   });
-  const dynamicAuthZ = {} as DynamicAuthorizationService;
   const costCenterService = new CostCenterService(dynamoDBService);
-  const projService = new ProjectService(dynamoDBService, dynamicAuthZ, costCenterService);
+  const projService = new ProjectService(dynamoDBService, costCenterService);
   const timestamp = '2022-05-18T20:33:42.608Z';
   const mockDateObject = new Date(timestamp);
   const user: AuthenticatedUser = {
@@ -202,63 +191,28 @@ describe('ProjectService', () => {
     vpcId: 'vpc-0b0bc7ae01d82e7b3'
   };
 
-  const noUserGroupsFunction = jest.fn((request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-    return Promise.resolve({
-      data: {
-        groupIds: []
-      }
-    });
-  });
+  const noUserGroups: string[] = [];
 
-  const itAdminUserGroupsFunction = jest.fn(
-    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-      return Promise.resolve({
-        data: {
-          groupIds: ['ITAdmin']
-        }
-      });
-    }
-  );
+  const itAdminUserGroups: string[] = ['ITAdmin'];
 
-  const getMultipleNonITGroupsFunction = jest.fn(
-    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-      return Promise.resolve({
-        data: {
-          groupIds: ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']
-        }
-      });
-    }
-  );
+  const multipleNonITGroups: string[] = ['proj-123#PA', 'proj-456#PA', 'proj-789#PA'];
 
-  const getSingleNonITGroupFunction = jest.fn(
-    (request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
-      return Promise.resolve({
-        data: {
-          groupIds: ['proj-123#PA']
-        }
-      });
-    }
-  );
+  const singleNonITGroup = ['proj-123#PA'];
 
   describe('listProjects', () => {
     test('should fail on list projects for negative pageSize', async () => {
       // BUILD
       const pageSize = -1;
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
+      await expect(() => projService.listProjects({ user, pageSize }, multipleNonITGroups)).rejects.toThrow(
         'Please supply a non-negative page size.'
       );
     });
 
     test('list all projects with no group membership', async () => {
-      // BUILD
-      dynamicAuthZ.getUserGroups = noUserGroupsFunction;
-
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ user }, noUserGroups);
 
       // CHECK
       expect(actualResponse).toEqual({ data: [] });
@@ -269,8 +223,6 @@ describe('ProjectService', () => {
       const queryItemResponse: QueryCommandOutput = {
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -290,7 +242,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ user }, itAdminUserGroups);
 
       // CHECK
       expect(actualResponse.data).toEqual([]);
@@ -306,8 +258,6 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
-
       ddbMock
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
@@ -326,7 +276,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ user }, itAdminUserGroups);
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -341,8 +291,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -370,10 +318,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { createdAt: { between: { value1: 'date1', value2: 'date2' } } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { createdAt: { between: { value1: 'date1', value2: 'date2' } } }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -388,8 +339,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -413,10 +362,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { dependency: { eq: 'cc-123' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { dependency: { eq: 'cc-123' } }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -431,8 +383,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -456,10 +406,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { status: { eq: 'AVAILABLE' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { status: { eq: 'AVAILABLE' } }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -474,8 +427,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -499,10 +450,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { name: { eq: 'Example project' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { name: { eq: 'Example project' } }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -517,8 +471,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -539,10 +491,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { createdAt: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { createdAt: 'asc' }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -557,8 +512,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -579,10 +532,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { dependency: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { dependency: 'asc' }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -597,8 +553,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -619,10 +573,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { status: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { status: 'asc' }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -637,8 +594,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
 
       ddbMock
         .on(QueryCommand, {
@@ -659,10 +614,13 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { name: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { name: 'asc' }
+        },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -688,8 +646,6 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
-
       ddbMock
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
@@ -708,7 +664,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize }, itAdminUserGroups);
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -734,8 +690,6 @@ describe('ProjectService', () => {
         $metadata: {}
       };
 
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
-
       ddbMock
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
@@ -754,21 +708,22 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects(
+        { user, pageSize, paginationToken },
+        itAdminUserGroups
+      );
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
     });
 
     test('list projects when user is only part of 1 groups', async () => {
-      dynamicAuthZ.getUserGroups = getSingleNonITGroupFunction;
-
       const getItemResponse: Record<string, JSONValue> = projItem;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       jest.spyOn(DynamoDBService.prototype as any, 'getItem').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ user }, singleNonITGroup);
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -779,8 +734,6 @@ describe('ProjectService', () => {
       const items = [projItem1, projItem2, projItem3];
       const pageSize = 4;
       const expectedResponse = { data: projects, paginationToken: undefined };
-
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -794,7 +747,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize }, multipleNonITGroups);
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -811,8 +764,6 @@ describe('ProjectService', () => {
       const pageSize = 3;
       const expectedResponse = { data: projects, paginationToken: paginationToken };
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -825,7 +776,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize }, multipleNonITGroups);
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -835,8 +786,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -849,12 +798,15 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: {
-          createdAt: { between: { value1: '2022-11-10T04:19:00.000Z', value2: '2022-11-10T04:20:00.000Z' } }
-        }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: {
+            createdAt: { between: { value1: '2022-11-10T04:19:00.000Z', value2: '2022-11-10T04:20:00.000Z' } }
+          }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1, project2]);
@@ -863,8 +815,6 @@ describe('ProjectService', () => {
     test('list all projects as user of multiple groups on 1 page with filter on dependency', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
-
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
 
       // mock getBatchItems call
       const batchGetItems: BatchGetItemCommandOutput = {
@@ -878,10 +828,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { dependency: { eq: 'cc-1' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { dependency: { eq: 'cc-1' } }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1]);
@@ -891,8 +844,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -905,10 +856,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { status: { eq: 'AVAILABLE' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { status: { eq: 'AVAILABLE' } }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1]);
@@ -918,8 +872,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -932,10 +884,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        filter: { name: { begins: 'name' } }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          filter: { name: { begins: 'name' } }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1, project2, project3]);
@@ -945,8 +900,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -959,10 +912,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { createdAt: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { createdAt: 'asc' }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1, project2, project3]);
@@ -972,8 +928,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -986,10 +940,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { dependency: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { dependency: 'asc' }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1, project2, project3]);
@@ -999,8 +956,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -1013,10 +968,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { status: 'asc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { status: 'asc' }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project1, project3, project2]);
@@ -1026,8 +984,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -1040,10 +996,13 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({
-        user,
-        sort: { name: 'desc' }
-      });
+      const actualResponse = await projService.listProjects(
+        {
+          user,
+          sort: { name: 'desc' }
+        },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual([project3, project2, project1]);
@@ -1060,8 +1019,6 @@ describe('ProjectService', () => {
       const pageSize = 2;
       const expectedResponse = { data: [project3], paginationToken: undefined };
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -1074,7 +1031,10 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects(
+        { user, pageSize, paginationToken },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1096,8 +1056,6 @@ describe('ProjectService', () => {
         )
       };
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -1110,7 +1068,10 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects(
+        { user, pageSize, paginationToken },
+        multipleNonITGroups
+      );
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1126,8 +1087,6 @@ describe('ProjectService', () => {
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 1;
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: {
@@ -1140,9 +1099,9 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ user, pageSize, paginationToken })).rejects.toThrow(
-        'Pagination token is invalid.'
-      );
+      await expect(() =>
+        projService.listProjects({ user, pageSize, paginationToken }, multipleNonITGroups)
+      ).rejects.toThrow('Pagination token is invalid.');
     });
 
     test('list all projects as user in multiple groups but nothing is returned from DDB', async () => {
@@ -1152,8 +1111,6 @@ describe('ProjectService', () => {
         paginationToken: undefined
       };
 
-      dynamicAuthZ.getUserGroups = getMultipleNonITGroupsFunction;
-
       // mock batchGetItems call
       const batchGetItems: BatchGetItemCommandOutput = {
         Responses: undefined,
@@ -1162,7 +1119,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ user }, multipleNonITGroups);
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1234,41 +1191,6 @@ describe('ProjectService', () => {
   });
 
   describe('createProject', () => {
-    const user: AuthenticatedUser = {
-      id: 'user-456',
-      roles: []
-    };
-
-    beforeEach(() => {
-      dynamicAuthZ.getUserGroups = itAdminUserGroupsFunction;
-      dynamicAuthZ.createGroup = jest.fn((request: CreateGroupRequest): Promise<CreateGroupResponse> => {
-        return Promise.resolve({
-          data: {
-            groupId: 'proj-123#PA'
-          }
-        });
-      });
-
-      const identityPermission: IdentityPermission = {
-        action: 'CREATE',
-        effect: 'ALLOW',
-        subjectType: '',
-        subjectId: '',
-        identityType: 'GROUP',
-        identityId: ''
-      };
-
-      dynamicAuthZ.createIdentityPermissions = jest.fn(
-        (request: CreateIdentityPermissionsRequest): Promise<CreateIdentityPermissionsResponse> => {
-          return Promise.resolve({
-            data: {
-              identityPermissions: [identityPermission]
-            }
-          });
-        }
-      );
-    });
-
     test('create a project with valid name', async () => {
       // BUILD
       const params = {
@@ -1336,7 +1258,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.createProject(params, user);
+      const actualResponse = await projService.createProject(params);
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1392,7 +1314,7 @@ describe('ProjectService', () => {
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow(
+      await expect(projService.createProject(params)).rejects.toThrow(
         'Project name "Example project" is in use by a non deleted project. Please use another name.'
       );
     });
@@ -1442,9 +1364,7 @@ describe('ProjectService', () => {
         .resolves({});
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow(
-        'Could not find cost center cc-123'
-      );
+      await expect(projService.createProject(params)).rejects.toThrow('Could not find cost center cc-123');
     });
 
     test('fail on update to DDB call', async () => {
@@ -1499,7 +1419,7 @@ describe('ProjectService', () => {
       ddbMock.on(UpdateItemCommand).rejects('Failed to update DDB');
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow('Failed to create project');
+      await expect(projService.createProject(params)).rejects.toThrow('Failed to create project');
     });
   });
 

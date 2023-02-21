@@ -4,7 +4,6 @@
  */
 
 import {
-  ProjectService,
   CreateProjectRequest,
   CreateProjectRequestParser,
   ListProjectsRequest,
@@ -30,6 +29,7 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
+import { ProjectPlugin } from './projects/projectPlugin';
 import {
   ProjectDatasetMetadata,
   ProjectDatasetMetadataParser,
@@ -39,7 +39,7 @@ import {
 
 export function setUpProjectRoutes(
   router: Router,
-  projectService: ProjectService,
+  projectService: ProjectPlugin,
   environmentService: EnvironmentService,
   metadataService: MetadataService,
   userService: UserManagementService

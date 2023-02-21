@@ -25,9 +25,11 @@ import { ListEnvironmentTypeConfigsRequest } from './envTypeConfigs/listEnvironm
 import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
+import { ConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { DatabaseError } from './errors/databaseError';
 import { DuplicateKeyError } from './errors/duplicateKeyError';
 import { Ec2Error } from './errors/ec2Error';
+import { NoInstanceFoundError } from './errors/noInstanceFoundError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
 import { generateRouter } from './generateRouter';
@@ -49,6 +51,7 @@ import {
 } from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
 import { Project } from './projectEnvTypeConfigs/project';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
+import { ProjectPlugin } from './projects/projectPlugin';
 import { CreateSshKeyRequest } from './sshKeys/createSshKeyRequest';
 import { CreateSshKeyResponse } from './sshKeys/createSshKeyResponse';
 import { DeleteSshKeyRequest } from './sshKeys/deleteSshKeyRequest';
@@ -58,7 +61,7 @@ import {
   ListUserSshKeysForProjectResponseParser
 } from './sshKeys/listUserSshKeysForProjectResponse';
 import { SendPublicKeyRequest } from './sshKeys/sendPublicKeyRequest';
-import { SendPublicKeyResponse } from './sshKeys/sendPublicKeyResponse';
+import { SendPublicKeyResponse, SendPublicKeyResponseParser } from './sshKeys/sendPublicKeyResponse';
 import { SshKey, SshKeyParser } from './sshKeys/sshKey';
 import { SshKeyPlugin } from './sshKeys/sshKeyPlugin';
 
@@ -82,6 +85,7 @@ export {
   PermissionsResponseParser,
   ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin,
+  ProjectPlugin,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
   DeleteSshKeyRequest,
@@ -113,5 +117,8 @@ export {
   ListEnvTypeConfigProjectsRequest,
   ListEnvTypeConfigProjectsRequestParser,
   Project,
-  DuplicateKeyError
+  NoInstanceFoundError,
+  ConnectionInfoNotDefinedError,
+  DuplicateKeyError,
+  SendPublicKeyResponseParser
 };

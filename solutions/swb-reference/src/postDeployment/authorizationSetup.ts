@@ -11,6 +11,7 @@ import {
   AuthenticatedUser,
   isIdentityPermissionCreationError
 } from '@aws/workbench-core-authorization';
+import { SwbAuthZSubject } from '../constants';
 
 export default class AuthorizationSetup {
   private _authService: DynamicAuthorizationService;
@@ -24,34 +25,56 @@ export default class AuthorizationSetup {
   }
 
   public async run(): Promise<void> {
-    const groupName = 'ITAdmin';
-    const adminUser: AuthenticatedUser = { id: this._constants.ROOT_USER_EMAIL, roles: [groupName] };
+    const itAdmin = 'ITAdmin';
+    const adminUser: AuthenticatedUser = { id: this._constants.ROOT_USER_EMAIL, roles: [itAdmin] };
 
-    await this.createGroupIfNotExist(groupName, 'IT Admin group for SWB.', adminUser);
+    await this.createGroupIfNotExist(itAdmin, 'IT Admin group for SWB.', adminUser);
 
-    const projectPermissions = this._mapActions(groupName, 'Project', ['User']);
-    const environmentTypePermissions = this._mapActions(groupName, 'EnvType', ['EnvTypeConfig']);
-    const datasetPermissions = this._mapActions(groupName, 'ExternalDataset');
-
-    const userPermissions = this._mapActions(groupName, 'User');
-    const costCenterPermissions = this._mapActions(groupName, 'CostCenter');
-    const awsAccountPermissions = this._mapActions(groupName, 'AwsAccount');
-    const groupPermissions = this._mapActions(groupName, 'Group | groupId', [], ['UPDATE']);
+    //IT Admin Permissions
+    const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
+    const userPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_USER);
+    const projectToUserAssociationPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
+      ['CREATE', 'DELETE']
+    );
+    const environmentPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT, [
+      'READ',
+      'UPDATE',
+      'DELETE'
+    ]);
+    const environmentTypePermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT_TYPE);
+    const environmentTypeConfigPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ETC);
+    const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, [
+      'READ',
+      'UPDATE',
+      'DELETE'
+    ]);
+    const awsAccountTemplateUrlsPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL,
+      ['CREATE']
+    );
+    const costCenterPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_COST_CENTER);
+    const awsAccountPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_AWS_ACCOUNT);
 
     await this.createIdentityPermissions(
       [
         ...projectPermissions,
+        ...environmentPermissions,
         ...environmentTypePermissions,
+        ...environmentTypeConfigPermissions,
         ...datasetPermissions,
         ...userPermissions,
         ...costCenterPermissions,
         ...awsAccountPermissions,
-        ...groupPermissions
+        ...projectToUserAssociationPermissions,
+        ...awsAccountTemplateUrlsPermissions
       ],
       adminUser
     );
 
-    await this.assignUserToGroup(adminUser.id, groupName, adminUser);
+    await this.assignUserToGroup(adminUser.id, itAdmin, adminUser);
   }
 
   /**
@@ -131,7 +154,6 @@ export default class AuthorizationSetup {
   private _mapActions(
     identityId: string,
     subjectType: string,
-    fields: string[] = [],
     actions: Action[] = ['CREATE', 'READ', 'UPDATE', 'DELETE']
   ): IdentityPermission[] {
     return actions.map((action) => {
@@ -141,8 +163,7 @@ export default class AuthorizationSetup {
         identityType: 'GROUP',
         subjectType,
         action,
-        identityId,
-        fields
+        identityId
       };
     });
   }

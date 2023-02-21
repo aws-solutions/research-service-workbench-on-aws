@@ -13,6 +13,8 @@ import {
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import {
+  DynamicRoutesMap,
+  RoutesIgnored,
   DynamicAuthorizationService,
   WBCGroupManagementPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
@@ -34,6 +36,7 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
+import * as DynamicRouteConfig from './dynamicRouteConfig';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DatabaseService } from './services/databaseService';
@@ -42,6 +45,7 @@ import { EnvTypeConfigService } from './services/envTypeConfigService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 import SshKeyService from './services/sshKeyService';
+import { SWBProjectService } from './services/swbProjectService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
 const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
@@ -65,9 +69,13 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
   ddbService: dynamicAuthAws.helpers.ddb,
   userGroupKeyType: authorizationGroupPrefix
 });
+const dynamicRoutesMap: DynamicRoutesMap = DynamicRouteConfig.dynamicRoutesMap;
+const routesIgnored: RoutesIgnored = DynamicRouteConfig.routesIgnored;
 const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
   new DDBDynamicAuthorizationPermissionsPlugin({
-    dynamoDBService: dynamicAuthAws.helpers.ddb
+    dynamoDBService: dynamicAuthAws.helpers.ddb,
+    dynamicRoutesMap,
+    routesIgnored
   });
 const caslAuthorizationPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
@@ -86,11 +94,7 @@ const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeCo
 );
 const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
 const costCenterService: CostCenterService = new CostCenterService(aws.helpers.ddb);
-const projectService: ProjectService = new ProjectService(
-  aws.helpers.ddb,
-  dynamicAuthorizationService,
-  costCenterService
-);
+const projectService: ProjectService = new ProjectService(aws.helpers.ddb, costCenterService);
 
 const apiRouteConfig: ApiRouteConfig = {
   environments: {
@@ -124,7 +128,6 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService,
   environmentTypeService: envTypeService,
   environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
-  projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
@@ -139,8 +142,11 @@ const apiRouteConfig: ApiRouteConfig = {
     environmentService,
     dynamicAuthorizationService
   ),
+  projectPlugin: new SWBProjectService(dynamicAuthorizationService, projectService),
+  projectService: projectService,
   sshKeyService: new SshKeyService(aws, projectService),
-  authorizationService: dynamicAuthorizationService
+  authorizationService: dynamicAuthorizationService,
+  routesIgnored: DynamicRouteConfig.routesIgnored
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);
