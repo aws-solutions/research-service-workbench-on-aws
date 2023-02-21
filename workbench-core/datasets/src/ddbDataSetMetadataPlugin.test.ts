@@ -29,6 +29,7 @@ import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { CreateDataSet, DataSet } from './models/dataSet';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { ListDataSetsResponse } from './models/listDataSetsResponse';
 import { StorageLocation } from './models/storageLocation';
 
 describe('DdbDataSetMetadataPlugin', () => {
@@ -91,26 +92,29 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
 
       const response = await plugin.listDataSets();
-      expect(response).toMatchObject<DataSet[]>([
-        {
-          id: mockDataSetId,
-          name: mockDataSetName,
-          path: mockDataSetPath,
-          awsAccountId: mockAwsAccountId,
-          storageType: mockDataSetStorageType,
-          storageName: mockDataSetStorageName,
-          createdAt: mockCreatedAt
-        }
-      ]);
+      expect(response).toMatchObject<ListDataSetsResponse>({
+        data: [
+          {
+            id: mockDataSetId,
+            name: mockDataSetName,
+            path: mockDataSetPath,
+            awsAccountId: mockAwsAccountId,
+            storageType: mockDataSetStorageType,
+            storageName: mockDataSetStorageName,
+            createdAt: mockCreatedAt
+          }
+        ]
+      });
     });
 
     it('returns an empty array if there are no DataSets to list', async () => {
       mockDdb.on(QueryCommand).resolves({});
 
-      const response: DataSet[] = await plugin.listDataSets();
+      const response: ListDataSetsResponse = await plugin.listDataSets();
       expect(response).toBeDefined();
-      expect(response).toHaveLength(0);
-      expect(response).toStrictEqual([]);
+      expect(response.data).toHaveLength(0);
+      expect(response.data).toStrictEqual([]);
+      expect(response.pageToken).toBeUndefined();
     });
   });
 

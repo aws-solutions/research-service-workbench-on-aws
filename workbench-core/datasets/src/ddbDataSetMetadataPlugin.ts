@@ -5,9 +5,11 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
+  addPaginationToken,
   AwsService,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
+  getPaginationToken,
   QueryParams,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
@@ -23,6 +25,7 @@ import {
   ExternalEndpointArrayParser,
   ExternalEndpointParser
 } from './models/externalEndpoint';
+import { ListDataSetsResponse } from './models/listDataSetsResponse';
 import { StorageLocation } from './models/storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
@@ -50,17 +53,26 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return ExternalEndpointParser.parse(response.Item);
   }
 
-  public async listDataSets(): Promise<DataSet[]> {
-    const params: QueryParams = {
+  public async listDataSets(pageSize?: number, pageToken?: string): Promise<ListDataSetsResponse> {
+    let params: QueryParams = {
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'dataset' }
     };
-    const response = await this._aws.helpers.ddb.query(params).execute();
-
-    if (!response.Items) {
-      return [];
+    if (pageSize) {
+      params.limit = pageSize;
     }
-    return DataSetArrayParser.parse(response.Items);
+    if (pageToken) {
+      params = addPaginationToken(pageToken, params);
+    }
+
+    const data = await this._aws.helpers.ddb.query(params).execute();
+    const response: ListDataSetsResponse = { data: [] };
+    if (!data.Items) {
+      return { data: [] };
+    }
+    response.data = DataSetArrayParser.parse(data.Items);
+    response.pageToken = getPaginationToken(data);
+    return response;
   }
 
   public async getDataSetMetadata(id: string): Promise<DataSet> {
@@ -150,7 +162,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     const datasets = await this.listDataSets();
 
     const map = new Map<string, StorageLocation>();
-    datasets.forEach((dataset) =>
+    datasets.data.forEach((dataset) =>
       map.set(dataset.storageName, {
         name: dataset.storageName,
         awsAccountId: dataset.awsAccountId,
@@ -159,6 +171,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       })
     );
     return Array.from(map.values());
+  }
+
+  public getDataSetResourceKey(): string {
+    return this._dataSetKeyType;
   }
 
   private async _validateCreateExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<void> {

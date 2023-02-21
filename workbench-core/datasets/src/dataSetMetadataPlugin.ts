@@ -5,15 +5,17 @@
 
 import { CreateDataSet, DataSet } from './models/dataSet';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { ListDataSetsResponse } from './models/listDataSetsResponse';
 import { StorageLocation } from './models/storageLocation';
 
 export interface DataSetMetadataPlugin {
   /**
    * Lists the DataSets in the database backend.
-   *
-   * @returns an array of DataSets.
+   * @param pageSize - optional limit to number of items returned in the list.
+   * @param pageToken - the start point for the query.
+   * @returns an object with its data element set to the array of datasets.
    */
-  listDataSets(): Promise<DataSet[]>;
+  listDataSets(pageSize?: number, pageToken?: string): Promise<ListDataSetsResponse>;
 
   /**
    * Gets the metadata associated with an overall dataset. This differs from
@@ -112,4 +114,9 @@ export interface DataSetMetadataPlugin {
    * @returns - a list of {@link StorageLocation}s
    */
   listStorageLocations(): Promise<StorageLocation[]>;
+
+  /**
+   * returns the prefix of dataset keys (if any) used in the underlying datastore.
+   */
+  getDataSetResourceKey(): string;
 }

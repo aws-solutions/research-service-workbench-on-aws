@@ -34,6 +34,7 @@ import { DataSetPermission } from './models/dataSetPermission';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { ExternalEndpoint } from './models/externalEndpoint';
 import { GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
+import { ListDataSetsResponse } from './models/listDataSetsResponse';
 import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './models/storageLocation';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
@@ -167,17 +168,19 @@ describe('DataSetService', () => {
     metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
 
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockImplementation(async () => {
-      return [
-        {
-          id: mockDataSetId,
-          name: mockDataSetName,
-          path: mockDataSetPath,
-          awsAccountId: mockAwsAccountId,
-          storageType: mockDataSetStorageType,
-          storageName: mockDataSetStorageName,
-          createdAt: mockCreatedAt
-        }
-      ];
+      return {
+        data: [
+          {
+            id: mockDataSetId,
+            name: mockDataSetName,
+            path: mockDataSetPath,
+            awsAccountId: mockAwsAccountId,
+            storageType: mockDataSetStorageType,
+            storageName: mockDataSetStorageName,
+            createdAt: mockCreatedAt
+          }
+        ]
+      };
     });
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetMetadata')
@@ -1129,36 +1132,48 @@ describe('DataSetService', () => {
     });
 
     it('returns the array of DataSets the authenticated user has access to when the user has access to all the datasets.', async () => {
-      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ]
+      });
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      await expect(
+        dataSetService.listDataSets(mockAuthenticatedUser)
+      ).resolves.toMatchObject<ListDataSetsResponse>({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ]
+      });
     });
 
     it('returns the array of DataSets the authenticated user has access to when the user doesnt have access to some of the datasets.', async () => {
-      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ]
+      });
       jest
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
         .mockResolvedValueOnce()
         .mockRejectedValueOnce(new ForbiddenError()) // no permissions on dataset 2
         .mockResolvedValueOnce();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      await expect(
+        dataSetService.listDataSets(mockAuthenticatedUser)
+      ).resolves.toMatchObject<ListDataSetsResponse>({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ]
+      });
     });
 
     it('generates an audit event when an error is thrown', async () => {

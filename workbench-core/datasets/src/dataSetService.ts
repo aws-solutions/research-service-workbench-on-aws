@@ -5,6 +5,7 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
+import { buildDynamoDBPkSk, toPaginationToken } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -30,6 +31,7 @@ import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
+import { ListDataSetsResponse } from './models/listDataSetsResponse';
 import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './models/storageLocation';
 
@@ -38,6 +40,8 @@ export class DataSetService {
   private _log: LoggingService;
   private _dbProvider: DataSetMetadataPlugin;
   private _authzPlugin: DataSetsAuthorizationPlugin;
+  private _dataSetsDefaultPageSize: number = 50;
+
   /**
    * Constructs a {@link DataSetService} instance.
    *
@@ -252,7 +256,11 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
+  public async listDataSets(
+    authenticatedUser: AuthenticatedUser,
+    pageSize?: number,
+    pageToken?: string
+  ): Promise<ListDataSetsResponse> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -262,24 +270,48 @@ export class DataSetService {
     };
 
     try {
-      const response: DataSet[] = [];
-      const allDatasets = await this._dbProvider.listDataSets();
+      let data: DataSet[] = [];
+      let currentPageToken = pageToken;
+      if (!_.isUndefined(pageSize) && (pageSize! < 1 || !_.isInteger(pageSize))) {
+        throw new DataSetInvalidParameterError("'pageSize' must be an integer greater than 0.");
+      }
 
-      await Promise.all(
-        allDatasets.map(async (dataset) => {
-          try {
-            // throws a ForbiddenError if the user doesnt have permission on the dataset
-            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
-            response.push(dataset);
-          } catch (error) {
-            if (!isForbiddenError(error)) {
-              throw error;
+      if (!pageSize) {
+        pageSize = this._dataSetsDefaultPageSize;
+      }
+
+      let pluginResponse: ListDataSetsResponse;
+
+      do {
+        pluginResponse = await this._dbProvider.listDataSets(pageSize, pageToken);
+
+        await Promise.all(
+          pluginResponse.data.map(async (dataset) => {
+            try {
+              // throws a ForbiddenError if the user doesnt have permission on the dataset
+              await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+              data.push(dataset);
+            } catch (error) {
+              if (!isForbiddenError(error)) {
+                throw error;
+              }
             }
-          }
-        })
-      );
+          })
+        );
+        currentPageToken = pluginResponse.pageToken;
+      } while (data.length < pageSize && currentPageToken);
 
-      await this._audit.write(metadata, response);
+      if (data.length > pageSize) {
+        data = data.slice(0, pageSize);
+        const lastKey = buildDynamoDBPkSk(data[pageSize - 1].id, this._dbProvider.getDataSetResourceKey());
+        currentPageToken = toPaginationToken(lastKey);
+      }
+
+      const response = {
+        data,
+        pageToken: currentPageToken
+      };
+      await this._audit.write(metadata, data);
       return response;
     } catch (error) {
       await this._audit.write(metadata, error);

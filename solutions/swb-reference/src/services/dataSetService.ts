@@ -29,7 +29,8 @@ import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
   DataSetsAuthorizationPlugin,
-  DataSetService as WorkbenchDataSetService
+  DataSetService as WorkbenchDataSetService,
+  ListDataSetsResponse
 } from '@aws/workbench-core-datasets';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
@@ -128,7 +129,7 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.importDataSet(request);
   }
 
-  public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
+  public listDataSets(user: AuthenticatedUser): Promise<ListDataSetsResponse> {
     return this._workbenchDataSetService.listDataSets(user);
   }
 

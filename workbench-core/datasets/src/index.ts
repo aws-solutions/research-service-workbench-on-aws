@@ -54,6 +54,7 @@ export {
   CreateExternalEndpoint,
   ExternalEndpointArrayParser
 } from './models/externalEndpoint';
+export { ListDataSetsResponse, ListDataSetsResponseParser } from './models/listDataSetsResponse';
 export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { StorageLocation } from './models/storageLocation';
 

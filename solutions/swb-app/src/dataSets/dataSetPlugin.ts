@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
+import { AddRemoveAccessPermissionRequest, ListDataSetsResponse } from '@aws/workbench-core-datasets';
 import { AuthenticatedUser } from '../users/authenticatedUser';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
 import { DataSet } from './dataSet';
@@ -26,7 +26,7 @@ export interface DataSetPlugin {
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
-  listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
+  listDataSets(user: AuthenticatedUser): Promise<ListDataSetsResponse>;
   listDataSetAccessPermissions(request: ListDataSetAccessPermissionsRequest): Promise<PermissionsResponse>;
   getSinglePartFileUploadUrl(
     dataSetId: string,
