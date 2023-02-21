@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
@@ -12,7 +13,15 @@ import {
   CreateExternalEndpointRequest,
   CreateExternalEndpointRequestParser
 } from './dataSets/createExternalEndpointRequestParser';
+import {
+  DataSetFileUploadRequest,
+  DataSetFileUploadRequestParser
+} from './dataSets/DataSetFileUploadRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import {
+  ListDataSetAccessPermissionsRequest,
+  ListDataSetAccessPermissionsRequestParser
+} from './dataSets/listDataSetAccessPermissionsRequestParser';
 import {
   ProjectAddAccessRequest,
   ProjectAddAccessRequestParser
@@ -21,7 +30,9 @@ import {
   ProjectRemoveAccessRequest,
   ProjectRemoveAccessRequestParser
 } from './dataSets/projectRemoveAccessRequestParser';
+import { RemoveDataSetRequest, RemoveDataSetRequestParser } from './dataSets/removeDataSetRequestParser';
 import { wrapAsync } from './errorHandlers';
+import { isConflictError } from './errors/conflictError';
 import { validateAndParse } from './validatorHelper';
 
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
@@ -102,6 +113,34 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
+  // Add file to dataset
+  router.get(
+    '/datasets/:dataSetId/upload-requests',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('dataSetId request parameter is invalid');
+      }
+
+      const validatedRequest = validateAndParse<DataSetFileUploadRequest>(DataSetFileUploadRequestParser, {
+        dataSetId: req.params.dataSetId,
+        filenames: req.query.filenames
+      });
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+
+      if (typeof validatedRequest.filenames === 'string') {
+        validatedRequest.filenames = [validatedRequest.filenames];
+      }
+
+      const urls = await Promise.all(
+        validatedRequest.filenames.map((filename) =>
+          dataSetService.getSinglePartFileUploadUrl(validatedRequest.dataSetId, filename, authenticatedUser)
+        )
+      );
+
+      res.status(200).json({ urls });
+    })
+  );
+
   // List dataSets
   router.get(
     '/datasets',
@@ -143,6 +182,53 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       await dataSetService.removeAccessForProject(validatedRequest);
 
       res.status(204).send();
+    })
+  );
+
+  router.get(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<ListDataSetAccessPermissionsRequest>(
+        ListDataSetAccessPermissionsRequestParser,
+        {
+          ...req.query,
+          authenticatedUser: res.locals.user,
+          dataSetId: req.params.datasetId
+        }
+      );
+      res.send(await dataSetService.listDataSetAccessPermissions(validatedRequest));
+    })
+  );
+
+  router.delete(
+    '/projects/:projectId/datasets/:datasetId/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<RemoveDataSetRequest>(RemoveDataSetRequestParser, {
+        authenticatedUser: res.locals.user,
+        dataSetId: req.params.datasetId
+      });
+
+      try {
+        await dataSetService.removeDataSet(validatedRequest.dataSetId, validatedRequest.authenticatedUser);
+
+        res.status(204).send();
+      } catch (e) {
+        console.error(e);
+
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetHasEndpointError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetNotFoundError(e)) {
+          throw Boom.notFound();
+        }
+
+        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+      }
     })
   );
 }

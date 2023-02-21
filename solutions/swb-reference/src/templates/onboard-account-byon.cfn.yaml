@@ -200,6 +200,7 @@ Resources:
                 - ec2:DescribeAccountAttributes
                 - ec2:CreateTags
                 - ec2:DeleteTags
+                - ec2:DescribeInstances
               Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
@@ -291,6 +292,7 @@ Resources:
               - config:*
               - servicecatalog:*
               - servicequotas:*
+              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:

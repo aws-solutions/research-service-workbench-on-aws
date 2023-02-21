@@ -3,18 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
+import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
 import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
+import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../support/utils/constants';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { dsUuidRegExp } from '../../support/utils/regExpressions';
 import Settings from '../../support/utils/settings';
+import { poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let dataSetName: string;
   let projectId: string;
   let costCenterId: string;
@@ -63,7 +65,7 @@ describe('multiStep dataset integration test', () => {
         {
           identity: getResearcherRole(projectId),
           identityType: 'GROUP',
-          accessLevel: 'read-only'
+          accessLevel: 'read-write'
         }
       ]
     });
@@ -131,7 +133,61 @@ describe('multiStep dataset integration test', () => {
       .dataset(dataSet.id)
       .associateWithProject(unassociatedProject.id, 'read-only');
 
+    console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
+    const { data: responseData } = await adminSession.resources.datasets
+      .dataset(dataSet.id)
+      .listAccessPermissions();
+    const sortedActual: DataSetPermission[] = responseData.data.permissions.sort(
+      (p1: DataSetPermission, p2: DataSetPermission) => p1.accessLevel < p2.accessLevel
+    );
+    const expected: DataSetPermission[] = [
+      {
+        accessLevel: 'read-write',
+        identity: `${projectId}#Researcher`,
+        identityType: 'GROUP'
+      },
+      {
+        accessLevel: 'read-only',
+        identity: `${unassociatedProject.id}#ProjectAdmin`,
+        identityType: 'GROUP'
+      }
+    ];
+
+    expect(sortedActual).toEqual(expected);
+
     console.log('DISASSOCIATE FROM PROJECT');
     await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
+
+    console.log('TERMINATE ENVIRONMENT & REMOVE DATASET');
+    await poll(
+      async () => {
+        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        console.log(`env status: ${envData.status}`);
+        return envData;
+      },
+      (data) => data?.status === 'COMPLETED' || data?.status === 'FAILED',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    );
+    await adminSession.resources.environments.environment(env.id, projectId).stop();
+    await poll(
+      async () => {
+        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        console.log(`env status: ${envData.status}`);
+        return envData;
+      },
+      (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    );
+    await adminSession.resources.environments.environment(env.id, projectId).terminate();
+    await poll(
+      async () => {
+        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        console.log(`env status: ${envData.status}`);
+        return envData;
+      },
+      (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    );
+    await adminSession.resources.datasets.dataset(dataSet.id).deleteFromProject(projectId);
   });
 });

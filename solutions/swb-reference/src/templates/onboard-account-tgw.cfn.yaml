@@ -86,13 +86,7 @@ Parameters:
 
   AvailabilityZones:
     Description: "List of Availability Zones to use for the subnets in the VPC."
-      Type: CommaDelimitedList
-
-  NumberofAZs:
-    AllowedValues:
-        - "1"
-    Description: Number of Availability Zones to use in the VPC. This must match your selections in the list of Availability Zones parameter. Currently this template only supports 1 zone.
-    Type: String
+    Type: CommaDelimitedList
 
   VPCName:
     Default: "primary"
@@ -262,6 +256,7 @@ Resources:
                 - ec2:CreateTags
                 - ec2:DeleteTags
                 - ec2:DescribeInternetGateways
+                - ec2:DescribeInstances
               Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
@@ -353,6 +348,7 @@ Resources:
               - config:*
               - servicecatalog:*
               - servicequotas:*
+              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:

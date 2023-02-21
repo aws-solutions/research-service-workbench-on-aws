@@ -27,12 +27,12 @@ export const researcherUser: UserItem = {
 
 export const adminUser: UserItem = {
   id: 'sample-admin-id',
-  givenName: 'Admin',
+  givenName: 'ITAdmin',
   familyName: 'User',
   email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
-  role: 'admin'
+  role: 'ITAdmin'
 };
 
 export interface CreateUserForm {
@@ -46,4 +46,3 @@ export interface CreateUserFormValidation {
   familyNameError?: string;
   givenNameError?: string;
 }
-

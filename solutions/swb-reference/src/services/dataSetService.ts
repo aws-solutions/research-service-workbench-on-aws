@@ -4,6 +4,7 @@
  */
 
 import {
+  ConflictError,
   DataSet,
   DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
@@ -13,6 +14,7 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
@@ -32,6 +34,8 @@ import {
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
+
+const timeToLiveSeconds: number = 60 * 15; // 15 min
 
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
@@ -54,6 +58,59 @@ export class DataSetService implements DataSetPlugin {
     this._dynamicAuthService = dynamicAuthService;
   }
 
+  public async removeDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<void> {
+    const dataset = await this.getDataSet(dataSetId, authenticatedUser);
+
+    const associatedProjects = await this._associatedProjects(dataset);
+    if (associatedProjects.length > 0) {
+      throw new ConflictError(
+        `DataSet ${dataSetId} cannot be removed because it is associated with project(s) [${associatedProjects.join(
+          ','
+        )}]`
+      );
+    }
+
+    await this._workbenchDataSetService.removeDataSet(
+      dataSetId,
+      () => {
+        return Promise.resolve();
+      },
+      authenticatedUser
+    );
+
+    const projectAdmin = dataset.owner!;
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataSetId,
+      [projectAdmin],
+      ['READ', 'UPDATE', 'DELETE']
+    );
+
+    const projectId = projectAdmin.split('#')[0];
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+      `${projectId}-${dataSetId!}`,
+      [projectAdmin],
+      ['READ', 'UPDATE']
+    );
+  }
+
+  private async _associatedProjects(dataset: DataSet): Promise<string[]> {
+    const permissions = await this._dynamicAuthService.getIdentityPermissionsBySubject({
+      subjectId: dataset.id!,
+      subjectType: SwbAuthZSubject.SWB_DATASET
+    });
+
+    const projectIds = permissions.data.identityPermissions
+      .filter((permission) => permission.identityType === 'GROUP')
+      .filter((permission) => permission.identityId !== dataset.owner!)
+      .map((permission) => `'${permission.identityId.split('#')[0]}'`);
+
+    return Array.from(new Set(projectIds));
+  }
+
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse> {
@@ -73,6 +130,18 @@ export class DataSetService implements DataSetPlugin {
 
   public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
     return this._workbenchDataSetService.listDataSets(user);
+  }
+
+  public async listDataSetAccessPermissions(
+    request: ListDataSetAccessPermissionsRequest
+  ): Promise<PermissionsResponse> {
+    const response = await this._workbenchDataSetService.getAllDataSetAccessPermissions(
+      request.dataSetId,
+      request.authenticatedUser,
+      request.paginationToken
+    );
+
+    return PermissionsResponseParser.parse(response);
   }
 
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
@@ -100,6 +169,20 @@ export class DataSetService implements DataSetPlugin {
     return dataset;
   }
 
+  public async getSinglePartFileUploadUrl(
+    dataSetId: string,
+    fileName: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<string> {
+    return this._workbenchDataSetService.getPresignedSinglePartUploadUrl(
+      dataSetId,
+      fileName,
+      timeToLiveSeconds,
+      this.storagePlugin,
+      authenticatedUser
+    );
+  }
+
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
     const response = await this._dataSetsAuthService.addAccessPermission(params);
     return PermissionsResponseParser.parse(response);
@@ -122,11 +205,11 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, {
-      id: '',
-      roles: []
-    });
+  public async removeAllAccessPermissions(
+    datasetId: string,
+    authenticatedUser: AuthenticatedUser
+  ): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId, authenticatedUser);
     return PermissionsResponseParser.parse(response);
   }
 
