@@ -87,7 +87,7 @@ jobs:
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference, deploy-swb-reference-byon, deploy-example-app]
+    needs: [readme-commit, deploy-swb-reference, deploy-example-app]
     env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
