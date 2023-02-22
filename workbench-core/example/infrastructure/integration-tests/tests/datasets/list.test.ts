@@ -67,7 +67,7 @@ describe('datasets list integration test', () => {
 
     it('should return an empty array when the user has no permissions on any dataset', async () => {
       const response = await updatedAdminSession.resources.datasets.get();
-      expect(response.data).toStrictEqual([]);
+      expect(response.data?.data).toStrictEqual([]);
     });
 
     it('should not return the datasets that the user has no permissions on from their userId', async () => {
@@ -94,7 +94,7 @@ describe('datasets list integration test', () => {
       });
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: DataSet) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: DataSet) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
       expect(dataSetIds).toStrictEqual(
@@ -126,7 +126,7 @@ describe('datasets list integration test', () => {
       });
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: Dataset) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(expect.not.arrayContaining([datasets[1].id, datasets[3].id]));
       expect(dataSetIds).toStrictEqual(
@@ -151,7 +151,7 @@ describe('datasets list integration test', () => {
       });
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: Dataset) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(
         expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
@@ -176,7 +176,7 @@ describe('datasets list integration test', () => {
       });
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: Dataset) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(
         expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
@@ -235,7 +235,7 @@ describe('datasets list integration test', () => {
       );
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: Dataset) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(
         expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
@@ -285,7 +285,7 @@ describe('datasets list integration test', () => {
       );
 
       const { data } = await updatedAdminSession.resources.datasets.get();
-      const dataSetIds = data.map((dataset: Dataset) => dataset.id);
+      const dataSetIds = data.data?.map((dataset: Dataset) => dataset.id);
 
       expect(dataSetIds).toStrictEqual(
         expect.not.arrayContaining([datasets[1].id, datasets[3].id, datasets[4].id])
@@ -306,7 +306,7 @@ describe('datasets list integration test', () => {
       };
       response = await adminSession.resources.datasets.storageLocations();
 
-      expect(response.data).toContainEqual(location);
+      expect(response.data?.data).toContainEqual(location);
     });
   });
 });
