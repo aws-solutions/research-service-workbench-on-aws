@@ -16,9 +16,12 @@ import { S3 } from '@aws-sdk/client-s3';
 import { S3Control } from '@aws-sdk/client-s3-control';
 import { SageMaker } from '@aws-sdk/client-sagemaker';
 import { ServiceCatalog } from '@aws-sdk/client-service-catalog';
+import { ServiceCatalogAppRegistry } from '@aws-sdk/client-service-catalog-appregistry';
+import { ServiceQuotas } from '@aws-sdk/client-service-quotas';
 import { SSM } from '@aws-sdk/client-ssm';
 import { STS } from '@aws-sdk/client-sts';
 import { Credentials } from '@aws-sdk/types';
+import AppRegistryService from './helpers/appRegistryService';
 import CloudformationService from './helpers/cloudformationService';
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 import S3Service from './helpers/s3Service';
@@ -41,12 +44,15 @@ export default class AwsService {
     lambda: Lambda;
     sagemaker: SageMaker;
     kms: KMS;
+    appRegistry: ServiceCatalogAppRegistry;
+    serviceQuotas: ServiceQuotas;
   };
   public helpers: {
     cloudformation: CloudformationService;
     s3: S3Service;
     ddb: DynamoDBService;
     serviceCatalog: ServiceCatalogService;
+    appRegistryService: AppRegistryService;
   };
 
   public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
@@ -66,14 +72,21 @@ export default class AwsService {
       ddb: new DynamoDB(options),
       lambda: new Lambda(options),
       sagemaker: new SageMaker(options),
-      kms: new KMS(options)
+      kms: new KMS(options),
+      appRegistry: new ServiceCatalogAppRegistry(options),
+      serviceQuotas: new ServiceQuotas(options)
     };
 
     this.helpers = {
       cloudformation: new CloudformationService(this.clients.cloudformation),
       s3: new S3Service(this.clients.s3),
       ddb: new DynamoDBService({ region, table: ddbTableName || '' }),
-      serviceCatalog: new ServiceCatalogService(this.clients.serviceCatalog)
+      serviceCatalog: new ServiceCatalogService(this.clients.serviceCatalog),
+      appRegistryService: new AppRegistryService(
+        this.clients.appRegistry,
+        this.clients.cloudformation,
+        this.clients.serviceQuotas
+      )
     };
   }
 

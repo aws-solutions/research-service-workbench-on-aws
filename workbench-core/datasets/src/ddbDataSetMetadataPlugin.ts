@@ -5,10 +5,13 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
+  addPaginationToken,
   AwsService,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
+  PaginatedResponse,
   QueryParams,
+  toPaginationToken,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -50,17 +53,24 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return ExternalEndpointParser.parse(response.Item);
   }
 
-  public async listDataSets(): Promise<DataSet[]> {
-    const params: QueryParams = {
+  public async listDataSets(
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
+    const query: QueryParams = addPaginationToken(paginationToken, {
+      key: { name: 'resourceType', value: 'dataset' },
       index: 'getResourceByCreatedAt',
-      key: { name: 'resourceType', value: 'dataset' }
-    };
-    const response = await this._aws.helpers.ddb.query(params).execute();
+      limit: pageSize
+    });
 
-    if (!response.Items) {
-      return [];
-    }
-    return DataSetArrayParser.parse(response.Items);
+    const response = await this._aws.helpers.ddb.getPaginatedItems(query);
+
+    const dataSets = DataSetArrayParser.parse(response.data) || [];
+
+    return {
+      data: dataSets,
+      paginationToken: response.paginationToken
+    };
   }
 
   public async getDataSetMetadata(id: string): Promise<DataSet> {
@@ -146,11 +156,14 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endpoint;
   }
 
-  public async listStorageLocations(): Promise<StorageLocation[]> {
-    const datasets = await this.listDataSets();
+  public async listStorageLocations(
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<StorageLocation>> {
+    const response = await this.listDataSets(pageSize, paginationToken);
 
     const map = new Map<string, StorageLocation>();
-    datasets.forEach((dataset) =>
+    response.data.forEach((dataset) =>
       map.set(dataset.storageName, {
         name: dataset.storageName,
         awsAccountId: dataset.awsAccountId,
@@ -158,7 +171,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         region: dataset.region
       })
     );
-    return Array.from(map.values());
+    return {
+      data: Array.from(map.values()),
+      paginationToken: response.paginationToken
+    };
   }
 
   private async _validateCreateExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<void> {
@@ -210,5 +226,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       key: buildDynamoDBPkSk(dataSet.id, this._dataSetKeyType),
       params: { item: dataSetItem }
     });
+  }
+
+  public getPaginationToken(dataSetId: string): string {
+    return toPaginationToken(buildDynamoDBPkSk(dataSetId, this._dataSetKeyType));
   }
 }

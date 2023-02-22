@@ -138,7 +138,7 @@ describe('multiStep dataset integration test', () => {
       .dataset(dataSet.id)
       .listAccessPermissions();
     const sortedActual: DataSetPermission[] = responseData.data.permissions.sort(
-      (p1: DataSetPermission, p2: DataSetPermission) => p1.accessLevel < p2.accessLevel
+      (p1: DataSetPermission, p2: DataSetPermission) => p1.accessLevel.localeCompare(p2.accessLevel)
     );
     const expected: DataSetPermission[] = [
       {
