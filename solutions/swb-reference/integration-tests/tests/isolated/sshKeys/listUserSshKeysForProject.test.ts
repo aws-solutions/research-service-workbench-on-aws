@@ -12,24 +12,24 @@ describe('listUserSshKeysForProject negative tests', () => {
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
-  let project2: { id: string };
+  let project2Id: string;
 
-  beforeEach(async () => {
-    ({ adminSession, pa1Session, project2 } = await paabHelper.createResources());
+  beforeAll(async () => {
+    ({ adminSession, pa1Session, project2Id } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await paabHelper.cleanup();
   });
 
   describe('with User that is not authorized', () => {
     test.skip('it throws 403 error', async () => {
       try {
-        const response = await pa1Session.resources.projects.project(project2.id).sshKeys().get();
+        const response = await pa1Session.resources.projects.project(project2Id).sshKeys().get();
         console.log('response', response);
       } catch (e) {
         checkHttpError(
