@@ -9,6 +9,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
+import { isProjectDeletedError } from './errors/projectDeletedError';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { processValidatorResult } from './validatorHelper';
 
@@ -30,7 +31,15 @@ export function setUpProjectEnvRoutes(
         if (req.body.id) {
           throw badRequest('id cannot be passed in the request body when trying to launch a new environment');
         }
-        const env: Environment = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
+        let env: Environment;
+        try {
+          env = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
+        } catch (e) {
+          if (isProjectDeletedError(e)) {
+            throw badRequest(e.message);
+          }
+          throw e;
+        }
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
           await environments[`${envType}`].lifecycle.launch(env);

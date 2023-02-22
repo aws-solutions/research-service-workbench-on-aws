@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProjectEnvPlugin } from '@aws/swb-app';
+import { ProjectEnvPlugin, ProjectDeletedError } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
+import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import {
   Action,
   AuthenticatedUser,
@@ -48,7 +49,11 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     },
     authenticatedUser: AuthenticatedUser
   ): Promise<Environment> {
-    await this._projectService.getProject({ projectId: params.projectId });
+    const project = await this._projectService.getProject({ projectId: params.projectId });
+
+    if (project.status === ProjectStatus.DELETED) {
+      throw new ProjectDeletedError(`Project ${params.projectId} was deleted`);
+    }
 
     const env: Environment = await this._envService.createEnvironment(params, authenticatedUser);
 

@@ -2,8 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { ConflictError } from '@aws/swb-app';
+import { ConflictError, ProjectDeletedError } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
+import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
@@ -85,7 +86,9 @@ describe('projectEnvTypeConfigService', () => {
 
   describe('associateProjectAndEnvTypeConfig', () => {
     beforeEach(() => {
-      mockProjectService.getProject = jest.fn().mockReturnValue({});
+      mockProjectService.getProject = jest.fn().mockReturnValue({
+        status: ProjectStatus.AVAILABLE
+      });
       mockEnvironmentTypeConfigService.getEnvironmentTypeConfig = jest.fn().mockReturnValue({});
       mockMetadataService.updateRelationship = jest.fn().mockReturnValue({});
       mockDynamicAuthService.createIdentityPermissions = jest.fn().mockReturnValue({});
@@ -109,6 +112,16 @@ describe('projectEnvTypeConfigService', () => {
       await expect(
         projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest)
       ).resolves.not.toThrow();
+    });
+    test('fails when project was deleted', async () => {
+      mockProjectService.getProject = jest.fn().mockReturnValue({
+        status: ProjectStatus.DELETED
+      });
+
+      // OPERATE n CHECK
+      await expect(() =>
+        projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest)
+      ).rejects.toThrowError(ProjectDeletedError);
     });
   });
 });

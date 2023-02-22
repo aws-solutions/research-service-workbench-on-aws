@@ -15,6 +15,7 @@ import { Ec2Error, isEc2Error } from './ec2Error';
 import { isNoInstanceFoundError, NoInstanceFoundError } from './noInstanceFoundError';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
+import { isProjectDeletedError, ProjectDeletedError } from './projectDeletedError';
 
 describe('custom error tests', () => {
   test('databaseError', () => {
@@ -62,6 +63,11 @@ describe('custom error tests', () => {
     expect(isNoInstanceFoundError(noInstanceFoundError)).toBe(true);
   });
 
+  test('projectDeletedError', () => {
+    const projectDeletedError = new ProjectDeletedError();
+    expect(isProjectDeletedError(projectDeletedError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
@@ -103,6 +109,10 @@ describe('custom error tests', () => {
 
     test('not noInstanceFoundError', () => {
       expect(isNoInstanceFoundError(error)).toBe(false);
+    });
+
+    test('not projectDeletedError', () => {
+      expect(isProjectDeletedError(error)).toBe(false);
     });
   });
 });
