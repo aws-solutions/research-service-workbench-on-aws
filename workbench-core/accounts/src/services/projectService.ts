@@ -22,6 +22,7 @@ import {
   DynamoDBService
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';
 import { CostCenter } from '../models/costCenters/costCenter';
 import { CreateProjectRequest } from '../models/projects/createProjectRequest';
@@ -395,11 +396,18 @@ export default class ProjectService {
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {
+    let costCenter: CostCenter;
     try {
-      return this._costCenterService.getCostCenter(costCenterId);
+      costCenter = await this._costCenterService.getCostCenter(costCenterId);
     } catch (e) {
       throw Boom.badRequest(`Could not find cost center ${costCenterId}`);
     }
+
+    if (costCenter.status !== CostCenterStatus.AVAILABLE) {
+      throw Boom.badRequest(`Cost center ${costCenterId} was deleted`);
+    }
+
+    return costCenter;
   }
 
   /**
