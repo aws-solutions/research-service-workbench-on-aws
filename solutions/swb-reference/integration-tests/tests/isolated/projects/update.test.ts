@@ -4,7 +4,6 @@
  */
 
 import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
-import { afterEach } from 'jest-circus';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -18,10 +17,17 @@ describe('Update Project negative tests', () => {
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let costCenterId: string;
 
+  beforeAll(async () => {
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
   beforeEach(async () => {
     expect.hasAssertions();
 
-    adminSession = await setup.getDefaultAdminSession();
     const projectName = randomTextGenerator.getFakeText('test-project-name');
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
@@ -34,15 +40,11 @@ describe('Update Project negative tests', () => {
 
     const { data: project } = await adminSession.resources.projects.create({
       name: projectName,
-      description: 'Project for TOP SECRET dragon research',
+      description: 'Update Project negative tests--Project for TOP SECRET dragon research',
       costCenterId: costCenter.id
     });
 
     existingProject = project;
-  });
-
-  afterEach(async () => {
-    await setup.cleanup();
   });
 
   describe('updating name to be same as existing project', () => {
@@ -51,7 +53,7 @@ describe('Update Project negative tests', () => {
     beforeEach(async () => {
       const { data: newProject } = await adminSession.resources.projects.create({
         name: randomTextGenerator.getFakeText('test-existing-name'),
-        description: 'Project for TOP SECRET dragon research',
+        description: 'Update Project negative tests--Second Project',
         costCenterId: costCenterId
       });
 

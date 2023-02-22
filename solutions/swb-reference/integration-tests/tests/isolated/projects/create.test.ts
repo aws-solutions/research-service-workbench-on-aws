@@ -23,10 +23,16 @@ describe('Create Project negative tests', () => {
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let createRequest: CreateRequest;
 
+  beforeAll(async () => {
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
   beforeEach(async () => {
     expect.hasAssertions();
-
-    adminSession = await setup.getDefaultAdminSession();
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'project integration test cost center',
@@ -35,13 +41,6 @@ describe('Create Project negative tests', () => {
     });
     costCenterId = costCenter.id;
 
-    existingProjectName = randomTextGenerator.getFakeText('test-project-name');
-    await adminSession.resources.projects.create({
-      name: existingProjectName,
-      description: 'Project for TOP SECRET dragon research',
-      costCenterId
-    });
-
     createRequest = {
       name: 'valid name',
       description: 'valid description',
@@ -49,13 +48,15 @@ describe('Create Project negative tests', () => {
     };
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
-  });
-
   describe('with a name', () => {
     describe('that belongs to an existing project', () => {
       beforeEach(async () => {
+        existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+        await adminSession.resources.projects.create({
+          name: existingProjectName,
+          description: 'Create Project negative tests--Project for TOP SECRET dragon research',
+          costCenterId
+        });
         createRequest.name = existingProjectName;
       });
 

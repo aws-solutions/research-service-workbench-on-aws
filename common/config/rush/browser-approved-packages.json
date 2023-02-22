@@ -475,10 +475,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "jest-circus",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "jest-fast-check",
       "allowedCategories": [ "production", "prototypes" ]
     },

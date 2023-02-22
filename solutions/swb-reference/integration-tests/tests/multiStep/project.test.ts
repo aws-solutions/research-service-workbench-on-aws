@@ -13,9 +13,11 @@ describe('multiStep project tests', () => {
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let projectName: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+  });
 
+  beforeEach(async () => {
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'project integration test cost center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
@@ -34,7 +36,7 @@ describe('multiStep project tests', () => {
     console.log('Creating Project');
     const { data: createdProject } = await adminSession.resources.projects.create({
       name: projectName,
-      description: 'Project for TOP SECRET dragon research',
+      description: 'happy path--Project for TOP SECRET dragon research',
       costCenterId
     });
 
@@ -50,7 +52,7 @@ describe('multiStep project tests', () => {
 
     console.log('Updating Project');
     const newName = randomTextGenerator.getFakeText('test-project-name');
-    const newDescription = 'Not a Project studying dragons!';
+    const newDescription = 'Happy path--Not a Project studying dragons!';
     const { data: updatedProject } = await adminSession.resources.projects
       .project(createdProject.id)
       .update({ name: newName, description: newDescription }, true);

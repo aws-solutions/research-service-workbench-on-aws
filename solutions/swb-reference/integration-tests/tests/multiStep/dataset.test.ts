@@ -20,9 +20,15 @@ describe('multiStep dataset integration test', () => {
   let projectId: string;
   let costCenterId: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+  });
 
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
+  beforeEach(async () => {
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
 
@@ -40,10 +46,6 @@ describe('multiStep dataset integration test', () => {
     });
 
     projectId = createdProject.id;
-  });
-
-  afterEach(async () => {
-    await setup.cleanup();
   });
 
   test('Environment provisioning with DataSet', async () => {
