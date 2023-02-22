@@ -5,6 +5,7 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -252,7 +253,11 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
+  public async listDataSets(
+    authenticatedUser: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -260,24 +265,41 @@ export class DataSetService {
         serviceName: DataSetService.name
       }
     };
-
     try {
-      const response: DataSet[] = [];
-      const allDatasets = await this._dbProvider.listDataSets();
+      const authedDataSets: DataSet[] = [];
 
-      await Promise.all(
-        allDatasets.map(async (dataset) => {
-          try {
-            // throws a ForbiddenError if the user doesnt have permission on the dataset
-            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
-            response.push(dataset);
-          } catch (error) {
-            if (!isForbiddenError(error)) {
-              throw error;
+      let lastPaginationToken = paginationToken;
+      do {
+        const pluginResponse = await this._dbProvider.listDataSets(pageSize, lastPaginationToken);
+
+        await Promise.all(
+          pluginResponse.data.map(async (dataset) => {
+            try {
+              await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+              authedDataSets.push(dataset);
+            } catch (error) {
+              if (!isForbiddenError(error)) {
+                throw error;
+              }
             }
-          }
-        })
-      );
+          })
+        );
+        lastPaginationToken = pluginResponse.paginationToken;
+      } while (authedDataSets.length < pageSize && lastPaginationToken);
+
+      let sortedDataSets = authedDataSets.sort((a: DataSet, b: DataSet) => {
+        return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+      });
+
+      if (authedDataSets.length > pageSize) {
+        sortedDataSets = sortedDataSets.slice(0, pageSize);
+        lastPaginationToken = this._dbProvider.getPaginationToken(sortedDataSets[pageSize - 1].id);
+      }
+
+      const response = {
+        data: sortedDataSets,
+        paginationToken: lastPaginationToken
+      };
 
       await this._audit.write(metadata, response);
       return response;
@@ -585,10 +607,11 @@ export class DataSetService {
    *
    * @returns - a list of {@link StorageLocation}s
    */
-  public async listStorageLocations(authenticatedUser: {
-    id: string;
-    roles: string[];
-  }): Promise<StorageLocation[]> {
+  public async listStorageLocations(
+    authenticatedUser: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<StorageLocation>> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listStorageLocations.name,
@@ -597,7 +620,7 @@ export class DataSetService {
       }
     };
     try {
-      const response = await this._dbProvider.listStorageLocations();
+      const response = await this._dbProvider.listStorageLocations(pageSize, paginationToken);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {

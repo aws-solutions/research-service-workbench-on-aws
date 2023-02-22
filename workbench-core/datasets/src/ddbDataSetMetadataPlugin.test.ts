@@ -18,7 +18,7 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, PaginatedResponse } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
@@ -90,27 +90,30 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      const response = await plugin.listDataSets();
-      expect(response).toMatchObject<DataSet[]>([
-        {
-          id: mockDataSetId,
-          name: mockDataSetName,
-          path: mockDataSetPath,
-          awsAccountId: mockAwsAccountId,
-          storageType: mockDataSetStorageType,
-          storageName: mockDataSetStorageName,
-          createdAt: mockCreatedAt
-        }
-      ]);
+      const response = await plugin.listDataSets(1, undefined);
+      expect(response).toMatchObject<PaginatedResponse<DataSet>>({
+        data: [
+          {
+            id: mockDataSetId,
+            name: mockDataSetName,
+            path: mockDataSetPath,
+            awsAccountId: mockAwsAccountId,
+            storageType: mockDataSetStorageType,
+            storageName: mockDataSetStorageName,
+            createdAt: mockCreatedAt
+          }
+        ],
+        paginationToken: undefined
+      });
     });
 
     it('returns an empty array if there are no DataSets to list', async () => {
       mockDdb.on(QueryCommand).resolves({});
 
-      const response: DataSet[] = await plugin.listDataSets();
-      expect(response).toBeDefined();
-      expect(response).toHaveLength(0);
-      expect(response).toStrictEqual([]);
+      const response: PaginatedResponse<DataSet> = await plugin.listDataSets(1, undefined);
+      expect(response.data).toBeDefined();
+      expect(response.data).toHaveLength(0);
+      expect(response.data).toStrictEqual([]);
     });
   });
 
@@ -419,10 +422,10 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      const response = await plugin.listStorageLocations();
-      expect(response).toBeDefined();
-      expect(response).toHaveLength(1);
-      expect(response).toMatchObject<StorageLocation[]>([
+      const response = await plugin.listStorageLocations(1, undefined);
+      expect(response.data).toBeDefined();
+      expect(response.data).toHaveLength(1);
+      expect(response.data).toMatchObject<StorageLocation[]>([
         {
           name: mockDataSetStorageName,
           awsAccountId: mockAwsAccountId,
