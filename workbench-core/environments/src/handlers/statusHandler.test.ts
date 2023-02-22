@@ -232,11 +232,14 @@ describe('StatusHandler', () => {
   test('execute updates with recent status on non-Launch operation', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
+    const environmentLifecycleHelper = {} as EnvironmentLifecycleHelper;
     environment.status = 'COMPLETED';
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
     envService.addMetadata = jest.fn();
+    environmentLifecycleHelper.getAwsSdkForEnvMgmtRole = jest.fn().mockReturnValueOnce({});
     statusHandler['_getEnvService'] = jest.fn(() => envService);
+    statusHandler['_getEnvHelper'] = jest.fn(() => environmentLifecycleHelper);
 
     // OPERATE
     await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
@@ -252,6 +255,8 @@ describe('StatusHandler', () => {
   test('execute updates with failure status', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
+    const environmentLifecycleHelper = {} as EnvironmentLifecycleHelper;
+    environmentLifecycleHelper.getAwsSdkForEnvMgmtRole = jest.fn().mockReturnValueOnce({});
     environment.status = 'COMPLETED';
     ebToDDB.errorMsg = 'Instance ran into error and cannot be terminated';
     ebToDDB.status = 'TERMINATING_FAILED';
@@ -259,6 +264,7 @@ describe('StatusHandler', () => {
     envService.updateEnvironment = jest.fn();
     envService.addMetadata = jest.fn();
     statusHandler['_getEnvService'] = jest.fn(() => envService);
+    statusHandler['_getEnvHelper'] = jest.fn(() => environmentLifecycleHelper);
 
     // OPERATE
     await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
