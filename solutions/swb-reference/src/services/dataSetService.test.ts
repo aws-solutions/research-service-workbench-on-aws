@@ -10,6 +10,7 @@ import {
   DataSetStoragePlugin,
   PermissionsResponse
 } from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequestParser } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
@@ -108,7 +109,7 @@ describe('DataSetService', () => {
     });
 
     test('for listDataSets', async () => {
-      await dataSetService.listDataSets({} as AuthenticatedUser);
+      await dataSetService.listDataSets({} as AuthenticatedUser, 1, undefined);
       expect(mockWorkbenchDataSetService.listDataSets).toHaveBeenCalled();
     });
   });
@@ -651,6 +652,36 @@ describe('DataSetService', () => {
           });
         });
       });
+    });
+  });
+
+  describe('listDataSetAccessPermissions', () => {
+    beforeEach(() => {
+      const response: PermissionsResponse = {
+        data: {
+          dataSetId: mockDataSet.id!,
+          permissions: [
+            {
+              accessLevel: 'read-only',
+              identity: `${projectId}#Researcher`,
+              identityType: 'GROUP'
+            }
+          ]
+        }
+      };
+      mockWorkbenchDataSetService.getAllDataSetAccessPermissions = jest.fn().mockReturnValueOnce(response);
+    });
+
+    test('it delegates to the workbench-core DataSetService method', async () => {
+      const request = ListDataSetAccessPermissionsRequestParser.parse({
+        dataSetId: mockDataSet.id!,
+        authenticatedUser: mockUser,
+        paginationToken: ''
+      });
+
+      await dataSetService.listDataSetAccessPermissions(request);
+
+      expect(mockWorkbenchDataSetService.getAllDataSetAccessPermissions).toHaveBeenCalled();
     });
   });
 });

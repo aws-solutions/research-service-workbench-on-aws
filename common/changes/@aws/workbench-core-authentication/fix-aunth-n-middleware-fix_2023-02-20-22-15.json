@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Updated getUserRolesFromToken to not throw when roles are not found.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

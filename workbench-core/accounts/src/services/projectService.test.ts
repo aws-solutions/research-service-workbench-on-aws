@@ -36,6 +36,7 @@ import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { Project } from '../models/projects/project';
@@ -199,7 +200,8 @@ describe('ProjectService', () => {
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
-    vpcId: 'vpc-0b0bc7ae01d82e7b3'
+    vpcId: 'vpc-0b0bc7ae01d82e7b3',
+    status: CostCenterStatus.AVAILABLE
   };
 
   const noUserGroupsFunction = jest.fn((request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> => {
@@ -1445,6 +1447,58 @@ describe('ProjectService', () => {
       await expect(projService.createProject(params, user)).rejects.toThrow(
         'Could not find cost center cc-123'
       );
+    });
+
+    test('fail on create a project with deleted cost center', async () => {
+      // BUILD
+      const params = {
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
+      };
+
+      // mock isProjectNameInUse call
+      const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
+        Count: 0,
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#name': 'name'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':name': {
+              S: 'Example project'
+            }
+          }
+        })
+        .resolves(isProjectNameValidQueryItemResponse);
+
+      // mock getCostCenter call
+      const getCostCenterGetItemResponse: GetItemCommandOutput = {
+        Item: marshall({ ...costCenterItem, status: CostCenterStatus.DELETED }),
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: 'exampleDDBTable',
+          Key: marshall({
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
+          })
+        })
+        .resolves(getCostCenterGetItemResponse);
+
+      // OPERATE n CHECK
+      await expect(projService.createProject(params, user)).rejects.toThrow('Cost center cc-123 was deleted');
     });
 
     test('fail on update to DDB call', async () => {

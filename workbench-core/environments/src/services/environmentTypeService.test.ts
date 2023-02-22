@@ -19,6 +19,7 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { EnvironmentTypeConfig } from '../models/environmentTypeConfigs/environmentTypeConfig';
 import { EnvironmentType } from '../models/environmentTypes/environmentType';
+import { EnvironmentTypeConfigStatus } from '../constants/environmentTypeConfigStatus';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 
@@ -54,7 +55,8 @@ describe('environmentTypeService', () => {
     updatedAt: '2022-06-17T21:25:24.333Z',
     description: 'Example config 1',
     id: envTypeConfigId,
-    type: 'sagemaker'
+    type: 'sagemaker',
+    status: EnvironmentTypeConfigStatus.AVAILABLE
   };
   const listEnvTypeConfigCommandParams = {
     TableName: TABLE_NAME,

@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
+import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
 import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
@@ -64,7 +65,7 @@ describe('multiStep dataset integration test', () => {
         {
           identity: getResearcherRole(projectId),
           identityType: 'GROUP',
-          accessLevel: 'read-only'
+          accessLevel: 'read-write'
         }
       ]
     });
@@ -131,6 +132,28 @@ describe('multiStep dataset integration test', () => {
     await adminSession.resources.datasets
       .dataset(dataSet.id)
       .associateWithProject(unassociatedProject.id, 'read-only');
+
+    console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
+    const { data: responseData } = await adminSession.resources.datasets
+      .dataset(dataSet.id)
+      .listAccessPermissions();
+    const sortedActual: DataSetPermission[] = responseData.data.permissions.sort(
+      (p1: DataSetPermission, p2: DataSetPermission) => p1.accessLevel.localeCompare(p2.accessLevel)
+    );
+    const expected: DataSetPermission[] = [
+      {
+        accessLevel: 'read-only',
+        identity: `${unassociatedProject.id}#ProjectAdmin`,
+        identityType: 'GROUP'
+      },
+      {
+        accessLevel: 'read-write',
+        identity: `${projectId}#Researcher`,
+        identityType: 'GROUP'
+      }
+    ];
+
+    expect(sortedActual).toEqual(expected);
 
     console.log('DISASSOCIATE FROM PROJECT');
     await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
