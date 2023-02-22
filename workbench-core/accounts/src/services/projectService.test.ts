@@ -1418,7 +1418,7 @@ describe('ProjectService', () => {
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow('Cost center cc-123 was deleted');
+      await expect(projService.createProject(params)).rejects.toThrow('Cost center cc-123 was deleted');
     });
 
     test('fail on update to DDB call', async () => {
