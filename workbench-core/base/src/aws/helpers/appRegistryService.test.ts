@@ -77,7 +77,7 @@ describe('appRegistryService', () => {
       ).resolves.not.toThrow();
       expect(mockServiceCatalogAppRegistry.associateResource).toHaveBeenCalledTimes(0);
     });
-    test('Excecutes Successfully', async () => {
+    test('Executes Successfully', async () => {
       await expect(
         appRegistryService.associateStackToAppRegistry(appRegistryName, stackName)
       ).resolves.not.toThrow();
@@ -107,7 +107,7 @@ describe('appRegistryService', () => {
       ).resolves.not.toThrow();
       expect(mockServiceCatalogAppRegistry.disassociateResource).toHaveBeenCalledTimes(0);
     });
-    test('Excecutes Successfully', async () => {
+    test('Executes Successfully', async () => {
       await expect(
         appRegistryService.disassociateStackToAppRegistry(appRegistryName, stackName)
       ).resolves.not.toThrow();
