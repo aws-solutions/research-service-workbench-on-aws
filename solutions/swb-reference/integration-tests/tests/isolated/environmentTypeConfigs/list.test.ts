@@ -24,7 +24,7 @@ describe('list environment type configs', () => {
     await setup.cleanup();
   });
 
-  test('list environments type configs excecutes successfully', async () => {
+  test('list environments type configs executes successfully', async () => {
     const { data: response } = await adminSession.resources.environmentTypes
       .environmentType(envTypeId)
       .configurations()

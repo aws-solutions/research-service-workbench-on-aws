@@ -25,7 +25,7 @@ To test the new Service Workbench on AWS v2 r0.1.0, follow the deployment instru
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-96.35%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.93%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.95%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-96.31%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-95.48%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-86.79%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-85.07%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.42%25-brightgreen.svg?style=flat) |
 
 ## Requirements
 
@@ -98,7 +98,7 @@ To run integration tests
 
 2. For `envTypeId` and `envType` open Postman Collection and select `List envTypes` inside `envType` folder (If Postman collection is not setup follow instructions [here](./SETUP_v2p1.md##postman-setup))
 
-    1. Excecute `List envTypes` request, you should get a json response with the next information
+    1. Execute `List envTypes` request, you should get a json response with the next information
         ```
             {
             "data": [
@@ -174,7 +174,7 @@ To run integration tests
     
     1. Replace `:envTypeId` in the URL request `{{API_URL}}/environmentTypes/:envTypeId/configurations` with value of the environment type id from the previous step.
 
-    2. Excecute `List envTypeConfigs` request, you should get a json response with the next information
+    2. Execute `List envTypeConfigs` request, you should get a json response with the next information
         ```
         {
             "data": [
@@ -225,7 +225,7 @@ To run integration tests
 
 4. For `projectId`, `costCenterId`, and `projectName`, open Postman Collection and select `List projects` inside `projects` folder.
 
-    1. Excecute `List projects` request, you should get a json response with the next information
+    1. Execute `List projects` request, you should get a json response with the next information
         ```
         {
             "data": [
@@ -291,15 +291,15 @@ To run integration tests
 
     4. In `./integration-tests/config` directory assign value copied to `terminatedEnvId` property in `<STAGE>.yaml` file. 
 
-    5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and excecute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and excecute `List Environments` request again.
+    5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and execute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and execute `List Environments` request again.
 
     6. Once environment is completed select `Stop Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id/stop` with the id of the environment created in previous step.
 
-    7. Excecute `Stop Environment` and wait until environment has status `STOPPED`, use `List Environments` request to monitor status.
+    7. Execute `Stop Environment` and wait until environment has status `STOPPED`, use `List Environments` request to monitor status.
 
     8. Once environemnt is stopped select `Terminate Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id` with the id of the environment created in previous step.
 
-    9. Excecute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
+    9. Execute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
    
 
 5. For `rootUsername`, type the email of the root user that is going to login into the application to run the integration tests, this is configured in `<STAGE>.yaml` file in `./src/config` directory for the installation step

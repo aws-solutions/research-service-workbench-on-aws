@@ -27,7 +27,7 @@ describe('list projects associated to environment type config', () => {
     await setup.cleanup();
   });
 
-  test('list envTypeConfigProjects excecutes successfully', async () => {
+  test('list envTypeConfigProjects executes successfully', async () => {
     const { data: response } = await adminSession.resources.environmentTypes
       .environmentType(envTypeId)
       .configurations()

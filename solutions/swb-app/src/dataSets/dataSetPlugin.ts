@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
 import { AuthenticatedUser } from '../users/authenticatedUser';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
@@ -11,6 +12,7 @@ import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpoint
 import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
+import { ListDataSetAccessPermissionsRequest } from './listDataSetAccessPermissionsRequestParser';
 import { PermissionsResponse } from './permissionsResponseParser';
 import { ProjectAddAccessRequest } from './projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from './projectRemoveAccessRequestParser';
@@ -25,7 +27,12 @@ export interface DataSetPlugin {
     request: DataSetExternalEndpointRequest
   ): Promise<DataSetAddExternalEndpointResponse>;
   getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet>;
-  listDataSets(user: AuthenticatedUser): Promise<DataSet[]>;
+  listDataSets(
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>>;
+  listDataSetAccessPermissions(request: ListDataSetAccessPermissionsRequest): Promise<PermissionsResponse>;
   getSinglePartFileUploadUrl(
     dataSetId: string,
     fileName: string,

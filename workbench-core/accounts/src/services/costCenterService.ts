@@ -17,6 +17,7 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
@@ -50,7 +51,7 @@ export default class CostCenterService {
       await this._dynamoDbService.updateExecuteAndFormat({
         key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
         params: {
-          item: { resourceType: `${this._resourceType}_deleted` }
+          item: { status: CostCenterStatus.DELETED, resourceType: `${this._resourceType}_deleted` }
         }
       });
     } catch (e) {
@@ -65,6 +66,7 @@ export default class CostCenterService {
    */
   public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
     await this.getCostCenter(request.id);
+
     const currentDate = new Date().toISOString();
     const updatedCostCenter = {
       name: request.name,
@@ -117,6 +119,7 @@ export default class CostCenterService {
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     const response = (await this._dynamoDbService
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
+      .strong()
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
@@ -146,7 +149,8 @@ export default class CostCenterService {
       subnetId: account.subnetId!,
       vpcId: account.vpcId!,
       environmentInstanceFiles: account.environmentInstanceFiles!,
-      externalId: account.externalId
+      externalId: account.externalId,
+      status: CostCenterStatus.AVAILABLE
     };
 
     const dynamoItem: { [key: string]: string } = {
