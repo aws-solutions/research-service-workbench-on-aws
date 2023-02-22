@@ -4,10 +4,15 @@
  */
 
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import {
+  DEFAULT_API_PAGE_SIZE,
+  resourceTypeToKey,
+  uuidWithLowercasePrefixRegExp
+} from '@aws/workbench-core-base';
 import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { toNumber } from 'lodash';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
   CreateExternalEndpointRequest,
@@ -146,7 +151,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const response = await dataSetService.listDataSets(authenticatedUser);
+      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
+      const paginationToken = req.query.paginationToken?.toString();
+
+      const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
       res.send(response);
     })
   );

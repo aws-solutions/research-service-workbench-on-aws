@@ -109,7 +109,7 @@ describe('DataSetService', () => {
     });
 
     test('for listDataSets', async () => {
-      await dataSetService.listDataSets({} as AuthenticatedUser);
+      await dataSetService.listDataSets({} as AuthenticatedUser, 1, undefined);
       expect(mockWorkbenchDataSetService.listDataSets).toHaveBeenCalled();
     });
   });
