@@ -5,12 +5,7 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
-import {
-  buildDynamoDBPkSk,
-  PaginatedResponse,
-  resourceTypeToKey,
-  toPaginationToken
-} from '@aws/workbench-core-base';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';

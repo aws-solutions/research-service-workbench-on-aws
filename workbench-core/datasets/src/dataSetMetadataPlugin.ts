@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { JSONValue, PaginatedResponse } from '@aws/workbench-core-base';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { CreateDataSet, DataSet } from './models/dataSet';
 import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { StorageLocation } from './models/storageLocation';
