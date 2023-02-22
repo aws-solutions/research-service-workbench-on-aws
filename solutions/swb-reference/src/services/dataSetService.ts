@@ -25,6 +25,7 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
@@ -128,8 +129,12 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.importDataSet(request);
   }
 
-  public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
-    return this._workbenchDataSetService.listDataSets(user);
+  public listDataSets(
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
+    return this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
   }
 
   public async listDataSetAccessPermissions(

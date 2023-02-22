@@ -16,7 +16,7 @@ import {
   ForbiddenError,
   WBCGroupManagementPlugin
 } from '@aws/workbench-core-authorization';
-import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
+import { AwsService, DynamoDBService, PaginatedResponse } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetService } from './dataSetService';
@@ -166,19 +166,24 @@ describe('DataSetService', () => {
     log = new LoggingService();
     metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
 
-    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockImplementation(async () => {
-      return [
-        {
-          id: mockDataSetId,
-          name: mockDataSetName,
-          path: mockDataSetPath,
-          awsAccountId: mockAwsAccountId,
-          storageType: mockDataSetStorageType,
-          storageName: mockDataSetStorageName,
-          createdAt: mockCreatedAt
-        }
-      ];
-    });
+    jest
+      .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
+      .mockImplementation(async (pageSize: number, paginationToken: string | undefined) => {
+        return {
+          data: [
+            {
+              id: mockDataSetId,
+              name: mockDataSetName,
+              path: mockDataSetPath,
+              awsAccountId: mockAwsAccountId,
+              storageType: mockDataSetStorageType,
+              storageName: mockDataSetStorageName,
+              createdAt: mockCreatedAt
+            }
+          ],
+          paginationToken: undefined
+        };
+      });
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetMetadata')
       .mockImplementation(async (id: string): Promise<DataSet> => {
@@ -318,16 +323,21 @@ describe('DataSetService', () => {
         accessLevel: mockReadOnlyAccessLevel
       };
     });
-    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations').mockImplementation(async () => {
-      return [
-        {
-          name: mockDataSetStorageName,
-          awsAccountId: mockAwsAccountId,
-          type: mockDataSetStorageType,
-          region: mockAwsBucketRegion
-        }
-      ];
-    });
+    jest
+      .spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations')
+      .mockImplementation(async (pageSize: number, paginationToken: string | undefined) => {
+        return {
+          data: [
+            {
+              name: mockDataSetStorageName,
+              awsAccountId: mockAwsAccountId,
+              type: mockDataSetStorageType,
+              region: mockAwsBucketRegion
+            }
+          ],
+          paginationToken: undefined
+        };
+      });
 
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'getStorageType').mockImplementation(() => {
       return mockDataSetStorageType;
@@ -1129,36 +1139,52 @@ describe('DataSetService', () => {
     });
 
     it('returns the array of DataSets the authenticated user has access to when the user has access to all the datasets.', async () => {
-      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toMatchObject<
+        PaginatedResponse<DataSet>
+      >({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
     });
 
     it('returns the array of DataSets the authenticated user has access to when the user doesnt have access to some of the datasets.', async () => {
-      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '2' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
       jest
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
         .mockResolvedValueOnce()
         .mockRejectedValueOnce(new ForbiddenError()) // no permissions on dataset 2
         .mockResolvedValueOnce();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toMatchObject<DataSet[]>([
-        { ...mockDataSetWithoutId, id: '1' },
-        { ...mockDataSetWithoutId, id: '3' }
-      ]);
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toMatchObject<
+        PaginatedResponse<DataSet>
+      >({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
     });
 
     it('generates an audit event when an error is thrown', async () => {
@@ -1166,10 +1192,55 @@ describe('DataSetService', () => {
         .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
         .mockRejectedValueOnce(new Error('intentional test error'));
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).rejects.toThrowError(
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).rejects.toThrowError(
         new Error('intentional test error')
       );
       expect(audit.write).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns a pagination token when there are more results than pageSize', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 1, undefined);
+      expect(result.paginationToken).not.toEqual(undefined);
+    });
+
+    it('does not return a pagination token when there exactly pageSize results', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined);
+      expect(result.paginationToken).toEqual(undefined);
+    });
+
+    it('does not return a pagination token when there are less results than pageSize', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 10, undefined);
+      expect(result.paginationToken).toEqual(undefined);
     });
 
     it('rethrows an unexpected error', async () => {
@@ -1177,7 +1248,7 @@ describe('DataSetService', () => {
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
         .mockRejectedValueOnce(new Error('some unknown error'));
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).rejects.toThrowError(
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 1, undefined)).rejects.toThrowError(
         new Error('some unknown error')
       );
     });
@@ -1590,25 +1661,28 @@ describe('DataSetService', () => {
 
   describe('listStorageLocations', () => {
     it('returns an array of known StorageLocations.', async () => {
-      await expect(dataSetService.listStorageLocations(mockAuthenticatedUser)).resolves.toMatchObject<
-        StorageLocation[]
-      >([
-        {
-          name: mockDataSetStorageName,
-          awsAccountId: mockAwsAccountId,
-          type: mockDataSetStorageType,
-          region: mockAwsBucketRegion
-        }
-      ]);
+      await expect(
+        dataSetService.listStorageLocations(mockAuthenticatedUser, 3, undefined)
+      ).resolves.toMatchObject<PaginatedResponse<StorageLocation>>({
+        data: [
+          {
+            name: mockDataSetStorageName,
+            awsAccountId: mockAwsAccountId,
+            type: mockDataSetStorageType,
+            region: mockAwsBucketRegion
+          }
+        ],
+        paginationToken: undefined
+      });
     });
     it('generates an audit event when an error is thrown', async () => {
       jest
         .spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations')
         .mockRejectedValueOnce(new Error('intentional test error'));
 
-      await expect(dataSetService.listStorageLocations(mockAuthenticatedUser)).rejects.toThrowError(
-        new Error('intentional test error')
-      );
+      await expect(
+        dataSetService.listStorageLocations(mockAuthenticatedUser, 3, undefined)
+      ).rejects.toThrowError(new Error('intentional test error'));
       expect(audit.write).toHaveBeenCalledTimes(1);
     });
   });
