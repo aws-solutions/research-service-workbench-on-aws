@@ -144,7 +144,7 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   projectPlugin: new SWBProjectService(dynamicAuthorizationService, projectService),
   projectService: projectService,
-  sshKeyService: new SshKeyService(aws, projectService),
+  sshKeyService: new SshKeyService(aws, projectService, environmentService),
   authorizationService: dynamicAuthorizationService,
   routesIgnored: DynamicRouteConfig.routesIgnored
 };

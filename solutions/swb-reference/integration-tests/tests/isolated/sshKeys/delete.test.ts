@@ -14,10 +14,11 @@ describe('Delete Key Pair negative tests', () => {
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
   let project1Id: string;
+  let project2Id: string;
   let sshKeyId: string;
 
   beforeEach(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
     expect.hasAssertions();
   });
 
@@ -62,23 +63,95 @@ describe('Delete Key Pair negative tests', () => {
     });
   });
 
-  describe('with Project that does not exist', () => {
+  describe('for project that does not exist', () => {
     let invalidProjectId: string;
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session
+      }
+    ];
 
     beforeEach(() => {
       invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
       sshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
 
-    test('it throws 404 error', async () => {
+    test.each(testBundle)('it throws 403/404 error', async (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      const session = sessionFunc();
+
+      console.log(`as ${username}`);
+
       try {
-        await adminSession.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).delete();
+        await session.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).delete();
       } catch (e) {
+        // TODO confirm error code 403/404
         checkHttpError(
           e,
           new HttpError(404, {
             error: 'Not Found',
             message: `Could not find project ${invalidProjectId}`
+          })
+        );
+      }
+    });
+  });
+
+  describe('for project that user does not have access to', () => {
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session,
+        projectId: () => project2Id
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session,
+        projectId: () => project2Id
+      }
+    ];
+
+    beforeEach(() => {
+      sshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+    });
+
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+      const session = sessionFunc();
+      const projectId = projectIdFunc();
+
+      console.log(`as ${username}`);
+
+      try {
+        await session.resources.projects.project(projectId).sshKeys().sshKey(sshKeyId).delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: `User is not authorized`
+          })
+        );
+      }
+    });
+  });
+
+  describe('with ITAdmin that cannot delete keys for a valid project', () => {
+    //TODO confirm if it's necessary to have a valid key here
+    const invalidSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+
+    test('it throws 403 error', async () => {
+      try {
+        await adminSession.resources.projects.project(project1Id).sshKeys().sshKey(invalidSshKeyId).delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: `User is not authorized`
           })
         );
       }
