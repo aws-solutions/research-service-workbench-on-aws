@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Add AVAILABLE/DELETE status to ETC",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

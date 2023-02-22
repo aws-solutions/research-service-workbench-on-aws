@@ -18,6 +18,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
+import { EnvironmentTypeConfigStatus } from '../constants/environmentTypeConfigStatus';
 import { EnvironmentTypeConfig } from '../models/environmentTypeConfigs/environmentTypeConfig';
 import { EnvironmentType } from '../models/environmentTypes/environmentType';
 
@@ -50,7 +51,8 @@ describe('environmentTypeConfigService', () => {
     updatedAt: '2022-06-17T21:25:24.333Z',
     description: 'Example config 1',
     id: envTypeConfigId,
-    type: 'sagemaker'
+    type: 'sagemaker',
+    status: EnvironmentTypeConfigStatus.AVAILABLE
   };
   const envTypeConfigDDBItem = {
     ...envTypeConfig,
