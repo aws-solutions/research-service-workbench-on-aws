@@ -12,30 +12,26 @@ describe('listUserSshKeysForProject negative tests', () => {
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
-  let project2: { id: string };
+  let project2Id: string;
 
-  beforeEach(async () => {
-    ({ adminSession, pa1Session, project2 } = await paabHelper.createResources());
+  beforeAll(async () => {
+    ({ adminSession, pa1Session, project2Id } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await paabHelper.cleanup();
   });
 
   describe('with User that is not authorized', () => {
-    beforeEach(() => {
-      //const pa2UserId = pa2Session.getUserId();
-    });
     test.skip('it throws 403 error', async () => {
       try {
-        const response = await pa1Session.resources.projects.project(project2.id).sshKeys().get();
+        const response = await pa1Session.resources.projects.project(project2Id).sshKeys().get();
         console.log('response', response);
       } catch (e) {
-        // console.error('actualError', e)
         checkHttpError(
           e,
           new HttpError(403, {
@@ -47,12 +43,8 @@ describe('listUserSshKeysForProject negative tests', () => {
   });
 
   describe('with Project that does not exist', () => {
-    let invalidProjectId: string;
-
-    beforeEach(() => {
-      invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
-    });
     test('it throws 404 error', async () => {
+      const invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
       try {
         await adminSession.resources.projects.project(invalidProjectId).sshKeys().get();
       } catch (e) {
