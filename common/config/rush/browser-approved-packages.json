@@ -87,6 +87,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-service-quotas",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-ssm",
       "allowedCategories": [ "production", "prototypes" ]
     },

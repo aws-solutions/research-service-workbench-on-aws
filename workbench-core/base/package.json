@@ -54,6 +54,8 @@
     "@aws-sdk/client-s3-control": "^3.212.0",
     "@aws-sdk/client-sagemaker": "^3.212.0",
     "@aws-sdk/client-service-catalog": "^3.212.0",
+    "@aws-sdk/client-service-catalog-appregistry": "^3.254.0",
+    "@aws-sdk/client-service-quotas": "^3.212.0",
     "@aws-sdk/client-ssm": "^3.212.0",
     "@aws-sdk/client-sts": "^3.212.0",
     "@aws-sdk/s3-request-presigner": "^3.212.0",
