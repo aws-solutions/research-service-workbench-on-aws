@@ -1198,6 +1198,51 @@ describe('DataSetService', () => {
       expect(audit.write).toHaveBeenCalledTimes(1);
     });
 
+    it('returns a pagination token when there are more results than pageSize', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 1, undefined);
+      expect(result.paginationToken).not.toEqual(undefined);
+    });
+
+    it('does not return a pagination token when there exactly pageSize results', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined);
+      expect(result.paginationToken).toEqual(undefined);
+    });
+
+    it('does not return a pagination token when there are less results than pageSize', async () => {
+      jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockResolvedValueOnce({
+        data: [
+          { ...mockDataSetWithoutId, id: '1' },
+          { ...mockDataSetWithoutId, id: '2' },
+          { ...mockDataSetWithoutId, id: '3' }
+        ],
+        paginationToken: undefined
+      });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
+
+      const result = await dataSetService.listDataSets(mockAuthenticatedUser, 10, undefined);
+      expect(result.paginationToken).toEqual(undefined);
+    });
+
     it('rethrows an unexpected error', async () => {
       jest
         .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet')
