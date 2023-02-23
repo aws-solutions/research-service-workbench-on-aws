@@ -2,6 +2,11 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import {
+  CreateDataSetRequest,
+  CreateDataSetRequestParser
+} from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
+import { getProjectAdminRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../clientSession';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
@@ -36,10 +41,10 @@ export class PaabHelper {
     });
 
     // create two projects
-    const ProjectNames: string[] = ['Project1', 'Project2'];
+    const projectNames: string[] = ['Project1', 'Project2'];
     const projectIds: string[] = [];
 
-    for (const projectName of ProjectNames) {
+    for (const projectName of projectNames) {
       // must follow Array order
       const projectResponse = await adminSession.resources.projects.create({
         name: this._randomTextGenerator.getFakeText(projectName),
@@ -51,11 +56,14 @@ export class PaabHelper {
     const [project1Id, project2Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
-    const pa1Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin1');
-    const pa2Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin2');
-    const rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
+    let pa1Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin1');
+    let pa2Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin2');
+    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
 
     // associate users with corresponding projects properly (as IT Admin)
+    console.log(`projects: ${projectIds}`);
+    console.log(`project1Id: ${project1Id}`);
+    console.log(`pa1SessionUserId: ${pa1Session.getUserId()!}`);
     await adminSession.resources.projects
       .project(project1Id)
       .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
@@ -66,6 +74,10 @@ export class PaabHelper {
       .project(project1Id)
       .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
 
+    pa1Session = await this._setup.getSessionForUserType('projectAdmin1');
+    pa2Session = await this._setup.getSessionForUserType('projectAdmin2');
+    rs1Session = await this._setup.getSessionForUserType('researcher1');
+
     return {
       adminSession,
       pa1Session,
@@ -74,6 +86,22 @@ export class PaabHelper {
       project1Id,
       project2Id
     };
+  }
+
+  public createDatasetRequest(projectId: string): CreateDataSetRequest {
+    const settings = this._setup.getSettings();
+    const dataSetName = this._randomTextGenerator.getFakeText('integration-test-dataSet');
+
+    return CreateDataSetRequestParser.parse({
+      storageName: settings.get('DataSetsBucketName'),
+      awsAccountId: settings.get('mainAccountId'),
+      path: dataSetName, // using same name to help potential troubleshooting
+      name: dataSetName,
+      region: settings.get('awsRegion'),
+      owner: getProjectAdminRole(projectId),
+      ownerType: 'GROUP',
+      type: 'internal'
+    });
   }
 
   public async cleanup(): Promise<void> {

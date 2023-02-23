@@ -43,18 +43,16 @@ import { validateAndParse } from './validatorHelper';
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
-    '/datasets',
+    '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
-      const dataSet = await dataSetService.provisionDataSet({
+      const dataSet = await dataSetService.provisionDataSet(req.params.projectId, {
         name: validatedRequest.name,
         storageName: validatedRequest.storageName,
         path: validatedRequest.path,
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: validatedRequest.owner,
-        ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
         permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
@@ -66,7 +64,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // import new prefix (assumes S3 bucket and path exist already)
   router.post(
-    '/datasets/import',
+    '/projects/:projectsId/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(req.body, CreateDataSetRequestParser);
       const dataSet = await dataSetService.importDataSet({
@@ -76,7 +74,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: validatedRequest.owner,
         type: validatedRequest.type,
         authenticatedUser: res.locals.user
       });
@@ -86,7 +83,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // share dataset
   router.post(
-    '/datasets/:id/share',
+    '/projects/:projectsId/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
@@ -106,7 +103,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Get dataset
   router.get(
-    '/datasets/:dataSetId',
+    '/projects/:projectsId/datasets/:dataSetId',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -120,7 +117,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Add file to dataset
   router.get(
-    '/datasets/:dataSetId/upload-requests',
+    '/projects/:projectsId/datasets/:dataSetId/upload-requests',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');

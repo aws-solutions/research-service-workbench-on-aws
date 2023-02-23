@@ -109,13 +109,14 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/datasets': {
+  '/projects/:projectId/datasets': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '*'
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ],
@@ -124,42 +125,58 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'CREATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '*'
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
   },
-  '/datasets/:datasetId': {
+  '/projects/:projectId/datasets/:datasetId': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '${datasetId}'
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
         }
       }
     ]
   },
-  '/datasets/import': {
+  '/projects/:projectId/datasets/:datasetId/softDelete': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/datasets/import': {
     // May need to add datasetId into this for authz
     POST: [
       {
         action: 'CREATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '*'
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
   },
-  '/datasets/share': {
+  '/projects/:projectId/datasets/share': {
     // May need to add datasetId into this for authz
     POST: [
       {
         action: 'CREATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '*'
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
@@ -361,6 +378,16 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     PUT: [
       {
         action: 'UPDATE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
+        }
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
           subjectId: '${datasetId}',
