@@ -276,7 +276,10 @@ export class SWBStack extends Stack {
       ]
     });
 
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) {
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
+    ) {
       childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
@@ -290,7 +293,10 @@ export class SWBStack extends Stack {
       });
     }
 
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) {
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
+    ) {
       childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
@@ -304,7 +310,10 @@ export class SWBStack extends Stack {
       });
     }
 
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) {
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
+    ) {
       childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
