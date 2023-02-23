@@ -27,7 +27,7 @@ describe('delete user negative tests', () => {
   test('user does not exist', async () => {
     const fakeUserId = '00000000-0000-0000-0000-000000000000';
     try {
-      await adminSession.resources.users.user(fakeUserId).delete();
+      await adminSession.resources.users.user(fakeUserId).purge();
     } catch (e) {
       checkHttpError(
         e,
@@ -48,7 +48,7 @@ describe('delete user negative tests', () => {
       expect(user).toBeDefined();
 
       userId = user.id;
-      await adminSession.resources.users.user(userId).delete();
+      await adminSession.resources.users.user(userId).purge();
     } catch (e) {
       checkHttpError(
         e,

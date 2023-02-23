@@ -80,8 +80,8 @@ export function setUpProjectRoutes(
   );
 
   // Soft delete project
-  router.put(
-    '/projects/:projectId/softDelete',
+  router.delete(
+    '/projects/:projectId',
     wrapAsync(async (req: Request, res: Response) => {
       async function checkDependencies(projectId: string): Promise<void> {
         // environments
