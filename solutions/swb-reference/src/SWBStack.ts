@@ -265,7 +265,7 @@ export class SWBStack extends Stack {
       value: swbVpc.vpc.vpcId
     });
 
-    let childMetadataNode = swbVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
+    const childMetadataNode = swbVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
     childMetadataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
@@ -275,48 +275,6 @@ export class SWBStack extends Stack {
         }
       ]
     });
-
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
-        .defaultChild as CfnResource;
-      childMetadataNode.addMetadata('cfn_nag', {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        rules_to_suppress: [
-          {
-            id: 'W33',
-            reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
-          }
-        ]
-      });
-    }
-
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
-        .defaultChild as CfnResource;
-      childMetadataNode.addMetadata('cfn_nag', {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        rules_to_suppress: [
-          {
-            id: 'W33',
-            reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
-          }
-        ]
-      });
-    }
-
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
-        .defaultChild as CfnResource;
-      childMetadataNode.addMetadata('cfn_nag', {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        rules_to_suppress: [
-          {
-            id: 'W33',
-            reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
-          }
-        ]
-      });
-    }
 
     new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
       value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
