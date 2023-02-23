@@ -14,6 +14,7 @@ import {
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
@@ -24,6 +25,7 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
@@ -127,8 +129,24 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.importDataSet(request);
   }
 
-  public listDataSets(user: AuthenticatedUser): Promise<DataSet[]> {
-    return this._workbenchDataSetService.listDataSets(user);
+  public listDataSets(
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
+    return this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
+  }
+
+  public async listDataSetAccessPermissions(
+    request: ListDataSetAccessPermissionsRequest
+  ): Promise<PermissionsResponse> {
+    const response = await this._workbenchDataSetService.getAllDataSetAccessPermissions(
+      request.dataSetId,
+      request.authenticatedUser,
+      request.paginationToken
+    );
+
+    return PermissionsResponseParser.parse(response);
   }
 
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {

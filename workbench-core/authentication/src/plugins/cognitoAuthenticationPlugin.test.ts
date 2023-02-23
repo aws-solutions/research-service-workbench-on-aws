@@ -281,20 +281,22 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       expect(userId).toBe('sub');
     });
+  });
 
+  describe('getUserRolesFromToken tests', () => {
     it('should return the cognito:groups claim from the decoded token', () => {
-      const userId = plugin.getUserRolesFromToken({
+      const roles = plugin.getUserRolesFromToken({
         ...baseDecodedAccessToken,
         'cognito:groups': ['Admin']
       });
 
-      expect(userId).toMatchObject(['Admin']);
+      expect(roles).toMatchObject(['Admin']);
     });
 
-    it('should throw InvalidJWTError when the decoded token doesnt have the cognito:groups claim', () => {
-      expect(() => {
-        plugin.getUserRolesFromToken(baseDecodedAccessToken);
-      }).toThrow(new InvalidJWTError('no cognito:roles claim'));
+    it('should return an empty array when the decoded token doesnt have the cognito:groups claim', () => {
+      const roles = plugin.getUserRolesFromToken(baseDecodedAccessToken);
+
+      expect(roles).toMatchObject([]);
     });
   });
 

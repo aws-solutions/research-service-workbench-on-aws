@@ -5,6 +5,7 @@
 
 import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -46,6 +47,7 @@ export class DataSetService {
    * @param masterDbProvider - an instance of {@link DataSetMetadataPlugin} configured for the solution's
    * main account. This plugin will reference the table which will track all DataSets even if some file
    * metadata resides in external accounts.
+   * @param authorizationPlugin - the plugin used for authorization checks
    * @returns - the intialized {@link DataSetService}.
    */
   public constructor(
@@ -140,6 +142,7 @@ export class DataSetService {
    * @param dataSetId - the ID of the DataSet to remove.
    * @param checkDependency - function to validate whether all required prerequisites are met before removing dataset.
    * If prerequisites are not met - function should throw error.
+   * @param authenticatedUser - the user making the request
    * @throws DataSetHasEndpontError - if the dataset has external endpoints assigned.
    */
   public async removeDataSet(
@@ -250,7 +253,11 @@ export class DataSetService {
    *
    * @returns an array of DataSet objects.
    */
-  public async listDataSets(authenticatedUser: AuthenticatedUser): Promise<DataSet[]> {
+  public async listDataSets(
+    authenticatedUser: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listDataSets.name,
@@ -258,24 +265,41 @@ export class DataSetService {
         serviceName: DataSetService.name
       }
     };
-
     try {
-      const response: DataSet[] = [];
-      const allDatasets = await this._dbProvider.listDataSets();
+      const authedDataSets: DataSet[] = [];
 
-      await Promise.all(
-        allDatasets.map(async (dataset) => {
-          try {
-            // throws a ForbiddenError if the user doesnt have permission on the dataset
-            await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
-            response.push(dataset);
-          } catch (error) {
-            if (!isForbiddenError(error)) {
-              throw error;
+      let lastPaginationToken = paginationToken;
+      do {
+        const pluginResponse = await this._dbProvider.listDataSets(pageSize, lastPaginationToken);
+
+        await Promise.all(
+          pluginResponse.data.map(async (dataset) => {
+            try {
+              await this._authzPlugin.isAuthorizedOnDataSet(dataset.id, 'read-only', authenticatedUser);
+              authedDataSets.push(dataset);
+            } catch (error) {
+              if (!isForbiddenError(error)) {
+                throw error;
+              }
             }
-          }
-        })
-      );
+          })
+        );
+        lastPaginationToken = pluginResponse.paginationToken;
+      } while (authedDataSets.length < pageSize && lastPaginationToken);
+
+      let sortedDataSets = authedDataSets.sort((a: DataSet, b: DataSet) => {
+        return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+      });
+
+      if (authedDataSets.length > pageSize) {
+        sortedDataSets = sortedDataSets.slice(0, pageSize);
+        lastPaginationToken = this._dbProvider.getPaginationToken(sortedDataSets[pageSize - 1].id);
+      }
+
+      const response = {
+        data: sortedDataSets,
+        paginationToken: lastPaginationToken
+      };
 
       await this._audit.write(metadata, response);
       return response;
@@ -289,6 +313,7 @@ export class DataSetService {
    * Get details on a particular DataSet.
    *
    * @param dataSetId - the Id of the DataSet for which details are desired.
+   * @param authenticatedUser - the user making the request
    * @returns - the DataSet object associated with that DataSet.
    */
   public async getDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<DataSet> {
@@ -331,16 +356,14 @@ export class DataSetService {
    * @param dataSetId - the name of the DataSet from which the endpoint will be removed.
    * @param externalEndpointId - the ID of the endpoint to remove.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
+   * @param authenticatedUser - the user making the request
    * to modify the target DataSet's underlying storage.
    */
   public async removeDataSetExternalEndpoint(
     dataSetId: string,
     externalEndpointId: string,
     storageProvider: DataSetsStoragePlugin,
-    authenticatedUser: {
-      id: string;
-      roles: string[];
-    }
+    authenticatedUser: AuthenticatedUser
   ): Promise<void> {
     const metadata: Metadata = {
       actor: authenticatedUser,
@@ -460,6 +483,7 @@ export class DataSetService {
    * @param endpointId - the ID of the endpoint.
    * @param externalRoleArn  - the ARN of the role to add to the endpoint.
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
+   * @param authenticatedUser - the user making the request
    * @param kmsKeyArn - an optional ARN to a KMS key used to encrypt data in the DataSet.
    */
   public async addRoleToExternalEndpoint(
@@ -467,10 +491,7 @@ export class DataSetService {
     endpointId: string,
     externalRoleArn: string,
     storageProvider: DataSetsStoragePlugin,
-    authenticatedUser: {
-      id: string;
-      roles: string[];
-    },
+    authenticatedUser: AuthenticatedUser,
     kmsKeyArn?: string
   ): Promise<void> {
     const metadata: Metadata = {
@@ -516,12 +537,13 @@ export class DataSetService {
    * Get the details of an external endpoint.
    * @param dataSetId - the ID of the DataSet.
    * @param endpointId - the id of the EndPoint.
+   * @param authenticatedUser - the user making the request
    * @returns - the details of the endpoint.
    */
   public async getExternalEndPoint(
     dataSetId: string,
     endpointId: string,
-    authenticatedUser: { id: string; roles: string[] }
+    authenticatedUser: AuthenticatedUser
   ): Promise<ExternalEndpoint> {
     const metadata: Metadata = {
       actor: authenticatedUser,
@@ -548,6 +570,7 @@ export class DataSetService {
    * @param fileName - the name of the file to upload.
    * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
+   * @param authenticatedUser - the user making the request
    * @returns the presigned URL
    */
   public async getPresignedSinglePartUploadUrl(
@@ -555,10 +578,7 @@ export class DataSetService {
     fileName: string,
     timeToLiveSeconds: number,
     storageProvider: DataSetsStoragePlugin,
-    authenticatedUser: {
-      id: string;
-      roles: string[];
-    }
+    authenticatedUser: AuthenticatedUser
   ): Promise<string> {
     const metadata: Metadata = {
       actor: authenticatedUser,
@@ -587,10 +607,11 @@ export class DataSetService {
    *
    * @returns - a list of {@link StorageLocation}s
    */
-  public async listStorageLocations(authenticatedUser: {
-    id: string;
-    roles: string[];
-  }): Promise<StorageLocation[]> {
+  public async listStorageLocations(
+    authenticatedUser: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<StorageLocation>> {
     const metadata: Metadata = {
       actor: authenticatedUser,
       action: this.listStorageLocations.name,
@@ -599,7 +620,7 @@ export class DataSetService {
       }
     };
     try {
-      const response = await this._dbProvider.listStorageLocations();
+      const response = await this._dbProvider.listStorageLocations(pageSize, paginationToken);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -653,7 +674,7 @@ export class DataSetService {
    */
   public async getDataSetAccessPermissions(
     params: GetAccessPermissionRequest,
-    authenticatedUser: { id: string; roles: string[] }
+    authenticatedUser: AuthenticatedUser
   ): Promise<PermissionsResponse> {
     const metadata: Metadata = {
       actor: authenticatedUser,
@@ -677,14 +698,14 @@ export class DataSetService {
   /**
    * Get all access permissions (read-only or read-write) associated with the dataset.
    *
-   * @param dataSetId - the id of the dataset for which permmissions are to be obtained.
+   * @param dataSetId - the id of the dataset for which permissions are to be obtained.
    * @param authenticatedUser - the 'id' of the user and that user's roles.
-   * @param pageToken - a token from a pervious query to continue recieving results.
+   * @param pageToken - a token from a previous query to continue receiving results.
    * @returns a {@link PermissionsResponse} object containing the permissions found.
    */
   public async getAllDataSetAccessPermissions(
     dataSetId: string,
-    authenticatedUser: { id: string; roles: string[] },
+    authenticatedUser: AuthenticatedUser,
     pageToken?: string
   ): Promise<PermissionsResponse> {
     const metadata: Metadata = {

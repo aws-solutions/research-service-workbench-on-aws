@@ -98,6 +98,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Dataset'
   },
@@ -110,6 +115,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'DatasetPermission'
   },
   {
     effect: 'ALLOW',

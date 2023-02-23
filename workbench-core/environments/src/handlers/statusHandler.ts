@@ -33,6 +33,11 @@ export default class StatusHandler {
     const lastDDBUpdate = envDetails!.updatedAt;
     const eventBusTime = event.metadata.time;
 
+    const envStackName = `SC-${event.metadata.account}-${
+      event.metadata.detail.ProvisionedProductId || envDetails.provisionedProductId
+    }`;
+    const appRegistryName = `${process.env.STACK_NAME}-hosting-account-SWBAppReg-${event.metadata.account}`;
+
     // Check if status already applied, or if this is an outdated event, or if instanceId has not been updated for the env.
     // We need to wait for "Launch" event to propagate `instanceId` value in DDB before environment status can be updated
     // Perform status update regardless if operation is "Launch" since SSM doc sends important details
@@ -46,12 +51,22 @@ export default class StatusHandler {
       return;
     }
 
+    // Get hosting account SDK instance
+    const envHelper = this._getEnvHelper();
+    const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId,
+      operation: `StatusHandler-${event.operation}`,
+      envType: event.metadata.detail.EnvType
+    });
+
     const updateRequest: { status: string; error?: { type: string; value: string }; resourceType?: string } =
       {
         status: event.status
       };
     if (event.status === 'TERMINATED') {
       updateRequest.resourceType = 'terminated_environment';
+      await hostSdk.helpers.appRegistryService.disassociateStackToAppRegistry(appRegistryName, envStackName);
     }
     if (event.errorMsg) {
       updateRequest.error = {
@@ -73,15 +88,6 @@ export default class StatusHandler {
       return;
     }
 
-    // Get hosting account SDK instance
-    const envHelper = this._getEnvHelper();
-    const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
-      operation: `StatusHandler-${event.operation}`,
-      envType: event.metadata.detail.EnvType
-    });
-
     // Get Instance ID and Instance ARN from RecordId provided in event metadata
     const { RecordOutputs } = await hostSdk.clients.serviceCatalog.describeRecord({
       Id: event.metadata.detail.RecordId
@@ -92,7 +98,6 @@ export default class StatusHandler {
       .OutputValue!;
     const instanceRoleArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceRoleName })!
       .OutputValue!;
-
     await envHelper.addRoleToAccessPoint(envDetails, instanceRoleArn);
 
     // We store the provisioned product ID sent in event metadata
@@ -130,6 +135,8 @@ export default class StatusHandler {
       resourceTypeToKey.environment,
       instDetails
     );
+
+    await hostSdk.helpers.appRegistryService.associateStackToAppRegistry(appRegistryName, envStackName);
   }
 
   /** Get environment ID from DDB for given instance ID

@@ -11,6 +11,7 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
@@ -27,7 +28,11 @@ describe('CostCenterService', () => {
   const accountId = 'acc-someId';
   const ddbMock = mockClient(DynamoDBClient);
   const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
-  type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
+  type CostCenterJson = Omit<CostCenter, 'accountId'> & {
+    pk: string;
+    sk: string;
+    dependency: string;
+  };
 
   beforeEach(() => {
     jest.resetModules();
@@ -87,7 +92,8 @@ describe('CostCenterService', () => {
           accountId: accountId,
           dependency: accountId,
           description: 'a description',
-          id: costCenterId
+          id: costCenterId,
+          status: CostCenterStatus.AVAILABLE
         };
       });
 
@@ -149,7 +155,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        status: CostCenterStatus.AVAILABLE
       };
       expectedCostCenter = {
         ...costCenterJson,
@@ -264,7 +271,8 @@ describe('CostCenterService', () => {
             description: createCostCenter.description,
             dependency: createCostCenter.accountId,
             accountId: accountId,
-            id: costCenterId
+            id: costCenterId,
+            status: CostCenterStatus.AVAILABLE
           };
           ddbMock.on(UpdateItemCommand).resolves({ Attributes: marshall(costCenter) });
         });
@@ -315,7 +323,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        status: CostCenterStatus.AVAILABLE
       };
       // Mock getting projects associated with cost center
       ddbMock.on(QueryCommand).resolves({
@@ -400,7 +409,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        status: CostCenterStatus.AVAILABLE
       };
       ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
     });
@@ -431,7 +441,8 @@ describe('CostCenterService', () => {
           hostingAccountHandlerRoleArn: '',
           awsAccountId: 'awsAccountId',
           createdAt: '2021-02-26T22:42:16.652Z',
-          updatedAt: '2021-02-26T22:42:16.652Z'
+          updatedAt: '2021-02-26T22:42:16.652Z',
+          status: CostCenterStatus.AVAILABLE
         });
       });
     });
@@ -474,7 +485,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        status: CostCenterStatus.AVAILABLE
       };
       // Mock getting projects associated with cost center
       ddbMock.on(QueryCommand).resolves({
@@ -559,7 +571,8 @@ describe('CostCenterService', () => {
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
-        updatedAt: mockDateObject.toISOString()
+        updatedAt: mockDateObject.toISOString(),
+        status: CostCenterStatus.AVAILABLE
       };
       ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
     });
@@ -590,7 +603,8 @@ describe('CostCenterService', () => {
           hostingAccountHandlerRoleArn: '',
           awsAccountId: 'awsAccountId',
           createdAt: '2021-02-26T22:42:16.652Z',
-          updatedAt: '2021-02-26T22:42:16.652Z'
+          updatedAt: '2021-02-26T22:42:16.652Z',
+          status: CostCenterStatus.AVAILABLE
         });
       });
     });
