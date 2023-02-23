@@ -13,7 +13,7 @@ import {
   AttributeValue
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { AwsService, JSONValue } from '@aws/workbench-core-base';
+import { AwsService, DEFAULT_API_PAGE_SIZE, JSONValue, MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import _ from 'lodash';
@@ -322,7 +322,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           FilterExpression: filterExpression,
           ExpressionAttributeNames: attributeNames,
           ExpressionAttributeValues: attributeValues,
-          KeyConditionExpression: keyConditionExpression
+          KeyConditionExpression: keyConditionExpression,
+          Limit: DEFAULT_API_PAGE_SIZE
         })
         .resolvesOnce({
           Items: [mockIdentityPermissionItem]
@@ -348,7 +349,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
         .on(QueryCommand, {
           ExpressionAttributeNames: attributeNames,
           ExpressionAttributeValues: attributeValues,
-          KeyConditionExpression: keyConditionExpression
+          KeyConditionExpression: keyConditionExpression,
+          Limit: DEFAULT_API_PAGE_SIZE
         })
         .resolvesOnce({
           Items: [mockIdentityPermissionItem]
@@ -375,7 +377,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           FilterExpression: filterExpression,
           ExpressionAttributeNames: attributeNames,
           ExpressionAttributeValues: attributeValues,
-          KeyConditionExpression: keyConditionExpression
+          KeyConditionExpression: keyConditionExpression,
+          Limit: DEFAULT_API_PAGE_SIZE
         })
         .resolvesOnce({
           Items: [mockIdentityPermissionItem]
@@ -402,7 +405,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           FilterExpression: filterExpression,
           ExpressionAttributeNames: attributeNames,
           ExpressionAttributeValues: attributeValues,
-          KeyConditionExpression: keyConditionExpression
+          KeyConditionExpression: keyConditionExpression,
+          Limit: DEFAULT_API_PAGE_SIZE
         })
         .resolvesOnce({
           Items: [mockIdentityPermissionItem],
@@ -423,11 +427,77 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       const nextResponse = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
         subjectId: sampleSubjectId,
         subjectType: sampleSubjectType,
-        identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }]
+        identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }],
+        paginationToken
       });
       expect(nextResponse.data.identityPermissions).toStrictEqual([mockIdentityPermission]);
       expect(nextResponse.paginationToken).toBeUndefined();
     });
+
+    test('Get identity permissions by subject with limit on number of identity permissions returned', async () => {
+      const keyConditionExpression = '#pk = :pk';
+      const filterExpression = '#id IN ( :id0 )';
+      const attributeNames = { '#pk': 'pk', '#id': 'identity' };
+      const attributeValues = {
+        ':pk': { S: `${sampleSubjectType}|${sampleSubjectId}` },
+        ':id0': { S: sampleGroupIdentity }
+      };
+      const limit = 1;
+      mockDDB
+        .on(QueryCommand, {
+          FilterExpression: filterExpression,
+          ExpressionAttributeNames: attributeNames,
+          ExpressionAttributeValues: attributeValues,
+          KeyConditionExpression: keyConditionExpression,
+          Limit: limit
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        });
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
+          subjectId: sampleSubjectId,
+          subjectType: sampleSubjectType,
+          identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }],
+          limit
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
+    });
+
+    test('Get identity permissions by subject default to MAX_API_PAGE_SIZE if limit exceeds it', async () => {
+      const keyConditionExpression = '#pk = :pk';
+      const filterExpression = '#id IN ( :id0 )';
+      const attributeNames = { '#pk': 'pk', '#id': 'identity' };
+      const attributeValues = {
+        ':pk': { S: `${sampleSubjectType}|${sampleSubjectId}` },
+        ':id0': { S: sampleGroupIdentity }
+      };
+      const limit = MAX_API_PAGE_SIZE + 1;
+      mockDDB
+        .on(QueryCommand, {
+          FilterExpression: filterExpression,
+          ExpressionAttributeNames: attributeNames,
+          ExpressionAttributeValues: attributeValues,
+          KeyConditionExpression: keyConditionExpression,
+          Limit: MAX_API_PAGE_SIZE
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        });
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
+          subjectId: sampleSubjectId,
+          subjectType: sampleSubjectType,
+          identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }],
+          limit
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
+    });
+
     test('Exceed identity limitation, throw ThroughputExceededError', async () => {
       const exceededIdentities = Array(101).fill({
         identityId: sampleGroupId,
@@ -532,9 +602,14 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
 
   describe('getIdentityPermissionsByIdentity', () => {
     test('Get identity permissions by identity', async () => {
-      mockDDB.on(QueryCommand).resolvesOnce({
-        Items: [mockIdentityPermissionItem]
-      });
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity',
+          Limit: DEFAULT_API_PAGE_SIZE
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem]
+        });
       const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
         identityId: sampleGroupId,
         identityType: sampleGroupType
@@ -544,9 +619,14 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
 
     test('Get identity permissions by identity with zero permissions', async () => {
-      mockDDB.on(QueryCommand).resolvesOnce({
-        Items: []
-      });
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity',
+          Limit: DEFAULT_API_PAGE_SIZE
+        })
+        .resolvesOnce({
+          Items: []
+        });
       const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
         identityId: sampleGroupId,
         identityType: sampleGroupType
@@ -558,7 +638,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     test('Get identity permissions by identity with pagination token', async () => {
       mockDDB
         .on(QueryCommand, {
-          IndexName: 'getIdentityPermissionsByIdentity'
+          IndexName: 'getIdentityPermissionsByIdentity',
+          Limit: DEFAULT_API_PAGE_SIZE
         })
         .resolvesOnce({
           Items: [mockIdentityPermissionItem],
@@ -582,6 +663,50 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       });
       expect(nextResponse.data.identityPermissions).toStrictEqual([mockIdentityPermission]);
       expect(nextResponse.paginationToken).toBeUndefined();
+    });
+
+    test('Get identity permissions by identity with limit on number of identity permissions', async () => {
+      const limit = 1;
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity',
+          Limit: limit
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        });
+
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+          identityId: sampleGroupId,
+          identityType: sampleGroupType,
+          limit
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
+    });
+
+    test('Get identity permissions by identity default to MAX_API_PAGE_SIZE if limit exceeds it', async () => {
+      const limit = MAX_API_PAGE_SIZE + 1;
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity',
+          Limit: MAX_API_PAGE_SIZE
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        });
+
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+          identityId: sampleGroupId,
+          identityType: sampleGroupType,
+          limit
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
     });
   });
   describe('deleteIdentityPermissions', () => {
