@@ -511,6 +511,40 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         }
       }
     ]
+  },
+  '/projects/:projectId/sshKeys': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/sshKeys/:sskKeyId': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '${sshKeyId}',
+          projectId: '${projectId}'
+        }
+      }
+    ]
   }
 };
 
