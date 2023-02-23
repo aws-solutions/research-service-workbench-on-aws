@@ -25,7 +25,6 @@ on:
         required: true
 
 jobs:
-# deploy only when files specific to swb package changed
   deploy-and-integration-test-swb-reference:
     runs-on: ubuntu-20.04
     environment: dev
@@ -41,7 +40,6 @@ jobs:
         uses: ./.github/actions/baseAction
 
       - name: Configure AWS Credentials
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.aws-dev-region }}
@@ -56,7 +54,6 @@ jobs:
           domainName: ${{ secrets.DOMAIN_NAME }}" >> "solutions/swb-reference/src/config/testEnv.yaml"
 
       - name: Deploy SWB-Reference
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
@@ -65,7 +62,8 @@ jobs:
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
       - name: Run Integration tests
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: |
           cd solutions/swb-reference
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests

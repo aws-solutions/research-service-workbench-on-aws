@@ -276,31 +276,44 @@ export class SWBStack extends Stack {
       ]
     });
 
-    childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
-      .defaultChild as CfnResource;
-    childMetadataNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        {
-          id: 'W33',
-          reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
-        }
-      ]
-    });
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
+    ) {
+      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
+        .defaultChild as CfnResource;
+      childMetadataNode.addMetadata('cfn_nag', {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        rules_to_suppress: [
+          {
+            id: 'W33',
+            reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
+          }
+        ]
+      });
+    }
 
-    childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
-      .defaultChild as CfnResource;
-    childMetadataNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        {
-          id: 'W33',
-          reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
-        }
-      ]
-    });
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
+    ) {
+      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
+        .defaultChild as CfnResource;
+      childMetadataNode.addMetadata('cfn_nag', {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        rules_to_suppress: [
+          {
+            id: 'W33',
+            reason: 'TODO: EC2 Subnet should not have MapPublicIpOnLaunch set to true'
+          }
+        ]
+      });
+    }
 
-    if (swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) {
+    if (
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
+      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
+    ) {
       childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {

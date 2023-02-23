@@ -5,6 +5,11 @@
 
 import { z } from 'zod';
 
+export enum EnvironmentTypeConfigStatus {
+  AVAILABLE = 'AVAILABLE',
+  DELETED = 'DELETED'
+}
+
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentTypeConfigParser = z.object({
   id: z.string(),
@@ -19,7 +24,8 @@ export const EnvironmentTypeConfigParser = z.object({
       key: z.string(),
       value: z.string()
     })
-  )
+  ),
+  status: z.nativeEnum(EnvironmentTypeConfigStatus).default(EnvironmentTypeConfigStatus.AVAILABLE)
 });
 
 export type EnvironmentTypeConfig = z.infer<typeof EnvironmentTypeConfigParser>;
