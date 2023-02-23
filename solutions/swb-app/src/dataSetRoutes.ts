@@ -159,6 +159,25 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
+  // List project dataSets
+  router.get(
+    '/projects/:projectId/datasets',
+    wrapAsync(async (req: Request, res: Response) => {
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
+      const paginationToken = req.query.paginationToken?.toString();
+      const projectId = req.params.projectId;
+
+      const response = await dataSetService.listDataSetsForProject(
+        projectId,
+        authenticatedUser,
+        pageSize,
+        paginationToken
+      );
+      res.send(response);
+    })
+  );
+
   router.put(
     '/projects/:projectId/datasets/:datasetId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
