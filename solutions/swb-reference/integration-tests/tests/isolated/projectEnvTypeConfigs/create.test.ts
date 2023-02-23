@@ -115,7 +115,7 @@ describe('Associate Project with EnvTypeConfig', () => {
       id: expect.stringMatching(dsUuidRegExp)
     });
 
-    await adminSession.resources.projects.project(projectId).softDelete();
+    await adminSession.resources.projects.project(projectId).delete();
 
     try {
       await adminSession.resources.projects

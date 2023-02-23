@@ -101,7 +101,7 @@ describe('environment start negative tests', () => {
       id: expect.stringMatching(dsUuidRegExp)
     });
 
-    await adminSession.resources.projects.project(projectId).softDelete();
+    await adminSession.resources.projects.project(projectId).delete();
 
     const envBody = {
       envTypeId: settings.get('envTypeId'),
