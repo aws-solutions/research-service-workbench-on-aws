@@ -52,6 +52,10 @@ export default class Resource {
     await this._axiosInstance.delete(this._api);
   }
 
+  public async purge(): Promise<void> {
+    await this._axiosInstance.delete(`${this._api}/purge`);
+  }
+
   // This method should be overridden by the class extending `resource`
   /**
    * Delete any resource that was created

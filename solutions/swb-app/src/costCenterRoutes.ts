@@ -34,8 +34,8 @@ export function setUpCostCenterRoutes(
     })
   );
 
-  router.put(
-    '/costCenters/:id/softDelete',
+  router.delete(
+    '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
       const deleteCostCenterRequest = { id: req.params.id };
       const validatedRequest = validateAndParse<DeleteCostCenterRequest>(
