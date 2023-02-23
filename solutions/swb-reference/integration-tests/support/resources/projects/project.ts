@@ -5,6 +5,7 @@
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
+import Datasets from '../datasets/datasets';
 import EnvironmentTypes from '../environmentTypes/environmentTypes';
 import SshKeys from '../sshKeys/sshKeys';
 
@@ -32,6 +33,10 @@ export default class Project extends Resource {
 
   public environmentTypes(): EnvironmentTypes {
     return new EnvironmentTypes(this._clientSession, this._api);
+  }
+
+  public dataSets(): Datasets {
+    return new Datasets(this._clientSession, this._api);
   }
 
   public async softDelete(): Promise<AxiosResponse> {
