@@ -27,6 +27,7 @@ interface Constants {
   ACCT_HANDLER_ARN_OUTPUT_KEY: string;
   API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
+  STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
   COGNITO_DOMAIN: string;
@@ -94,6 +95,7 @@ function getConstants(): Constants {
   const ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
   const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+  const STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY = 'StatusHandlerLambdaRoleOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
@@ -123,6 +125,7 @@ function getConstants(): Constants {
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
+    STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY,
     COGNITO_DOMAIN,
     WEBSITE_URLS,
     USER_POOL_ID,
