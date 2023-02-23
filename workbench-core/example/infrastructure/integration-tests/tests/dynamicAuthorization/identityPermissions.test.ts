@@ -116,14 +116,43 @@ describe('dynamic authorization identity permission integration tests ', () => {
         identityId: groupId,
         identityType: 'GROUP'
       });
-      expect(response.data.identityPermissions).toStrictEqual(identityPermissions);
+      expect(response.data.data.identityPermissions).toStrictEqual(identityPermissions);
     });
     test('get identity permissions by identity with no permission', async () => {
       const response = await adminSession.resources.identityPermissions.getByIdentity({
         identityId: groupId,
         identityType: 'GROUP'
       });
-      expect(response.data.identityPermissions).toStrictEqual([]);
+      expect(response.data.data.identityPermissions).toStrictEqual([]);
+    });
+
+    test('get identity permissions by identity with limit on identity permissions returned, use paginationToken to retrieve the next', async () => {
+      const { data: identityPermissionsData } = await adminSession.resources.identityPermissions.create({
+        identities: [
+          { identityId: groupId, identityType: 'GROUP' },
+          { identityId: groupId, identityType: 'GROUP' }
+        ]
+      });
+      const identityPermissions: IdentityPermission[] = identityPermissionsData.identityPermissions;
+      const limit = '1';
+      const { data } = await adminSession.resources.identityPermissions.getByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP',
+        limit
+      });
+      expect(data.data.identityPermissions.length).toBe(1);
+      const { data: secondData } = await adminSession.resources.identityPermissions.getByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP',
+        limit,
+        paginationToken: data.paginationToken
+      });
+      expect(secondData.data.identityPermissions.length).toBe(1);
+      expect(
+        [...data.data.identityPermissions, ...secondData.data.identityPermissions]
+          .map((a) => a.identityId)
+          .sort()
+      ).toStrictEqual(identityPermissions.map((a) => a.identityId).sort());
     });
   });
   describe('getIdentityPermissionsBySubject', () => {
@@ -184,7 +213,30 @@ describe('dynamic authorization identity permission integration tests ', () => {
         subjectType,
         subjectId
       });
-      expect(data.identityPermissions).toStrictEqual(identityPermissions);
+      expect(data.data.identityPermissions).toStrictEqual(identityPermissions);
+    });
+
+    test('get identity permissions by subject with a limit on number of identity permissions returned, use paginationToken to retrieve the next', async () => {
+      const limit = '1';
+      const { data } = await adminSession.resources.identityPermissions.getBySubject({
+        subjectType,
+        subjectId,
+        limit
+      });
+      expect(data.data.identityPermissions.length).toStrictEqual(1);
+
+      const { data: secondData } = await adminSession.resources.identityPermissions.getBySubject({
+        subjectType,
+        subjectId,
+        limit,
+        paginationToken: data.paginationToken
+      });
+      expect(secondData.data.identityPermissions.length).toStrictEqual(1);
+      expect(
+        [...data.data.identityPermissions, ...secondData.data.identityPermissions]
+          .map((a) => a.identityId)
+          .sort()
+      ).toStrictEqual(identityPermissions.map((a) => a.identityId).sort());
     });
 
     test('get identity permissions by subject, filter on action', async () => {
@@ -194,7 +246,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
         subjectId,
         action
       });
-      expect(data.identityPermissions).toStrictEqual([mockDeleteIdentityPermission]);
+      expect(data.data.identityPermissions).toStrictEqual([mockDeleteIdentityPermission]);
     });
 
     test('get identity permissions by subject, filter on groupId', async () => {
@@ -204,7 +256,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
         subjectId,
         identities
       });
-      expect(data.identityPermissions).toStrictEqual([mockCreateIdentityPermission]);
+      expect(data.data.identityPermissions).toStrictEqual([mockCreateIdentityPermission]);
     });
 
     test('get identity permissions by subject, filter on groupId and action, no permissions returned', async () => {
@@ -216,7 +268,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
         identities,
         action
       });
-      expect(data.identityPermissions).toStrictEqual([]);
+      expect(data.data.identityPermissions).toStrictEqual([]);
     });
 
     test('get identity permissions by subject, filter on groupIds exceeds 100 should return a 429', async () => {
