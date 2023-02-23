@@ -88,7 +88,7 @@ describe('multiStep user to project integration test', () => {
           costCenterId
         });
 
-        await adminSession.resources.projects.project(createdProject.id).softDelete();
+        await adminSession.resources.projects.project(createdProject.id).delete();
 
         try {
           await adminSession.resources.projects.project(createdProject.id).listUsersForProject(role);

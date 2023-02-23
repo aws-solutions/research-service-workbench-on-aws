@@ -28,7 +28,7 @@ export default class User extends Resource {
       await adminSession.resources.users.user(this._id).update({ status: 'INACTIVE' }, true);
 
       console.log(`Attempting to delete user ${this._id}.`);
-      await adminSession.resources.users.user(this._id).delete();
+      await adminSession.resources.users.user(this._id).purge();
 
       console.log(`Deleted user ${this._id}`);
     } catch (e) {
