@@ -60,7 +60,7 @@ describe('multiStep users integration test', () => {
       status: Status.INACTIVE
     });
 
-    await adminSession.resources.users.user(userId).delete();
+    await adminSession.resources.users.user(userId).purge();
     try {
       await adminSession.resources.users.user(userId).get();
     } catch (e) {
