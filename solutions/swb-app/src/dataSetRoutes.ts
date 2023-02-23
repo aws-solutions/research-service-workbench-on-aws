@@ -209,7 +209,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   );
 
   router.delete(
-    '/projects/:projectId/datasets/:datasetId/softDelete',
+    '/projects/:projectId/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<RemoveDataSetRequest>(RemoveDataSetRequestParser, {
         authenticatedUser: res.locals.user,
