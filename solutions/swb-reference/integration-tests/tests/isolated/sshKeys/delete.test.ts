@@ -17,12 +17,12 @@ describe('Delete Key Pair negative tests', () => {
   let project2Id: string;
   let sshKeyId: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
     expect.hasAssertions();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await paabHelper.cleanup();
   });
 
@@ -31,11 +31,13 @@ describe('Delete Key Pair negative tests', () => {
     const testBundle = [
       {
         username: 'projectAdmin1',
-        session: () => pa1Session
+        session: () => pa1Session,
+        projectId: () => project1Id
       },
       {
         username: 'researcher1',
-        session: () => rs1Session
+        session: () => rs1Session,
+        projectId: () => project1Id
       }
     ];
 
@@ -44,13 +46,14 @@ describe('Delete Key Pair negative tests', () => {
     });
 
     test.each(testBundle)('within a valid project', async (testCase) => {
-      const { username, session: sessionFunc } = testCase;
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
       const session = sessionFunc();
+      const projectId = projectIdFunc();
 
       console.log(`as ${username}`);
 
       try {
-        await session.resources.projects.project(project1Id).sshKeys().sshKey(invalidSshKeyId).delete();
+        await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).delete();
       } catch (e) {
         checkHttpError(
           e,
@@ -81,7 +84,7 @@ describe('Delete Key Pair negative tests', () => {
       sshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
 
-    test.each(testBundle)('it throws 403/404 error', async (testCase) => {
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
       const { username, session: sessionFunc } = testCase;
       const session = sessionFunc();
 
@@ -90,12 +93,10 @@ describe('Delete Key Pair negative tests', () => {
       try {
         await session.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).delete();
       } catch (e) {
-        // TODO confirm error code 403/404
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
@@ -141,12 +142,11 @@ describe('Delete Key Pair negative tests', () => {
   });
 
   describe('with ITAdmin that cannot delete keys for a valid project', () => {
-    //TODO confirm if it's necessary to have a valid key here
-    const invalidSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+    const sampleSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
 
     test('it throws 403 error', async () => {
       try {
-        await adminSession.resources.projects.project(project1Id).sshKeys().sshKey(invalidSshKeyId).delete();
+        await adminSession.resources.projects.project(project1Id).sshKeys().sshKey(sampleSshKeyId).delete();
       } catch (e) {
         checkHttpError(
           e,

@@ -13,7 +13,6 @@ export default class Project extends Resource {
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
     super(clientSession, 'project', id, parentApi);
     this._clientSession = clientSession;
-    console.log(this._api);
   }
 
   public async assignUserToProject(
@@ -40,7 +39,6 @@ export default class Project extends Resource {
   }
 
   public sshKeys(): SshKeys {
-    console.log(this._api);
     return new SshKeys(this._clientSession, this._api);
   }
 

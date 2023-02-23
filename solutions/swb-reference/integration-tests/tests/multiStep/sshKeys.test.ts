@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import HttpError from '../../support/utils/HttpError';
@@ -9,12 +14,12 @@ describe('sshKeys API multiStep integration test', () => {
   let rs1Session: ClientSession;
   let project1Id: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const resources = await paabHelper.createResources();
     ({ pa1Session, rs1Session, project1Id } = resources);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await paabHelper.cleanup();
   });
 
@@ -114,6 +119,9 @@ describe('sshKeys API multiStep integration test', () => {
           })
         );
       }
+
+      console.log(`${userName1} can delete their own key`);
+      await session1.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).delete();
     });
   });
 });

@@ -11,7 +11,6 @@ export default class SshKeys extends CollectionResource {
     super(clientSession, 'sshKeys', 'sshKey');
     const parentRoute = parentApi ? `${parentApi}/` : '';
     this._api = `${parentRoute}sshKeys`;
-    console.log(this._api);
   }
 
   public sshKey(id: string): SshKey {

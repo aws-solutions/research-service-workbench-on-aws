@@ -5,12 +5,10 @@
 
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
-import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('cannot create SSH key', () => {
-  const setup: Setup = new Setup();
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
@@ -24,7 +22,7 @@ describe('cannot create SSH key', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('when the user already has a key for that project', () => {
@@ -46,11 +44,11 @@ describe('cannot create SSH key', () => {
     describe.each(testBundle)('for each user', (testCase) => {
       const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
       let session: ClientSession;
-      const project1Id: string = projectIdFunc();
-      console.log(project1Id);
+      let project1Id: string;
 
       beforeEach(async () => {
         session = sessionFunc();
+        project1Id = projectIdFunc();
         const { data: existingSshKey } = await session.resources.projects
           .project(project1Id)
           .sshKeys()
@@ -62,7 +60,6 @@ describe('cannot create SSH key', () => {
         try {
           await session.resources.projects.project(project1Id).sshKeys().create();
         } catch (e) {
-          console.error('actual error', e);
           checkHttpError(
             e,
             new HttpError(400, {
