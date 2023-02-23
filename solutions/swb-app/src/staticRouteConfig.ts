@@ -80,12 +80,10 @@ export const routesMap: RoutesMap = {
         action: 'UPDATE',
         subject: 'CostCenter'
       }
-    ]
-  },
-  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
-    PUT: [
+    ],
+    DELETE: [
       {
-        action: 'UPDATE',
+        action: 'DELETE',
         subject: 'CostCenter'
       }
     ]
@@ -277,7 +275,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}/softDelete`]:
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       DELETE: [
         {
@@ -355,10 +353,8 @@ export const routesMap: RoutesMap = {
         action: 'UPDATE',
         subject: 'Project'
       }
-    ]
-  },
-  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
-    PUT: [
+    ],
+    DELETE: [
       {
         action: 'DELETE',
         subject: 'Project'
@@ -412,12 +408,6 @@ export const routesMap: RoutesMap = {
     ]
   },
   [`/users/${uuidRegExpAsString}`]: {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: 'User'
-      }
-    ],
     PATCH: [
       {
         action: 'UPDATE',
@@ -431,6 +421,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/users/${uuidRegExpAsString}/purge`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ]
+  },
   '/roles/Researcher': {
     PUT: [
       {
@@ -439,7 +437,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`${projectsIdRoutePrefix}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`]:
+  [`${projectsIdRoutePrefix}/sshKeys/${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}/purge`]:
     {
       DELETE: [
         {

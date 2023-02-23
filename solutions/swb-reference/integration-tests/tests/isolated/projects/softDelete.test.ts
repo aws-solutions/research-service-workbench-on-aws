@@ -29,7 +29,7 @@ describe('Soft Delete Project negative tests', () => {
 
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(invalidProjectId).softDelete();
+        await adminSession.resources.projects.project(invalidProjectId).delete();
       } catch (e) {
         checkHttpError(
           e,
