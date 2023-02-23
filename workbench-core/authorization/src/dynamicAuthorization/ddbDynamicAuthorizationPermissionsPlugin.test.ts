@@ -427,7 +427,8 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       const nextResponse = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
         subjectId: sampleSubjectId,
         subjectType: sampleSubjectType,
-        identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }]
+        identities: [{ identityId: sampleGroupId, identityType: sampleGroupType }],
+        paginationToken
       });
       expect(nextResponse.data.identityPermissions).toStrictEqual([mockIdentityPermission]);
       expect(nextResponse.paginationToken).toBeUndefined();
