@@ -58,7 +58,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
   );
   // Delete SSH Key
   router.delete(
-    '/projects/:projectId/sshKeys/:sshKeyId',
+    '/projects/:projectId/sshKeys/:sshKeyId/purge',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedResult = validateAndParse<DeleteSshKeyRequest>(DeleteSshKeyRequestParser, {
         currentUserId: res.locals.user.id,

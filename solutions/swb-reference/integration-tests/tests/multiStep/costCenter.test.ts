@@ -48,6 +48,6 @@ describe('multiStep costCenter test', () => {
     expect(updatedCostCenterB).toMatchObject({ name, description });
 
     console.log('Delete Cost Center B');
-    await expect(adminSession.resources.costCenters.costCenter(createdCostCenterB.id).softDelete()).resolves;
+    await expect(adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete()).resolves;
   });
 });
