@@ -228,10 +228,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.conflict(e.message);
         }
 
-        if (isDataSetNotFoundError(e)) {
-          throw Boom.notFound();
-        }
-
         throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
       }
     })

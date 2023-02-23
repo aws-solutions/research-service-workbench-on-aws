@@ -45,7 +45,7 @@ describe('datasets delete negative tests', () => {
   });
 
   describe('when the dataset does not exist', () => {
-    test('it returns a 404', async () => {
+    test('it returns a 403', async () => {
       try {
         await pa1Session.resources.projects
           .project(project1Id)
@@ -55,9 +55,8 @@ describe('datasets delete negative tests', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Not Found`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
