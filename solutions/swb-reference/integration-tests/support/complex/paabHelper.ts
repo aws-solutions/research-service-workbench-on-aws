@@ -56,9 +56,6 @@ export class PaabHelper {
     let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
 
     // associate users with corresponding projects properly (as IT Admin)
-    console.log(`projects: ${projectIds}`);
-    console.log(`project1Id: ${project1Id}`);
-    console.log(`pa1SessionUserId: ${pa1Session.getUserId()!}`);
     await adminSession.resources.projects
       .project(project1Id)
       .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
