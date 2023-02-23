@@ -34,5 +34,5 @@ new WorkbenchAppRegistry(exampleStack, 'ExampleStack', {
   destroy: true,
   appInsights: true
 });
-
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+app.synth();
