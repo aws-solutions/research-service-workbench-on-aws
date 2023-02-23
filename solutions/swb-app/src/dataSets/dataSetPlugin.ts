@@ -32,6 +32,12 @@ export interface DataSetPlugin {
     pageSize: number,
     paginationToken: string | undefined
   ): Promise<PaginatedResponse<DataSet>>;
+  listDataSetsForProject(
+    projectId: string,
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>>;
   listDataSetAccessPermissions(request: ListDataSetAccessPermissionsRequest): Promise<PermissionsResponse>;
   getSinglePartFileUploadUrl(
     dataSetId: string,
