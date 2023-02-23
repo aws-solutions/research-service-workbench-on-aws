@@ -16,13 +16,13 @@ describe('listUserSshKeysForProject negative tests', () => {
   let project1Id: string;
   let project2Id: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
 
     expect.hasAssertions();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await paabHelper.cleanup();
   });
 
@@ -42,7 +42,7 @@ describe('listUserSshKeysForProject negative tests', () => {
     beforeEach(() => {
       invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
     });
-    test.each(testBundle)('it throws 403/404 error', async (testCase) => {
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
       const { username, session: sessionFunc } = testCase;
       const session = sessionFunc();
 
@@ -51,12 +51,10 @@ describe('listUserSshKeysForProject negative tests', () => {
       try {
         await session.resources.projects.project(invalidProjectId).sshKeys().get();
       } catch (e) {
-        // TODO confirm error code 403/404
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+          new HttpError(403, {
+            error: `User is not authorized`
           })
         );
       }

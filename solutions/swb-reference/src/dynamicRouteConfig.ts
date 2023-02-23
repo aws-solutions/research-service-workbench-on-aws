@@ -534,7 +534,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/sshKeys/:sskKeyId': {
+  '/projects/:projectId/sshKeys/:sshKeyId': {
     DELETE: [
       {
         action: 'DELETE',

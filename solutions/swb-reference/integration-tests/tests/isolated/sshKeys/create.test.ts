@@ -18,12 +18,12 @@ describe('cannot create SSH key', () => {
   let project1Id: string;
   let project2Id: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
     expect.hasAssertions();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await setup.cleanup();
   });
 
@@ -47,6 +47,7 @@ describe('cannot create SSH key', () => {
       const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
       let session: ClientSession;
       const project1Id: string = projectIdFunc();
+      console.log(project1Id);
 
       beforeEach(async () => {
         session = sessionFunc();
@@ -90,7 +91,7 @@ describe('cannot create SSH key', () => {
     beforeEach(() => {
       invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
     });
-    test.each(testBundle)('it throws 403/404 error', async (testCase) => {
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
       const { username, session: sessionFunc } = testCase;
       const session = sessionFunc();
 
@@ -99,12 +100,10 @@ describe('cannot create SSH key', () => {
       try {
         await session.resources.projects.project(invalidProjectId).sshKeys().create();
       } catch (e) {
-        // TODO confirm error code 403/404
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
@@ -145,7 +144,7 @@ describe('cannot create SSH key', () => {
     });
   });
 
-  describe('with ITAdmin cannot create a key a valid project', () => {
+  describe('with ITAdmin, cannot create a key for a valid project', () => {
     test('it throws 403 error', async () => {
       try {
         await adminSession.resources.projects.project(project1Id).sshKeys().create();
