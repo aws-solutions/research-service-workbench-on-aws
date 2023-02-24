@@ -377,7 +377,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCNATGWSubnetCIDRAZ2
-      AvailabilityZone: "us-east-1b"
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'NATGW-AZ2']]
@@ -400,7 +400,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCTGWSubnetCIDRAZ2
-      AvailabilityZone: "us-east-1b"
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'TGW-AZ2']]
@@ -423,7 +423,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCGWLBESubnetCIDRAZ2
-      AvailabilityZone: "us-east-1b"
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'GWLBE-AZ2']]
@@ -446,7 +446,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ2
-      AvailabilityZone: "us-east-1b"
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ2']]
@@ -465,7 +465,7 @@ Resources:
           Value: !Join [ '-' , [ !Ref "AWS::StackName", 'SecurityVPC'] ]
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Delay function to wait for attachment ot be available
+# Delay function to wait for attachment to be available
 # ----------------------------------------------------------------------------------------------------------------------
   Delay:
     Type: 'Custom::Delay'
