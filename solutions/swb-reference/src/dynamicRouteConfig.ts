@@ -96,10 +96,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
           subjectId: '${costCenter}'
         }
       }
-    ]
-  },
-  '/costCenters/:costCenter/softDelete': {
-    PUT: [
+    ],
+    DELETE: [
       {
         action: 'DELETE',
         subject: {
@@ -456,10 +454,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
           subjectId: '${projectId}'
         }
       }
-    ]
-  },
-  '/projects/:projectId/softDelete': {
-    PUT: [
+    ],
+    DELETE: [
       {
         action: 'DELETE',
         subject: {
@@ -522,15 +518,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     ]
   },
   '/users/:userId': {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: {
-          subjectType: SwbAuthZSubject.SWB_USER,
-          subjectId: '${userId}'
-        }
-      }
-    ],
     PATCH: [
       {
         action: 'UPDATE',
@@ -546,6 +533,51 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_USER,
           subjectId: '${userId}'
+        }
+      }
+    ]
+  },
+  '/users/:userId/purge': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_USER,
+          subjectId: '${userId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/sshKeys': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/sshKeys/:sshKeyId/purge': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '${sshKeyId}',
+          projectId: '${projectId}'
         }
       }
     ]

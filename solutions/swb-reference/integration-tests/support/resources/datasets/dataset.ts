@@ -31,7 +31,7 @@ export default class Dataset extends Resource {
   }
 
   public async deleteFromProject(projectId: string): Promise<void> {
-    return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/softDelete`);
+    return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}`);
   }
 
   public async disassociateFromProject(projectId: string): Promise<AxiosResponse> {

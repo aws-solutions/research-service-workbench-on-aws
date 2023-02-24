@@ -45,10 +45,6 @@ export default class Project extends Resource {
     return new Datasets(this._clientSession, this._api);
   }
 
-  public async softDelete(): Promise<AxiosResponse> {
-    return this._axiosInstance.put(`${this._api}/softDelete`);
-  }
-
   public sshKeys(): SshKeys {
     return new SshKeys(this._clientSession, this._api);
   }
@@ -56,7 +52,7 @@ export default class Project extends Resource {
   protected async cleanup(): Promise<void> {
     try {
       console.log(`Attempting to softDelete project ${this._id}.`);
-      await this.softDelete();
+      await this.delete();
     } catch (e) {
       console.warn(
         `Could not delete project ${this._id}". 

@@ -207,9 +207,15 @@ export class SWBProjectService implements ProjectPlugin {
         paRole,
         { projectId: { $eq: projectId } }
       ),
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_SSH_KEY, ['CREATE', 'READ'], paRole, {
-        projectId: { $eq: projectId }
-      })
+      ...this._generateIdentityPermissions(
+        '*',
+        SwbAuthZSubject.SWB_SSH_KEY,
+        ['CREATE', 'READ', 'DELETE'],
+        paRole,
+        {
+          projectId: { $eq: projectId }
+        }
+      )
     ];
   }
 
@@ -248,7 +254,7 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions(
         '*',
         SwbAuthZSubject.SWB_SSH_KEY,
-        ['CREATE', 'READ'],
+        ['CREATE', 'READ', 'DELETE'],
         researcherRole,
         { projectId: { $eq: projectId } }
       )
