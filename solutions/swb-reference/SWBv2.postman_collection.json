@@ -1509,9 +1509,16 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/ProjectAdmin",
+              "raw": "{{API_URL}}/projects/:projectId/users",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", "ProjectAdmin"],
+              "path": ["projects", ":projectId", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "ProjectAdmin",
+                  "disabled": true
+                }
+              ],
               "variable": [
                 {
                   "key": "projectId",
@@ -1548,9 +1555,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", ":userId"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
               "variable": [
                 {
                   "key": "projectId",
@@ -1582,9 +1589,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", ":userId"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
               "variable": [
                 {
                   "key": "projectId",
