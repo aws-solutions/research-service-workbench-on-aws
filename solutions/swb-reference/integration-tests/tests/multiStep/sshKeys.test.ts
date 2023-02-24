@@ -19,6 +19,10 @@ describe('sshKeys API multiStep integration test', () => {
     ({ pa1Session, rs1Session, project1Id } = resources);
   });
 
+  beforeEach(async () => {
+    expect.hasAssertions();
+  });
+
   afterAll(async () => {
     await paabHelper.cleanup();
   });

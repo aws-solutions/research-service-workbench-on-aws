@@ -18,6 +18,9 @@ describe('cannot create SSH key', () => {
 
   beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+  });
+
+  beforeEach(async () => {
     expect.hasAssertions();
   });
 
