@@ -198,7 +198,7 @@ export class DynamicAuthorizationService {
         return;
       }
       if (!(await this.isRouteProtected({ route, method })).data.routeProtected)
-        throw new RouteNotSecuredError('Route is not secured');
+        throw new RouteNotSecuredError(`Route ${method} ${route} is not secured`);
       const { data: dynamicOperationsData } =
         await this._dynamicAuthorizationPermissionsPlugin.getDynamicOperationsByRoute({ route, method });
       // combine path params found with provided params, prioritizing provided params

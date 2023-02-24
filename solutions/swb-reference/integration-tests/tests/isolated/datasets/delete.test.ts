@@ -142,7 +142,7 @@ describe('datasets delete negative tests', () => {
             .project(project1Id)
             .dataSets()
             .dataset(dataSet.id!)
-            .deleteFromProject(project1Id);
+            .softDelete();
         } catch (e) {
           checkHttpError(
             e,

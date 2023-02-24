@@ -93,7 +93,7 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
       `${dataSetId!}`,
       [projectAdmin],
-      ['READ', 'UPDATE']
+      ['READ', 'UPDATE', 'DELETE']
     );
   }
 
@@ -169,7 +169,7 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
       `${dataset.id!}`,
       [projectAdmin],
-      ['READ', 'UPDATE']
+      ['READ', 'UPDATE', 'DELETE']
     );
 
     return dataset;
