@@ -29,7 +29,7 @@ describe('remove user from project negative tests', () => {
 
     const { data } = await adminSession.resources.projects.create({
       name: `TestProject-${uuidv4()}`,
-      description: 'Project for list users for project tests',
+      description: 'Project for remove user from project negative tests',
       costCenterId: costCenter.id
     });
 
