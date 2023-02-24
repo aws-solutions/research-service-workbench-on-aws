@@ -8,7 +8,6 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { dsUuidRegExp } from '../../../support/utils/regExpressions';
 import Settings from '../../../support/utils/settings';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
