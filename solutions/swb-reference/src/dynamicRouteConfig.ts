@@ -380,8 +380,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-          subjectId: '${datasetId}',
-          projectId: '*'
+          subjectId: '${datasetId}'
         }
       }
     ],
@@ -390,8 +389,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-          subjectId: '${datasetId}',
-          projectId: '*'
+          subjectId: '${datasetId}'
         }
       }
     ]
