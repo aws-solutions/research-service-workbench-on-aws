@@ -7,23 +7,28 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentTypeConfig } from '@aws/workbench-core-environments';
 import ClientSession from '../../support/clientSession';
 import { EnvironmentTypeHelper } from '../../support/complex/environmentTypeHelper';
-import Setup from '../../support/setup';
+import { PaabHelper } from '../../support/complex/paabHelper';
 import { DEFLAKE_DELAY_IN_MILLISECONDS } from '../../support/utils/constants';
 import HttpError from '../../support/utils/HttpError';
 import { envTypeConfigRegExp } from '../../support/utils/regExpressions';
 import { checkHttpError, sleep } from '../../support/utils/utilities';
 
 describe('multiStep environment type and environment type config test', () => {
-  const setup: Setup = new Setup();
-  let adminSession: ClientSession;
-  const projectId = setup.getSettings().get('projectId');
   const envTypeHandler = new EnvironmentTypeHelper();
+  const paabHelper: PaabHelper = new PaabHelper();
+  let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let projectId: string;
+
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   test('create Environment Type', async () => {
@@ -142,7 +147,7 @@ describe('multiStep environment type and environment type config test', () => {
         .associate()
     ).resolves.not.toThrow();
 
-    //Retrieve etc association from project
+    //Test retrieving as ITAdmin
     console.log('Retrieve etc association from project as list');
     const { data: response } = await adminSession.resources.projects
       .project(projectId)
@@ -172,6 +177,39 @@ describe('multiStep environment type and environment type config test', () => {
       .projects()
       .get();
     expect(projectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length).toBeTruthy();
+
+    //Test retrieving as Project Admin
+    console.log('Retrieve etc association from project as list');
+    const { data: paResponse } = await paSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .get({});
+    expect(
+      paResponse.data.filter((projETC: EnvironmentTypeConfig) => projETC.id === envTypeConfig.id).length
+    ).toBeTruthy();
+
+    console.log('Retrieve single etc association from project');
+    const { data: paSingleResponse } = await paSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .get();
+    expect(paSingleResponse.id === envTypeConfig.id).toBeTruthy();
+
+    console.log('Retrieve project association from etc as list');
+    const { data: paProjectsResponse } = await paSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .projects()
+      .get();
+    expect(
+      paProjectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length
+    ).toBeTruthy();
 
     //Throw when Delete Environment Type Config with active associations
     console.log('Throw when Deleting Environment Type Config with active associations');

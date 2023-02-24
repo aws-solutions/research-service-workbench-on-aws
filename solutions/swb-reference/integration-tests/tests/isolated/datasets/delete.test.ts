@@ -96,9 +96,11 @@ describe('datasets delete negative tests', () => {
           description: 'Temporary DataSet for integration test'
         };
         const { data: env } = await pa1Session.resources.environments.create(envBody);
-        console.log('created environment');
-        const { data: envDetails } = await pa1Session.resources.environments
-          .environment(env.id, project1Id)
+
+        const { data: envDetails } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
           .get();
         console.log('got environment');
         const awsRegion = settings.get('awsRegion');

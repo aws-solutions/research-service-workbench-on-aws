@@ -6,6 +6,7 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
 import Datasets from '../datasets/datasets';
+import Environments from '../environments/environments';
 import EnvironmentTypes from '../environmentTypes/environmentTypes';
 import SshKeys from '../sshKeys/sshKeys';
 
@@ -20,6 +21,7 @@ export default class Project extends Resource {
     userId: string,
     requestBody: Record<string, string>
   ): Promise<AxiosResponse> {
+    console.log(this._api);
     return this._axiosInstance.post(`${this._api}/users/${userId}`, requestBody);
   }
 
@@ -29,6 +31,10 @@ export default class Project extends Resource {
 
   public async listUsersForProject(role: string): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/users/${role}`);
+  }
+
+  public environments(): Environments {
+    return new Environments(this._clientSession, this._id);
   }
 
   public environmentTypes(): EnvironmentTypes {

@@ -9,14 +9,24 @@ import CollectionResource from '../base/collectionResource';
 import Environment from './environment';
 
 export default class Environments extends CollectionResource {
-  public constructor(clientSession: ClientSession) {
+  private _projectId: string | undefined;
+
+  public constructor(clientSession: ClientSession, projectId?: string) {
     super(clientSession, 'environments', 'environment');
-    this._api = 'environments';
+    if (projectId) {
+      this._api = `projects/${projectId}/environments`;
+      this._projectId = projectId;
+    } else {
+      this._api = 'environments';
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  public environment(id: string, projectId?: string): Environment {
-    return new Environment(id, this._clientSession, this._api, projectId);
+  public environment(id: string): Environment {
+    if (!this._projectId) {
+      throw new Error('No ProjectID found. Individual environments require a projectId.');
+    }
+    return new Environment(id, this._clientSession, this._api, this._projectId);
   }
 
   protected _buildDefaults(resource: EnvironmentCreateRequest): EnvironmentCreateRequest {
@@ -33,20 +43,17 @@ export default class Environments extends CollectionResource {
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async create(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
-    const projectId = body.projectId ?? this._settings.get('projectId');
-    this._api = `projects/${projectId}/environments`;
-    delete body.projectId;
-    const response = super.create(body, applyDefault);
-    this._api = 'environments';
-    return response;
+    if (!this._projectId) {
+      throw new Error('CreateEnvironments requires a parent Project resource.');
+    }
+    return super.create(body, applyDefault);
   }
 
-  public async listProjectEnvironments(projectId?: string): Promise<AxiosResponse> {
-    projectId = projectId ?? this._settings.get('projectId');
-    this._api = `projects/${projectId}/environments`;
-    const response = super.get();
-    this._api = 'environments';
-    return response;
+  public async listProjectEnvironments(): Promise<AxiosResponse> {
+    if (!this._projectId) {
+      throw new Error('ListProjectEnvironments requires a parent Project resource.');
+    }
+    return super.get();
   }
 }
 

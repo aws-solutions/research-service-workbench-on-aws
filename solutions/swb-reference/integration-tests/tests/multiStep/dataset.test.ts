@@ -15,16 +15,15 @@ import Settings from '../../support/utils/settings';
 import { poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
 
   let pa1Session: ClientSession;
   let project1Id: string;
   let project2Id: string;
-  let paabHelper: PaabHelper;
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
     const paabResources = await paabHelper.createResources();
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;
@@ -81,8 +80,10 @@ describe('multiStep dataset integration test', () => {
     const { data: env } = await pa1Session.resources.environments.create(envBody);
 
     // Verify environment has access point for dataset
-    const { data: envDetails } = await pa1Session.resources.environments
-      .environment(env.id, project1Id)
+    const { data: envDetails } = await pa1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .environment(env.id)
       .get();
     const awsRegion = settings.get('awsRegion');
     const mainAccountId = settings.get('mainAccountId');
@@ -155,27 +156,39 @@ describe('multiStep dataset integration test', () => {
     console.log('TERMINATE ENVIRONMENT & REMOVE DATASET');
     await poll(
       async () => {
-        const { data: envData } = await pa1Session.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },
       (data) => data?.status === 'COMPLETED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await pa1Session.resources.environments.environment(env.id, project1Id).stop();
+    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
     await poll(
       async () => {
-        const { data: envData } = await pa1Session.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },
       (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await pa1Session.resources.environments.environment(env.id, project1Id).terminate();
+    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).terminate();
     await poll(
       async () => {
-        const { data: envData } = await pa1Session.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },

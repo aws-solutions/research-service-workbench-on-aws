@@ -14,13 +14,12 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets file upload tests', () => {
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let datasetHelper: DatasetHelper;
   let pa1Session: ClientSession;
   let project1Id: string;
-  let paabHelper: PaabHelper;
-
   let dataSet: DataSet;
 
   beforeEach(async () => {
@@ -41,7 +40,6 @@ describe('datasets file upload tests', () => {
   });
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
     const paabResources = await paabHelper.createResources();
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;

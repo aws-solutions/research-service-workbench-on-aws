@@ -412,7 +412,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '*' // only be called by ITAdmin with no Project boundary
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
@@ -488,7 +489,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/roles/:role/users': {
+  '/projects/:projectId/users/:role': {
     GET: [
       {
         action: 'READ',

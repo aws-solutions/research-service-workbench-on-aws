@@ -3,30 +3,34 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get EnvTypeConfig with Project route', () => {
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
-  const projectId = setup.getSettings().get('projectId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   const nonExistentEnvTypeConfigId = 'etc-12345678-1234-1234-1234-123456789012';
+  let projectId: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    adminSession = paabResources.adminSession;
+    projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   test('fails when using invalid format project Id', async () => {
