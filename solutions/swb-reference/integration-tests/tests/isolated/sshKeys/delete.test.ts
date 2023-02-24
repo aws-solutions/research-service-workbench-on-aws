@@ -56,7 +56,7 @@ describe('Delete Key Pair negative tests', () => {
 
     test.skip('it throws 403 error', async () => {
       try {
-        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(existingSshKeyId).delete();
+        await adminSession.resources.projects.project(project.id).sshKeys().sshKey(existingSshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -79,7 +79,7 @@ describe('Delete Key Pair negative tests', () => {
 
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).delete();
+        await adminSession.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -105,7 +105,7 @@ describe('Delete Key Pair negative tests', () => {
           .project(project.id)
           .sshKeys()
           .sshKey(nonExistentSshKeyId)
-          .delete();
+          .purge();
       } catch (e) {
         checkHttpError(
           e,

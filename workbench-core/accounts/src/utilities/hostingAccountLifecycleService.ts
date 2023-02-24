@@ -71,12 +71,12 @@ export default class HostingAccountLifecycleService {
     // Share the artifacts bucket with the new hosting account
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
-      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
+      [process.env.STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
       [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
       [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
     } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
       process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY!,
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
     ]);
