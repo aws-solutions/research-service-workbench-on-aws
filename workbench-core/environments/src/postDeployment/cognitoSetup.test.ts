@@ -37,7 +37,7 @@ describe('CognitoSetup', () => {
       });
     }
 
-    test('run: Create new user', async () => {
+    test('run: adminCreateUser is called during admin creation', async () => {
       const cognitoSetup = new CognitoSetup(constants);
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
