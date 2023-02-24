@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getProjectAdminRole } from '../../../../src/utils/roleUtils';
 import ClientSession from '../../../support/clientSession';
 import { DatasetHelper } from '../../../support/complex/datasetHelper';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import Settings from '../../../support/utils/settings';
@@ -15,39 +16,52 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('datasets file upload tests', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
-  let adminSession: ClientSession;
   let datasetHelper: DatasetHelper;
+  let pa1Session: ClientSession;
+  let project1Id: string;
+  let paabHelper: PaabHelper;
 
   let dataSet: DataSet;
 
   beforeEach(async () => {
     expect.hasAssertions();
 
-    const { data } = await adminSession.resources.datasets.create({
-      storageName: settings.get('DataSetsBucketName'),
-      awsAccountId: settings.get('mainAccountId'),
-      region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(settings.get('projectId')),
-      ownerType: 'GROUP',
-      type: 'internal'
-    });
+    const { data } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .create({
+        storageName: settings.get('DataSetsBucketName'),
+        awsAccountId: settings.get('mainAccountId'),
+        region: settings.get('awsRegion'),
+        owner: getProjectAdminRole(project1Id),
+        ownerType: 'GROUP',
+        type: 'internal'
+      });
     dataSet = data;
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    paabHelper = new PaabHelper();
+    const paabResources = await paabHelper.createResources();
+    project1Id = paabResources.project1Id;
+    pa1Session = paabResources.pa1Session;
+
     datasetHelper = new DatasetHelper();
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   it('returns the presigned upload url when one file name is passed in', async () => {
     const filename = 'TestFile1';
 
     // get presigned URL
-    const { data } = await adminSession.resources.datasets.dataset(dataSet.id).getFileUploadUrls(filename);
+    const { data } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .dataset(dataSet.id)
+      .getFileUploadUrls(filename);
 
     // Add a fake file using the URL
     await Promise.all(data.urls.map((url: string) => axios.put(url, 'fake data')));
@@ -63,7 +77,11 @@ describe('datasets file upload tests', () => {
     const filenames = ['TestFile1', 'TestFile2'];
 
     // get presigned URLs
-    const { data } = await adminSession.resources.datasets.dataset(dataSet.id).getFileUploadUrls(filenames);
+    const { data } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .dataset(dataSet.id)
+      .getFileUploadUrls(filenames);
 
     // Add fake files using the URLs
     await Promise.all(data.urls.map((url: string) => axios.put(url, 'fake data')));
@@ -79,7 +97,11 @@ describe('datasets file upload tests', () => {
 
   it('returns a 400 error when no file names are passed in', async () => {
     try {
-      await adminSession.resources.datasets.dataset(dataSet.id).getFileUploadUrls();
+      await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .dataset(dataSet.id)
+        .getFileUploadUrls();
     } catch (e) {
       checkHttpError(
         e,

@@ -155,6 +155,18 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
+  '/projects/:projectId/datasets/:datasetId/upload-requests': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
   '/projects/:projectId/datasets/import': {
     // May need to add datasetId into this for authz
     POST: [

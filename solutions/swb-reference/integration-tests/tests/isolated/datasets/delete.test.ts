@@ -16,12 +16,9 @@ describe('datasets delete negative tests', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let pa1Session: ClientSession;
-  // let pa2Session: ClientSession;
-  // let researcher1Sesssion: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let paabHelper: PaabHelper;
-  // let adminSession: ClientSession
   let dataSet: DataSet;
   let dataSetBody: CreateDataSetRequest;
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
@@ -33,9 +30,6 @@ describe('datasets delete negative tests', () => {
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
     pa1Session = paabResources.pa1Session;
-    // pa2Session = paabResources.pa2Session;
-    // researcher1Sesssion = paabResources.rs1Session;
-    // adminSession = paabResources.adminSession;
 
     expect.hasAssertions();
   });
