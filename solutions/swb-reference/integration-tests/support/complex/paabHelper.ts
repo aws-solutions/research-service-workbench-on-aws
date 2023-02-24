@@ -23,15 +23,17 @@ interface PaabResources {
 export class PaabHelper {
   private _setup: Setup;
   private _randomTextGenerator: RandomTextGenerator;
+  private _outputError: boolean | undefined;
 
-  public constructor() {
+  public constructor(outputError?: boolean) {
     this._setup = new Setup();
     this._randomTextGenerator = new RandomTextGenerator(this._setup.getSettings().get('runId'));
+    this._outputError = outputError;
   }
 
   public async createResources(): Promise<PaabResources> {
     // create IT admin session
-    const adminSession: ClientSession = await this._setup.getDefaultAdminSession();
+    const adminSession: ClientSession = await this._setup.getDefaultAdminSession(this._outputError);
 
     // set up new cost center
     const { data: costCenter } = await adminSession.resources.costCenters.create({
@@ -56,14 +58,17 @@ export class PaabHelper {
     const [project1Id, project2Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
-    let pa1Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin1');
-    let pa2Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin2');
-    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
+    let pa1Session: ClientSession = await this._setup.getSessionForUserType(
+      'projectAdmin1',
+      this._outputError
+    );
+    let pa2Session: ClientSession = await this._setup.getSessionForUserType(
+      'projectAdmin2',
+      this._outputError
+    );
+    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1', this._outputError);
 
     // associate users with corresponding projects properly (as IT Admin)
-    console.log(`projects: ${projectIds}`);
-    console.log(`project1Id: ${project1Id}`);
-    console.log(`pa1SessionUserId: ${pa1Session.getUserId()!}`);
     await adminSession.resources.projects
       .project(project1Id)
       .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
@@ -74,9 +79,9 @@ export class PaabHelper {
       .project(project1Id)
       .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
 
-    pa1Session = await this._setup.getSessionForUserType('projectAdmin1');
-    pa2Session = await this._setup.getSessionForUserType('projectAdmin2');
-    rs1Session = await this._setup.getSessionForUserType('researcher1');
+    pa1Session = await this._setup.getSessionForUserType('projectAdmin1', this._outputError);
+    pa2Session = await this._setup.getSessionForUserType('projectAdmin2', this._outputError);
+    rs1Session = await this._setup.getSessionForUserType('researcher1', this._outputError);
 
     return {
       adminSession,

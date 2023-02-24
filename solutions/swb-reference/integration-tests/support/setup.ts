@@ -31,7 +31,7 @@ export default class Setup {
     throw new Error('Implement createAdminSession');
   }
 
-  public async getDefaultAdminSession(): Promise<ClientSession> {
+  public async getDefaultAdminSession(outputError?: boolean): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
       const userPoolId = this._settings.get('cognitoUserPoolId');
@@ -51,7 +51,7 @@ export default class Setup {
         rootPasswordParamStorePath
       });
 
-      const session = this._getClientSession(accessToken);
+      const session = this._getClientSession(accessToken, outputError);
       this._sessions.push(session);
       this._defaultAdminSession = session;
     }
@@ -59,7 +59,8 @@ export default class Setup {
   }
 
   public async getSessionForUserType(
-    userType: 'projectAdmin1' | 'projectAdmin2' | 'researcher1'
+    userType: 'projectAdmin1' | 'projectAdmin2' | 'researcher1',
+    outputError?: boolean
   ): Promise<ClientSession> {
     const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
     const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
@@ -68,12 +69,16 @@ export default class Setup {
 
     const userName = await secretsService.getSecret(userNameParamStorePath);
     const password = await secretsService.getSecret(userPasswordParamStorePath);
-    return this.getSessionForUser(userName, password);
+    return this.getSessionForUser(userName, password, outputError);
   }
 
-  public async getSessionForUser(userName: string, password: string): Promise<ClientSession> {
+  public async getSessionForUser(
+    userName: string,
+    password: string,
+    outputError?: boolean
+  ): Promise<ClientSession> {
     const accessToken = await this._getCognitoTokenForUser(userName, password);
-    const session = this._getClientSession(accessToken);
+    const session = this._getClientSession(accessToken, outputError);
     this._sessions.push(session);
     return session;
   }
@@ -128,8 +133,8 @@ export default class Setup {
     return this._settings;
   }
 
-  private _getClientSession(accessToken?: string): ClientSession {
-    return new ClientSession(this, accessToken);
+  private _getClientSession(accessToken?: string, outputError?: boolean): ClientSession {
+    return new ClientSession(this, accessToken, outputError);
   }
 
   private async _loadSecrets(secretsService: SecretsService): Promise<void> {

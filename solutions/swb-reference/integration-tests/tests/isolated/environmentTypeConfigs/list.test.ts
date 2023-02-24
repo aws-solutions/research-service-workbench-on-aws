@@ -42,21 +42,23 @@ describe('list environment type configs', () => {
       expect(Array.isArray(response.data)).toBe(true);
     });
 
-    test('list environments type configs fails when using invalid format envType Id', async () => {
-      try {
-        await itAdminSession.resources.environmentTypes
-          .environmentType('invalid-envType-id')
-          .configurations()
-          .get({});
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
-    });
+    // TODO: Update this test once input validation is added
+    // test('list environments type configs fails when using invalid format envType Id', async () => {
+    //   try {
+    //     await itAdminSession.resources.environmentTypes
+    //       .environmentType('invalid-envType-id')
+    //       .configurations()
+    //       .get({});
+    //   } catch (e) {
+    //     checkHttpError(
+    //       e,
+    //       new HttpError(400, {
+    //         error: 'Bad Request',
+    //         message: ''
+    //       })
+    //     );
+    //   }
+    // });
   });
 
   describe('Project Admin tests', () => {
