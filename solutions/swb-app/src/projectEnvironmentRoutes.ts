@@ -4,11 +4,12 @@
  */
 
 import { CreateEnvironmentSchema, Environment } from '@aws/workbench-core-environments';
-import { badRequest, conflict } from '@hapi/boom';
+import { badImplementation, badRequest, conflict, isBoom } from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
+import { isProjectDeletedError } from './errors/projectDeletedError';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { processValidatorResult } from './validatorHelper';
 
@@ -30,10 +31,26 @@ export function setUpProjectEnvRoutes(
         if (req.body.id) {
           throw badRequest('id cannot be passed in the request body when trying to launch a new environment');
         }
-        const env: Environment = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
+        let env: Environment;
+        try {
+          env = await projectEnvironmentService.createEnvironment(req.body, res.locals.user);
+        } catch (e) {
+          if (isBoom(e)) {
+            throw e;
+          }
+          if (isProjectDeletedError(e)) {
+            throw badRequest(e.message);
+          }
+
+          throw badImplementation(
+            `There was a problem creating environment type ${envType} for project ${req.body.projectId}`
+          );
+        }
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
           await environments[`${envType}`].lifecycle.launch(env);
+
+          res.status(201).send(env);
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
@@ -43,7 +60,6 @@ export function setUpProjectEnvRoutes(
           });
           throw e;
         }
-        res.status(201).send(env);
       } else {
         throw badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
