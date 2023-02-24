@@ -49,6 +49,6 @@ describe('multiStep costCenter test', () => {
 
     console.log('Delete Cost Center B');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).softDelete()).resolves;
+    expect(await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete()).resolves;
   });
 });
