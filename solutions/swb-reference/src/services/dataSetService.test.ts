@@ -173,7 +173,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
+            await dataSetService.provisionDataSet(createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
@@ -204,7 +204,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
+            await dataSetService.provisionDataSet(createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,

@@ -41,28 +41,10 @@ describe('list environment type configs', () => {
         .get({});
       expect(Array.isArray(response.data)).toBe(true);
     });
-
-    // TODO: Update this test once input validation is added
-    // test('list environments type configs fails when using invalid format envType Id', async () => {
-    //   try {
-    //     await itAdminSession.resources.environmentTypes
-    //       .environmentType('invalid-envType-id')
-    //       .configurations()
-    //       .get({});
-    //   } catch (e) {
-    //     checkHttpError(
-    //       e,
-    //       new HttpError(400, {
-    //         error: 'Bad Request',
-    //         message: ''
-    //       })
-    //     );
-    //   }
-    // });
   });
 
   describe('Project Admin tests', () => {
-    test('list environments type configs excecutes successfully', async () => {
+    test('list environments type configs for project excecutes successfully', async () => {
       const { data: response } = await paSession.resources.projects
         .project(projectId)
         .environmentTypes()
@@ -72,12 +54,9 @@ describe('list environment type configs', () => {
       expect(Array.isArray(response.data)).toBe(true);
     });
 
-    test('list environments type configs fails when using invalid format envType Id', async () => {
+    test('list environments type configs (non-project route) fails', async () => {
       try {
-        await paSession.resources.environmentTypes
-          .environmentType('invalid-envType-id')
-          .configurations()
-          .get({});
+        await paSession.resources.environmentTypes.environmentType(envTypeId).configurations().get({});
       } catch (e) {
         checkHttpError(
           e,
@@ -90,7 +69,7 @@ describe('list environment type configs', () => {
   });
 
   describe('Researcher tests', () => {
-    test('list environments type configs excecutes successfully', async () => {
+    test('list environments type configs for project excecutes successfully', async () => {
       const { data: response } = await researcherSession.resources.projects
         .project(projectId)
         .environmentTypes()
@@ -100,10 +79,10 @@ describe('list environment type configs', () => {
       expect(Array.isArray(response.data)).toBe(true);
     });
 
-    test('list environments type configs fails when using invalid format envType Id', async () => {
+    test('list environments type configs (non-project route) fails', async () => {
       try {
         await researcherSession.resources.environmentTypes
-          .environmentType('invalid-envType-id')
+          .environmentType(envTypeId)
           .configurations()
           .get({});
       } catch (e) {

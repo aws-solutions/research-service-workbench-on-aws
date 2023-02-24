@@ -9,7 +9,7 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
-import { isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
+import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
@@ -43,16 +43,18 @@ import { validateAndParse } from './validatorHelper';
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
-    '/projects/:projectId/datasets',
+    '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
-      const dataSet = await dataSetService.provisionDataSet(req.params.projectId, {
+      const dataSet = await dataSetService.provisionDataSet({
         name: validatedRequest.name,
         storageName: validatedRequest.storageName,
         path: validatedRequest.path,
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
+        owner: validatedRequest.owner,
+        ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
         permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
@@ -64,7 +66,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // import new prefix (assumes S3 bucket and path exist already)
   router.post(
-    '/projects/:projectsId/datasets/import',
+    '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(req.body, CreateDataSetRequestParser);
       const dataSet = await dataSetService.importDataSet({
@@ -74,6 +76,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
+        owner: validatedRequest.owner,
         type: validatedRequest.type,
         authenticatedUser: res.locals.user
       });
@@ -83,7 +86,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // share dataset
   router.post(
-    '/projects/:projectsId/datasets/:id/share',
+    '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
@@ -103,7 +106,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Get dataset
   router.get(
-    '/projects/:projectsId/datasets/:dataSetId',
+    '/datasets/:dataSetId',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -117,7 +120,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Add file to dataset
   router.get(
-    '/projects/:projectsId/datasets/:dataSetId/upload-requests',
+    '/datasets/:dataSetId/upload-requests',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -226,6 +229,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
         if (isDataSetHasEndpointError(e)) {
           throw Boom.conflict(e.message);
+        }
+
+        if (isDataSetNotFoundError(e)) {
+          throw Boom.notFound();
         }
 
         throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);

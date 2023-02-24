@@ -26,16 +26,12 @@ export default class Dataset extends Resource {
     });
   }
 
-  public async softDelete(): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`${this._api}/softDelete`);
-  }
-
   public async deleteFromProject(projectId: string): Promise<void> {
     return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}`);
   }
 
   public async disassociateFromProject(projectId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`${this._api}/relationships`);
+    return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/relationships`);
   }
 
   public async listAccessPermissions(): Promise<AxiosResponse> {
