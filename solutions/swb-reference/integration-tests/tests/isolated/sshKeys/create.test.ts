@@ -13,34 +13,37 @@ describe('cannot create SSH key', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
   let project: { id: string };
+  let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+
+  beforeAll(async () => {
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
 
   beforeEach(async () => {
     expect.hasAssertions();
-    adminSession = await setup.getDefaultAdminSession();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: randomTextGenerator.getFakeText('fakeCostCenterName'),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: randomTextGenerator.getFakeText('fakeProjectName'),
-      description: 'Project for list users for project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
-  });
-
-  afterEach(async () => {
-    await setup.cleanup();
+    costCenterId = costCenter.id;
   });
 
   describe('when the user already has a key for that project', () => {
     let existingSshKeyId: string;
 
     beforeEach(async () => {
+      const { data } = await adminSession.resources.projects.create({
+        name: randomTextGenerator.getFakeText('fakeProjectName'),
+        description: 'Project for cannot create SSH key',
+        costCenterId: costCenterId
+      });
+      project = data;
       const { data: existingSshKey } = await adminSession.resources.projects
         .project(project.id)
         .sshKeys()
