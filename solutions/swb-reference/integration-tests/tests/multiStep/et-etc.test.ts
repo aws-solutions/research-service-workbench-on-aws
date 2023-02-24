@@ -19,12 +19,14 @@ describe('multiStep environment type and environment type config test', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;
+  let researcherSession: ClientSession;
 
   beforeAll(async () => {
     const paabResources = await paabHelper.createResources();
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
@@ -209,6 +211,40 @@ describe('multiStep environment type and environment type config test', () => {
       .get();
     expect(
       paProjectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length
+    ).toBeTruthy();
+
+    //Test retrieving as Researcher
+    console.log('Retrieve etc association from project as list');
+    const { data: researcherResponse } = await researcherSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .get({});
+    expect(
+      researcherResponse.data.filter((projETC: EnvironmentTypeConfig) => projETC.id === envTypeConfig.id)
+        .length
+    ).toBeTruthy();
+
+    console.log('Retrieve single etc association from project');
+    const { data: researcherSingleResponse } = await researcherSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .get();
+    expect(researcherSingleResponse.id === envTypeConfig.id).toBeTruthy();
+
+    console.log('Retrieve project association from etc as list');
+    const { data: researcherProjectsResponse } = await researcherSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .projects()
+      .get();
+    expect(
+      researcherProjectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length
     ).toBeTruthy();
 
     //Throw when Delete Environment Type Config with active associations

@@ -41,6 +41,7 @@ describe('list environment type configs associated to project', () => {
     expect(Array.isArray(response.data)).toBe(true);
   });
 
+  // TODO: Update and enable this test once input validation is in place.
   test('list projectEnvTypeConfigs fails when using invalid format project Id', async () => {
     try {
       await adminSession.resources.projects
@@ -52,8 +53,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find project invalid-project-id`
         })
       );
     }
@@ -78,6 +80,7 @@ describe('list environment type configs associated to project', () => {
     }
   });
 
+  // TODO: Update and enable this test once input validation is in place.
   test('list projectEnvTypeConfigs fails when using invalid format envType Id', async () => {
     try {
       await adminSession.resources.projects
@@ -89,8 +92,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find environment type invalid-envType-id`
         })
       );
     }

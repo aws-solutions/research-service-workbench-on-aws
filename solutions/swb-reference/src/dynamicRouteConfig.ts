@@ -295,13 +295,13 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId': {
+  '/environmentTypes/:envTypeId': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE,
-          subjectId: '${environmentTypeId}'
+          subjectId: '${envTypeId}'
         }
       }
     ],
@@ -310,12 +310,12 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE,
-          subjectId: '${environmentTypeId}'
+          subjectId: '${envTypeId}'
         }
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId/configurations': {
+  '/environmentTypes/:envTypeId/configurations': {
     GET: [
       {
         action: 'READ',
@@ -335,13 +335,13 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId/configurations/:etcId': {
+  '/environmentTypes/:envTypeId/configurations/:envTypeConfigId': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
         }
       }
     ],
@@ -350,7 +350,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
         }
       }
     ],
@@ -359,7 +359,18 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
+        }
+      }
+    ]
+  },
+  '/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_PROJECT,
+          subjectId: '*'
         }
       }
     ]
@@ -404,7 +415,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/environmentTypes/:environmentTypeId/configurations': {
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations': {
     GET: [
       {
         action: 'READ',
@@ -416,7 +427,19 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/environmentTypes/:environmentTypeId/configurations/:etcId/relationships': {
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_ETC,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships': {
     PUT: [
       {
         action: 'UPDATE',

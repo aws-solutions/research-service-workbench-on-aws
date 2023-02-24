@@ -33,120 +33,125 @@ describe('Get EnvTypeConfig with Project route', () => {
     await paabHelper.cleanup();
   });
 
-  test('fails when using invalid format project Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project('invalid-project-id')
-        .environmentTypes()
-        .environmentType(envTypeId)
-        .configurations()
-        .environmentTypeConfig(envTypeConfigId)
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
+  describe('IT Admin tests', () => {
+    test('fails when using invalid format project Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project('invalid-project-id')
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .environmentTypeConfig(envTypeConfigId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
 
-  test('fails when using non existing project Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project(nonExistentProjectId)
-        .environmentTypes()
-        .environmentType(envTypeId)
-        .configurations()
-        .environmentTypeConfig(envTypeConfigId)
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: 'Resource not found'
-        })
-      );
-    }
-  });
+    test('fails when using non existing project Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(nonExistentProjectId)
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .environmentTypeConfig(envTypeConfigId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
 
-  test('fails when using invalid format envType Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project(projectId)
-        .environmentTypes()
-        .environmentType('invalid-envType-id')
-        .configurations()
-        .environmentTypeConfig(envTypeConfigId)
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
+    test('fails when using invalid format envType Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(projectId)
+          .environmentTypes()
+          .environmentType('invalid-envType-id')
+          .configurations()
+          .environmentTypeConfig(envTypeConfigId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
 
-  test('fails when using non existing envType Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project(projectId)
-        .environmentTypes()
-        .environmentType(nonExistentEnvTypeId)
-        .configurations()
-        .environmentTypeConfig(envTypeConfigId)
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: 'Resource not found'
-        })
-      );
-    }
-  });
+    test('fails when using non existing envType Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(projectId)
+          .environmentTypes()
+          .environmentType(nonExistentEnvTypeId)
+          .configurations()
+          .environmentTypeConfig(envTypeConfigId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
 
-  test('fails when using invalid format envTypeConfig Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project(projectId)
-        .environmentTypes()
-        .environmentType(envTypeId)
-        .configurations()
-        .environmentTypeConfig('invalid-etc-id')
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
+    test('fails when using invalid format envTypeConfig Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(projectId)
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .environmentTypeConfig('invalid-etc-id')
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
 
-  test('fails when using non existing envTypeConfig Id', async () => {
-    try {
-      await adminSession.resources.projects
-        .project(projectId)
-        .environmentTypes()
-        .environmentType(envTypeId)
-        .configurations()
-        .environmentTypeConfig(nonExistentEnvTypeConfigId)
-        .get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: 'Resource not found'
-        })
-      );
-    }
+    test('fails when using non existing envTypeConfig Id', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(projectId)
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .environmentTypeConfig(nonExistentEnvTypeConfigId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: 'Resource not found'
+          })
+        );
+      }
+    });
   });
 });

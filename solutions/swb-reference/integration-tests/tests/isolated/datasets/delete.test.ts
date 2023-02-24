@@ -92,10 +92,12 @@ describe('datasets delete negative tests', () => {
           envType: settings.get('envType'),
           datasetIds: [dataSet.id],
           name: randomTextGenerator.getFakeText('dataset-name'),
-          projectId: project1Id,
           description: 'Temporary DataSet for integration test'
         };
-        const { data: env } = await pa1Session.resources.environments.create(envBody);
+        const { data: env } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .create(envBody);
 
         const { data: envDetails } = await pa1Session.resources.projects
           .project(project1Id)
