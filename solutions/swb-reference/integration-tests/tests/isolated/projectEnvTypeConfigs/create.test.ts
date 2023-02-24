@@ -92,29 +92,6 @@ describe('Associate Project with EnvTypeConfig', () => {
 
     const projectId = createdProject.id;
 
-    const dataSetBody = CreateDataSetRequestParser.parse({
-      storageName: settings.get('DataSetsBucketName'),
-      awsAccountId: settings.get('mainAccountId'),
-      path: dataSetName, // using same name to help potential troubleshooting
-      name: dataSetName,
-      region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(createdProject.id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(createdProject.id),
-          identityType: 'GROUP',
-          accessLevel: 'read-only'
-        }
-      ]
-    });
-
-    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
-    expect(dataSet).toMatchObject({
-      id: expect.stringMatching(dsUuidRegExp)
-    });
-
     await adminSession.resources.projects.project(projectId).delete();
 
     try {

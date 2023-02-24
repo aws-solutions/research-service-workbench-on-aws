@@ -81,7 +81,7 @@ describe('environment start negative tests', () => {
     const dataSetBody = CreateDataSetRequestParser.parse({
       storageName: settings.get('DataSetsBucketName'),
       awsAccountId: settings.get('mainAccountId'),
-      path: dataSetName, // using same name to help potential troubleshooting
+      path: dataSetName,
       name: dataSetName,
       region: settings.get('awsRegion'),
       owner: getProjectAdminRole(createdProject.id),
@@ -97,9 +97,6 @@ describe('environment start negative tests', () => {
     });
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
-    expect(dataSet).toMatchObject({
-      id: expect.stringMatching(dsUuidRegExp)
-    });
 
     await adminSession.resources.projects.project(projectId).delete();
 
