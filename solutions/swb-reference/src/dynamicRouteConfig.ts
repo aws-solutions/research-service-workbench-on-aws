@@ -532,7 +532,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/sshKeys/:sshKeyId': {
+  '/projects/:projectId/sshKeys/:sshKeyId/purge': {
     DELETE: [
       {
         action: 'DELETE',

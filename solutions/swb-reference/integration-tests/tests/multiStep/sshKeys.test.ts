@@ -52,8 +52,8 @@ describe('sshKeys API multiStep integration test', () => {
       expect(listedSshKey.sshKeys.length).toEqual(1);
       expect(listedSshKey.sshKeys[0].sshKeyId).toEqual(createdSshKey.id);
 
-      console.log('deleting the key');
-      await session.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).delete();
+      console.log('hard deleting the key');
+      await session.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).purge();
 
       console.log('retrieving the key does not return deleted key');
       const { data: listedSshKeyAfterDelete } = await session.resources.projects
@@ -109,7 +109,7 @@ describe('sshKeys API multiStep integration test', () => {
 
       console.log(`${userName2} fails to delete the ${userName1}'s key`);
       try {
-        await session2.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).delete();
+        await session2.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -120,8 +120,8 @@ describe('sshKeys API multiStep integration test', () => {
         );
       }
 
-      console.log(`${userName1} can delete their own key`);
-      await session1.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).delete();
+      console.log(`${userName1} can hard delete their own key`);
+      await session1.resources.projects.project(projectId).sshKeys().sshKey(createdSshKey.id).purge();
     });
   });
 });

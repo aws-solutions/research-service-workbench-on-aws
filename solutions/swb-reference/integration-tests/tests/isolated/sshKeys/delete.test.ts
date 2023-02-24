@@ -53,7 +53,7 @@ describe('Delete Key Pair negative tests', () => {
       console.log(`as ${username}`);
 
       try {
-        await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).delete();
+        await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -91,7 +91,7 @@ describe('Delete Key Pair negative tests', () => {
       console.log(`as ${username}`);
 
       try {
-        await session.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).delete();
+        await session.resources.projects.project(invalidProjectId).sshKeys().sshKey(sshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -129,7 +129,7 @@ describe('Delete Key Pair negative tests', () => {
       console.log(`as ${username}`);
 
       try {
-        await session.resources.projects.project(projectId).sshKeys().sshKey(sshKeyId).delete();
+        await session.resources.projects.project(projectId).sshKeys().sshKey(sshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
@@ -146,7 +146,7 @@ describe('Delete Key Pair negative tests', () => {
 
     test('it throws 403 error', async () => {
       try {
-        await adminSession.resources.projects.project(project1Id).sshKeys().sshKey(sampleSshKeyId).delete();
+        await adminSession.resources.projects.project(project1Id).sshKeys().sshKey(sampleSshKeyId).purge();
       } catch (e) {
         checkHttpError(
           e,
