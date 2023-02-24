@@ -16,9 +16,16 @@ describe('Delete Key Pair negative tests', () => {
   let project: { id: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
+  beforeAll(async () => {
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
   beforeEach(async () => {
     expect.hasAssertions();
-    adminSession = await setup.getDefaultAdminSession();
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: randomTextGenerator.getFakeText('fakeCostCenterName'),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
@@ -27,15 +34,11 @@ describe('Delete Key Pair negative tests', () => {
 
     const { data } = await adminSession.resources.projects.create({
       name: randomTextGenerator.getFakeText('fakeProjectName'),
-      description: 'Project for list users for project tests',
+      description: 'Project for Delete Key Pair negative tests',
       costCenterId: costCenter.id
     });
 
     project = data;
-  });
-
-  afterEach(async () => {
-    await setup.cleanup();
   });
 
   // TODO: multiple user session support has to exist for this test
