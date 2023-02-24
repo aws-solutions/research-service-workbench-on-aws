@@ -88,11 +88,10 @@ export class DataSetService implements DataSetPlugin {
       ['READ', 'UPDATE', 'DELETE']
     );
 
-    const projectId = projectAdmin.split('#')[0];
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-      `${projectId}-${dataSetId!}`,
+      `${dataSetId!}`,
       [projectAdmin],
       ['READ', 'UPDATE']
     );
@@ -168,7 +167,7 @@ export class DataSetService implements DataSetPlugin {
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-      `${projectId}-${dataset.id!}`,
+      `${dataset.id!}`,
       [projectAdmin],
       ['READ', 'UPDATE']
     );
