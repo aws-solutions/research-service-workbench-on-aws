@@ -18,8 +18,12 @@ describe('multiStep awsAccount integration test', () => {
   const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
   });
 
   test('it works', async () => {

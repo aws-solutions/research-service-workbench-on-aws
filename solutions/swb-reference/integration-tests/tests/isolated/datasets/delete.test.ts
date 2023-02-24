@@ -23,8 +23,11 @@ describe('datasets delete negative tests', () => {
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   let dataSetName: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+  });
+
+  beforeEach(async () => {
     dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
@@ -37,7 +40,7 @@ describe('datasets delete negative tests', () => {
 
     const { data: createdProject } = await adminSession.resources.projects.create({
       name: `${dataSetName} project`,
-      description: 'test description',
+      description: 'datasets delete negative tests--project',
       costCenterId
     });
 
@@ -69,7 +72,7 @@ describe('datasets delete negative tests', () => {
     dataSet = newDataSet;
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await setup.cleanup();
   });
 
@@ -155,7 +158,7 @@ describe('datasets delete negative tests', () => {
       beforeEach(async () => {
         const { data: project } = await adminSession.resources.projects.create({
           name: `${dataSet.name} unassociated project`,
-          description: 'test description',
+          description: 'datasets delete negative tests--second project',
           costCenterId
         });
         await adminSession.resources.datasets
