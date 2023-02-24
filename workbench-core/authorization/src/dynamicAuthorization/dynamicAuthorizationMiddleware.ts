@@ -33,13 +33,6 @@ export default function withDynamicAuth(
         return;
       }
       const authenticatedUser = AuthenticatedUserParser.parse(res.locals.user);
-      console.log(
-        `isAuthorizedOnRoute args: ${JSON.stringify({
-          route,
-          method,
-          authenticatedUser
-        })}`
-      );
       await dynamicAuthorizationService.isAuthorizedOnRoute({
         route,
         method,
@@ -48,7 +41,7 @@ export default function withDynamicAuth(
       next();
       return;
     } catch (err) {
-      // log if a logger is provided)
+      // log if a logger is provided
       options?.logger?.error(`Dynamic Authorization Middleware Error: ${err}`);
       res.status(403).json({ error: 'User is not authorized' });
     }

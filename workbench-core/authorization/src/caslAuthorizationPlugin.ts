@@ -37,9 +37,6 @@ export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
     dynamicOperations: DynamicOperation[]
   ): Promise<void> {
     const ability: Ability = this._defineAbilitiesForIdentityPermissions(identityPermissions);
-    console.log(`Ability: ${JSON.stringify(ability)}`);
-    console.log(`IdentityPermissions: ${JSON.stringify(identityPermissions)}`);
-    console.log(`dynamicOperations: ${JSON.stringify(dynamicOperations)}`);
     try {
       dynamicOperations.forEach((dynamicOperation: DynamicOperation) => {
         const { subject } = dynamicOperation;
