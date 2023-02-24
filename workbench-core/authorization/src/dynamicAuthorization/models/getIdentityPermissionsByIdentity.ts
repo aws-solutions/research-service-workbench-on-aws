@@ -18,6 +18,10 @@ export const GetIdentityPermissionsByIdentityRequestParser = z
      */
     identityId: z.string(),
     /**
+     * Limit on number of identity permissions returned
+     */
+    limit: z.number().optional(),
+    /**
      * Pagination token to retrieve the next set of results
      */
     paginationToken: z.string().optional()
