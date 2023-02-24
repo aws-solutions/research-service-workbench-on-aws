@@ -167,7 +167,7 @@ describe('Create Project negative tests', () => {
         });
         costCenterId = costCenter.id;
 
-        await adminSession.resources.costCenters.costCenter(costCenterId).softDelete();
+        await adminSession.resources.costCenters.costCenter(costCenterId).delete();
       });
 
       test('it throws 400 error', async () => {

@@ -109,27 +109,15 @@ describe('userManagement activate/deactivate user integration test', () => {
     }
   });
 
-  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
+  it('should return an error when deactivating a user with an invalid UUID', async () => {
     try {
       await adminSession.resources.users.user(invalidUuid).deactivate();
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
-
-  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
-    try {
-      await adminSession.resources.users.user(invalidUuid).deactivate();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find user ${invalidUuid}`
         })
       );
     }

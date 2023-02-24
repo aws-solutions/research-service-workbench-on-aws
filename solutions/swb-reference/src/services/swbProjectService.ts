@@ -186,6 +186,7 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ENVIRONMENT, ['CREATE', 'READ'], paRole, {
         projectId: { $eq: projectId }
       }),
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ENVIRONMENT_TYPE, ['READ'], paRole),
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ETC, ['READ'], paRole, {
         projectId: { $eq: projectId }
       }),
@@ -206,9 +207,15 @@ export class SWBProjectService implements ProjectPlugin {
         paRole,
         { projectId: { $eq: projectId } }
       ),
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_SSH_KEY, ['CREATE', 'READ'], paRole, {
-        projectId: { $eq: projectId }
-      })
+      ...this._generateIdentityPermissions(
+        '*',
+        SwbAuthZSubject.SWB_SSH_KEY,
+        ['CREATE', 'READ', 'DELETE'],
+        paRole,
+        {
+          projectId: { $eq: projectId }
+        }
+      )
     ];
   }
 
@@ -230,6 +237,12 @@ export class SWBProjectService implements ProjectPlugin {
         researcherRole,
         { projectId: { $eq: projectId } }
       ),
+      ...this._generateIdentityPermissions(
+        '*',
+        SwbAuthZSubject.SWB_ENVIRONMENT_TYPE,
+        ['READ'],
+        researcherRole
+      ),
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ETC, ['READ'], researcherRole, {
         projectId: { $eq: projectId }
       }),
@@ -241,7 +254,7 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions(
         '*',
         SwbAuthZSubject.SWB_SSH_KEY,
-        ['CREATE', 'READ'],
+        ['CREATE', 'READ', 'DELETE'],
         researcherRole,
         { projectId: { $eq: projectId } }
       )

@@ -96,10 +96,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
           subjectId: '${costCenter}'
         }
       }
-    ]
-  },
-  '/costCenters/:costCenter/softDelete': {
-    PUT: [
+    ],
+    DELETE: [
       {
         action: 'DELETE',
         subject: {
@@ -147,6 +145,18 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     DELETE: [
       {
         action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/datasets/:datasetId/upload-requests': {
+    GET: [
+      {
+        action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
           subjectId: '${datasetId}',
@@ -285,13 +295,13 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId': {
+  '/environmentTypes/:envTypeId': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE,
-          subjectId: '${environmentTypeId}'
+          subjectId: '${envTypeId}'
         }
       }
     ],
@@ -300,12 +310,12 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE,
-          subjectId: '${environmentTypeId}'
+          subjectId: '${envTypeId}'
         }
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId/configurations': {
+  '/environmentTypes/:envTypeId/configurations': {
     GET: [
       {
         action: 'READ',
@@ -325,13 +335,13 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/environmentTypes/:environmentTypeId/configurations/:etcId': {
+  '/environmentTypes/:envTypeId/configurations/:envTypeConfigId': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
         }
       }
     ],
@@ -340,7 +350,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
         }
       }
     ],
@@ -349,7 +359,18 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '${etcId}' // no required boundary to control which ETs a user can see
+          subjectId: '${envTypeConfigId}' // no required boundary to control which ETs a user can see
+        }
+      }
+    ]
+  },
+  '/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_PROJECT,
+          subjectId: '*'
         }
       }
     ]
@@ -380,8 +401,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'UPDATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-          subjectId: '${datasetId}',
-          projectId: '${projectId}'
+          subjectId: '${datasetId}'
         }
       }
     ],
@@ -390,24 +410,36 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-          subjectId: '${datasetId}',
-          projectId: '${projectId}'
+          subjectId: '${datasetId}'
         }
       }
     ]
   },
-  '/projects/:projectId/environmentTypes/:environmentTypeId/configurations': {
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations': {
     GET: [
       {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_ETC,
-          subjectId: '*' // only be called by ITAdmin with no Project boundary
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
   },
-  '/projects/:projectId/environmentTypes/:environmentTypeId/configurations/:etcId/relationships': {
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_ETC,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships': {
     PUT: [
       {
         action: 'UPDATE',
@@ -445,10 +477,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
           subjectId: '${projectId}'
         }
       }
-    ]
-  },
-  '/projects/:projectId/softDelete': {
-    PUT: [
+    ],
+    DELETE: [
       {
         action: 'DELETE',
         subject: {
@@ -458,7 +488,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/users/:userId': {
+  '/projects/:projectId/users/:userId/relationships': {
     POST: [
       {
         action: 'CREATE',
@@ -478,7 +508,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/roles/:role/users': {
+  '/projects/:projectId/users': {
     GET: [
       {
         action: 'READ',
@@ -511,15 +541,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     ]
   },
   '/users/:userId': {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: {
-          subjectType: SwbAuthZSubject.SWB_USER,
-          subjectId: '${userId}'
-        }
-      }
-    ],
     PATCH: [
       {
         action: 'UPDATE',
@@ -535,6 +556,51 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_USER,
           subjectId: '${userId}'
+        }
+      }
+    ]
+  },
+  '/users/:userId/purge': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_USER,
+          subjectId: '${userId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/sshKeys': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
+  },
+  '/projects/:projectId/sshKeys/:sshKeyId/purge': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '${sshKeyId}',
+          projectId: '${projectId}'
         }
       }
     ]

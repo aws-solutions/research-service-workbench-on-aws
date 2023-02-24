@@ -6,6 +6,7 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
 import Datasets from '../datasets/datasets';
+import Environments from '../environments/environments';
 import EnvironmentTypes from '../environmentTypes/environmentTypes';
 import SshKeys from '../sshKeys/sshKeys';
 
@@ -20,15 +21,19 @@ export default class Project extends Resource {
     userId: string,
     requestBody: Record<string, string>
   ): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/users/${userId}`, requestBody);
+    return this._axiosInstance.post(`${this._api}/users/${userId}/relationships`, requestBody);
   }
 
   public async removeUserFromProject(userId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`${this._api}/users/${userId}`);
+    return this._axiosInstance.delete(`${this._api}/users/${userId}/relationships`);
   }
 
   public async listUsersForProject(role: string): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/users/${role}`);
+    return this._axiosInstance.get(`${this._api}/users`, { params: { role } });
+  }
+
+  public environments(): Environments {
+    return new Environments(this._clientSession, this._id);
   }
 
   public environmentTypes(): EnvironmentTypes {
@@ -39,10 +44,6 @@ export default class Project extends Resource {
     return new Datasets(this._clientSession, this._api);
   }
 
-  public async softDelete(): Promise<AxiosResponse> {
-    return this._axiosInstance.put(`${this._api}/softDelete`);
-  }
-
   public sshKeys(): SshKeys {
     return new SshKeys(this._clientSession, this._api);
   }
@@ -50,7 +51,7 @@ export default class Project extends Resource {
   protected async cleanup(): Promise<void> {
     try {
       console.log(`Attempting to softDelete project ${this._id}.`);
-      await this.softDelete();
+      await this.delete();
     } catch (e) {
       console.warn(
         `Could not delete project ${this._id}". 

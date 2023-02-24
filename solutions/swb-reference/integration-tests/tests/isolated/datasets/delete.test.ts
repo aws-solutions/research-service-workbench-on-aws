@@ -16,12 +16,9 @@ describe('datasets delete negative tests', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
   let pa1Session: ClientSession;
-  // let pa2Session: ClientSession;
-  // let researcher1Sesssion: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let paabHelper: PaabHelper;
-  // let adminSession: ClientSession
   let dataSet: DataSet;
   let dataSetBody: CreateDataSetRequest;
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
@@ -33,9 +30,6 @@ describe('datasets delete negative tests', () => {
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
     pa1Session = paabResources.pa1Session;
-    // pa2Session = paabResources.pa2Session;
-    // researcher1Sesssion = paabResources.rs1Session;
-    // adminSession = paabResources.adminSession;
 
     expect.hasAssertions();
   });
@@ -98,13 +92,17 @@ describe('datasets delete negative tests', () => {
           envType: settings.get('envType'),
           datasetIds: [dataSet.id],
           name: randomTextGenerator.getFakeText('dataset-name'),
-          projectId: project1Id,
           description: 'Temporary DataSet for integration test'
         };
-        const { data: env } = await pa1Session.resources.environments.create(envBody);
-        console.log('created environment');
-        const { data: envDetails } = await pa1Session.resources.environments
-          .environment(env.id, project1Id)
+        const { data: env } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .create(envBody);
+
+        const { data: envDetails } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
           .get();
         console.log('got environment');
         const awsRegion = settings.get('awsRegion');

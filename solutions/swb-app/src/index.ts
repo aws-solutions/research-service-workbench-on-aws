@@ -26,7 +26,6 @@ import { UpdateEnvironmentTypeConfigRequest } from './envTypeConfigs/updateEnvir
 import { AwsServiceError } from './errors/awsServiceError';
 import { ConflictError } from './errors/conflictError';
 import { ConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
-import { DatabaseError } from './errors/databaseError';
 import { DuplicateKeyError } from './errors/duplicateKeyError';
 import { Ec2Error } from './errors/ec2Error';
 import { NoInstanceFoundError } from './errors/noInstanceFoundError';
@@ -97,7 +96,6 @@ export {
   SshKeyPlugin,
   SendPublicKeyRequest,
   SendPublicKeyResponse,
-  DatabaseError,
   NonUniqueKeyError,
   NoKeyExistsError,
   Ec2Error,

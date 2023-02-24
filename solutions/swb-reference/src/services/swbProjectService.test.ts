@@ -248,6 +248,17 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       }
     });
   }
+  // Environment Type permissions
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: paRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE
+    });
+  }
   // Environment Type Config permissions
   for (const action of ['READ']) {
     identityPermissions.push({
@@ -299,7 +310,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
     });
   }
   // SSH Key permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE', 'READ', 'DELETE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -351,6 +362,17 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       }
     });
   }
+  // Environment Type permissions
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: researcherRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE
+    });
+  }
   // Environment Type Config permissions
   for (const action of ['READ']) {
     identityPermissions.push({
@@ -388,7 +410,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
     });
   }
   // SSH Key permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE', 'READ', 'DELETE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
