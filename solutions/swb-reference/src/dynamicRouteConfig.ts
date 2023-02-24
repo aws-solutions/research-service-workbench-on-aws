@@ -381,7 +381,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
           subjectId: '${datasetId}',
-          projectId: '${projectId}'
+          projectId: '*'
         }
       }
     ],
@@ -391,7 +391,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
           subjectId: '${datasetId}',
-          projectId: '${projectId}'
+          projectId: '*'
         }
       }
     ]
