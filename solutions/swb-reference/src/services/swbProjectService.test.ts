@@ -248,6 +248,17 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       }
     });
   }
+  // Environment Type permissions
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: paRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE
+    });
+  }
   // Environment Type Config permissions
   for (const action of ['READ']) {
     identityPermissions.push({
@@ -349,6 +360,17 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       conditions: {
         projectId: { $eq: projectId }
       }
+    });
+  }
+  // Environment Type permissions
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: researcherRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE
     });
   }
   // Environment Type Config permissions

@@ -9,9 +9,10 @@ import CollectionResource from '../base/collectionResource';
 import Dataset from './dataset';
 
 export default class Datasets extends CollectionResource {
-  public constructor(clientSession: ClientSession) {
+  public constructor(clientSession: ClientSession, parentApi: string = '') {
     super(clientSession, 'datasets', 'dataset');
-    this._api = 'datasets';
+    const parentRoute = parentApi ? `${parentApi}/` : '';
+    this._api = `${parentRoute}datasets`;
   }
 
   public dataset(id: string): Dataset {

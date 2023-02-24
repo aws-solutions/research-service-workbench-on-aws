@@ -73,8 +73,9 @@ describe('update environment types', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find environment type wrong-format-id to update`
         })
       );
     }

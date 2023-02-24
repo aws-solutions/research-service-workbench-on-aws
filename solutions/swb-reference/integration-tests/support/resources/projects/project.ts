@@ -5,6 +5,8 @@
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
+import Datasets from '../datasets/datasets';
+import Environments from '../environments/environments';
 import EnvironmentTypes from '../environmentTypes/environmentTypes';
 import SshKeys from '../sshKeys/sshKeys';
 
@@ -30,8 +32,16 @@ export default class Project extends Resource {
     return this._axiosInstance.get(`${this._api}/users`, { params: { role } });
   }
 
+  public environments(): Environments {
+    return new Environments(this._clientSession, this._id);
+  }
+
   public environmentTypes(): EnvironmentTypes {
     return new EnvironmentTypes(this._clientSession, this._api);
+  }
+
+  public dataSets(): Datasets {
+    return new Datasets(this._clientSession, this._api);
   }
 
   public sshKeys(): SshKeys {
