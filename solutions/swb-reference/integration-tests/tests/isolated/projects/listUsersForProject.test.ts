@@ -62,8 +62,9 @@ describe('list users for project tests', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(403, {
-            error: 'User is not authorized'
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `role: Invalid enum value. Expected 'ProjectAdmin' | 'Researcher', received 'abc'`
           })
         );
       }

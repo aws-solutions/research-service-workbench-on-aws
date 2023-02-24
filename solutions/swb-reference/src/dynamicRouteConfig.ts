@@ -465,7 +465,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/users/:userId': {
+  '/projects/:projectId/users/:userId/relationships': {
     POST: [
       {
         action: 'CREATE',
@@ -485,7 +485,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
-  '/projects/:projectId/users/:role': {
+  '/projects/:projectId/users': {
     GET: [
       {
         action: 'READ',
