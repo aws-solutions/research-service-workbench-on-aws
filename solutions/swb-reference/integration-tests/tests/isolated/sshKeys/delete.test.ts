@@ -19,6 +19,9 @@ describe('Delete Key Pair negative tests', () => {
 
   beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+  });
+
+  beforeEach(async () => {
     expect.hasAssertions();
   });
 
@@ -141,7 +144,7 @@ describe('Delete Key Pair negative tests', () => {
     });
   });
 
-  describe('with ITAdmin that cannot delete keys for a valid project', () => {
+  describe('with ITAdmin, cannot delete keys for a valid project', () => {
     const sampleSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
 
     test('it throws 403 error', async () => {
