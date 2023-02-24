@@ -32,6 +32,7 @@ import { Ec2Error } from './errors/ec2Error';
 import { NoInstanceFoundError } from './errors/noInstanceFoundError';
 import { NoKeyExistsError } from './errors/noKeyExistsError';
 import { NonUniqueKeyError } from './errors/nonUniqueKeyError';
+import { ProjectDeletedError } from './errors/projectDeletedError';
 import { generateRouter } from './generateRouter';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { AssociateProjectEnvTypeConfigRequest } from './projectEnvTypeConfigs/associateProjectEnvTypeConfigRequest';
@@ -118,5 +119,6 @@ export {
   NoInstanceFoundError,
   ConnectionInfoNotDefinedError,
   DuplicateKeyError,
-  SendPublicKeyResponseParser
+  SendPublicKeyResponseParser,
+  ProjectDeletedError
 };
