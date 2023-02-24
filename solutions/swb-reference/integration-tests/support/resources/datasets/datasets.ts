@@ -22,6 +22,10 @@ export default class Datasets extends CollectionResource {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
 
+  public async list(pageSize?: number, paginationToken?: string): Promise<AxiosResponse> {
+    return this._axiosInstance.get(this._api, { params: { pageSize, paginationToken } });
+  }
+
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const dataSetName = randomTextGenerator.getFakeText('test-DS');
