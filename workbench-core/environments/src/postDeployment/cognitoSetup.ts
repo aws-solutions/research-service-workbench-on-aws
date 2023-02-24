@@ -4,7 +4,6 @@
  */
 
 import {
-  GroupExistsException,
   ListUserPoolsCommandInput,
   UserPoolDescriptionType,
   UsernameExistsException
@@ -33,29 +32,6 @@ export default class CognitoSetup {
     const userPoolId = await this.getUserPoolId();
     console.log(`User pool id: ${userPoolId}`);
 
-    // Create IT Admin and Researcher groups in user pool if they do not exist
-    try {
-      await this.createGroup('ITAdmin', userPoolId);
-      console.log('Creating IT Admin group because group does not exist');
-    } catch (e) {
-      if (e instanceof GroupExistsException) {
-        console.log(`IT Admin group already exists in user pool ${USER_POOL_NAME}`);
-      } else {
-        throw e;
-      }
-    }
-
-    try {
-      await this.createGroup('Researcher', userPoolId);
-      console.log('Creating Researcher group because group does not exist');
-    } catch (e) {
-      if (e instanceof GroupExistsException) {
-        console.log(`Researcher group already exists in user pool ${USER_POOL_NAME}`);
-      } else {
-        throw e;
-      }
-    }
-
     // Create root user in user pool if user does not exist in pool
     try {
       await this.adminCreateUser();
@@ -70,10 +46,6 @@ export default class CognitoSetup {
         throw e;
       }
     }
-
-    // Add user to Admin user group if it has not already been added
-    await this.adminAddUserToGroup('ITAdmin', userPoolId, ROOT_USER_EMAIL);
-    console.log(`User ${ROOT_USER_EMAIL} added to IT Admin group`);
   }
 
   /**
