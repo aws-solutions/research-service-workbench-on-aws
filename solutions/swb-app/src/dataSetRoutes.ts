@@ -9,7 +9,7 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
-import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
+import { isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
