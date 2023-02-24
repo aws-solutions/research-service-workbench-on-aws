@@ -51,9 +51,9 @@ export class PaabHelper {
     const [project1Id, project2Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
-    const pa1Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin1');
-    const pa2Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin2');
-    const rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
+    let pa1Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin1');
+    let pa2Session: ClientSession = await this._setup.getSessionForUserType('projectAdmin2');
+    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1');
 
     // associate users with corresponding projects properly (as IT Admin)
     await adminSession.resources.projects
@@ -65,6 +65,10 @@ export class PaabHelper {
     await adminSession.resources.projects
       .project(project1Id)
       .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
+
+    pa1Session = await this._setup.getSessionForUserType('projectAdmin1');
+    pa2Session = await this._setup.getSessionForUserType('projectAdmin2');
+    rs1Session = await this._setup.getSessionForUserType('researcher1');
 
     return {
       adminSession,

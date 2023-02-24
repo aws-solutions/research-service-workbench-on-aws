@@ -4,81 +4,152 @@
  */
 
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('cannot create SSH key', () => {
-  const setup: Setup = new Setup();
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
-  let project: { id: string };
-  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
     expect.hasAssertions();
-    adminSession = await setup.getDefaultAdminSession();
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: randomTextGenerator.getFakeText('fakeCostCenterName'),
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: randomTextGenerator.getFakeText('fakeProjectName'),
-      description: 'Project for list users for project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
+  afterAll(async () => {
+    await paabHelper.cleanup();
   });
 
   describe('when the user already has a key for that project', () => {
     let existingSshKeyId: string;
 
-    beforeEach(async () => {
-      const { data: existingSshKey } = await adminSession.resources.projects
-        .project(project.id)
-        .sshKeys()
-        .create();
-      existingSshKeyId = existingSshKey.id;
-    });
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session,
+        projectId: () => project1Id
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session,
+        projectId: () => project1Id
+      }
+    ];
 
-    test('it throws 400 error', async () => {
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+      let session: ClientSession;
+      let project1Id: string;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+        project1Id = projectIdFunc();
+        const { data: existingSshKey } = await session.resources.projects
+          .project(project1Id)
+          .sshKeys()
+          .create();
+        existingSshKeyId = existingSshKey.id;
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects.project(project1Id).sshKeys().create();
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `The keypair '${existingSshKeyId}' already exists.`
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('for Project that does not exist', () => {
+    let invalidProjectId: string;
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session
+      }
+    ];
+
+    beforeEach(() => {
+      invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
+    });
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      const session = sessionFunc();
+
+      console.log(`as ${username}`);
+
       try {
-        await adminSession.resources.projects.project(project.id).sshKeys().create();
+        await session.resources.projects.project(invalidProjectId).sshKeys().create();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(400, {
-            error: 'Bad Request',
-            message: `The keypair '${existingSshKeyId}' already exists.`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
     });
   });
 
-  describe('for Project that does not exist', () => {
-    let invalidProjectId: string;
+  describe('for project user does not have access to', () => {
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session,
+        projectId: () => project2Id
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session,
+        projectId: () => project2Id
+      }
+    ];
 
-    beforeEach(() => {
-      invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
-    });
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+      const session = sessionFunc();
+      const projectId = projectIdFunc();
 
-    test('it throws 404 error', async () => {
+      console.log(`as ${username}`);
+
       try {
-        await adminSession.resources.projects.project(invalidProjectId).sshKeys().create();
+        await session.resources.projects.project(projectId).sshKeys().create();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+          new HttpError(403, {
+            error: `User is not authorized`
+          })
+        );
+      }
+    });
+  });
+
+  describe('with ITAdmin, cannot create a key for a valid project', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await adminSession.resources.projects.project(project1Id).sshKeys().create();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: `User is not authorized`
           })
         );
       }

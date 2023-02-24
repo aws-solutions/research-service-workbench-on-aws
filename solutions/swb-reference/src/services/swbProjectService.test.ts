@@ -299,7 +299,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
     });
   }
   // SSH Key permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE', 'READ', 'DELETE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -388,7 +388,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
     });
   }
   // SSH Key permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE', 'READ', 'DELETE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,

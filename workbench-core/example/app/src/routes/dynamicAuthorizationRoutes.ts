@@ -245,12 +245,16 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   router.get(
     '/authorization/permissions/identity',
     wrapAsync(async (req: Request, res: Response) => {
+      const query = {
+        ...req.query,
+        limit: req.query.limit && typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined
+      };
       const validatedRequest = validateAndParse<GetIdentityPermissionsByIdentityRequest>(
         GetIdentityPermissionsByIdentityRequestParser,
-        req.query
+        query
       );
-      const { data } = await service.getIdentityPermissionsByIdentity(validatedRequest);
-      res.status(200).send(data);
+      const response = await service.getIdentityPermissionsByIdentity(validatedRequest);
+      res.status(200).send(response);
     })
   );
   router.get(
@@ -261,12 +265,17 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           const identities: string[] = req.query.identities as string[];
           req.query.identities = identities.map((identity) => JSON.parse(identity));
         }
+        const query = {
+          ...req.query,
+          limit:
+            req.query.limit && typeof req.query.limit === 'string' ? parseInt(req.query.limit) : undefined
+        };
         const validatedRequest = validateAndParse<GetIdentityPermissionsBySubjectRequest>(
           GetIdentityPermissionsBySubjectRequestParser,
-          req.query
+          query
         );
-        const { data } = await service.getIdentityPermissionsBySubject(validatedRequest);
-        res.status(200).send(data);
+        const response = await service.getIdentityPermissionsBySubject(validatedRequest);
+        res.status(200).send(response);
       } catch (err) {
         if (isThroughputExceededError(err)) throw Boom.tooManyRequests('Too many identities');
         throw err;
