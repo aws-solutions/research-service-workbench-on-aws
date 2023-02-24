@@ -6,12 +6,16 @@ import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
+import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
+import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Associate Project with EnvTypeConfig', () => {
   const setup: Setup = new Setup();
   const paabHelper: PaabHelper = new PaabHelper();
   let adminSession: ClientSession;
+  const settings: Settings = setup.getSettings();
+  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
@@ -68,6 +72,44 @@ describe('Associate Project with EnvTypeConfig', () => {
         new HttpError(404, {
           error: 'Not Found',
           message: `Could not find project ${nonExistentProjectId}`
+        })
+      );
+    }
+  });
+
+  test('fails when using deleted project', async () => {
+    const dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: `${dataSetName} cost center`,
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test object'
+    });
+
+    const { data: createdProject } = await adminSession.resources.projects.create({
+      name: `${dataSetName} project`,
+      description: 'test description',
+      costCenterId: costCenter.id
+    });
+
+    const projectId = createdProject.id;
+
+    await adminSession.resources.projects.project(projectId).delete();
+
+    try {
+      await adminSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .associate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `Project ${projectId} was deleted`
         })
       );
     }
