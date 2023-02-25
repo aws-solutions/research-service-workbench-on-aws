@@ -45,7 +45,7 @@ describe('datasets delete negative tests', () => {
           .project(project1Id)
           .dataSets()
           .dataset('dataset-00000000-0000-0000-0000-000000000000')
-          .delete();
+          .softDelete();
       } catch (e) {
         checkHttpError(
           e,
@@ -142,7 +142,7 @@ describe('datasets delete negative tests', () => {
             .project(project1Id)
             .dataSets()
             .dataset(dataSet.id!)
-            .deleteFromProject(project1Id);
+            .softDelete();
         } catch (e) {
           checkHttpError(
             e,
@@ -168,7 +168,11 @@ describe('datasets delete negative tests', () => {
 
       test('it returns a 409', async () => {
         try {
-          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id!)
+            .softDelete();
         } catch (e) {
           checkHttpError(
             e,
