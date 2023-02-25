@@ -61,7 +61,8 @@ describe('list datasets for project tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            error: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            error: 'Bad Request',
+            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
@@ -77,7 +78,8 @@ describe('list datasets for project tests', () => {
         checkHttpError(
           e,
           new HttpError(400, {
-            error: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            error: 'Bad Request',
+            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
