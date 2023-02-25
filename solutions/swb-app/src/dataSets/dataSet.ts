@@ -7,7 +7,7 @@ export interface DataSet {
   /**
    * an internally generated value which uniquely identifies the dataset.
    */
-  id?: string;
+  id: string;
 
   /**
    * the name of a DataSet
@@ -17,7 +17,7 @@ export interface DataSet {
   /**
    * the date and time string at which the DataSet was added to the solution.
    */
-  createdAt?: string;
+  createdAt: string;
 
   /**
    * (optional) a description of the dataset

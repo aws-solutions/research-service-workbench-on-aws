@@ -136,6 +136,36 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
   }
 
+  public async listDataSetsForProject(
+    projectId: string,
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
+    let projectDatasets: DataSet[] = [];
+
+    let lastPaginationToken = paginationToken;
+    do {
+      const allDatasets = await this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
+      projectDatasets = projectDatasets.concat(
+        allDatasets.data.filter((dataset) => dataset.owner?.split('#')[0] === projectId)
+      );
+      lastPaginationToken = allDatasets.paginationToken;
+    } while (projectDatasets.length < pageSize && lastPaginationToken);
+
+    if (projectDatasets.length > pageSize) {
+      projectDatasets = projectDatasets.slice(0, pageSize);
+      lastPaginationToken = this._workbenchDataSetService.getPaginationToken(
+        projectDatasets[pageSize - 1].id
+      );
+    }
+
+    return {
+      data: projectDatasets,
+      paginationToken: lastPaginationToken
+    };
+  }
+
   public async listDataSetAccessPermissions(
     request: ListDataSetAccessPermissionsRequest
   ): Promise<PermissionsResponse> {
@@ -150,18 +180,40 @@ export class DataSetService implements DataSetPlugin {
 
   public async provisionDataSet(projectId: string, request: CreateProvisionDatasetRequest): Promise<DataSet> {
     //add permissions in AuthZ for user to read, write, update, delete, and update read/write permissions
-    request.owner = getProjectAdminRole(projectId);
+    const projectAdmin = getProjectAdminRole(projectId);
+    const projectResearcher = getResearcherRole(projectId);
+
     request.ownerType = 'GROUP';
+    request.owner = projectAdmin;
+    request.permissions = [
+      {
+        identity: projectAdmin,
+        identityType: 'GROUP',
+        accessLevel: 'read-write'
+      },
+      {
+        identity: projectResearcher,
+        identityType: 'GROUP',
+        accessLevel: 'read-write'
+      }
+    ];
 
     const dataset = await this._workbenchDataSetService.provisionDataSet(request);
 
-    const projectAdmin = dataset.owner!;
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
       dataset.id!,
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
+    );
+
+    await this._addAuthZPermissionsForDataset(
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataset.id!,
+      [projectResearcher],
+      ['READ']
     );
 
     await this._addAuthZPermissionsForDataset(
