@@ -63,7 +63,7 @@ export default class Environment extends Resource {
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );
 
-      if (!['STOPPED'].includes(envStatus)) {
+      if (!['STOPPED', 'TERMINATING'].includes(envStatus)) {
         console.log(
           `Environment must be stopped to terminate. Currently in state ${envStatus}. Stopping environment ${this._id}.`
         );
