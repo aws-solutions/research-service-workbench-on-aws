@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
@@ -48,6 +49,35 @@ describe('list datasets for project tests', () => {
           e,
           new HttpError(403, {
             error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('cannot have a page size of 0', async () => {
+      try {
+        await pa1Session.resources.projects.project(project1Id).dataSets().get({ pageSize: 0 });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+          })
+        );
+      }
+    });
+
+    test('cannot have a page size of over the max', async () => {
+      try {
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .get({ pageSize: MAX_API_PAGE_SIZE + 1 });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }

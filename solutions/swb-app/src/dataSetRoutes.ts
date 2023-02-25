@@ -6,6 +6,7 @@
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import {
   DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
   resourceTypeToKey,
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
@@ -150,6 +151,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
 
+      if (pageSize < 1 || pageSize > MAX_API_PAGE_SIZE) {
+        throw Boom.badRequest(`Page size must be between 1 and ${MAX_API_PAGE_SIZE}`);
+      }
+
       const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
       res.send(response);
     })
@@ -163,6 +168,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
       const projectId = req.params.projectId;
+
+      if (pageSize < 1 || pageSize > MAX_API_PAGE_SIZE) {
+        throw Boom.badRequest(`Page size must be between 1 and ${MAX_API_PAGE_SIZE}`);
+      }
 
       const response = await dataSetService.listDataSetsForProject(
         projectId,
