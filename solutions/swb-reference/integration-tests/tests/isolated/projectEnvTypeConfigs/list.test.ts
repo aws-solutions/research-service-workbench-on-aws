@@ -41,7 +41,6 @@ describe('list environment type configs associated to project', () => {
     expect(Array.isArray(response.data)).toBe(true);
   });
 
-  // TODO: Update and enable this test once input validation is in place.
   test('list projectEnvTypeConfigs fails when using invalid format project Id', async () => {
     try {
       await adminSession.resources.projects
@@ -80,7 +79,6 @@ describe('list environment type configs associated to project', () => {
     }
   });
 
-  // TODO: Update and enable this test once input validation is in place.
   test('list projectEnvTypeConfigs fails when using invalid format envType Id', async () => {
     try {
       await adminSession.resources.projects

@@ -143,23 +143,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
-  // List dataSets
-  router.get(
-    '/datasets',
-    wrapAsync(async (req: Request, res: Response) => {
-      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
-      const paginationToken = req.query.paginationToken?.toString();
-
-      if (pageSize < 1 || pageSize > MAX_API_PAGE_SIZE) {
-        throw Boom.badRequest(`Page size must be between 1 and ${MAX_API_PAGE_SIZE}`);
-      }
-
-      const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
-      res.send(response);
-    })
-  );
-
   // List project dataSets
   router.get(
     '/projects/:projectId/datasets',

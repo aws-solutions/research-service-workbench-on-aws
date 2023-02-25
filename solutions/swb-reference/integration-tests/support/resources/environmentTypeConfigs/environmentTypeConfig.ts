@@ -42,15 +42,18 @@ export default class EnvironmentTypeConfig extends Resource {
         .environmentTypeConfig(this._id)
         .projects()
         .get();
-    associatedProjects.data?.forEach(async (project) => {
-      await defAdminSession.resources.projects
-        .project(project.id)
-        .environmentTypes()
-        .environmentType(this._parentId)
-        .configurations()
-        .environmentTypeConfig(this._id)
-        .disassociate();
-    });
+
+    await Promise.all(
+      associatedProjects.data?.map(async (project) => {
+        await defAdminSession.resources.projects
+          .project(project.id)
+          .environmentTypes()
+          .environmentType(this._parentId)
+          .configurations()
+          .environmentTypeConfig(this._id)
+          .disassociate();
+      })
+    );
 
     await defAdminSession.resources.environmentTypes
       .environmentType(this._parentId)

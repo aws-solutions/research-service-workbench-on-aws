@@ -48,7 +48,6 @@ describe('multiStep costCenter test', () => {
     expect(updatedCostCenterB).toMatchObject({ name, description });
 
     console.log('Delete Cost Center B');
-    // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete()).resolves;
+    await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete();
   });
 });
