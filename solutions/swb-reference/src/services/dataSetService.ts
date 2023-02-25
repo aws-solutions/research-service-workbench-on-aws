@@ -213,7 +213,7 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET,
       dataset.id!,
       [projectResearcher],
-      ['READ', 'UPDATE']
+      ['READ']
     );
 
     await this._addAuthZPermissionsForDataset(
