@@ -107,6 +107,17 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
+  '/datasets/:datasetId': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectId: '${datasetId}'
+        }
+      }
+    ]
+  },
   '/projects/:projectId/datasets': {
     GET: [
       {
@@ -184,7 +195,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     ]
   },
   '/projects/:projectId/datasets/import': {
-    // May need to add datasetId into this for authz
     POST: [
       {
         action: 'CREATE',
@@ -197,7 +207,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
     ]
   },
   '/projects/:projectId/datasets/share': {
-    // May need to add datasetId into this for authz
     POST: [
       {
         action: 'CREATE',

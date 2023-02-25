@@ -174,6 +174,17 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
+  // Get DataSet
+  router.get(
+    '/datasets/:datasetId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+
+      const response = await dataSetService.getDataSet(req.params.datasetId, authenticatedUser);
+      res.send(response);
+    })
+  );
+
   router.put(
     '/projects/:projectId/datasets/:datasetId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
