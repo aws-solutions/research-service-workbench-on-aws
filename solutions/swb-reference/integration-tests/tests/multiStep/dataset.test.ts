@@ -77,7 +77,10 @@ describe('multiStep dataset integration test', () => {
       projectId: project1Id,
       description: 'Temporary DataSet for integration test'
     };
-    const { data: env } = await pa1Session.resources.environments.create(envBody);
+    const { data: env } = await pa1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .create(envBody);
 
     // Verify environment has access point for dataset
     const { data: envDetails } = await pa1Session.resources.projects
@@ -120,7 +123,11 @@ describe('multiStep dataset integration test', () => {
 
     console.log('ASSOCIATE WITH PROJECT');
 
-    await pa1Session.resources.datasets.dataset(dataSet.id).associateWithProject(project2Id, 'read-only');
+    await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .dataset(dataSet.id)
+      .associateWithProject(project2Id, 'read-only');
 
     console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
     const { data: responseData } = await pa1Session.resources.projects
@@ -195,10 +202,6 @@ describe('multiStep dataset integration test', () => {
       (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await pa1Session.resources.projects
-      .project(project1Id)
-      .dataSets()
-      .dataset(dataSet.id)
-      .deleteFromProject(project2Id);
+    await pa1Session.resources.projects.project(project2Id).dataSets().dataset(dataSet.id).delete();
   });
 });

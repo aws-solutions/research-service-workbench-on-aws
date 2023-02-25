@@ -138,11 +138,7 @@ describe('datasets delete negative tests', () => {
 
       test('it returns a 409', async () => {
         try {
-          await pa1Session.resources.projects
-            .project(project1Id)
-            .dataSets()
-            .dataset(dataSet.id!)
-            .deleteFromProject(project1Id);
+          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
         } catch (e) {
           checkHttpError(
             e,
