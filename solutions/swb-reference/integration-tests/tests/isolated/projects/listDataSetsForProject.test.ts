@@ -34,22 +34,15 @@ describe('list datasets for project tests', () => {
   });
 
   describe('negative tests', () => {
-    test('IT Admin cannot list datasets for a project', async () => {
-      try {
-        await itAdminSession.resources.projects.project(project1Id).dataSets().list();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
+    test('IT Admin cannot view any datasets, so the call will return an empty list', async () => {
+      const { data } = await itAdminSession.resources.projects.project(project1Id).dataSets().get();
+
+      expect(data.data).toStrictEqual([]);
     });
 
     test('Project Admin from project 2 cannot list datasets for project 1', async () => {
       try {
-        await pa2Session.resources.projects.project(project1Id).dataSets().list();
+        await pa2Session.resources.projects.project(project1Id).dataSets().get();
       } catch (e) {
         checkHttpError(
           e,
@@ -80,7 +73,7 @@ describe('list datasets for project tests', () => {
     });
 
     test('Project Admin can list datasets for a project', async () => {
-      const { data } = await pa1Session.resources.projects.project(project1Id).dataSets().list();
+      const { data } = await pa1Session.resources.projects.project(project1Id).dataSets().get();
 
       expect(data.data).toEqual(
         expect.arrayContaining([
@@ -92,7 +85,7 @@ describe('list datasets for project tests', () => {
     });
 
     test('Researcher can list datasets for a project', async () => {
-      const { data } = await researcher1Session.resources.projects.project(project1Id).dataSets().list();
+      const { data } = await researcher1Session.resources.projects.project(project1Id).dataSets().get();
 
       expect(data.data).toEqual(
         expect.arrayContaining([
@@ -107,7 +100,7 @@ describe('list datasets for project tests', () => {
       const { data: firstRequest } = await researcher1Session.resources.projects
         .project(project1Id)
         .dataSets()
-        .list(1);
+        .get({ pageSize: 1 });
 
       expect(firstRequest.data).toEqual(
         expect.arrayContaining([expect.objectContaining({ id: dataset1Id })])
@@ -118,7 +111,7 @@ describe('list datasets for project tests', () => {
       const { data: secondRequest } = await researcher1Session.resources.projects
         .project(project1Id)
         .dataSets()
-        .list(1, firstRequest.paginationToken);
+        .get({ pageSize: 1, paginationToken: firstRequest.paginationToken });
 
       expect(secondRequest.data).toEqual(
         expect.arrayContaining([expect.objectContaining({ id: dataset2Id })])
@@ -129,7 +122,7 @@ describe('list datasets for project tests', () => {
       const { data: lastRequest } = await researcher1Session.resources.projects
         .project(project1Id)
         .dataSets()
-        .list(1, secondRequest.paginationToken);
+        .get({ pageSize: 1, paginationToken: secondRequest.paginationToken });
 
       expect(lastRequest.data).toStrictEqual([]);
       expect(lastRequest.paginationToken).toBeUndefined();
