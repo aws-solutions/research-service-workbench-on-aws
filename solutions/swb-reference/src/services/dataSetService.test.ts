@@ -173,7 +173,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(createDatasetRequest);
+            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
@@ -186,10 +186,10 @@ describe('DataSetService', () => {
           beforeEach(() => {
             identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
-            subjectId = `${projectId}-dataSetId`;
+            subjectId = `dataSetId`;
             subjectType = SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL;
             effect = 'ALLOW';
-            actions = ['READ', 'UPDATE'];
+            actions = ['READ', 'UPDATE', 'DELETE'];
 
             identityPermissions = actions.map((action: Action) => {
               return {
@@ -204,7 +204,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(createDatasetRequest);
+            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
@@ -318,14 +318,14 @@ describe('DataSetService', () => {
 
           describe('for DATASET_ACCESS_LEVEL', () => {
             beforeEach(() => {
-              const actions: Action[] = ['READ', 'UPDATE'];
+              const actions: Action[] = ['READ', 'UPDATE', 'DELETE'];
               identityPermissions = actions.map((action: Action) => {
                 return {
                   action,
                   effect: 'ALLOW',
                   identityId: `${projectId}#ProjectAdmin`,
                   identityType: 'GROUP',
-                  subjectId: `${projectId}-dataSetId`,
+                  subjectId: `dataSetId`,
                   subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL
                 };
               });

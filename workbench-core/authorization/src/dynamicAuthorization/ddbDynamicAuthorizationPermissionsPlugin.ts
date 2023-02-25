@@ -4,7 +4,17 @@
  */
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { DynamoDBService, JSONValue, addPaginationToken, getPaginationToken } from '@aws/workbench-core-base';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import {
+  DynamoDBService,
+  JSONValue,
+  addPaginationToken,
+  getPaginationToken,
+  QueryParams,
+  DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
+  fromPaginationToken
+} from '@aws/workbench-core-base';
 import _ from 'lodash';
 import { createRouter, RadixRouter } from 'radix3';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
@@ -134,9 +144,10 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async getIdentityPermissionsByIdentity(
     getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
   ): Promise<GetIdentityPermissionsByIdentityResponse> {
-    const { identityId, identityType } = getIdentityPermissionsByIdentityRequest;
+    const { identityId, identityType, limit } = getIdentityPermissionsByIdentityRequest;
     const identity = `${identityType}|${identityId}`;
-    const queryParams = {
+    let queryParams: QueryParams = {
+      limit: Math.min(limit ?? DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE),
       index: this._getIdentityPermissionsByIdentityIndex,
       key: {
         name: this._getIdentityPermissionsByIdentityPartitionKey,
@@ -144,7 +155,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
       }
     };
     if (getIdentityPermissionsByIdentityRequest.paginationToken)
-      addPaginationToken(getIdentityPermissionsByIdentityRequest.paginationToken, queryParams);
+      queryParams = addPaginationToken(getIdentityPermissionsByIdentityRequest.paginationToken, queryParams);
     const { data, paginationToken } = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     const identityPermissions = data.map((item) => this._transformItemToIdentityPermission(item));
@@ -159,20 +170,22 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
-    const { subjectId, subjectType } = getIdentityPermissionsBySubjectRequest;
+    const { subjectId, subjectType, limit } = getIdentityPermissionsBySubjectRequest;
     const key = {
       name: 'pk',
       value: this._createIdentityPermissionsPartitionKey(subjectType, subjectId)
     };
 
     const query = this._dynamoDBService.query({
-      key
+      key,
+      limit: Math.min(limit ?? DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE)
     });
 
     if (getIdentityPermissionsBySubjectRequest.action) {
       query.sortKey('sk').begins({ S: `${getIdentityPermissionsBySubjectRequest.action}` });
     }
-
+    if (getIdentityPermissionsBySubjectRequest.paginationToken)
+      query.start(marshall(fromPaginationToken(getIdentityPermissionsBySubjectRequest.paginationToken)));
     //IN operator maxed out at 100
     if (getIdentityPermissionsBySubjectRequest.identities) {
       const { identities } = getIdentityPermissionsBySubjectRequest;

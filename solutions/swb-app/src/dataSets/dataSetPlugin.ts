@@ -20,7 +20,7 @@ import { ProjectRemoveAccessRequest } from './projectRemoveAccessRequestParser';
 export interface DataSetPlugin {
   storagePlugin: DataSetStoragePlugin;
 
-  provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet>;
+  provisionDataSet(projectId: string, request: CreateProvisionDatasetRequest): Promise<DataSet>;
   removeDataSet(dataSetId: string, authenticatedUser: AuthenticatedUser): Promise<void>;
   importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet>;
   addDataSetExternalEndpoint(

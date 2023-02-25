@@ -26,6 +26,10 @@ export const GetIdentityPermissionsBySubjectRequestParser = z.object({
    */
   identities: z.array(IdentityParser).optional(),
   /**
+   * Limit on number of identity permissions returned
+   */
+  limit: z.number().optional(),
+  /**
    * Pagination token to retrieve the next set of results
    */
   paginationToken: z.string().optional()

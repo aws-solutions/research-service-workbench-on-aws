@@ -6,6 +6,7 @@ import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createData
 import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
 import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
+import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
 import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../support/utils/constants';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
@@ -14,37 +15,23 @@ import Settings from '../../support/utils/settings';
 import { poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
-  let adminSession: ClientSession;
-  let dataSetName: string;
-  let projectId: string;
-  let costCenterId: string;
 
-  beforeEach(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+  let pa1Session: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
 
-    const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-    dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
-
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: `${dataSetName} cost center`,
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-    costCenterId = costCenter.id;
-
-    const { data: createdProject } = await adminSession.resources.projects.create({
-      name: `${dataSetName} project`,
-      description: 'test description',
-      costCenterId
-    });
-
-    projectId = createdProject.id;
+  beforeAll(async () => {
+    const paabResources = await paabHelper.createResources();
+    project1Id = paabResources.project1Id;
+    pa1Session = paabResources.pa1Session;
+    project2Id = paabResources.project2Id;
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
+  afterAll(async () => {
+    await paabHelper.cleanup();
   });
 
   test('Environment provisioning with DataSet', async () => {
@@ -58,12 +45,12 @@ describe('multiStep dataset integration test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(projectId),
+      owner: getProjectAdminRole(project1Id),
       ownerType: 'GROUP',
       type: 'internal',
       permissions: [
         {
-          identity: getResearcherRole(projectId),
+          identity: getResearcherRole(project1Id),
           identityType: 'GROUP',
           accessLevel: 'read-write'
         }
@@ -71,7 +58,10 @@ describe('multiStep dataset integration test', () => {
     });
 
     console.log('CREATE');
-    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
+    const { data: dataSet } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .create(dataSetBody, false);
     expect(dataSet).toMatchObject({
       id: expect.stringMatching(dsUuidRegExp)
     });
@@ -84,14 +74,19 @@ describe('multiStep dataset integration test', () => {
       envType: settings.get('envType'),
       datasetIds: [dataSet.id],
       name: randomTextGenerator.getFakeText('dataset-name'),
-      projectId,
+      projectId: project1Id,
       description: 'Temporary DataSet for integration test'
     };
-    const { data: env } = await adminSession.resources.environments.create(envBody);
+    const { data: env } = await pa1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .create(envBody);
 
     // Verify environment has access point for dataset
-    const { data: envDetails } = await adminSession.resources.environments
-      .environment(env.id, projectId)
+    const { data: envDetails } = await pa1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .environment(env.id)
       .get();
     const awsRegion = settings.get('awsRegion');
     const mainAccountId = settings.get('mainAccountId');
@@ -115,7 +110,11 @@ describe('multiStep dataset integration test', () => {
 
     console.log('GET');
     // Verify dataset has env access point listed in its external endpoints
-    const { data: dataSetDetails } = await adminSession.resources.datasets.dataset(dataSet.id).get();
+    const { data: dataSetDetails } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .dataset(dataSet.id)
+      .get();
     // Dataset was created just for this test case, so we expect only one endpoint
     expect(dataSetDetails).toMatchObject({
       ...dataSetBody,
@@ -123,18 +122,17 @@ describe('multiStep dataset integration test', () => {
     });
 
     console.log('ASSOCIATE WITH PROJECT');
-    // Verify the dataset can be associated with a project
-    const { data: unassociatedProject } = await adminSession.resources.projects.create({
-      name: `${dataSetName} unassociated project`,
-      description: 'test description',
-      costCenterId
-    });
-    await adminSession.resources.datasets
+
+    await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
       .dataset(dataSet.id)
-      .associateWithProject(unassociatedProject.id, 'read-only');
+      .associateWithProject(project2Id, 'read-only');
 
     console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
-    const { data: responseData } = await adminSession.resources.datasets
+    const { data: responseData } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
       .dataset(dataSet.id)
       .listAccessPermissions();
     const sortedActual: DataSetPermission[] = responseData.data.permissions.sort(
@@ -143,12 +141,12 @@ describe('multiStep dataset integration test', () => {
     const expected: DataSetPermission[] = [
       {
         accessLevel: 'read-only',
-        identity: `${unassociatedProject.id}#ProjectAdmin`,
+        identity: `${project2Id}#ProjectAdmin`,
         identityType: 'GROUP'
       },
       {
         accessLevel: 'read-write',
-        identity: `${projectId}#Researcher`,
+        identity: `${project1Id}#Researcher`,
         identityType: 'GROUP'
       }
     ];
@@ -156,38 +154,54 @@ describe('multiStep dataset integration test', () => {
     expect(sortedActual).toEqual(expected);
 
     console.log('DISASSOCIATE FROM PROJECT');
-    await adminSession.resources.datasets.dataset(dataSet.id).disassociateFromProject(unassociatedProject.id);
+    await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .dataset(dataSet.id)
+      .disassociateFromProject(project2Id);
 
     console.log('TERMINATE ENVIRONMENT & REMOVE DATASET');
     await poll(
       async () => {
-        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },
       (data) => data?.status === 'COMPLETED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await adminSession.resources.environments.environment(env.id, projectId).stop();
+    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
     await poll(
       async () => {
-        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },
       (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await adminSession.resources.environments.environment(env.id, projectId).terminate();
+    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).terminate();
     await poll(
       async () => {
-        const { data: envData } = await adminSession.resources.environments.environment(env.id).get();
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
         console.log(`env status: ${envData.status}`);
         return envData;
       },
       (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await adminSession.resources.datasets.dataset(dataSet.id).deleteFromProject(projectId);
+    await pa1Session.resources.projects.project(project2Id).dataSets().dataset(dataSet.id).delete();
   });
 });

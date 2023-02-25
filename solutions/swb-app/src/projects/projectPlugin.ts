@@ -7,11 +7,11 @@ import {
   CreateProjectRequest,
   DeleteProjectRequest,
   GetProjectRequest,
+  GetProjectsRequest,
   ListProjectsRequest,
   Project,
   UpdateProjectRequest
 } from '@aws/workbench-core-accounts';
-import { GetProjectsRequest } from '@aws/workbench-core-accounts/lib/models/projects/getProjectsRequest';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { PaginatedResponse } from '@aws/workbench-core-base';
 

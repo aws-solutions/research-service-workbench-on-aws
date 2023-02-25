@@ -12,10 +12,12 @@ describe('listUserSshKeysForProject negative tests', () => {
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let project1Id: string;
   let project2Id: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project2Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
@@ -26,33 +28,84 @@ describe('listUserSshKeysForProject negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  describe('with User that is not authorized', () => {
-    test.skip('it throws 403 error', async () => {
+  describe('for project that does not exist', () => {
+    let invalidProjectId: string;
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session
+      }
+    ];
+
+    beforeEach(() => {
+      invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
+    });
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      const session = sessionFunc();
+
+      console.log(`as ${username}`);
+
       try {
-        const response = await pa1Session.resources.projects.project(project2Id).sshKeys().get();
-        console.log('response', response);
+        await session.resources.projects.project(invalidProjectId).sshKeys().get();
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(403, {
-            error: 'User is not authorized' //User does not have access
+            error: `User is not authorized`
           })
         );
       }
     });
   });
 
-  describe('with Project that does not exist', () => {
-    test('it throws 404 error', async () => {
-      const invalidProjectId = 'proj-00000000-0000-0000-0000-000000000000';
+  describe('for project that user does not have access to', () => {
+    const testBundle = [
+      {
+        username: 'projectAdmin1',
+        session: () => pa1Session,
+        projectId: () => project2Id
+      },
+      {
+        username: 'researcher1',
+        session: () => rs1Session,
+        projectId: () => project2Id
+      }
+    ];
+
+    test.each(testBundle)('it throws 403 error', async (testCase) => {
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+      const session = sessionFunc();
+      const projectId = projectIdFunc();
+
+      console.log(`as ${username}`);
+
       try {
-        await adminSession.resources.projects.project(invalidProjectId).sshKeys().get();
+        await session.resources.projects.project(projectId).sshKeys().get();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+          new HttpError(403, {
+            error: `User is not authorized`
+          })
+        );
+      }
+    });
+  });
+
+  describe('with ITAdmin that cannot list keys for a valid project', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await adminSession.resources.projects.project(project1Id).sshKeys().get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: `User is not authorized`
           })
         );
       }

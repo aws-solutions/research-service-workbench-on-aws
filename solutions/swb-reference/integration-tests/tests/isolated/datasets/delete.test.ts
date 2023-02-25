@@ -3,88 +3,54 @@ import {
   CreateDataSetRequest,
   CreateDataSetRequestParser
 } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getProjectAdminRole, getResearcherRole } from '../../../../src/utils/roleUtils';
+import { getResearcherRole } from '../../../../src/utils/roleUtils';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { dsUuidRegExp } from '../../../support/utils/regExpressions';
 import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets delete negative tests', () => {
   const setup: Setup = new Setup();
   const settings: Settings = setup.getSettings();
-  let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
+  let paabHelper: PaabHelper;
   let dataSet: DataSet;
   let dataSetBody: CreateDataSetRequest;
-  let projectId: string;
-  let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   let dataSetName: string;
 
-  beforeEach(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+  beforeAll(async () => {
+    paabHelper = new PaabHelper();
+    const paabResources = await paabHelper.createResources();
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
+    pa1Session = paabResources.pa1Session;
 
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: `${dataSetName} cost center`,
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    costCenterId = costCenter.id;
-
-    const { data: createdProject } = await adminSession.resources.projects.create({
-      name: `${dataSetName} project`,
-      description: 'test description',
-      costCenterId
-    });
-
-    projectId = createdProject.id;
-
-    dataSetBody = CreateDataSetRequestParser.parse({
-      storageName: settings.get('DataSetsBucketName'),
-      awsAccountId: settings.get('mainAccountId'),
-      path: dataSetName, // using same name to help potential troubleshooting
-      name: dataSetName,
-      region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(createdProject.id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(createdProject.id),
-          identityType: 'GROUP',
-          accessLevel: 'read-only'
-        }
-      ]
-    });
-
-    const { data: newDataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
-    expect(newDataSet).toMatchObject({
-      id: expect.stringMatching(dsUuidRegExp)
-    });
-
-    dataSet = newDataSet;
+    expect.hasAssertions();
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
+  afterAll(async () => {
+    await paabHelper.cleanup();
   });
 
   describe('when the dataset does not exist', () => {
-    test('it returns a 404', async () => {
+    test('it returns a 403', async () => {
       try {
-        await adminSession.resources.datasets
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
           .dataset('dataset-00000000-0000-0000-0000-000000000000')
-          .deleteFromProject(projectId);
+          .delete();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Not Found`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
@@ -92,6 +58,32 @@ describe('datasets delete negative tests', () => {
   });
 
   describe('when the dataset is still associated with', () => {
+    beforeEach(async () => {
+      dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+
+      dataSetBody = CreateDataSetRequestParser.parse({
+        storageName: settings.get('DataSetsBucketName'),
+        awsAccountId: settings.get('mainAccountId'),
+        path: dataSetName,
+        name: dataSetName,
+        region: settings.get('awsRegion'),
+        type: 'internal',
+        permissions: [
+          {
+            identity: getResearcherRole(project1Id),
+            identityType: 'GROUP',
+            accessLevel: 'read-only'
+          }
+        ]
+      });
+
+      const { data: newDataSet } = await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .create(dataSetBody, false);
+      dataSet = newDataSet;
+    });
+
     describe('external endpoints', () => {
       beforeEach(async () => {
         const envBody = {
@@ -100,14 +92,19 @@ describe('datasets delete negative tests', () => {
           envType: settings.get('envType'),
           datasetIds: [dataSet.id],
           name: randomTextGenerator.getFakeText('dataset-name'),
-          projectId,
           description: 'Temporary DataSet for integration test'
         };
-        const { data: env } = await adminSession.resources.environments.create(envBody);
+        const { data: env } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .create(envBody);
 
-        const { data: envDetails } = await adminSession.resources.environments
-          .environment(env.id, projectId)
+        const { data: envDetails } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
           .get();
+        console.log('got environment');
         const awsRegion = settings.get('awsRegion');
         const mainAccountId = settings.get('mainAccountId');
         const accessPointName = `${dataSet.id!.slice(0, 13)}-mounted-on-${env.id.slice(0, 12)}`;
@@ -128,7 +125,11 @@ describe('datasets delete negative tests', () => {
           ])
         });
 
-        const { data: dataSetDetails } = await adminSession.resources.datasets.dataset(dataSet.id!).get();
+        const { data: dataSetDetails } = await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .dataset(dataSet.id!)
+          .get();
         expect(dataSetDetails).toMatchObject({
           ...dataSetBody,
           externalEndpoints: [envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]]
@@ -137,7 +138,7 @@ describe('datasets delete negative tests', () => {
 
       test('it returns a 409', async () => {
         try {
-          await adminSession.resources.datasets.dataset(dataSet.id!).deleteFromProject(projectId);
+          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
         } catch (e) {
           checkHttpError(
             e,
@@ -153,21 +154,17 @@ describe('datasets delete negative tests', () => {
     describe('projects other than the datasets owning project', () => {
       let associatedProjectId: string;
       beforeEach(async () => {
-        const { data: project } = await adminSession.resources.projects.create({
-          name: `${dataSet.name} unassociated project`,
-          description: 'test description',
-          costCenterId
-        });
-        await adminSession.resources.datasets
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
           .dataset(dataSet.id!)
-          .associateWithProject(project.id, 'read-only');
-
-        associatedProjectId = project.id;
+          .associateWithProject(project2Id, 'read-only');
+        associatedProjectId = project2Id;
       });
 
       test('it returns a 409', async () => {
         try {
-          await adminSession.resources.datasets.dataset(dataSet.id!).deleteFromProject(projectId);
+          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
         } catch (e) {
           checkHttpError(
             e,
