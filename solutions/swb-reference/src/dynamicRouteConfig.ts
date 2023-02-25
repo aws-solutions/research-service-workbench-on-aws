@@ -188,7 +188,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'READ',
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '${datasetId}'
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
         }
       }
     ]
