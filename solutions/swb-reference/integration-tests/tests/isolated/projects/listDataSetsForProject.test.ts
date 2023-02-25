@@ -2,18 +2,18 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('list users for project tests', () => {
+describe('list datasets for project tests', () => {
   let paabHelper: PaabHelper;
-  let adminSession: ClientSession;
-  let researcherSession: ClientSession;
-  let paSession: ClientSession;
-  let projectId: string;
+  let itAdminSession: ClientSession;
+  let researcher1Session: ClientSession;
+  let pa1Session: ClientSession;
+  let pa2Session: ClientSession;
+  let project1Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -22,10 +22,11 @@ describe('list users for project tests', () => {
   beforeAll(async () => {
     paabHelper = new PaabHelper();
     const paabResources = await paabHelper.createResources();
-    adminSession = paabResources.adminSession;
-    researcherSession = paabResources.rs1Session;
-    paSession = paabResources.pa1Session;
-    projectId = paabResources.project1Id;
+    itAdminSession = paabResources.adminSession;
+    researcher1Session = paabResources.rs1Session;
+    pa1Session = paabResources.pa1Session;
+    pa2Session = paabResources.pa2Session;
+    project1Id = paabResources.project1Id;
   });
 
   afterAll(async () => {
@@ -33,24 +34,22 @@ describe('list users for project tests', () => {
   });
 
   describe('negative tests', () => {
-    test('project does not exist', async () => {
-      const projectId = `${resourceTypeToKey.project.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
+    test('IT Admin cannot list datasets for a project', async () => {
       try {
-        await adminSession.resources.projects.project(projectId).dataSets().list();
+        await itAdminSession.resources.projects.project(project1Id).dataSets().list();
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Could not find project ${projectId}`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
     });
 
-    test('IT Admin cannot list datasets for a project', async () => {
+    test('Project Admin from project 2 cannot list datasets for project 1', async () => {
       try {
-        await adminSession.resources.projects.project(projectId).dataSets().list();
+        await pa2Session.resources.projects.project(project1Id).dataSets().list();
       } catch (e) {
         checkHttpError(
           e,
@@ -63,16 +62,77 @@ describe('list users for project tests', () => {
   });
 
   describe('basic tests', () => {
-    test('Project Admin can list datasets for a project', async () => {
-      const { data } = await paSession.resources.projects.project(projectId).dataSets().list();
+    let dataset1Id: string;
+    let dataset2Id: string;
 
-      expect(data.data).toBe([]);
+    beforeAll(async () => {
+      const response1 = await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .create(paabHelper.createDatasetRequest(project1Id), false);
+      const response2 = await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .create(paabHelper.createDatasetRequest(project1Id), false);
+
+      dataset1Id = response1.data.id;
+      dataset2Id = response2.data.id;
+    });
+
+    test('Project Admin can list datasets for a project', async () => {
+      const { data } = await pa1Session.resources.projects.project(project1Id).dataSets().list();
+
+      expect(data.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: dataset1Id }),
+          expect.objectContaining({ id: dataset2Id })
+        ])
+      );
+      expect(data.data.length).toBe(2);
     });
 
     test('Researcher can list datasets for a project', async () => {
-      const { data } = await researcherSession.resources.projects.project(projectId).dataSets().list();
+      const { data } = await researcher1Session.resources.projects.project(project1Id).dataSets().list();
 
-      expect(data.data).toBe([]);
+      expect(data.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: dataset1Id }),
+          expect.objectContaining({ id: dataset2Id })
+        ])
+      );
+      expect(data.data.length).toBe(2);
+    });
+
+    test('listing datasets with pagination', async () => {
+      const { data: firstRequest } = await researcher1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .list(1);
+
+      expect(firstRequest.data).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: dataset1Id })])
+      );
+      expect(firstRequest.data.length).toBe(1);
+      expect(firstRequest.paginationToken).toBeDefined();
+
+      const { data: secondRequest } = await researcher1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .list(1, firstRequest.paginationToken);
+
+      expect(secondRequest.data).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: dataset2Id })])
+      );
+      expect(secondRequest.data.length).toBe(1);
+      expect(secondRequest.paginationToken).toBeDefined();
+
+      const { data: lastRequest } = await researcher1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .list(1, secondRequest.paginationToken);
+
+      expect(lastRequest.data).toStrictEqual([]);
+      expect(lastRequest.paginationToken).toBeUndefined();
     });
   });
 });

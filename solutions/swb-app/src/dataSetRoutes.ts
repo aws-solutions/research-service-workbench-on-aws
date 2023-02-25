@@ -56,7 +56,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         owner: validatedRequest.owner,
         ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
-        permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
       });
 
