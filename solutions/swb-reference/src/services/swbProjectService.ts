@@ -175,9 +175,6 @@ export class SWBProjectService implements ProjectPlugin {
     return this._projectService.updateProject(request);
   }
 
-  /**
-   *
-   */
   private _generatePAIdentityPermissions(projectId: string, paRole: string): IdentityPermission[] {
     return [
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET, ['CREATE', 'READ'], paRole, {
@@ -219,9 +216,6 @@ export class SWBProjectService implements ProjectPlugin {
     ];
   }
 
-  /**
-   *
-   */
   private _generateResearcherIdentityPermissions(
     projectId: string,
     researcherRole: string
