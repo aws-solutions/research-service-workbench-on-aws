@@ -8,11 +8,11 @@ import {
   GetProjectRequest,
   GetProjectsRequest,
   ListProjectsRequest,
+  Project,
   ProjectService,
+  ProjectStatus,
   UpdateProjectRequest
 } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
 import {
   Action,
   AuthenticatedUser,

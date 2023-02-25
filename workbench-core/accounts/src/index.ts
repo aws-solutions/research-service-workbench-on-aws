@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { ProjectStatus } from './constants/projectStatus';
 import AccountHandler from './handlers/accountHandler';
 import {
   AwsAccountTemplateUrlsRequest,
@@ -85,6 +86,7 @@ export {
   AssignUserToProjectRequestParser,
   AssignUserToProjectRequest,
   Project,
+  ProjectStatus,
   ListUsersForRoleRequest,
   ListUsersForRoleRequestParser
 };
