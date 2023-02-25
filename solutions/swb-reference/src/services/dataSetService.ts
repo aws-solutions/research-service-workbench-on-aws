@@ -65,7 +65,7 @@ export class DataSetService implements DataSetPlugin {
     const associatedProjects = await this._associatedProjects(dataset);
     if (associatedProjects.length > 0) {
       throw new ConflictError(
-        `DataSet ${dataSetId} cannot be removed because it is associated with project(s) [${associatedProjects.join(
+        `DataSet ${dataSetId} cannot be removed because it is still associated with roles in the following project(s) [${associatedProjects.join(
           ','
         )}]`
       );
@@ -79,7 +79,9 @@ export class DataSetService implements DataSetPlugin {
       authenticatedUser
     );
 
-    const projectAdmin = dataset.owner!;
+    const projectId = dataset.owner!.split('#')[0];
+
+    const projectAdmin = getProjectAdminRole(projectId);
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -87,13 +89,21 @@ export class DataSetService implements DataSetPlugin {
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
     );
-
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
       `${dataSetId!}`,
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
+    );
+
+    const researcher = getResearcherRole(projectId);
+    await this._addAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataSetId,
+      [researcher],
+      ['READ']
     );
   }
 
@@ -105,7 +115,7 @@ export class DataSetService implements DataSetPlugin {
 
     const projectIds = permissions.data.identityPermissions
       .filter((permission) => permission.identityType === 'GROUP')
-      .filter((permission) => permission.identityId !== dataset.owner!)
+      .filter((permission) => permission.identityId.split('#')[0] !== dataset.owner!.split('#')[0])
       .map((permission) => `'${permission.identityId.split('#')[0]}'`);
 
     return Array.from(new Set(projectIds));
@@ -144,13 +154,27 @@ export class DataSetService implements DataSetPlugin {
   ): Promise<PaginatedResponse<DataSet>> {
     let projectDatasets: DataSet[] = [];
 
+    if (user.roles.includes('ITAdmin')) {
+      return {
+        data: [],
+        paginationToken: undefined
+      };
+    }
+
+    let page = 0;
     let lastPaginationToken = paginationToken;
     do {
-      const allDatasets = await this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
-      projectDatasets = projectDatasets.concat(
-        allDatasets.data.filter((dataset) => dataset.owner?.split('#')[0] === projectId)
+      console.log(`page ${page}`);
+      page += 1;
+      const dataSetsOnPageResponse = await this._workbenchDataSetService.listDataSets(
+        user,
+        pageSize,
+        paginationToken
       );
-      lastPaginationToken = allDatasets.paginationToken;
+      projectDatasets = projectDatasets.concat(
+        dataSetsOnPageResponse.data.filter((dataset) => dataset.owner?.split('#')[0] === projectId)
+      );
+      lastPaginationToken = dataSetsOnPageResponse.paginationToken;
     } while (projectDatasets.length < pageSize && lastPaginationToken);
 
     if (projectDatasets.length > pageSize) {

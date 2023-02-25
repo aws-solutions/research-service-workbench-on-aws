@@ -148,12 +148,13 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+      const maxPageSize = MAX_API_PAGE_SIZE;
       const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
       const projectId = req.params.projectId;
 
-      if (pageSize < 1 || pageSize > MAX_API_PAGE_SIZE) {
-        throw Boom.badRequest(`Page size must be between 1 and ${MAX_API_PAGE_SIZE}`);
+      if (pageSize < 1 || pageSize > maxPageSize) {
+        throw Boom.badRequest(`Page size must be between 1 and ${maxPageSize}`);
       }
 
       const response = await dataSetService.listDataSetsForProject(

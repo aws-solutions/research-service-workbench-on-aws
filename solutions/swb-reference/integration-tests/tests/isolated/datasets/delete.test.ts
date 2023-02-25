@@ -170,7 +170,7 @@ describe('datasets delete negative tests', () => {
             e,
             new HttpError(409, {
               error: 'Conflict',
-              message: `DataSet ${dataSet.id} cannot be removed because it is associated with project(s) ['${associatedProjectId}']`
+              message: `DataSet ${dataSet.id} cannot be removed because it is still associated with roles in the following project(s) ['${associatedProjectId}']`
             })
           );
         }

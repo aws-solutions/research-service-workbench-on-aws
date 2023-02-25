@@ -146,6 +146,11 @@ describe('multiStep dataset integration test', () => {
       },
       {
         accessLevel: 'read-write',
+        identity: `${project1Id}#ProjectAdmin`,
+        identityType: 'GROUP'
+      },
+      {
+        accessLevel: 'read-write',
         identity: `${project1Id}#Researcher`,
         identityType: 'GROUP'
       }
