@@ -202,6 +202,6 @@ describe('multiStep dataset integration test', () => {
       (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await pa1Session.resources.projects.project(project2Id).dataSets().dataset(dataSet.id).softDelete();
+    await pa1Session.resources.projects.project(project2Id).dataSets().dataset(dataSet.id).delete();
   });
 });

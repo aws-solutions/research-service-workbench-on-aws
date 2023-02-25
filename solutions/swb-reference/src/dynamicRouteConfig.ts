@@ -139,6 +139,16 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
           projectId: '${projectId}'
         }
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectId: '${datasetId}',
+          projectId: '${projectId}'
+        }
+      }
     ]
   },
   '/projects/:projectId/datasets/:datasetId/permissions': {
@@ -157,18 +167,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
           subjectId: '${datasetId}'
-        }
-      }
-    ]
-  },
-  '/projects/:projectId/datasets/:datasetId/softDelete': {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: {
-          subjectType: SwbAuthZSubject.SWB_DATASET,
-          subjectId: '${datasetId}',
-          projectId: '${projectId}'
         }
       }
     ]

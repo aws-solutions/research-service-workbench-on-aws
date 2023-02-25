@@ -26,10 +26,6 @@ export default class Dataset extends Resource {
     });
   }
 
-  public async softDelete(): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`${this._api}/softDelete`);
-  }
-
   public async disassociateFromProject(associatedProjectId: string): Promise<AxiosResponse> {
     return this._axiosInstance.delete(`/projects/${associatedProjectId}/datasets/${this._id}/relationships`);
   }
