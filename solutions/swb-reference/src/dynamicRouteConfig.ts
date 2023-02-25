@@ -141,6 +141,26 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       }
     ]
   },
+  '/projects/:projectId/datasets/:datasetId/permissions': {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+          subjectId: '${datasetId}'
+        }
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
+          subjectId: '${datasetId}'
+        }
+      }
+    ]
+  },
   '/projects/:projectId/datasets/:datasetId/softDelete': {
     DELETE: [
       {
