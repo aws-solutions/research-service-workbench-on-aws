@@ -12,10 +12,8 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Associate Project with EnvTypeConfig', () => {
   const setup: Setup = new Setup();
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(true);
   let adminSession: ClientSession;
-  const settings: Settings = setup.getSettings();
-  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
@@ -78,16 +76,18 @@ describe('Associate Project with EnvTypeConfig', () => {
   });
 
   test('fails when using deleted project', async () => {
-    const dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
-
+    const settings: Settings = setup.getSettings();
+    const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
+    const testName = randomTextGenerator.getFakeText(
+      'projectEnvTypeConfig-isolatedTest-create-failsWhenUsingDeletedProject'
+    );
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: `${dataSetName} cost center`,
+      name: `${testName} cost center`,
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
-
     const { data: createdProject } = await adminSession.resources.projects.create({
-      name: `${dataSetName} project`,
+      name: `${testName} project`,
       description: 'test description',
       costCenterId: costCenter.id
     });

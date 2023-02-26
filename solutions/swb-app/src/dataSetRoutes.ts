@@ -10,7 +10,7 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
-import { isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
+import { DataSetNotFoundError, isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
@@ -149,10 +149,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
       const maxPageSize = MAX_API_PAGE_SIZE;
-      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
+      const pageSize = req.query.pageSize ? toNumber(req.query.pageSize) : DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
       const projectId = req.params.projectId;
-
       if (pageSize < 1 || pageSize > maxPageSize) {
         throw Boom.badRequest(`Page size must be between 1 and ${maxPageSize}`);
       }
@@ -173,8 +172,16 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
 
-      const response = await dataSetService.getDataSet(req.params.datasetId, authenticatedUser);
-      res.send(response);
+      try {
+        const response = await dataSetService.getDataSet(req.params.datasetId, authenticatedUser);
+        res.send(response);
+      } catch (e) {
+        if (e instanceof DataSetNotFoundError) {
+          throw Boom.notFound(`Could not find dataset ${req.params.datasetId}`);
+        }
+        console.error(e);
+        throw Boom.badImplementation(`There was a problem getting dataset ${req.params.datasetId}`);
+      }
     })
   );
 

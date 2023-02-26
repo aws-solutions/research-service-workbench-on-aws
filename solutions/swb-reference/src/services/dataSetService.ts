@@ -98,7 +98,7 @@ export class DataSetService implements DataSetPlugin {
     );
 
     const researcher = getResearcherRole(projectId);
-    await this._addAuthZPermissionsForDataset(
+    await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
       dataSetId,
@@ -169,7 +169,7 @@ export class DataSetService implements DataSetPlugin {
       const dataSetsOnPageResponse = await this._workbenchDataSetService.listDataSets(
         user,
         pageSize,
-        paginationToken
+        lastPaginationToken
       );
       projectDatasets = projectDatasets.concat(
         dataSetsOnPageResponse.data.filter((dataset) => dataset.owner?.split('#')[0] === projectId)

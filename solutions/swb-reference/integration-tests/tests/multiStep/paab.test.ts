@@ -6,6 +6,7 @@ import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createData
 import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
+import { ListDatasetsResponse } from '../../support/models/datasets';
 import { ListEnvironmentResponse } from '../../support/models/environments';
 import { ListETCsResponse } from '../../support/models/environmentTypeConfigs';
 import { ListProjectsResponse } from '../../support/models/projects';
@@ -18,8 +19,6 @@ import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { envUuidRegExp } from '../../support/utils/regExpressions';
 import { checkHttpError, poll } from '../../support/utils/utilities';
-
-jest.retryTimes(0);
 
 describe('multiStep environment test', () => {
   const paabHelper: PaabHelper = new PaabHelper();
@@ -154,13 +153,11 @@ describe('multiStep environment test', () => {
 
     console.log('Verifying PA2 CANNOT see Dataset1...');
     // List Datasets for Project
-    // const { data: pa2Datasets }: ListDatasetsResponse = await pa2Session.resources.projects
-    //   .project(project2Id)
-    //   .dataSets()
-    //   .get()
-    // expect(
-    //   pa2Datasets.data.filter((ds) => ds.id === ds1.id).length
-    // ).toEqual(0);
+    const { data: pa2Datasets }: ListDatasetsResponse = await pa2Session.resources.projects
+      .project(project2Id)
+      .dataSets()
+      .get();
+    expect(pa2Datasets.data.filter((ds) => ds.id === ds1.id).length).toEqual(0);
     // Get Dataset
     try {
       await pa2Session.resources.projects.project(project1Id).dataSets().dataset(ds1.id).get();
@@ -432,6 +429,7 @@ async function _waitForEnvironmentToReachState(
   desiredState: string,
   timeout: number
 ): Promise<void> {
+  console.log(`Waiting for Environment ${envId} is in state ${desiredState}...`);
   await poll(
     async () => session.resources.projects.project(projectId).environments().environment(envId).get(),
     (env) => env?.data?.status !== transitionState,

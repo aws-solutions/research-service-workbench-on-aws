@@ -55,8 +55,11 @@ describe('datasets create negative tests', () => {
 
     test('Researchers who belong to the project', async () => {
       try {
-        const createRequest = paabHelper.createDatasetRequest();
-        await researcher1Sesssion.resources.datasets.create(createRequest, false);
+        const createRequest = paabHelper.createDatasetRequest(project1Id);
+        await researcher1Sesssion.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .create(createRequest, false);
       } catch (actualError) {
         checkHttpError(actualError, expectedError);
       }
@@ -64,8 +67,8 @@ describe('datasets create negative tests', () => {
 
     test('ProjectAdmins who belong to another project', async () => {
       try {
-        const createRequest = paabHelper.createDatasetRequest();
-        await pa2Session.resources.datasets.create(createRequest, false);
+        const createRequest = paabHelper.createDatasetRequest(project1Id);
+        await pa2Session.resources.projects.project(project1Id).dataSets().create(createRequest, false);
       } catch (actualError) {
         checkHttpError(actualError, expectedError);
       }
@@ -73,8 +76,8 @@ describe('datasets create negative tests', () => {
 
     test('ITAdmins', async () => {
       try {
-        const createRequest = paabHelper.createDatasetRequest();
-        await adminSession.resources.datasets.create(createRequest, false);
+        const createRequest = paabHelper.createDatasetRequest(project1Id);
+        await adminSession.resources.projects.project(project1Id).dataSets().create(createRequest, false);
       } catch (actualError) {
         console.log(JSON.stringify(actualError));
         console.log(JSON.stringify(expectedError));

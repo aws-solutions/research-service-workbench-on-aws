@@ -96,8 +96,7 @@ describe('update environment type configs', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message:
-              'Could not find envType et-prod-qlzt22ebv436k,pa-blgdqpkiki2ma with envTypeConfig wrong-format-id to update'
+            message: `Could not find envType ${envTypeId} with envTypeConfig wrong-format-id to update`
           })
         );
       }

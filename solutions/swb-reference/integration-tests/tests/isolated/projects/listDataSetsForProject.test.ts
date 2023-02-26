@@ -94,11 +94,11 @@ describe('list datasets for project tests', () => {
       const response1 = await pa1Session.resources.projects
         .project(project1Id)
         .dataSets()
-        .create(paabHelper.createDatasetRequest(), false);
+        .create(paabHelper.createDatasetRequest(project1Id), false);
       const response2 = await pa1Session.resources.projects
         .project(project1Id)
         .dataSets()
-        .create(paabHelper.createDatasetRequest(), false);
+        .create(paabHelper.createDatasetRequest(project1Id), false);
 
       dataset1Id = response1.data.id;
       dataset2Id = response2.data.id;
