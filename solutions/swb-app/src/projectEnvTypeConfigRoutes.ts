@@ -8,6 +8,7 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { isConflictError } from './errors/conflictError';
+import { isProjectDeletedError } from './errors/projectDeletedError';
 import {
   AssociateProjectEnvTypeConfigRequest,
   AssociateProjectEnvTypeConfigRequestParser
@@ -47,7 +48,20 @@ export function setUpProjectEnvTypeConfigRoutes(
           user: res.locals.user
         }
       );
-      await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(request);
+      try {
+        await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(request);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+        if (isProjectDeletedError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem associating project ${req.body.projectId} with environment type ${req.params.envTypeId}`
+        );
+      }
       res.status(201).send();
     })
   );

@@ -89,7 +89,7 @@ export function setUpEnvTypeConfigRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const listEnvTypeConfigRequest = validateAndParse<ListEnvironmentTypeConfigsRequest>(
         ListEnvironmentTypeConfigsRequestParser,
-        { envTypeId: req.params.envTypeId, ...req.body }
+        { envTypeId: req.params.envTypeId, ...req.query }
       );
 
       const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);

@@ -72,12 +72,10 @@ Parameters:
     Default: ""
 
   IsPublicVPC:
-    AllowedValues:
-      - "true"
-      - "false"
-    Default: "true"
-    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
     Type: String
+    AllowedValues: [true, false]
+    Default: true
+    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
 
   GLBEndpointServiceName:
     Type: String
@@ -128,10 +126,9 @@ Parameters:
     Type: String
     Default: '*'
 
-
 Conditions:
   enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
-  PublicVPC: !Equals [!Ref "IsPublicVPC", "true"]
+  PublicVPC: !Equals [!Ref IsPublicVPC, true]
 
 Mappings:
   Solution:
@@ -677,6 +674,7 @@ Resources:
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
+    Condition: PublicVPC
     DependsOn: VPCGatewayAttachment
     Properties:
       RouteTableId: !Ref PublicRouteTable
