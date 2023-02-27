@@ -404,11 +404,15 @@ export function setUpDSRoutes(
         throw Boom.badRequest('datasetid request parameter is invalid');
       }
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-
+      const { pageToken, pageSize } = req.query;
+      if (pageToken && typeof pageToken !== 'string') throw Boom.badRequest('pageToken is not a string');
+      if (pageSize && typeof pageSize !== 'string') throw Boom.badRequest('pageSize is not a string');
       try {
         const response = await dataSetService.getAllDataSetAccessPermissions(
           req.params.datasetId,
-          authenticatedUser
+          authenticatedUser,
+          pageToken,
+          pageSize ? parseInt(pageSize) : undefined
         );
         res.status(200).send(response);
       } catch (error) {

@@ -177,20 +177,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     }
   };
 
-  const mockReadOnlyGetIdentityPermissionResponse: GetIdentityPermissionsBySubjectResponse = {
-    data: {
-      identityPermissions: [
-        {
-          identityId: groupId,
-          identityType: 'GROUP',
-          action: 'READ',
-          effect: 'ALLOW',
-          subjectType: dataSetSubjectType,
-          subjectId: dataSetId
-        }
-      ]
-    }
-  };
+  let mockReadOnlyGetIdentityPermissionResponse: GetIdentityPermissionsBySubjectResponse;
 
   const mockHasDeleteGetIdentityPermissionResponse: GetIdentityPermissionsBySubjectResponse = {
     data: {
@@ -272,6 +259,20 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   });
 
   beforeEach(() => {
+    mockReadOnlyGetIdentityPermissionResponse = {
+      data: {
+        identityPermissions: [
+          {
+            identityId: groupId,
+            identityType: 'GROUP',
+            action: 'READ',
+            effect: 'ALLOW',
+            subjectType: dataSetSubjectType,
+            subjectId: dataSetId
+          }
+        ]
+      }
+    };
     expect.hasAssertions();
   });
 
@@ -749,6 +750,43 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
         }
       });
     });
+
+    it('returns the expected access permissions with a limit on pageSize to 1', async () => {
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
+        .mockImplementation(async () => mockReadOnlyGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.getAllDataSetAccessPermissions(dataSetId, undefined, 1)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        }
+      });
+    });
+
+    it('returns the expected access permissions with a limit on pageSize to 1', async () => {
+      mockReadOnlyGetIdentityPermissionResponse.paginationToken = 'samplePageToken';
+      jest
+        .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')
+        .mockImplementation(async () => mockReadOnlyGetIdentityPermissionResponse);
+
+      await expect(
+        plugin.getAllDataSetAccessPermissions(dataSetId, undefined, 1)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.identity, identityType: 'GROUP', accessLevel: 'read-only' }
+          ]
+        },
+        pageToken: 'samplePageToken'
+      });
+    });
+
     it('filters out non READ/UPDATE permissions', async () => {
       jest
         .spyOn(DynamicAuthorizationService.prototype, 'getIdentityPermissionsBySubject')

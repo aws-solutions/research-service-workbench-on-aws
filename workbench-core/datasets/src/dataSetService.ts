@@ -701,12 +701,14 @@ export class DataSetService {
    * @param dataSetId - the id of the dataset for which permissions are to be obtained.
    * @param authenticatedUser - the 'id' of the user and that user's roles.
    * @param pageToken - a token from a previous query to continue receiving results.
+   * @param pageSize - an optional number indicating the number of permissions returned.
    * @returns a {@link PermissionsResponse} object containing the permissions found.
    */
   public async getAllDataSetAccessPermissions(
     dataSetId: string,
     authenticatedUser: AuthenticatedUser,
-    pageToken?: string
+    pageToken?: string,
+    pageSize?: number
   ): Promise<PermissionsResponse> {
     const metadata: Metadata = {
       actor: authenticatedUser,
@@ -717,15 +719,12 @@ export class DataSetService {
       dataSetId
     };
     try {
-      const dataSetResponse = await this.getDataSet(dataSetId, authenticatedUser);
-      const response = {
-        data: {
-          dataSetId: dataSetResponse.id!,
-          permissions: dataSetResponse.permissions!
-        }
-      };
-      await this._audit.write(metadata, response);
-      return response;
+      const [, permissionsResponse] = await Promise.all([
+        this._dbProvider.getDataSetMetadata(dataSetId),
+        this._authzPlugin.getAllDataSetAccessPermissions(dataSetId, pageToken, pageSize)
+      ]);
+      await this._audit.write(metadata, permissionsResponse);
+      return permissionsResponse;
     } catch (error) {
       await this._audit.write(metadata, error);
       throw error;

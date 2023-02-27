@@ -49,9 +49,14 @@ export interface DataSetsAuthorizationPlugin {
    *
    * @param datasetId - the ID of the dataset for which permissions should be retrieved.
    * @param pageToken - an optional token indicating the start point of the returned values.
+   * @param pageSize - an optional number indicating the number of permissions returned.
    * @returns a {@link PermissionsResponse} object containing the permissions associated with the dataset.
    */
-  getAllDataSetAccessPermissions(datasetId: string, pageToken?: string): Promise<PermissionsResponse>;
+  getAllDataSetAccessPermissions(
+    datasetId: string,
+    pageToken?: string,
+    pageSize?: number
+  ): Promise<PermissionsResponse>;
 
   /**
    * Remove all permssions from a given dataset.

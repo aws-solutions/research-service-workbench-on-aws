@@ -1745,13 +1745,35 @@ describe('DataSetService', () => {
         dataSetService.getAllDataSetAccessPermissions(mockDataSetId, mockAuthenticatedUser)
       ).resolves.toMatchObject(mockAddAccessResponse);
     });
+
+    it('returns permssions on a dataset with pageToken.', async () => {
+      const pageToken = 'samplePageToken';
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAllDataSetAccessPermissions')
+        .mockImplementationOnce(async () => {
+          return {
+            data: {
+              dataSetId: mockDataSetId,
+              permissions: [mockReadOnlyUserPermission]
+            },
+            pageToken
+          };
+        });
+      await expect(
+        dataSetService.getAllDataSetAccessPermissions(mockDataSetId, mockAuthenticatedUser, undefined, 1)
+      ).resolves.toMatchObject({
+        ...mockAddAccessResponse,
+        pageToken
+      });
+    });
+
     it('throws when an invalid dataset Id is given.', async () => {
       try {
         await dataSetService.getAllDataSetAccessPermissions(mockInvalidId, mockAuthenticatedUser);
       } catch (error) {
         expect(isDataSetNotFoundError(error)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
-        expect(audit.write).toHaveBeenCalledTimes(2);
+        expect(audit.write).toHaveBeenCalledTimes(1);
       }
     });
   });
