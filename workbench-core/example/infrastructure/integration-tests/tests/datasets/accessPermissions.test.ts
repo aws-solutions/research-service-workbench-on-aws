@@ -264,7 +264,7 @@ describe('DataSets access permissions integration tests', () => {
         }
       ]);
     });
-    it('gets multiple permissions on a dataset with page size set to 1', async () => {
+    it('gets multiple permissions on a dataset with page size set to 2', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const permissions: DataSetPermission[] = createDataSetResponse.data.permissions;
       const dataSetId: string = createDataSetResponse.data.id;
