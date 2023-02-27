@@ -33,7 +33,7 @@ export default class Setup {
   }
 
   public static getSetup(): Setup {
-    return this._setup;
+    return new Setup();
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
