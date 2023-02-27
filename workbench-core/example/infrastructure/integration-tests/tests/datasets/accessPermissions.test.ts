@@ -170,7 +170,7 @@ describe('DataSets access permissions integration tests', () => {
     });
   });
 
-  describe('getDatasetAllAccessPermissions', () => {
+  describe('getAllDataSetAccessPermissions', () => {
     it('throws if the DataSet does not exist.', async () => {
       const fakeDataSet: Dataset = adminSession.resources.datasets.dataset({
         id: `${dataSetPrefix.toLowerCase()}-${uuidv4()}`,
@@ -261,6 +261,69 @@ describe('DataSets access permissions integration tests', () => {
           identityType: 'GROUP',
           identity: groupId,
           accessLevel: 'read-write'
+        }
+      ]);
+    });
+    it('gets multiple permissions on a dataset with page size set to 1', async () => {
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const permissions: DataSetPermission[] = createDataSetResponse.data.permissions;
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
+
+      const dataSet = adminSession.resources.datasets.children.get(dataSetId) as Dataset;
+      await dataSet.addAccess({
+        permission: {
+          identityType: 'GROUP',
+          identity: groupId,
+          accessLevel: 'read-only'
+        }
+      });
+      await dataSet.addAccess({
+        permission: {
+          identityType: 'USER',
+          identity: userId,
+          accessLevel: 'read-only'
+        }
+      });
+      // using await expect(...).toMatchObject(...) requires permissions order to be
+      // deterministic. This is not.
+      const response: PermissionsResponse = await dataSet.getAllAccess({
+        pageSize: '2'
+      });
+      expect(response.data).toBeDefined();
+      expect(response.data.dataSetId).toEqual(dataSetId);
+      expect(response.data.permissions).toHaveLength(2);
+
+      let allPermissions = response.data.permissions;
+      const secondResponse = await dataSet.getAllAccess({
+        pageSize: '2',
+        pageToken: response.pageToken!
+      });
+      expect(secondResponse.data).toBeDefined();
+      expect(secondResponse.data.dataSetId).toEqual(dataSetId);
+      expect(secondResponse.data.permissions).toHaveLength(1);
+
+      allPermissions = [...allPermissions, ...secondResponse.data.permissions];
+      // using filter instead of find as failure is desirable on duplicates
+      const defaultPermission = allPermissions.filter(
+        (p: DataSetPermission) => p.identity === permissions[0].identity
+      );
+      expect(defaultPermission).toMatchObject(permissions);
+      const userPermission = allPermissions.filter((p: DataSetPermission) => p.identity === userId);
+      expect(userPermission).toMatchObject([
+        {
+          identityType: 'USER',
+          identity: userId,
+          accessLevel: 'read-only'
+        }
+      ]);
+      const groupPermission = allPermissions.filter((p: DataSetPermission) => p.identity === groupId);
+      expect(groupPermission).toMatchObject([
+        {
+          identityType: 'GROUP',
+          identity: groupId,
+          accessLevel: 'read-only'
         }
       ]);
     });
