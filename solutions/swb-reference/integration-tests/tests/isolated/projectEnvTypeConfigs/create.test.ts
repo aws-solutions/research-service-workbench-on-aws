@@ -11,8 +11,8 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Associate Project with EnvTypeConfig', () => {
-  const setup: Setup = new Setup();
-  const paabHelper: PaabHelper = new PaabHelper(true);
+  const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');

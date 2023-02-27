@@ -9,15 +9,31 @@ import ClientSession from './clientSession';
 import Settings from './utils/settings';
 
 export default class Setup {
+  private static _setup: Setup = new Setup();
   private _settings: Settings;
   private _sessions: ClientSession[] = [];
   private _defaultAdminSession: ClientSession | undefined = undefined;
+  private _cognitoTokenService: CognitoTokenService;
+  private _secretsService: SecretsService;
 
-  public constructor() {
+  private constructor() {
     // @ts-ignore
     this._settings = new Settings(global['__settings__']);
 
     jest.retryTimes(1);
+
+    const awsRegion = this._settings.get('awsRegion');
+    this._secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+    this._loadSecrets(this._secretsService)
+      .then()
+      .catch((error) => {
+        throw error;
+      });
+    this._cognitoTokenService = new CognitoTokenService(awsRegion, this._secretsService);
+  }
+
+  public static getSetup(): Setup {
+    return this._setup;
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
@@ -38,13 +54,7 @@ export default class Setup {
       const clientId = this._settings.get('cognitoUserPoolClientId');
       const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
-      const awsRegion = this._settings.get('awsRegion');
-      const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-
-      await this._loadSecrets(secretsService);
-
-      const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
-      const { accessToken } = await cognitoTokenService.generateCognitoToken({
+      const { accessToken } = await this._cognitoTokenService.generateCognitoToken({
         userPoolId,
         clientId,
         rootUserNameParamStorePath,
@@ -64,11 +74,9 @@ export default class Setup {
   ): Promise<ClientSession> {
     const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
     const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
-    const awsRegion = this._settings.get('awsRegion');
-    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
-    const userName = await secretsService.getSecret(userNameParamStorePath);
-    const password = await secretsService.getSecret(userPasswordParamStorePath);
+    const userName = await this._secretsService.getSecret(userNameParamStorePath);
+    const password = await this._secretsService.getSecret(userPasswordParamStorePath);
     return this.getSessionForUser(userName, password, outputError);
   }
 
@@ -86,13 +94,8 @@ export default class Setup {
   private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
     const userPoolId = this._settings.get('cognitoUserPoolId');
     const clientId = this._settings.get('cognitoUserPoolClientId');
-    const awsRegion = this._settings.get('awsRegion');
-    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
-    await this._loadSecrets(secretsService);
-
-    const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
-    const { accessToken } = await cognitoTokenService.generateCognitoTokenWithCredentials(
+    const { accessToken } = await this._cognitoTokenService.generateCognitoTokenWithCredentials(
       userPoolId,
       clientId,
       userName,

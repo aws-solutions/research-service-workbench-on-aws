@@ -6,7 +6,7 @@ import Setup from '../setup';
 export class DatasetHelper {
   private _awsSdk: AwsService;
   public constructor() {
-    const setup = new Setup();
+    const setup = Setup.getSetup();
     this._awsSdk = setup.getMainAwsClient();
   }
 

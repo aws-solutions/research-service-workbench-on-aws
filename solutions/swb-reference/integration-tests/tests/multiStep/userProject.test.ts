@@ -9,7 +9,7 @@ import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
 
 describe('multiStep user to project integration test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
 

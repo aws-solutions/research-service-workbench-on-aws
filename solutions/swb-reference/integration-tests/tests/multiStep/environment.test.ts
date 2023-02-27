@@ -6,15 +6,20 @@ import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import { ListEnvironmentResponse } from '../../support/models/environments';
 import Environments from '../../support/resources/environments/environments';
+import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
   ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
   ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { envUuidRegExp } from '../../support/utils/regExpressions';
+import Settings from '../../support/utils/settings';
 import { poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
+  const settings: Settings = Setup.getSetup().getSettings();
+  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   const paabHelper: PaabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let paSession: ClientSession;
@@ -47,7 +52,15 @@ describe('multiStep environment test', () => {
       .environments();
     //Create Environment A
     console.log('Creating Environment A');
-    const { data: environmentA } = await paSessionEnvironments.create();
+    const envABody = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('environment-multistep-test-envA'),
+      description: 'EnvironmentA for multistep/environment.test'
+    };
+    const { data: environmentA } = await paSessionEnvironments.create(envABody, false);
     expect(environmentA).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
@@ -59,7 +72,15 @@ describe('multiStep environment test', () => {
 
     //Create Environment B
     console.log('Creating Environment B');
-    const { data: environmentB } = await paSessionEnvironments.create();
+    const envBBody = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('environment-multistep-test-envB'),
+      description: 'EnvironmentB for multistep/environment.test'
+    };
+    const { data: environmentB } = await paSessionEnvironments.create(envBBody, false);
     expect(environmentB).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet

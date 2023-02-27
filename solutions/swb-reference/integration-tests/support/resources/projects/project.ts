@@ -50,7 +50,6 @@ export default class Project extends Resource {
 
   protected async cleanup(): Promise<void> {
     try {
-      console.log(`Attempting to softDelete project ${this._id}.`);
       await this.delete();
     } catch (e) {
       console.warn(

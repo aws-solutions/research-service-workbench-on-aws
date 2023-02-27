@@ -18,11 +18,14 @@ import {
 import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { envUuidRegExp } from '../../support/utils/regExpressions';
+import Settings from '../../support/utils/settings';
 import { checkHttpError, poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
+  const settings: Settings = setup.getSettings();
+  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   const etId: string = setup.getSettings().get('envTypeId');
   const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
   let adminSession: ClientSession;
@@ -69,20 +72,41 @@ describe('multiStep environment test', () => {
       .associate();
 
     console.log('Creating Environment1 for Project1...');
-    const { data: env1 } = await pa1Session.resources.projects.project(project1Id).environments().create();
+    const env1Body = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('paab-test-env1'),
+      description: 'Environment1 for paab.test'
+    };
+    const { data: env1 } = await pa1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .create(env1Body, false);
 
     console.log('Creating Environment2 for Project2...');
-    const { data: env2 } = await pa2Session.resources.projects.project(project2Id).environments().create();
+    const env2Body = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('paab-test-env2'),
+      description: 'Environment2 for paab.test'
+    };
+    const { data: env2 } = await pa2Session.resources.projects
+      .project(project2Id)
+      .environments()
+      .create(env2Body, false);
 
     console.log('Creating Dataset1 for Project1...');
-    const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
     const datasetName = randomTextGenerator.getFakeText('paab-test');
     const dataSetBody = CreateDataSetRequestParser.parse({
-      storageName: setup.getSettings().get('DataSetsBucketName'),
-      awsAccountId: setup.getSettings().get('mainAccountId'),
+      storageName: settings.get('DataSetsBucketName'),
+      awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
-      region: setup.getSettings().get('awsRegion'),
+      region: settings.get('awsRegion'),
       owner: getProjectAdminRole(project1Id),
       ownerType: 'GROUP',
       type: 'internal',

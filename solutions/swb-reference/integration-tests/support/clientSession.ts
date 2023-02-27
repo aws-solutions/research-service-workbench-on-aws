@@ -63,10 +63,10 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
-          const httpError = new HttpError(error.response.status, error.response.data);
           if (outputError) {
-            console.error(JSON.stringify(httpError));
+            console.error(JSON.stringify(error));
           }
+          const httpError = new HttpError(error.response.status, error.response.data);
           return Promise.reject(httpError);
         }
         return Promise.reject(error);

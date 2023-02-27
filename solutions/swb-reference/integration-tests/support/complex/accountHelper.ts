@@ -10,7 +10,7 @@ export class AccountHelper {
   private _awsSdk: AwsService;
   private _settings: Settings;
   public constructor() {
-    const setup: Setup = new Setup();
+    const setup: Setup = Setup.getSetup();
     this._settings = setup.getSettings();
     this._awsSdk = setup.getMainAwsClient();
   }

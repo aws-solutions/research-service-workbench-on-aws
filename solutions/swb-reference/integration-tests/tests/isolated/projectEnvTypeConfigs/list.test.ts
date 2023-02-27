@@ -10,7 +10,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list environment type configs associated to project', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';

@@ -11,7 +11,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('environments launch negative tests', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;

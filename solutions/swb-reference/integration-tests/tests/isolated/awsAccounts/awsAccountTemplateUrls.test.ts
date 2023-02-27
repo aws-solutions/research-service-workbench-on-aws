@@ -9,7 +9,7 @@ import Setup from '../../../support/setup';
 
 describe('awsAccountTemplateUrls tests', () => {
   const mockExternalId = 'workbench-integration-test';
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
 
   beforeEach(() => {

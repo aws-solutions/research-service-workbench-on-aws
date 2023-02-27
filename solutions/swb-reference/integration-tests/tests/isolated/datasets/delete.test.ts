@@ -13,7 +13,7 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets delete negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   let pa1Session: ClientSession;
   let project1Id: string;

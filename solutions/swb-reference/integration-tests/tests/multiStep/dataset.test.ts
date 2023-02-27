@@ -16,7 +16,7 @@ import { poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
 
   let pa1Session: ClientSession;
@@ -74,7 +74,6 @@ describe('multiStep dataset integration test', () => {
       envType: settings.get('envType'),
       datasetIds: [dataSet.id],
       name: randomTextGenerator.getFakeText('dataset-name'),
-      projectId: project1Id,
       description: 'Temporary DataSet for integration test'
     };
     const { data: env } = await pa1Session.resources.projects

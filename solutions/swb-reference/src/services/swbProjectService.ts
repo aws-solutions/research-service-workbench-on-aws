@@ -17,8 +17,10 @@ import {
 import {
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
+  DeleteGroupRequest,
   DeleteIdentityPermissionsRequestParser,
   DynamicAuthorizationService,
+  GroupNotFoundError,
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
@@ -154,14 +156,30 @@ export class SWBProjectService implements ProjectPlugin {
 
     await this._dynamicAuthorizationService.deleteIdentityPermissions(deleteIdentityPermissionsRequest);
 
-    await this._dynamicAuthorizationService.deleteGroup({
+    await this._idempotentGroupDeletion({
       authenticatedUser,
       groupId: paRole
     });
-    await this._dynamicAuthorizationService.deleteGroup({
+
+    await this._idempotentGroupDeletion({
       authenticatedUser,
       groupId: researcherRole
     });
+  }
+
+  /**
+   * Performs an idempotent group deletion so that an error does not get thrown if group already doesn't exist.
+   * @param request - DeleteGroupRequest
+   */
+  private async _idempotentGroupDeletion(request: DeleteGroupRequest): Promise<void> {
+    try {
+      await this._dynamicAuthorizationService.deleteGroup(request);
+    } catch (e) {
+      if (!(e instanceof GroupNotFoundError)) {
+        throw e;
+      }
+      console.warn(`Group ${request.groupId} was not found.`);
+    }
   }
 
   /**

@@ -2,7 +2,7 @@ import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 
 describe('multiStep costCenter test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
 
   beforeAll(async () => {
@@ -48,6 +48,7 @@ describe('multiStep costCenter test', () => {
     expect(updatedCostCenterB).toMatchObject({ name, description });
 
     console.log('Delete Cost Center B');
-    await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete();
+    // eslint-disable-next-line no-unused-expressions
+    expect(await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete()).resolves;
   });
 });

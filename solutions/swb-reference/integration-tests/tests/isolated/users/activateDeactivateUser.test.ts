@@ -14,7 +14,7 @@ const fakeUuid = '00000000-0000-0000-0000-000000000000';
 const invalidUuid = '12345';
 
 describe('userManagement activate/deactivate user integration test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let userId: string;
 

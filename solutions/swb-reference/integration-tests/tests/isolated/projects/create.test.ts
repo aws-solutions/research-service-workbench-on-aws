@@ -16,7 +16,7 @@ interface CreateRequest {
 }
 
 describe('Create Project negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   let existingProjectName: string;

@@ -26,7 +26,7 @@ export class PaabHelper {
   private _outputError: boolean | undefined;
 
   public constructor(outputError?: boolean) {
-    this._setup = new Setup();
+    this._setup = Setup.getSetup();
     this._randomTextGenerator = new RandomTextGenerator(this._setup.getSettings().get('runId'));
     this._outputError = outputError;
   }

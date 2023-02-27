@@ -15,7 +15,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets file upload tests', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   let datasetHelper: DatasetHelper;
   let pa1Session: ClientSession;

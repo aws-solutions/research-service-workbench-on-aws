@@ -10,7 +10,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Disassociate Project with EnvTypeConfig', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');

@@ -57,9 +57,12 @@ export function setUpProjectEnvTypeConfigRoutes(
         if (isProjectDeletedError(e)) {
           throw Boom.badRequest(e.message);
         }
-
+        console.error(
+          `Unexpected error when associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`,
+          e
+        );
         throw Boom.badImplementation(
-          `There was a problem associating project ${req.body.projectId} with environment type ${req.params.envTypeId}`
+          `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
         );
       }
       res.status(201).send();
@@ -82,10 +85,19 @@ export function setUpProjectEnvTypeConfigRoutes(
         await projectEnvTypeConfigService.disassociateProjectAndEnvTypeConfig(request);
         res.status(204).send();
       } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
         if (isConflictError(e)) {
           throw Boom.conflict(e.message);
         }
-        throw e;
+        console.error(
+          `Unexpected error when disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`,
+          e
+        );
+        throw Boom.badImplementation(
+          `There was a problem disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
+        );
       }
     })
   );
@@ -97,8 +109,18 @@ export function setUpProjectEnvTypeConfigRoutes(
         ListProjectEnvTypeConfigsRequestParser,
         { envTypeId: req.params.envTypeId, projectId: req.params.projectId, ...req.body }
       );
-      const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
-      res.status(201).send(relationships);
+      try {
+        const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
+        res.status(201).send(relationships);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+        console.error(`There was a problem list ETCs associated with project ${req.body.projectId}`, e);
+        throw Boom.badImplementation(
+          `There was a problem list ETCs associated with project ${req.body.projectId}`
+        );
+      }
     })
   );
 

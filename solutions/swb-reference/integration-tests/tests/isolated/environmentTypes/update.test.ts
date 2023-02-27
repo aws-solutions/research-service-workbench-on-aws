@@ -8,7 +8,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('update environment types', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const testEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   beforeEach(() => {
