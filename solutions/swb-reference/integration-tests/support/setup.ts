@@ -4,40 +4,29 @@
  */
 
 import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
+import jwt_decode from 'jwt-decode';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';
 
 export default class Setup {
-  private static _setup: Setup = new Setup();
   private _settings: Settings;
   private _sessions: ClientSession[] = [];
   private _defaultAdminSession: ClientSession | undefined = undefined;
-  private _cognitoTokenService: CognitoTokenService;
-  private _secretsService: SecretsService;
 
   private constructor() {
     // @ts-ignore
     this._settings = new Settings(global['__settings__']);
 
     jest.retryTimes(1);
-
-    const awsRegion = this._settings.get('awsRegion');
-    this._secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-    this._loadSecrets(this._secretsService)
-      .then()
-      .catch((error) => {
-        throw error;
-      });
-    this._cognitoTokenService = new CognitoTokenService(awsRegion, this._secretsService);
   }
 
   public static getSetup(): Setup {
     return new Setup();
   }
 
-  public async createAnonymousSession(): Promise<ClientSession> {
-    const session = this._getClientSession();
+  public async createAnonymousSession(outputError?: boolean): Promise<ClientSession> {
+    const session = this._getClientSession(undefined, outputError);
     this._sessions.push(session);
 
     return session;
@@ -48,23 +37,40 @@ export default class Setup {
   }
 
   public async getDefaultAdminSession(outputError?: boolean): Promise<ClientSession> {
-    // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
-    if (this._defaultAdminSession === undefined) {
-      const userPoolId = this._settings.get('cognitoUserPoolId');
-      const clientId = this._settings.get('cognitoUserPoolClientId');
-      const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
-      const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
-      const { accessToken } = await this._cognitoTokenService.generateCognitoToken({
-        userPoolId,
-        clientId,
-        rootUserNameParamStorePath,
-        rootPasswordParamStorePath
-      });
+    if (this._defaultAdminSession) {
+      const decodedIdToken = jwt_decode(this._defaultAdminSession.accessToken as string);
+      const expiresAt = _.get(decodedIdToken, 'exp', 0) * 1000;
 
-      const session = this._getClientSession(accessToken, outputError);
-      this._sessions.push(session);
-      this._defaultAdminSession = session;
+      // Assume the default admin session is shared between all test cases in a given test suite (ie. test file),
+      // so it has to stay active throughout the test suite duration.
+      // Therefore the buffer time (in minutes) should be the longest time taken by any single test suite
+      // If the current token has less than the buffer minutes remaining, we create a new one.
+      const bufferInMinutes = 25;
+      const tokenExpired = (expiresAt - Date.now()) / 60 / 1000 < bufferInMinutes;
+      if (!tokenExpired) {
+        return this._defaultAdminSession;
+      }
     }
+    const userPoolId = this._settings.get('cognitoUserPoolId');
+    const clientId = this._settings.get('cognitoUserPoolClientId');
+    const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
+    const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+
+    await this._loadSecrets(secretsService);
+
+    const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
+    const { accessToken } = await cognitoTokenService.generateCognitoToken({
+      userPoolId,
+      clientId,
+      rootUserNameParamStorePath,
+      rootPasswordParamStorePath
+    });
+
+    const session = this._getClientSession(accessToken, outputError);
+    this._sessions.push(session);
+    this._defaultAdminSession = session;
     return this._defaultAdminSession;
   }
 
@@ -74,9 +80,11 @@ export default class Setup {
   ): Promise<ClientSession> {
     const userNameParamStorePath = this._settings.get(`${userType}UserNameParamStorePath`);
     const userPasswordParamStorePath = this._settings.get(`${userType}PasswordParamStorePath`);
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
-    const userName = await this._secretsService.getSecret(userNameParamStorePath);
-    const password = await this._secretsService.getSecret(userPasswordParamStorePath);
+    const userName = await secretsService.getSecret(userNameParamStorePath);
+    const password = await secretsService.getSecret(userPasswordParamStorePath);
     return this.getSessionForUser(userName, password, outputError);
   }
 
@@ -94,8 +102,13 @@ export default class Setup {
   private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
     const userPoolId = this._settings.get('cognitoUserPoolId');
     const clientId = this._settings.get('cognitoUserPoolClientId');
+    const awsRegion = this._settings.get('awsRegion');
+    const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
-    const { accessToken } = await this._cognitoTokenService.generateCognitoTokenWithCredentials(
+    await this._loadSecrets(secretsService);
+
+    const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
+    const { accessToken } = await cognitoTokenService.generateCognitoTokenWithCredentials(
       userPoolId,
       clientId,
       userName,
