@@ -4,7 +4,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Cost Center negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
 
   beforeEach(() => {

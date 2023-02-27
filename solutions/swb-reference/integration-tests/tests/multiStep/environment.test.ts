@@ -3,32 +3,64 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../support/clientSession';
+import { PaabHelper } from '../../support/complex/paabHelper';
 import { ListEnvironmentResponse } from '../../support/models/environments';
+import Environments from '../../support/resources/environments/environments';
 import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
   ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
   ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { envUuidRegExp } from '../../support/utils/regExpressions';
+import Settings from '../../support/utils/settings';
 import { poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
-  const setup: Setup = new Setup();
+  const settings: Settings = Setup.getSetup().getSettings();
+  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
+  const paabHelper: PaabHelper = new PaabHelper();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let projectId: string;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
+  /**
+   * This test uses ProjectAdmin1 role to manage EnvironmentA and ITAdmin role to manage EnvironmentB after having been
+   * created by PA1.
+   * ListEnvironments is tested as ITAdmin.
+   * Expect all APIs other than ListEnvironments to work for PA1 role.
+   * Only Start, Stop, Terminate, Get, and ListEnvironments should work for ITAdmin.
+   */
   test('launch, connect, stop, get, terminate', async () => {
+    const adminSessionEnvironments: Environments = adminSession.resources.projects
+      .project(projectId)
+      .environments();
+    const paSessionEnvironments: Environments = paSession.resources.projects
+      .project(projectId)
+      .environments();
     //Create Environment A
     console.log('Creating Environment A');
-    const { data: environmentA } = await adminSession.resources.environments.create();
+    const envABody = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('environment-multistep-test-envA'),
+      description: 'EnvironmentA for multistep/environment.test'
+    };
+    const { data: environmentA } = await paSessionEnvironments.create(envABody, false);
     expect(environmentA).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
@@ -37,11 +69,18 @@ describe('multiStep environment test', () => {
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
     });
-    const projectId = environmentA.projectId;
 
     //Create Environment B
     console.log('Creating Environment B');
-    const { data: environmentB } = await adminSession.resources.environments.create();
+    const envBBody = {
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('environment-multistep-test-envB'),
+      description: 'EnvironmentB for multistep/environment.test'
+    };
+    const { data: environmentB } = await paSessionEnvironments.create(envBBody, false);
     expect(environmentB).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
@@ -54,13 +93,11 @@ describe('multiStep environment test', () => {
     //Verify Environment A was started and is available
     console.log('Verify Environment A was started and is available');
     await poll(
-      async () => adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => paSessionEnvironments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'PENDING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentA to complete
-    const { data: environmentACompleted } = await adminSession.resources.environments
-      .environment(environmentA.id)
-      .get();
+    const { data: environmentACompleted } = await paSessionEnvironments.environment(environmentA.id).get();
     expect(environmentACompleted).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       status: 'COMPLETED',
@@ -72,11 +109,13 @@ describe('multiStep environment test', () => {
     //Verify Environment B was started and is available
     console.log('Verify Environment B was started and is available');
     await poll(
-      async () => adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSessionEnvironments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'PENDING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentB to complete
-    const { data: environmentBCompleted } = await adminSession.resources.environments
+    const { data: environmentBCompleted } = await adminSession.resources.projects
+      .project(projectId)
+      .environments()
       .environment(environmentB.id)
       .get();
     expect(environmentBCompleted).toMatchObject({
@@ -89,7 +128,7 @@ describe('multiStep environment test', () => {
 
     //Verify Connect Environment A
     console.log('Verify Connect Environment A');
-    const { data: environmentAConnectInfo } = await adminSession.resources.environments
+    const { data: environmentAConnectInfo } = await paSessionEnvironments
       .environment(environmentA.id)
       .connect();
     expect(environmentAConnectInfo).toMatchObject({
@@ -101,15 +140,13 @@ describe('multiStep environment test', () => {
 
     //Stop Environment A
     console.log('Stopping Environment A');
-    await adminSession.resources.environments.environment(environmentA.id).stop();
+    await paSessionEnvironments.environment(environmentA.id).stop();
     await poll(
-      async () => adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => paSessionEnvironments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentA to stop
-    const { data: environmentAStopped } = await adminSession.resources.environments
-      .environment(environmentA.id)
-      .get();
+    const { data: environmentAStopped } = await paSessionEnvironments.environment(environmentA.id).get();
     expect(environmentAStopped).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
@@ -117,6 +154,8 @@ describe('multiStep environment test', () => {
       PROJ: expect.anything() // PROJ should be defined
     });
     console.log('Environment A Stopped');
+
+    // Use ITAdmin to test ListEnvironments functionality
 
     //Search Environment A filtering by name
     console.log('Searching for Environment A: filtering by "name"');
@@ -161,15 +200,13 @@ describe('multiStep environment test', () => {
 
     //Start Environment A after being stopped
     console.log('Starting Environment A after being stopped');
-    await adminSession.resources.environments.environment(environmentA.id).start();
+    await paSessionEnvironments.environment(environmentA.id).start();
     await poll(
-      async () => adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => paSessionEnvironments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentA to complete
-    const { data: environmentAStarted } = await adminSession.resources.environments
-      .environment(environmentA.id)
-      .get();
+    const { data: environmentAStarted } = await adminSessionEnvironments.environment(environmentA.id).get();
     expect(environmentAStarted).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       status: 'COMPLETED',
@@ -180,19 +217,17 @@ describe('multiStep environment test', () => {
 
     //Stop Environments A and B
     console.log(`Stopping Environments A: ${environmentA.id}`);
-    await adminSession.resources.environments.environment(environmentA.id).stop();
+    await paSessionEnvironments.environment(environmentA.id).stop();
     console.log(`Stopping Environments B: ${environmentB.id}`);
-    await adminSession.resources.environments.environment(environmentB.id).stop();
+    await adminSessionEnvironments.environment(environmentB.id).stop();
 
     //Wait for Environment A to stop
     await poll(
-      async () => adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => paSessionEnvironments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentA to stop
-    const { data: environmentAStopped2 } = await adminSession.resources.environments
-      .environment(environmentA.id)
-      .get();
+    const { data: environmentAStopped2 } = await paSessionEnvironments.environment(environmentA.id).get();
     expect(environmentAStopped2).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
@@ -203,13 +238,11 @@ describe('multiStep environment test', () => {
 
     //Wait for Environment B to stop
     await poll(
-      async () => adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSessionEnvironments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentB to stop
-    const { data: environmentBStopped } = await adminSession.resources.environments
-      .environment(environmentB.id)
-      .get();
+    const { data: environmentBStopped } = await adminSessionEnvironments.environment(environmentB.id).get();
     expect(environmentBStopped).toMatchObject({
       id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
@@ -220,26 +253,38 @@ describe('multiStep environment test', () => {
 
     //Terminate Environments A and B
     console.log('Terminating Environments A and B');
-    await adminSession.resources.environments.environment(environmentA.id).terminate();
-    await adminSession.resources.environments.environment(environmentB.id).terminate();
+    await paSessionEnvironments.environment(environmentA.id).terminate();
+    await adminSessionEnvironments.environment(environmentB.id).terminate();
 
     //Wait for Environments A and B to terminate
     await poll(
-      async () => adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => paSessionEnvironments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'TERMINATING',
       ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     ); //wait for environmentA to Terminate
     await poll(
-      async () => adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSessionEnvironments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'TERMINATING',
       ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     ); //wait for environmentB to Terminate
     //Validate Environments A and B are not retrieved on get all environments call
     console.log('Check that terminated environments are not shown when listing all environments');
-    const { data: allEnvironments }: ListEnvironmentResponse =
-      await adminSession.resources.environments.listProjectEnvironments(projectId);
+    const { data: allEnvironments }: ListEnvironmentResponse = await adminSession.resources.projects
+      .project(projectId)
+      .environments()
+      .listProjectEnvironments();
     expect(
       allEnvironments.data.filter((env) => env.id === environmentA.id || env.id === environmentB.id).length
     ).toEqual(0);
+
+    // Verify terminating already terminated environments return 204
+    let terminatedResponse = await paSessionEnvironments.environment(environmentA.id).terminate();
+    expect(terminatedResponse.status).toEqual(204);
+    let envDetailResponse = await paSessionEnvironments.environment(environmentA.id).get();
+    expect(envDetailResponse.data.status).toEqual('TERMINATED');
+    terminatedResponse = await adminSessionEnvironments.environment(environmentB.id).terminate();
+    expect(terminatedResponse.status).toEqual(204);
+    envDetailResponse = await adminSessionEnvironments.environment(environmentB.id).get();
+    expect(envDetailResponse.data.status).toEqual('TERMINATED');
   });
 });

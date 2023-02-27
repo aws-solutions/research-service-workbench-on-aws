@@ -762,6 +762,10 @@ export class DataSetService {
     }
   }
 
+  public getPaginationToken(dataSetId: string): string {
+    return this._dbProvider.getPaginationToken(dataSetId);
+  }
+
   private _generateMountObject(
     dataSetName: string,
     endpointURL: string,

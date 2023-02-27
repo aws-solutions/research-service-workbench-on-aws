@@ -11,15 +11,7 @@ import {
   CognitoAuthenticationPluginOptions,
   CognitoAuthenticationPlugin
 } from '@aws/workbench-core-authentication';
-import {
-  withAuth,
-  AuthorizationService,
-  CASLAuthorizationPlugin,
-  PermissionsMap,
-  RoutesIgnored,
-  RoutesMap,
-  StaticPermissionsPlugin
-} from '@aws/workbench-core-authorization';
+import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -40,8 +32,6 @@ import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
 import { setUpSshKeyRoutes } from './sshKeyRoutes';
-import * as StaticPermissionsConfig from './staticPermissionsConfig';
-import * as StaticRoutesConfig from './staticRouteConfig';
 import { setUpUserRoutes } from './userRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
@@ -71,25 +61,15 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     new CognitoAuthenticationPlugin(cognitoPluginOptions)
   );
 
-  // Create Authorization Service
-  const staticPermissionsMap: PermissionsMap = StaticPermissionsConfig.permissionsMap;
-  const staticRoutesMap: RoutesMap = StaticRoutesConfig.routesMap;
-  const staticRoutesIgnored: RoutesIgnored = StaticRoutesConfig.routesIgnored;
   const logger: LoggingService = new LoggingService();
-  const staticPermissionsPlugin: StaticPermissionsPlugin = new StaticPermissionsPlugin(
-    staticPermissionsMap,
-    staticRoutesMap,
-    staticRoutesIgnored,
-    logger
-  );
-  const caslAuthorizationsPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
-  const authorizationService: AuthorizationService = new AuthorizationService(
-    caslAuthorizationsPlugin,
-    staticPermissionsPlugin
-  );
 
-  app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
-  app.use(withAuth(authorizationService, { logger: logger }));
+  app.use(
+    verifyToken(authenticationService, {
+      ignoredRoutes: apiRouteConfig.routesIgnored,
+      loggingService: logger
+    })
+  );
+  app.use(withDynamicAuth(apiRouteConfig.authorizationService, { logger: logger }));
 
   // Auditing
   const continueOnError = false;
@@ -110,7 +90,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(
     router,
-    apiRouteConfig.projectService,
+    apiRouteConfig.projectPlugin,
     apiRouteConfig.environmentService,
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService

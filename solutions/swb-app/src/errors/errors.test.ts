@@ -9,7 +9,6 @@ import {
   ConnectionInfoNotDefinedError,
   isConnectionInfoNotDefinedError
 } from './connectionInfoNotDefinedError';
-import { DatabaseError, isDatabaseError } from './databaseError';
 import { DuplicateKeyError, isDuplicateKeyError } from './duplicateKeyError';
 import { Ec2Error, isEc2Error } from './ec2Error';
 import { isNoInstanceFoundError, NoInstanceFoundError } from './noInstanceFoundError';
@@ -18,11 +17,6 @@ import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
 import { isProjectDeletedError, ProjectDeletedError } from './projectDeletedError';
 
 describe('custom error tests', () => {
-  test('databaseError', () => {
-    const databaseError = new DatabaseError();
-    expect(isDatabaseError(databaseError)).toBe(true);
-  });
-
   test('noKeyExistsError', () => {
     const noKeyExistsError = new NoKeyExistsError();
     expect(isNoKeyExistsError(noKeyExistsError)).toBe(true);
@@ -73,10 +67,6 @@ describe('custom error tests', () => {
 
     beforeEach(() => {
       error = new Error();
-    });
-
-    test('not databaseError', () => {
-      expect(isDatabaseError(error)).toBe(false);
     });
 
     test('not noKeyExistsError', () => {

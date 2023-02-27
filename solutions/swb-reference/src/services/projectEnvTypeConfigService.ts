@@ -14,8 +14,7 @@ import {
   Project,
   ProjectDeletedError
 } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
+import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
 import {
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,

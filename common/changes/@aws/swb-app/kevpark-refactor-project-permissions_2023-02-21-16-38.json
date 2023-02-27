@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Add ProjectPlugin",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

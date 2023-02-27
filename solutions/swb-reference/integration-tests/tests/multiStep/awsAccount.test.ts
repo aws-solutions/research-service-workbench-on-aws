@@ -14,7 +14,7 @@ import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import Settings from '../../support/utils/settings';
 
 describe('multiStep awsAccount integration test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
 

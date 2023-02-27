@@ -2,7 +2,7 @@ import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 
 describe('multiStep costCenter test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
 
   beforeAll(async () => {

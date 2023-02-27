@@ -8,7 +8,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list projects associated to environment type config', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
@@ -48,8 +48,9 @@ describe('list projects associated to environment type config', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find environment type config invalid-config-id`
         })
       );
     }
@@ -85,8 +86,9 @@ describe('list projects associated to environment type config', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find environment type config ${envTypeConfigId}`
         })
       );
     }

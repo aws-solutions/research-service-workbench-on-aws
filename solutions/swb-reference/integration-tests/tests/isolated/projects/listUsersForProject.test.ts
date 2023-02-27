@@ -10,7 +10,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list users for project tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let project: { id: string };
 
@@ -62,8 +62,9 @@ describe('list users for project tests', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(403, {
-            error: 'User is not authorized'
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `role: Invalid enum value. Expected 'ProjectAdmin' | 'Researcher', received 'abc'`
           })
         );
       }

@@ -110,7 +110,10 @@ describe('ProjectEnvService', () => {
         identityId: identityId,
         identityType: identityType,
         subjectId: subjectId,
-        subjectType: envConnectionSubjectType
+        subjectType: envConnectionSubjectType,
+        conditions: {
+          projectId: { $eq: fakeProjectId }
+        }
       });
       for (const action of actions) {
         envIdentityPermissions.push({
@@ -119,7 +122,10 @@ describe('ProjectEnvService', () => {
           identityId: identityId,
           identityType: identityType,
           subjectId: subjectId,
-          subjectType: envSubjectType
+          subjectType: envSubjectType,
+          conditions: {
+            projectId: { $eq: fakeProjectId }
+          }
         });
       }
     }

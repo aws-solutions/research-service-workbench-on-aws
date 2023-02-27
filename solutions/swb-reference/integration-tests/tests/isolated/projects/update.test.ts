@@ -11,7 +11,7 @@ import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Update Project negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let existingProject: Project;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));

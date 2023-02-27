@@ -56,25 +56,35 @@ export default class AwsService {
   };
 
   public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
+    const customBackoff = (retryCount: number): number => {
+      console.log(`retry count: ${retryCount}, waiting: 100ms`);
+      return 100;
+    };
     const { region, ddbTableName } = options;
+    const sdkOptions = {
+      maxRetries: 5,
+      retryDelayOptions: { customBackoff },
+      ...options
+    };
+
     this.clients = {
-      cloudformation: new CloudFormation(options),
-      cognito: new CognitoIdentityProvider(options),
-      ssm: new SSM(options),
-      ec2: new EC2(options),
-      ec2InstanceConnect: new EC2InstanceConnect(options),
-      eventBridge: new EventBridge(options),
-      serviceCatalog: new ServiceCatalog(options),
-      s3: new S3(options),
-      sts: new STS(options),
-      iam: new IAM(options),
-      s3Control: new S3Control(options),
-      ddb: new DynamoDB(options),
-      lambda: new Lambda(options),
-      sagemaker: new SageMaker(options),
-      kms: new KMS(options),
-      appRegistry: new ServiceCatalogAppRegistry(options),
-      serviceQuotas: new ServiceQuotas(options)
+      cloudformation: new CloudFormation(sdkOptions),
+      cognito: new CognitoIdentityProvider(sdkOptions),
+      ssm: new SSM(sdkOptions),
+      ec2: new EC2(sdkOptions),
+      ec2InstanceConnect: new EC2InstanceConnect(sdkOptions),
+      eventBridge: new EventBridge(sdkOptions),
+      serviceCatalog: new ServiceCatalog(sdkOptions),
+      s3: new S3(sdkOptions),
+      sts: new STS(sdkOptions),
+      iam: new IAM(sdkOptions),
+      s3Control: new S3Control(sdkOptions),
+      ddb: new DynamoDB(sdkOptions),
+      lambda: new Lambda(sdkOptions),
+      sagemaker: new SageMaker(sdkOptions),
+      kms: new KMS(sdkOptions),
+      appRegistry: new ServiceCatalogAppRegistry(sdkOptions),
+      serviceQuotas: new ServiceQuotas(sdkOptions)
     };
 
     this.helpers = {

@@ -7,7 +7,7 @@ import Setup from '../../support/setup';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
 describe('multiStep project tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
