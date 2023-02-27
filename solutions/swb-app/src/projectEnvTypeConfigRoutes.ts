@@ -57,10 +57,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         if (isProjectDeletedError(e)) {
           throw Boom.badRequest(e.message);
         }
-        console.error(
-          `Unexpected error when associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`,
-          e
-        );
+        console.error(e);
         throw Boom.badImplementation(
           `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
         );
@@ -91,10 +88,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         if (isConflictError(e)) {
           throw Boom.conflict(e.message);
         }
-        console.error(
-          `Unexpected error when disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`,
-          e
-        );
+        console.error(e);
         throw Boom.badImplementation(
           `There was a problem disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
         );
@@ -116,7 +110,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         if (Boom.isBoom(e)) {
           throw e;
         }
-        console.error(`There was a problem list ETCs associated with project ${req.body.projectId}`, e);
+        console.error(e);
         throw Boom.badImplementation(
           `There was a problem list ETCs associated with project ${req.body.projectId}`
         );
