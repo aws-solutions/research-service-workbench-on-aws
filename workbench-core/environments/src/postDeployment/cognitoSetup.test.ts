@@ -2,14 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-jest.mock('md5-file');
-
 import {
   AdminCreateUserCommand,
   CognitoIdentityProviderClient,
-  CreateGroupCommand,
-  GroupExistsException,
   ListUserPoolsCommand,
   UsernameExistsException
 } from '@aws-sdk/client-cognito-identity-provider';
@@ -34,11 +29,6 @@ describe('CognitoSetup', () => {
           }
         ]
       });
-
-      cognitoMock.on(CreateGroupCommand).resolves({
-        Group: {}
-      });
-
       cognitoMock.on(AdminCreateUserCommand).resolves({
         User: {
           Username: 'user@example.com',
@@ -47,41 +37,18 @@ describe('CognitoSetup', () => {
       });
     }
 
-    test('run: Create new groups, create new user, add user to Admin group', async () => {
+    test('run: adminCreateUser is called during admin creation', async () => {
       const cognitoSetup = new CognitoSetup(constants);
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
+      jest.spyOn(cognitoSetup, 'adminCreateUser');
 
       const returnVal = await cognitoSetup.run();
       expect(returnVal).toBeUndefined();
+      expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
     });
 
-    test('run: Groups already exist, create new user, add user to Admin group', async () => {
-      const cognitoSetup = new CognitoSetup(constants);
-      const cognitoMock = mockClient(CognitoIdentityProviderClient);
-      mockCognito(cognitoMock);
-
-      const responseMetadata = { httpStatusCode: 400 };
-      cognitoMock.on(AdminCreateUserCommand).rejects(
-        new GroupExistsException({
-          $metadata: responseMetadata,
-          message: ''
-        })
-      );
-
-      // Mock create user
-      cognitoMock.on(AdminCreateUserCommand).resolves({
-        User: {
-          Username: 'user@example.com',
-          Enabled: true
-        }
-      });
-      jest.spyOn(cognitoSetup, 'createGroup').mockImplementation();
-      const returnVal = await cognitoSetup.run();
-      expect(returnVal).toBeUndefined();
-    });
-
-    test('run: Create groups, user already exists, add user to Admin group', async () => {
+    test('run: User already exists', async () => {
       const cognitoSetup = new CognitoSetup(constants);
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
@@ -96,30 +63,7 @@ describe('CognitoSetup', () => {
       jest.spyOn(cognitoSetup, 'adminCreateUser').mockImplementation();
       const returnVal = await cognitoSetup.run();
       expect(returnVal).toBeUndefined();
-    });
-
-    test('run: Groups already exist, user already exists, add user to Admin group', async () => {
-      const cognitoSetup = new CognitoSetup(constants);
-      const cognitoMock = mockClient(CognitoIdentityProviderClient);
-      mockCognito(cognitoMock);
-
-      const responseMetadata = { httpStatusCode: 400 };
-      cognitoMock.on(AdminCreateUserCommand).rejects(
-        new GroupExistsException({
-          $metadata: responseMetadata,
-          message: ''
-        })
-      );
-      cognitoMock.on(AdminCreateUserCommand).rejects(
-        new UsernameExistsException({
-          $metadata: responseMetadata,
-          message: ''
-        })
-      );
-      jest.spyOn(cognitoSetup, 'createGroup').mockImplementation();
-      jest.spyOn(cognitoSetup, 'adminCreateUser').mockImplementation();
-      const returnVal = await cognitoSetup.run();
-      expect(returnVal).toBeUndefined();
+      expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
     });
   });
 });
