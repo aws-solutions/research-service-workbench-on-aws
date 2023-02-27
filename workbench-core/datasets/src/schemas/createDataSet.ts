@@ -15,8 +15,6 @@ const CreateDataSetSchema: Schema = {
     path: { type: 'string' },
     awsAccountId: { type: 'string' },
     region: { type: 'string' },
-    owner: { type: 'string' },
-    ownerType: { type: 'string' },
     permissions: {
       type: 'array',
       items: {

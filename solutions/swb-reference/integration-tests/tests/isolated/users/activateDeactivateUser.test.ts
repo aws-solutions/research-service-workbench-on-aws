@@ -14,7 +14,7 @@ const fakeUuid = '00000000-0000-0000-0000-000000000000';
 const invalidUuid = '12345';
 
 describe('userManagement activate/deactivate user integration test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let userId: string;
 
@@ -109,27 +109,15 @@ describe('userManagement activate/deactivate user integration test', () => {
     }
   });
 
-  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
+  it('should return an error when deactivating a user with an invalid UUID', async () => {
     try {
       await adminSession.resources.users.user(invalidUuid).deactivate();
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
-
-  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
-    try {
-      await adminSession.resources.users.user(invalidUuid).deactivate();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
+        new HttpError(404, {
+          error: 'Not Found',
+          message: `Could not find user ${invalidUuid}`
         })
       );
     }

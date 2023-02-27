@@ -21,7 +21,9 @@ async function sleep(ms: number): Promise<void> {
 }
 
 function checkHttpError(actualError: Error, expectedError: HttpError): void {
-  expect(actualError instanceof HttpError).toBeTruthy();
+  if (!(actualError instanceof HttpError)) {
+    throw new Error(`Error was not an HttpError. Actual error: ${JSON.stringify(actualError)}`);
+  }
   expect(expectedError.isEqual(actualError)).toBeTruthy();
 }
 

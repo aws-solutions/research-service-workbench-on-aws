@@ -20,7 +20,7 @@ export default class ClientSession {
   private _userId?: string;
   public resources: Resources;
 
-  public constructor(setup: Setup, accessToken?: string) {
+  public constructor(setup: Setup, accessToken?: string, outputError?: boolean) {
     this._settings = setup.getSettings();
     this._setup = setup;
     this._isAnonymousSession = accessToken === undefined;
@@ -63,8 +63,10 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
+          if (outputError) {
+            console.error(JSON.stringify(error));
+          }
           const httpError = new HttpError(error.response.status, error.response.data);
-          console.error(JSON.stringify(httpError));
           return Promise.reject(httpError);
         }
         return Promise.reject(error);

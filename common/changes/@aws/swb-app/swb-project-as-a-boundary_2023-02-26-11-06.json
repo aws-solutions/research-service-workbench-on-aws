@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Update dataset delete route to handle page size 0 and GetDataset to handle dataset already being deleted",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

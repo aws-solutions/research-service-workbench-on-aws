@@ -6,10 +6,11 @@
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import {
   DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
   resourceTypeToKey,
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
-import { isDataSetHasEndpointError, isDataSetNotFoundError } from '@aws/workbench-core-datasets';
+import { DataSetNotFoundError, isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
@@ -43,20 +44,17 @@ import { validateAndParse } from './validatorHelper';
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
-    '/datasets',
+    '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
-      const dataSet = await dataSetService.provisionDataSet({
+      const dataSet = await dataSetService.provisionDataSet(req.params.projectId, {
         name: validatedRequest.name,
         storageName: validatedRequest.storageName,
         path: validatedRequest.path,
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: validatedRequest.owner,
-        ownerType: validatedRequest.ownerType,
         type: validatedRequest.type,
-        permissions: validatedRequest.permissions,
         authenticatedUser: res.locals.user
       });
 
@@ -66,7 +64,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // import new prefix (assumes S3 bucket and path exist already)
   router.post(
-    '/datasets/import',
+    '/projects/:projectsId/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(req.body, CreateDataSetRequestParser);
       const dataSet = await dataSetService.importDataSet({
@@ -76,7 +74,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         awsAccountId: validatedRequest.awsAccountId,
         region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: validatedRequest.owner,
         type: validatedRequest.type,
         authenticatedUser: res.locals.user
       });
@@ -86,7 +83,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // share dataset
   router.post(
-    '/datasets/:id/share',
+    '/projects/:projectsId/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
@@ -106,7 +103,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Get dataset
   router.get(
-    '/datasets/:dataSetId',
+    '/projects/:projectsId/datasets/:dataSetId',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -120,7 +117,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Add file to dataset
   router.get(
-    '/datasets/:dataSetId/upload-requests',
+    '/projects/:projectsId/datasets/:dataSetId/upload-requests',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -146,16 +143,45 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     })
   );
 
-  // List dataSets
+  // List project dataSets
   router.get(
-    '/datasets',
+    '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
-      const pageSize = toNumber(req.query.pageSize) || DEFAULT_API_PAGE_SIZE;
+      const maxPageSize = MAX_API_PAGE_SIZE;
+      const pageSize = req.query.pageSize ? toNumber(req.query.pageSize) : DEFAULT_API_PAGE_SIZE;
       const paginationToken = req.query.paginationToken?.toString();
+      const projectId = req.params.projectId;
+      if (pageSize < 1 || pageSize > maxPageSize) {
+        throw Boom.badRequest(`Page size must be between 1 and ${maxPageSize}`);
+      }
 
-      const response = await dataSetService.listDataSets(authenticatedUser, pageSize, paginationToken);
+      const response = await dataSetService.listDataSetsForProject(
+        projectId,
+        authenticatedUser,
+        pageSize,
+        paginationToken
+      );
       res.send(response);
+    })
+  );
+
+  // Get DataSet
+  router.get(
+    '/datasets/:datasetId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
+
+      try {
+        const response = await dataSetService.getDataSet(req.params.datasetId, authenticatedUser);
+        res.send(response);
+      } catch (e) {
+        if (e instanceof DataSetNotFoundError) {
+          throw Boom.notFound(`Could not find dataset ${req.params.datasetId}`);
+        }
+        console.error(e);
+        throw Boom.badImplementation(`There was a problem getting dataset ${req.params.datasetId}`);
+      }
     })
   );
 
@@ -194,7 +220,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   );
 
   router.get(
-    '/datasets/:datasetId/permissions',
+    '/projects/:projectId/datasets/:datasetId/permissions',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListDataSetAccessPermissionsRequest>(
         ListDataSetAccessPermissionsRequestParser,
@@ -229,10 +255,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
         if (isDataSetHasEndpointError(e)) {
           throw Boom.conflict(e.message);
-        }
-
-        if (isDataSetNotFoundError(e)) {
-          throw Boom.notFound();
         }
 
         throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);

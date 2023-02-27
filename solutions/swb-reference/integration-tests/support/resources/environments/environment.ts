@@ -11,10 +11,10 @@ import Resource from '../base/resource';
 
 export default class Environment extends Resource {
   private _projectId: string;
-  public constructor(id: string, clientSession: ClientSession, parentApi: string, projectId?: string) {
+
+  public constructor(id: string, clientSession: ClientSession, parentApi: string, projectId: string) {
     super(clientSession, 'environment', id, parentApi);
-    this._projectId = projectId ?? this._settings.get('projectId');
-    this._api = `projects/${this._projectId}/environments/${id}`;
+    this._projectId = projectId;
   }
 
   public async connect(): Promise<AxiosResponse> {
@@ -39,7 +39,11 @@ export default class Environment extends Resource {
 
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
-    const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
+    const { data: resource } = await defAdminSession.resources.projects
+      .project(this._projectId)
+      .environments()
+      .environment(this._id)
+      .get();
     let envStatus: EnvironmentStatus = resource.status;
     if (['TERMINATED'].includes(envStatus)) {
       // Exit early because environment has already been terminated
@@ -49,29 +53,56 @@ export default class Environment extends Resource {
     try {
       console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
       await poll(
-        async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
+        async () =>
+          defAdminSession.resources.projects
+            .project(this._projectId)
+            .environments()
+            .environment(this._id)
+            .get(),
         (env) => !['PENDING', 'STOPPING', 'STARTING'].includes(env?.data?.status),
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );
 
-      if (!['STOPPED'].includes(envStatus)) {
-        console.log(`Environment must be stopped to terminate. Currently in state ${envStatus}.`);
-        await defAdminSession.resources.environments.environment(this._id, this._projectId).stop();
+      if (!['STOPPED', 'TERMINATING'].includes(envStatus)) {
+        console.log(
+          `Environment must be stopped to terminate. Currently in state ${envStatus}. Stopping environment ${this._id}.`
+        );
+        await defAdminSession.resources.projects
+          .project(this._projectId)
+          .environments()
+          .environment(this._id)
+          .stop();
         await poll(
-          async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
+          async () =>
+            defAdminSession.resources.projects
+              .project(this._projectId)
+              .environments()
+              .environment(this._id)
+              .get(),
           (env) => env?.data?.status === 'STOPPED',
           ENVIRONMENT_START_MAX_WAITING_SECONDS
         );
       }
 
-      const { data: completedResource } = await defAdminSession.resources.environments
-        .environment(this._id, this._projectId)
+      const { data: completedResource } = await defAdminSession.resources.projects
+        .project(this._projectId)
+        .environments()
+        .environment(this._id)
         .get();
       envStatus = completedResource.status;
       console.log(`Terminating environment ${this._id}.`);
-      await defAdminSession.resources.environments.environment(this._id, this._projectId).terminate();
+      await defAdminSession.resources.projects
+        .project(this._projectId)
+        .environments()
+        .environment(this._id)
+        .terminate();
       await poll(
-        async () => defAdminSession.resources.environments.environment(this._id, this._projectId).get(),
+        async () =>
+          defAdminSession.resources.projects
+            .project(this._projectId)
+            .environments()
+            .environment(this._id)
+            .get(),
         (env) => env?.data?.status === 'TERMINATED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );

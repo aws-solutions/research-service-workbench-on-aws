@@ -4,7 +4,6 @@
  */
 
 import {
-  ProjectService,
   CreateProjectRequest,
   CreateProjectRequestParser,
   ListProjectsRequest,
@@ -16,7 +15,9 @@ import {
   DeleteProjectRequest,
   DeleteProjectRequestParser,
   AssignUserToProjectRequestParser,
-  AssignUserToProjectRequest
+  AssignUserToProjectRequest,
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
 } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import { validateAndParse, MetadataService, resourceTypeToKey, runInBatches } from '@aws/workbench-core-base';
@@ -30,6 +31,7 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
+import { ProjectPlugin } from './projects/projectPlugin';
 import {
   ProjectDatasetMetadata,
   ProjectDatasetMetadataParser,
@@ -39,7 +41,7 @@ import {
 
 export function setUpProjectRoutes(
   router: Router,
-  projectService: ProjectService,
+  projectService: ProjectPlugin,
   environmentService: EnvironmentService,
   metadataService: MetadataService,
   userService: UserManagementService
@@ -155,7 +157,7 @@ export function setUpProjectRoutes(
 
   // add user to the project
   router.post(
-    '/projects/:projectId/users/:userId',
+    '/projects/:projectId/users/:userId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<AssignUserToProjectRequest>(
         AssignUserToProjectRequestParser,
@@ -224,7 +226,7 @@ export function setUpProjectRoutes(
 
   // remove user from the project
   router.delete(
-    '/projects/:projectId/users/:userId',
+    '/projects/:projectId/users/:userId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId;
       const projectId = req.params.projectId;
@@ -256,10 +258,14 @@ export function setUpProjectRoutes(
 
   // list users for role
   router.get(
-    '/projects/:projectId/users/:role',
+    '/projects/:projectId/users',
     wrapAsync(async (req: Request, res: Response) => {
       const projectId = req.params.projectId;
-      const role = req.params.role;
+      const validatedRequest = validateAndParse<ListUsersForRoleRequest>(
+        ListUsersForRoleRequestParser,
+        req.query
+      );
+      const { role } = validatedRequest;
       const groupId = `${projectId}#${role}`;
 
       try {

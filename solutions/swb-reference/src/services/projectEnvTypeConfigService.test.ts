@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { ConflictError, ProjectDeletedError } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
+import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
 import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {

@@ -49,23 +49,25 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     },
     authenticatedUser: AuthenticatedUser
   ): Promise<Environment> {
-    const project = await this._projectService.getProject({ projectId: params.projectId });
+    const projectId = params.projectId;
+    const project = await this._projectService.getProject({ projectId });
 
     if (project.status === ProjectStatus.DELETED) {
-      throw new ProjectDeletedError(`Project ${params.projectId} was deleted`);
+      throw new ProjectDeletedError(`Project ${projectId} was deleted`);
     }
 
     const env: Environment = await this._envService.createEnvironment(params, authenticatedUser);
 
-    const projectAdmin = getProjectAdminRole(params.projectId);
-    const projectResearcher = getResearcherRole(params.projectId);
+    const projectAdmin = getProjectAdminRole(projectId);
+    const projectResearcher = getResearcherRole(projectId);
 
     await this._addAuthZPermissionsForEnv(
       authenticatedUser,
       SwbAuthZSubject.SWB_ENVIRONMENT,
       env.id,
       [projectAdmin, projectResearcher],
-      ['READ', 'UPDATE', 'DELETE']
+      ['READ', 'UPDATE', 'DELETE'],
+      projectId
     );
 
     await this._addAuthZPermissionsForEnv(
@@ -73,7 +75,8 @@ export class ProjectEnvService implements ProjectEnvPlugin {
       SwbAuthZSubject.SWB_ENVIRONMENT_CONNECTION,
       env.id,
       [projectAdmin, projectResearcher],
-      ['READ']
+      ['READ'],
+      projectId
     );
 
     return env;
@@ -117,7 +120,8 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     subjectType: string,
     subjectId: string,
     roles: string[],
-    actions: Action[]
+    actions: Action[],
+    projectId: string
   ): Promise<void> {
     const partialIdentityPermission = {
       action: undefined,
@@ -125,7 +129,10 @@ export class ProjectEnvService implements ProjectEnvPlugin {
       identityId: undefined,
       identityType: 'GROUP',
       subjectId: subjectId,
-      subjectType: subjectType
+      subjectType: subjectType,
+      conditions: {
+        projectId: { $eq: projectId }
+      }
     };
 
     const identityPermissions: IdentityPermission[] = [];

@@ -9,7 +9,7 @@ import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
 
 describe('multiStep user to project integration test', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
 
@@ -36,6 +36,7 @@ describe('multiStep user to project integration test', () => {
   describe('Happy path', () => {
     test.each(['ProjectAdmin', 'Researcher'])('for role: %p', async (role: string) => {
       // create project
+      console.log('Creating project...');
       const { data: project } = await adminSession.resources.projects.create({
         name: `TestProject-${uuidv4()}`,
         description: 'Project for happy path user to project API',
@@ -43,6 +44,7 @@ describe('multiStep user to project integration test', () => {
       });
 
       // create user
+      console.log('Creating user...');
       const { data: user } = await adminSession.resources.users.create({
         firstName: 'Project',
         lastName: role,
@@ -50,6 +52,7 @@ describe('multiStep user to project integration test', () => {
       });
 
       // assign user to project
+      console.log(`Assigning user ${user.id} to project ${project.id}...`);
       await adminSession.resources.projects.project(project.id).assignUserToProject(user.id, { role });
 
       // list users by role
@@ -67,6 +70,7 @@ describe('multiStep user to project integration test', () => {
       ]);
 
       // remove users from project
+      console.log(`Removing user ${user} from project ${project.id}...`);
       await adminSession.resources.projects.project(project.id).removeUserFromProject(user.id);
 
       // list users by role
@@ -82,6 +86,7 @@ describe('multiStep user to project integration test', () => {
     test.each(['ProjectAdmin', 'Researcher'])(
       'cannot list users with role "%p" for deleted project',
       async (role: string) => {
+        console.log('Creating project...');
         const { data: createdProject } = await adminSession.resources.projects.create({
           name: `TestProject-${uuidv4()}`,
           description: 'Project for negative integration tests',
@@ -91,6 +96,7 @@ describe('multiStep user to project integration test', () => {
         await adminSession.resources.projects.project(createdProject.id).delete();
 
         try {
+          console.log(`Expecting failed attempt to list users for deleted project ${createdProject.id}`);
           await adminSession.resources.projects.project(createdProject.id).listUsersForProject(role);
         } catch (e) {
           checkHttpError(

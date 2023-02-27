@@ -9,7 +9,7 @@ export class EnvironmentTypeHelper {
   private _settings: Settings;
   private _environmentTypeService: EnvironmentTypeService;
   public constructor() {
-    const setup = new Setup();
+    const setup = Setup.getSetup();
     this._awsSdk = setup.getMainAwsClient();
     this._settings = setup.getSettings();
     this._environmentTypeService = new EnvironmentTypeService(this._awsSdk.helpers.ddb);

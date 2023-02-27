@@ -65,7 +65,7 @@ export class DataSetService implements DataSetPlugin {
     const associatedProjects = await this._associatedProjects(dataset);
     if (associatedProjects.length > 0) {
       throw new ConflictError(
-        `DataSet ${dataSetId} cannot be removed because it is associated with project(s) [${associatedProjects.join(
+        `DataSet ${dataSetId} cannot be removed because it is still associated with roles in the following project(s) [${associatedProjects.join(
           ','
         )}]`
       );
@@ -79,7 +79,9 @@ export class DataSetService implements DataSetPlugin {
       authenticatedUser
     );
 
-    const projectAdmin = dataset.owner!;
+    const projectId = dataset.owner!.split('#')[0];
+
+    const projectAdmin = getProjectAdminRole(projectId);
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -87,14 +89,21 @@ export class DataSetService implements DataSetPlugin {
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
     );
-
-    const projectId = projectAdmin.split('#')[0];
     await this._removeAuthZPermissionsForDataset(
       authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-      `${projectId}-${dataSetId!}`,
+      `${dataSetId!}`,
       [projectAdmin],
-      ['READ', 'UPDATE']
+      ['READ', 'UPDATE', 'DELETE']
+    );
+
+    const researcher = getResearcherRole(projectId);
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataSetId,
+      [researcher],
+      ['READ']
     );
   }
 
@@ -106,7 +115,7 @@ export class DataSetService implements DataSetPlugin {
 
     const projectIds = permissions.data.identityPermissions
       .filter((permission) => permission.identityType === 'GROUP')
-      .filter((permission) => permission.identityId !== dataset.owner!)
+      .filter((permission) => permission.identityId.split('#')[0] !== dataset.owner!.split('#')[0])
       .map((permission) => `'${permission.identityId.split('#')[0]}'`);
 
     return Array.from(new Set(projectIds));
@@ -137,6 +146,50 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets(user, pageSize, paginationToken);
   }
 
+  public async listDataSetsForProject(
+    projectId: string,
+    user: AuthenticatedUser,
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSet>> {
+    let projectDatasets: DataSet[] = [];
+
+    if (user.roles.includes('ITAdmin')) {
+      return {
+        data: [],
+        paginationToken: undefined
+      };
+    }
+
+    let page = 0;
+    let lastPaginationToken = paginationToken;
+    do {
+      console.log(`page ${page}`);
+      page += 1;
+      const dataSetsOnPageResponse = await this._workbenchDataSetService.listDataSets(
+        user,
+        pageSize,
+        lastPaginationToken
+      );
+      projectDatasets = projectDatasets.concat(
+        dataSetsOnPageResponse.data.filter((dataset) => dataset.owner?.split('#')[0] === projectId)
+      );
+      lastPaginationToken = dataSetsOnPageResponse.paginationToken;
+    } while (projectDatasets.length < pageSize && lastPaginationToken);
+
+    if (projectDatasets.length > pageSize) {
+      projectDatasets = projectDatasets.slice(0, pageSize);
+      lastPaginationToken = this._workbenchDataSetService.getPaginationToken(
+        projectDatasets[pageSize - 1].id
+      );
+    }
+
+    return {
+      data: projectDatasets,
+      paginationToken: lastPaginationToken
+    };
+  }
+
   public async listDataSetAccessPermissions(
     request: ListDataSetAccessPermissionsRequest
   ): Promise<PermissionsResponse> {
@@ -149,11 +202,28 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+  public async provisionDataSet(projectId: string, request: CreateProvisionDatasetRequest): Promise<DataSet> {
     //add permissions in AuthZ for user to read, write, update, delete, and update read/write permissions
+    const projectAdmin = getProjectAdminRole(projectId);
+    const projectResearcher = getResearcherRole(projectId);
+
+    request.ownerType = 'GROUP';
+    request.owner = projectAdmin;
+    request.permissions = [
+      {
+        identity: projectAdmin,
+        identityType: 'GROUP',
+        accessLevel: 'read-write'
+      },
+      {
+        identity: projectResearcher,
+        identityType: 'GROUP',
+        accessLevel: 'read-write'
+      }
+    ];
+
     const dataset = await this._workbenchDataSetService.provisionDataSet(request);
 
-    const projectAdmin = dataset.owner!;
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -162,13 +232,20 @@ export class DataSetService implements DataSetPlugin {
       ['READ', 'UPDATE', 'DELETE']
     );
 
-    const projectId = projectAdmin.split('#')[0];
+    await this._addAuthZPermissionsForDataset(
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET,
+      dataset.id!,
+      [projectResearcher],
+      ['READ']
+    );
+
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL,
-      `${projectId}-${dataset.id!}`,
+      `${dataset.id!}`,
       [projectAdmin],
-      ['READ', 'UPDATE']
+      ['READ', 'UPDATE', 'DELETE']
     );
 
     return dataset;
