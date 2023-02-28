@@ -12,7 +12,16 @@ import {
   WorkbenchSecureS3Bucket,
   WorkbenchDynamodb
 } from '@aws/workbench-core-infrastructure';
-import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import {
+  Aws,
+  aws_cognito,
+  CfnOutput,
+  CfnResource,
+  Duration,
+  RemovalPolicy,
+  Stack,
+  StackProps
+} from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   CfnDeployment,
@@ -27,16 +36,24 @@ import {
   AnyPrincipal,
   CfnPolicy,
   Effect,
+  ManagedPolicy,
   Policy,
   PolicyStatement,
+  Role,
   ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
-import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
+import { createAccessLogsBucket } from './helpers/helper-function';
+
+export interface ExampleStackProps extends StackProps {
+  hostingAccountId: string;
+  lambdaRoleName: string;
+}
 
 export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
@@ -50,7 +67,7 @@ export class ExampleStack extends Stack {
   private _accessLogsBucket: Bucket;
   private _s3AccessLogsPrefix: string;
 
-  public constructor(scope: Construct, id: string, props?: StackProps) {
+  public constructor(scope: Construct, id: string, props: ExampleStackProps) {
     super(scope, id, props);
 
     const domainSuffix = `${Aws.ACCOUNT_ID}-${Aws.REGION}`;
@@ -79,7 +96,13 @@ export class ExampleStack extends Stack {
     );
     const encryptionKey: Key = workbenchEncryptionKey.key;
 
-    this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
+    // this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
+    this._accessLogsBucket = createAccessLogsBucket(
+      this,
+      'ExampleS3AccessLogsBucket',
+      this._s3AccessLogsPrefix,
+      'ExampleS3BucketAccessLogsNameOutput'
+    );
 
     const workbenchSecureS3Bucket = new WorkbenchSecureS3Bucket(this, 'ExampleS3Bucket', {
       encryptionKey: encryptionKey,
@@ -97,7 +120,11 @@ export class ExampleStack extends Stack {
 
     this._addAccessPointDelegationStatement(datasetBucket);
 
-    const exampleLambda: Function = this._createLambda(datasetBucket);
+    const exampleLambda: Function = this._createLambda(
+      datasetBucket,
+      props.hostingAccountId,
+      props.lambdaRoleName
+    );
 
     const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
       this,
@@ -206,7 +233,7 @@ export class ExampleStack extends Stack {
 
     NagSuppressions.addResourceSuppressionsByPath(
       this,
-      '/ExampleStack/ExampleLambdaService/ServiceRole/DefaultPolicy/Resource',
+      '/ExampleStack/ExampleLambdaRole/DefaultPolicy/Resource',
       [
         // The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.
         {
@@ -345,62 +372,6 @@ export class ExampleStack extends Stack {
     );
   }
 
-  private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
-    const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      versioned: true,
-      enforceSSL: true,
-      encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true
-    });
-
-    exampleS3AccessLogsBucket.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
-        actions: ['s3:PutObject'],
-        resources: [`${exampleS3AccessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
-        conditions: {
-          StringEquals: {
-            'aws:SourceAccount': Aws.ACCOUNT_ID
-          }
-        }
-      })
-    );
-
-    //CFN NAG Suppression
-    const exampleS3AccessLogsBucketNode = exampleS3AccessLogsBucket.node.defaultChild as CfnBucket;
-    exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        // S3 Bucket should have access logging configured
-        {
-          id: 'W35',
-          reason:
-            "This is an access log bucket, we don't need to configure access logging for access log buckets"
-        }
-      ]
-    });
-
-    new CfnOutput(this, bucketNameOutput, {
-      value: exampleS3AccessLogsBucket.bucketName,
-      exportName: bucketNameOutput
-    });
-
-    //CDK NAG Suppression
-    NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
-      // The S3 Bucket has server access logs disabled.
-      {
-        id: 'AwsSolutions-S1',
-        reason:
-          "This is an access log bucket, we don't need to configure access logging for access log buckets"
-      }
-    ]);
-
-    return exampleS3AccessLogsBucket;
-  }
-
   private _createRestApi(exampleLambda: Function): void {
     const logGroup = new LogGroup(this, 'ExampleAPIGatewayAccessLogs');
 
@@ -531,7 +502,16 @@ export class ExampleStack extends Stack {
     );
   }
 
-  private _createLambda(datasetBucket: Bucket): Function {
+  private _createLambda(datasetBucket: Bucket, hostingAccountId: string, lambdaRoleName: string): Function {
+    const exampleLambdaRole = new Role(this, lambdaRoleName, {
+      roleName: lambdaRoleName,
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com')
+    });
+
+    exampleLambdaRole.addManagedPolicy(
+      ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+    );
+
     const exampleLambda: Function = new Function(this, 'ExampleLambdaService', {
       runtime: Runtime.NODEJS_18_X,
       handler: 'buildLambda.handler',
@@ -539,7 +519,8 @@ export class ExampleStack extends Stack {
       functionName: 'ExampleLambda',
       environment: this._exampleLambdaEnvVars,
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
-      memorySize: 832
+      memorySize: 832,
+      role: exampleLambdaRole
     });
 
     const exampleLambdaPolicy: Policy = new Policy(this, 'ExampleLambdaPolicy', {
@@ -623,11 +604,32 @@ export class ExampleStack extends Stack {
             'cognito-idp:ListUsersInGroup'
           ],
           resources: ['*']
+        }),
+        new PolicyStatement({
+          sid: 'crossAccountS3DatasetAccess',
+          actions: ['sts:AssumeRole'],
+          resources: [`arn:${Aws.PARTITION}:iam::${hostingAccountId}:role/ExampleCrossAccountRole`]
         })
       ]
     });
 
     //CFN NAG Suppression
+    const exampleLambdaRoleNode = this.node.findChild('ExampleLambdaRole');
+
+    const exampleCrossAccountRoleMetaDataNode = exampleLambdaRoleNode.node.findChild(
+      'Resource'
+    ) as CfnResource;
+    exampleCrossAccountRoleMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        // Resource found with an explicit name, this disallows updates that require replacement of this resource
+        {
+          id: 'W28',
+          reason: 'Explicit rolename required here'
+        }
+      ]
+    });
+
     const exampleLambdaNode = exampleLambda.node.defaultChild as CfnFunction;
     exampleLambdaNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -650,7 +652,6 @@ export class ExampleStack extends Stack {
       ]
     });
 
-    //CFN NAG Suppression
     const exampleLambdaPolicyNode = exampleLambdaPolicy.node.defaultChild as CfnPolicy;
     exampleLambdaPolicyNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -658,6 +659,10 @@ export class ExampleStack extends Stack {
         {
           id: 'W12',
           reason: 'I am ok with using wildcard here !'
+        },
+        {
+          id: 'W76',
+          reason: 'All Policies are required'
         }
       ]
     });
@@ -683,7 +688,7 @@ export class ExampleStack extends Stack {
 
     //CDK NAG Suppression
     NagSuppressions.addResourceSuppressions(
-      exampleLambda,
+      exampleLambdaRole,
       [
         // The IAM user, role, or group uses AWS managed policies.
         {

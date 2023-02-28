@@ -82,6 +82,8 @@ jobs:
       aws-test-region: ${{ secrets.AWS_TEST_REGION }}
       test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
       aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
+      aws-test-hosting-account-id: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_ID }}
+      aws-test-hosting-account-region: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_REGION }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   merge-develop-to-stage:
