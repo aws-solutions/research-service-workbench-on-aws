@@ -3,10 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-interface CreateCostCenterRequest {
-  name: string;
-  accountId: string;
-  description: string;
-}
+import { z } from 'zod';
 
-export default CreateCostCenterRequest;
+// eslint-disable-next-line @rushstack/typedef-var
+export const CreateCostCenterRequestParser = z.object({
+  name: z.string(),
+  accountId: z.string(),
+  description: z.string()
+});
+
+export type CreateCostCenterRequest = z.infer<typeof CreateCostCenterRequestParser>;

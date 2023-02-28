@@ -13,7 +13,10 @@ import { CreateAccountRequest, CreateAccountRequestParser } from './models/accou
 import { GetAccountRequest, GetAccountRequestParser } from './models/accounts/getAccountRequest';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
 import { UpdateAccountRequest, UpdateAccountRequestParser } from './models/accounts/updateAccountRequest';
-import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
+import {
+  CreateCostCenterRequest,
+  CreateCostCenterRequestParser
+} from './models/costCenters/createCostCenterRequest';
 import {
   DeleteCostCenterRequestParser,
   DeleteCostCenterRequest
@@ -55,6 +58,7 @@ export {
   CostCenterService,
   ProjectService,
   CreateCostCenterRequest,
+  CreateCostCenterRequestParser,
   CreateProjectRequest,
   CreateProjectRequestParser,
   ListProjectsRequest,
