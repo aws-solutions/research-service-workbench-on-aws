@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Duration, RemovalPolicy, SecretValue, Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, SecretValue } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -16,7 +16,6 @@ import {
   UserPoolIdentityProviderOidcProps,
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
-import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import merge from 'lodash/merge';
 
@@ -56,12 +55,6 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
-  authFlows: {
-    adminUserPassword: true,
-    userSrp: true,
-    userPassword: true,
-    custom: true
-  },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true,
   idTokenValidity: Duration.minutes(15),
@@ -87,13 +80,15 @@ export interface WorkbenchUserPoolOidcIdentityProvider
 
 export class WorkbenchCognito extends Construct {
   public readonly userPool: UserPool;
-  public readonly userPoolClient: UserPoolClient;
+  public readonly webUiUserPoolClient: UserPoolClient;
+  public readonly integrationTestUserPoolClient: UserPoolClient;
   public readonly userPoolDomain: UserPoolDomain;
 
   public readonly cognitoDomain: string;
   public readonly userPoolId: string;
-  public readonly userPoolClientId: string;
-  public readonly userPoolClientSecret: SecretValue;
+  public readonly webUiUserPoolClientId: string;
+  public readonly webUiUserPoolClientSecret: SecretValue;
+  public readonly integrationTestUserPoolClientId: string;
 
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
@@ -137,43 +132,47 @@ export class WorkbenchCognito extends Construct {
         callbackUrls: websiteUrls,
         logoutUrls: websiteUrls
       },
+      generateSecret: true,
       accessTokenValidity: props.accessTokenValidity,
       idTokenValidity: props.idTokenValidity,
-      refreshTokenValidity: props.refreshTokenValidity
+      refreshTokenValidity: props.refreshTokenValidity,
+      authFlows: {
+        userSrp: true,
+        userPassword: true,
+        custom: true
+      }
     };
-    const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
-    this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
-      ...userPoolClientProps,
+    const webUiUserPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
+    this.webUiUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-webUi', {
+      ...webUiUserPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName
-    });
-    this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
-
-    const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
-      resourceType: 'Custom::DescribeCognitoUserPoolClient',
-      onCreate: {
-        region: Stack.of(this).region,
-        service: 'CognitoIdentityServiceProvider',
-        action: 'describeUserPoolClient',
-        parameters: {
-          UserPoolId: this.userPool.userPoolId,
-          ClientId: this.userPoolClient.userPoolClientId
-        },
-        physicalResourceId: PhysicalResourceId.of(this.userPoolClient.userPoolClientId)
-      },
-      policy: AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [this.userPool.userPoolArn]
-      }),
-      installLatestAwsSdk: true
+      userPoolClientName: `${userPoolClientName}-webUi`
     });
 
-    const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(
-      'UserPoolClient.ClientSecret'
+    const tempIntegrationTestUserPoolClientProps: UserPoolClientOptions = {
+      authFlows: {
+        adminUserPassword: true
+      }
+    };
+    const integrationTestUserPoolClientProps = merge(
+      userPoolClientDefaults,
+      tempUserPoolClientProps,
+      tempIntegrationTestUserPoolClientProps
     );
+    this.integrationTestUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-iTest', {
+      ...integrationTestUserPoolClientProps,
+      userPool: this.userPool,
+      userPoolClientName: `${userPoolClientName}-iTest`
+    });
+    this.userPool.identityProviders.forEach((provider) => {
+      this.webUiUserPoolClient.node.addDependency(provider);
+      this.integrationTestUserPoolClient.node.addDependency(provider);
+    });
 
     this.cognitoDomain = this.userPoolDomain.baseUrl();
     this.userPoolId = this.userPool.userPoolId;
-    this.userPoolClientId = this.userPoolClient.userPoolClientId;
-    this.userPoolClientSecret = SecretValue.unsafePlainText(userPoolClientSecret);
+    this.webUiUserPoolClientId = this.webUiUserPoolClient.userPoolClientId;
+    this.integrationTestUserPoolClientId = this.integrationTestUserPoolClient.userPoolClientId;
+    this.webUiUserPoolClientSecret = this.webUiUserPoolClient.userPoolClientSecret;
   }
 }

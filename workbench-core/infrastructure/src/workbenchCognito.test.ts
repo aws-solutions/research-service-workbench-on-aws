@@ -68,7 +68,32 @@ describe('WorkbenchCognito tests', () => {
     });
 
     // User Pool Client
-    template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
+    template.resourceCountIs('AWS::Cognito::UserPoolClient', 2);
+    template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
+      AllowedOAuthFlows: ['code'],
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthScopes: ['openid'],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
+      EnableTokenRevocation: true,
+      GenerateSecret: true,
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
+      RefreshTokenValidity: 10080,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
+    });
+
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
       AllowedOAuthFlows: ['code'],
       AllowedOAuthFlowsUserPoolClient: true,
@@ -165,7 +190,8 @@ describe('WorkbenchCognito tests', () => {
     });
 
     // User Pool Client
-    template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
+    template.resourceCountIs('AWS::Cognito::UserPoolClient', 2);
+
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
       AllowedOAuthFlows: ['code'],
       AllowedOAuthFlowsUserPoolClient: true,
@@ -190,7 +216,34 @@ describe('WorkbenchCognito tests', () => {
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
       ],
-      ClientName: workbenchCognitoProps.userPoolClientName
+      ClientName: `${workbenchCognitoProps.userPoolClientName}-webUi`
+    });
+
+    template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
+      AllowedOAuthFlows: ['code'],
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthScopes: ['openid'],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
+      EnableTokenRevocation: true,
+      GenerateSecret: true,
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 60,
+      AccessTokenValidity: 5,
+      RefreshTokenValidity: 1440,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
+        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ],
+      ClientName: `${workbenchCognitoProps.userPoolClientName}-iTest`
     });
   });
 

@@ -28,8 +28,10 @@ import {
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
-  clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret'
+  webUiClient: {
+    clientId: 'fake-client-id',
+    clientSecret: 'fake-client-secret'
+  }
 } as const;
 
 const defaultCookieOpts = {

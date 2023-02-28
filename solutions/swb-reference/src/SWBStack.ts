@@ -151,8 +151,8 @@ export class SWBStack extends Stack {
       userPoolId = USER_POOL_ID;
     } else {
       cognitoDomain = workbenchCognito.cognitoDomain;
-      clientId = workbenchCognito.userPoolClientId;
-      clientSecret = workbenchCognito.userPoolClientSecret.unsafeUnwrap();
+      clientId = workbenchCognito.webUiUserPoolClientId;
+      clientSecret = workbenchCognito.webUiUserPoolClientSecret.unsafeUnwrap();
       userPoolId = workbenchCognito.userPoolId;
     }
 
@@ -1481,7 +1481,7 @@ export class SWBStack extends Stack {
     });
 
     new CfnOutput(this, 'cognitoUserPoolClientId', {
-      value: workbenchCognito.userPoolClientId
+      value: workbenchCognito.webUiUserPoolClientId
     });
 
     new CfnOutput(this, 'cognitoDomainName', {

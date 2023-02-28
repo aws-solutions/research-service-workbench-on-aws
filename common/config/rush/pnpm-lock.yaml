@@ -1235,6 +1235,7 @@ importers:
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.212.0
+      '@aws-sdk/client-cognito-identity-provider': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/client-s3-control': ^3.212.0
       '@aws-sdk/client-sagemaker': ^3.212.0
@@ -1324,6 +1325,7 @@ importers:
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_n7frpkljg2gwx3fmjmebgjuhvu
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_wq2qa5m5mvoc532wwgm4qnqnwa
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_wq2qa5m5mvoc532wwgm4qnqnwa
+      '@aws-sdk/client-cognito-identity-provider': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
