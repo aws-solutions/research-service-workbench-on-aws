@@ -29,6 +29,8 @@ export default class AuthorizationSetup {
     const adminUser: AuthenticatedUser = { id: this._constants.ROOT_USER_EMAIL, roles: [itAdmin] };
 
     await this.createGroupIfNotExist(itAdmin, 'IT Admin group for SWB.', adminUser);
+    //Purge ITAdmin permssions
+    await this._purgeGroupPermissions(itAdmin, adminUser);
 
     //IT Admin Permissions
     const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
@@ -45,7 +47,7 @@ export default class AuthorizationSetup {
     ]);
     const environmentTypePermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT_TYPE);
     const environmentTypeConfigPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ETC);
-    const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, ['READ']);
+    const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, ['READ', 'UPDATE']);
     const awsAccountTemplateUrlsPermissions = this._mapActions(
       itAdmin,
       SwbAuthZSubject.SWB_AWS_ACCOUNT_TEMPLATE_URL,
@@ -162,5 +164,25 @@ export default class AuthorizationSetup {
         identityId
       };
     });
+  }
+
+  private async _purgeGroupPermissions(groupId: string, user: AuthenticatedUser): Promise<void> {
+    console.log(`starting purging of ${groupId} permissions`);
+    let paginationToken = undefined;
+    do {
+      const identityPermissionsResponse = await this._authService.getIdentityPermissionsByIdentity({
+        identityType: 'GROUP',
+        identityId: groupId,
+        limit: 100
+      });
+      const permissionsToBeDeleted = identityPermissionsResponse.data.identityPermissions;
+      paginationToken = identityPermissionsResponse.paginationToken;
+      if (permissionsToBeDeleted.length > 0) {
+        await this._authService.deleteIdentityPermissions({
+          identityPermissions: permissionsToBeDeleted,
+          authenticatedUser: user
+        });
+      }
+    } while (paginationToken);
   }
 }

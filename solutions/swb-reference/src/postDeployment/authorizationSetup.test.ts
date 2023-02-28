@@ -42,7 +42,11 @@ describe('AuthorizationSetup', () => {
       getDynamicOperationsByRoute: jest.fn(),
       createIdentityPermissions: jest.fn(),
       deleteIdentityPermissions: jest.fn(),
-      getIdentityPermissionsByIdentity: jest.fn(),
+      getIdentityPermissionsByIdentity: jest.fn().mockResolvedValue({
+        data: {
+          identityPermissions: []
+        }
+      }),
       getIdentityPermissionsBySubject: jest.fn(),
       deleteSubjectIdentityPermissions: jest.fn()
     };
