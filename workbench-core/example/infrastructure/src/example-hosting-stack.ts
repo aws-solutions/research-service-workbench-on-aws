@@ -8,14 +8,14 @@ import {
   WorkbenchEncryptionKeyWithRotation,
   WorkbenchSecureS3Bucket
 } from '@aws/workbench-core-infrastructure';
-import { Aws, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, CfnOutput, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { ArnPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { createAccessLogsBucket } from './helpers/helper-function';
+import { addAccessPointDelegationStatement, createAccessLogsBucket } from './helpers/helper-function';
 
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
@@ -52,6 +52,20 @@ export class ExampleHostingStack extends Stack {
         autoDeleteObjects: true
       }
     ).bucket;
+
+    new CfnOutput(this, 'ExampleHostS3DataSetsBucketName', {
+      value: examplehostingDataSetBucket.bucketName
+    });
+
+    new CfnOutput(this, 'HostingAccountId', {
+      value: Aws.ACCOUNT_ID
+    });
+
+    new CfnOutput(this, 'HostingAccountRegion', {
+      value: Aws.REGION
+    });
+
+    addAccessPointDelegationStatement(examplehostingDataSetBucket);
 
     const exampleCrossAccountRole = new Role(this, 'ExampleCrossAccountRole', {
       roleName: 'ExampleCrossAccountRole',

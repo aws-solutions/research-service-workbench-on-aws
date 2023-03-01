@@ -73,8 +73,8 @@ export default class Datasets extends CollectionResource {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const dataSetName = randomTextGenerator.getFakeText('test-DS');
     const storageName = this._settings.get('ExampleS3DataSetsBucketName');
-    const awsAccountId = this._settings.get('mainAccountId');
-    const region = this._settings.get('AwsRegion');
+    const awsAccountId = this._settings.get('MainAccountId');
+    const region = this._settings.get('MainAccountRegion');
 
     return {
       datasetName: resource.datasetName ?? dataSetName,

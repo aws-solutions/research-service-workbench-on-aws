@@ -34,7 +34,7 @@ export default class Setup {
     const clientId = this._settings.get('ExampleCognitoUserPoolClientId');
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
-    const awsRegion = this._settings.get('AwsRegion');
+    const awsRegion = this._settings.get('MainAccountRegion');
 
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
     const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
@@ -68,7 +68,7 @@ export default class Setup {
 
   public getMainAwsClient(tableName: keyof Setting): AwsService {
     return new AwsService({
-      region: this._settings.get('AwsRegion'),
+      region: this._settings.get('MainAccountRegion'),
       ddbTableName: this._settings.get(tableName)
     });
   }
