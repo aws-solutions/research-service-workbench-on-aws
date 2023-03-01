@@ -684,4 +684,207 @@ describe('DataSetService', () => {
       expect(mockWorkbenchDataSetService.getAllDataSetAccessPermissions).toHaveBeenCalled();
     });
   });
+
+  describe('listDataSetsForProject', () => {
+    let pageSize: number;
+    let paginationToken: string | undefined;
+
+    beforeEach(() => {
+      pageSize = 1;
+      paginationToken = '';
+    });
+
+    describe('when user role contains ITAdmin', () => {
+      beforeEach(() => {
+        mockUser = {
+          id: 'sampleId',
+          roles: ['ITAdmin']
+        };
+      });
+
+      describe('role only has ITAdmin', () => {
+        test('it succeeds, and response with empty data list and undefined pagination', async () => {
+          // BUILD
+          const mockResponse = {
+            data: [],
+            paginationToken: undefined
+          };
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            paginationToken
+          );
+          // CHECK
+          expect(actualResponse).toEqual(mockResponse);
+        });
+      });
+
+      describe('role contains ITAdmin and ProjectAdmin', () => {
+        beforeEach(() => {
+          mockUser.roles.push(getProjectAdminRole(projectId));
+        });
+
+        test('it succeeds, and response with empty data list and undefined pagination', async () => {
+          const mockResponse = {
+            data: [],
+            paginationToken: undefined
+          };
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            paginationToken
+          );
+          expect(actualResponse).toEqual(mockResponse);
+        });
+      });
+    });
+
+    describe('when user role does not contains ITAdmin', () => {
+      beforeEach(() => {
+        mockUser = {
+          id: 'sampleId',
+          roles: []
+        };
+      });
+
+      // check filtering by project works
+      describe('when workbenchDataSetService returns datasets from multiple projects', () => {
+        let queriedProjectId: string;
+        let otherProjectId: string;
+        let mockDataSetWithoutOwner: DataSet;
+        let mockDataSetListWithOwner: DataSet[];
+
+        beforeEach(() => {
+          queriedProjectId = 'proj-queriedProjectId';
+          otherProjectId = 'proj-otherProjectId';
+
+          mockDataSetWithoutOwner = DataSetParser.parse({
+            id: 'dataSetId',
+            name: 'mockDataSet',
+            path: 'path',
+            storageName: 'storageName',
+            storageType: 'storageType',
+            createdAt: '2023-02-14T19:18:46'
+          });
+
+          // have different projectIds as owner
+          mockDataSetListWithOwner = [
+            { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` },
+            { ...mockDataSetWithoutOwner, owner: `${otherProjectId}#ProjectAdmin` },
+            { ...mockDataSetWithoutOwner, owner: `${otherProjectId}#Researcher` },
+            { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#Researcher` }
+          ];
+
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: mockDataSetListWithOwner,
+            paginationToken: undefined
+          });
+
+          mockWorkbenchDataSetService.getPaginationToken = jest.fn().mockReturnValueOnce('');
+        });
+
+        describe('when results from workbenchDataSetService is less or equal to pageSize', () => {
+          beforeEach(() => {
+            pageSize = 5;
+          });
+          test('response only contains queried projectId', async () => {
+            const mockResponseData = [
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` },
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#Researcher` }
+            ];
+
+            const actualResponse = await dataSetService.listDataSetsForProject(
+              queriedProjectId,
+              mockUser,
+              pageSize,
+              paginationToken
+            );
+
+            expect(actualResponse.data).toEqual(mockResponseData);
+            expect(actualResponse.data.length).toBeLessThanOrEqual(pageSize);
+          });
+        });
+
+        describe('when results from workbenchDataSetService is greater than pageSize', () => {
+          beforeEach(() => {
+            pageSize = 1;
+          });
+
+          test('response only contains queried projectId, and length is pageSIze', async () => {
+            const mockResponseData = [
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` }
+            ];
+
+            const actualResponse = await dataSetService.listDataSetsForProject(
+              queriedProjectId,
+              mockUser,
+              pageSize,
+              paginationToken
+            );
+
+            expect(actualResponse.data).toEqual(mockResponseData);
+            expect(actualResponse.data.length).toEqual(pageSize);
+          });
+        });
+      });
+
+      // check paginationToken gets returned if mock of workbenchDataSetService returns a pagination token
+      describe('when workbenchDataSetService returns a pagination token', () => {
+        let mockReturnedToken: string;
+        let randomInputToken: string;
+
+        beforeEach(() => {
+          mockReturnedToken = 'samplePaginationToken';
+          randomInputToken = '';
+
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: [mockDataSet], // have one result to avoid infinite loop
+            paginationToken: mockReturnedToken
+          });
+        });
+
+        test('this pagination get returned', async () => {
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            randomInputToken
+          );
+          // CHECK
+          expect(actualResponse.paginationToken).toEqual(mockReturnedToken);
+        });
+      });
+
+      // check custom input token works
+      describe('when custom generation of pagination token', () => {
+        let customToken: string;
+
+        beforeEach(() => {
+          customToken = 'sampleCustomToken';
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockImplementation(() => {
+            return {
+              data: [mockDataSet], // have one result to avoid infinite loop
+              paginationToken: customToken
+            };
+          });
+        });
+
+        test('custom pagination token is returned', async () => {
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            customToken
+          );
+          // CHECK
+          expect(actualResponse.paginationToken).toEqual(customToken);
+        });
+      });
+    });
+  });
 });
