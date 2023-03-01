@@ -56,7 +56,7 @@ export class ExampleHostingStack extends Stack {
     ).bucket;
 
     const exampleCrossAccountRole = new Role(this, props.crossAccountRoleName, {
-      //   roleName: props.crossAccountRoleName,
+      roleName: props.crossAccountRoleName,
       assumedBy: new ArnPrincipal(
         `arn:${Aws.PARTITION}:iam::${props.mainAccountId}:role/${props.lambdaRoleName}`
       ).withConditions({
