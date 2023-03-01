@@ -17,6 +17,7 @@ import {
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
+import { cloneDeep } from 'lodash';
 import merge from 'lodash/merge';
 
 const userPoolDefaults: UserPoolProps = {
@@ -55,6 +56,11 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
+  authFlows: {
+    userSrp: true,
+    userPassword: true,
+    custom: true
+  },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true,
   idTokenValidity: Duration.minutes(15),
@@ -66,7 +72,8 @@ export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrls: string[];
   userPoolName?: string;
-  userPoolClientName?: string;
+  webUiUserPoolClientName?: string;
+  programmaticAccessUserPoolName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
   accessTokenValidity?: Duration;
   idTokenValidity?: Duration;
@@ -81,20 +88,21 @@ export interface WorkbenchUserPoolOidcIdentityProvider
 export class WorkbenchCognito extends Construct {
   public readonly userPool: UserPool;
   public readonly webUiUserPoolClient: UserPoolClient;
-  public readonly integrationTestUserPoolClient: UserPoolClient;
+  public readonly programmaticAccessUserPoolClient: UserPoolClient;
   public readonly userPoolDomain: UserPoolDomain;
 
   public readonly cognitoDomain: string;
   public readonly userPoolId: string;
   public readonly webUiUserPoolClientId: string;
   public readonly webUiUserPoolClientSecret: SecretValue;
-  public readonly integrationTestUserPoolClientId: string;
+  public readonly programmaticAccessUserPoolClientId: string;
 
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
       domainPrefix,
       websiteUrls,
-      userPoolClientName,
+      webUiUserPoolClientName,
+      programmaticAccessUserPoolName,
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
@@ -105,7 +113,7 @@ export class WorkbenchCognito extends Construct {
       removalPolicy: props.removalPolicy
     };
 
-    const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);
+    const userPoolProps = merge(cloneDeep(userPoolDefaults), tempUserPoolProps);
 
     this.userPool = new UserPool(this, 'WorkbenchUserPool', userPoolProps);
 
@@ -135,18 +143,13 @@ export class WorkbenchCognito extends Construct {
       generateSecret: true,
       accessTokenValidity: props.accessTokenValidity,
       idTokenValidity: props.idTokenValidity,
-      refreshTokenValidity: props.refreshTokenValidity,
-      authFlows: {
-        userSrp: true,
-        userPassword: true,
-        custom: true
-      }
+      refreshTokenValidity: props.refreshTokenValidity
     };
-    const webUiUserPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
+    const userPoolClientProps = merge(cloneDeep(userPoolClientDefaults), tempUserPoolClientProps);
     this.webUiUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-webUi', {
-      ...webUiUserPoolClientProps,
+      ...userPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: `${userPoolClientName}-webUi`
+      userPoolClientName: webUiUserPoolClientName
     });
 
     const tempIntegrationTestUserPoolClientProps: UserPoolClientOptions = {
@@ -154,25 +157,21 @@ export class WorkbenchCognito extends Construct {
         adminUserPassword: true
       }
     };
-    const integrationTestUserPoolClientProps = merge(
-      userPoolClientDefaults,
-      tempUserPoolClientProps,
-      tempIntegrationTestUserPoolClientProps
-    );
-    this.integrationTestUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-iTest', {
-      ...integrationTestUserPoolClientProps,
+    merge(userPoolClientProps, tempIntegrationTestUserPoolClientProps);
+    this.programmaticAccessUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-iTest', {
+      ...userPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: `${userPoolClientName}-iTest`
+      userPoolClientName: programmaticAccessUserPoolName
     });
     this.userPool.identityProviders.forEach((provider) => {
       this.webUiUserPoolClient.node.addDependency(provider);
-      this.integrationTestUserPoolClient.node.addDependency(provider);
+      this.programmaticAccessUserPoolClient.node.addDependency(provider);
     });
 
     this.cognitoDomain = this.userPoolDomain.baseUrl();
     this.userPoolId = this.userPool.userPoolId;
     this.webUiUserPoolClientId = this.webUiUserPoolClient.userPoolClientId;
-    this.integrationTestUserPoolClientId = this.integrationTestUserPoolClient.userPoolClientId;
+    this.programmaticAccessUserPoolClientId = this.programmaticAccessUserPoolClient.userPoolClientId;
     this.webUiUserPoolClientSecret = this.webUiUserPoolClient.userPoolClientSecret;
   }
 }

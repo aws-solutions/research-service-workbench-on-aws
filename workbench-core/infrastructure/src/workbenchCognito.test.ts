@@ -126,7 +126,8 @@ describe('WorkbenchCognito tests', () => {
       domainPrefix: 'test-domain',
       websiteUrls: ['https://www.example.com'],
       userPoolName: 'Sample-User-Pool-Name',
-      userPoolClientName: 'Sample-User-Pool-Client-Name',
+      webUiUserPoolClientName: 'Sample-User-Pool-Client-Name-webUi',
+      programmaticAccessUserPoolName: 'Sample-User-Pool-Client-Name-iTest',
       accessTokenValidity: Duration.minutes(5),
       idTokenValidity: Duration.hours(1),
       refreshTokenValidity: Duration.hours(24),
@@ -211,12 +212,11 @@ describe('WorkbenchCognito tests', () => {
       },
       ExplicitAuthFlows: [
         'ALLOW_USER_PASSWORD_AUTH',
-        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
         'ALLOW_CUSTOM_AUTH',
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
       ],
-      ClientName: `${workbenchCognitoProps.userPoolClientName}-webUi`
+      ClientName: workbenchCognitoProps.webUiUserPoolClientName
     });
 
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
@@ -243,7 +243,7 @@ describe('WorkbenchCognito tests', () => {
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
       ],
-      ClientName: `${workbenchCognitoProps.userPoolClientName}-iTest`
+      ClientName: workbenchCognitoProps.programmaticAccessUserPoolName
     });
   });
 

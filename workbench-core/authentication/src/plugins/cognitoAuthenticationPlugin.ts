@@ -29,7 +29,7 @@ interface TokensExpiration {
   refreshToken: number; // ms
 }
 
-export interface CognitoWebUiClientAuthenticationOptions {
+export interface CognitoWebUiClient {
   /**
    * The Cognito app client ID.
    */
@@ -55,7 +55,7 @@ export interface CognitoAuthenticationPluginOptions {
   /**
    * The WebUI client authentication options
    */
-  webUiClient: CognitoWebUiClientAuthenticationOptions;
+  webUiClient: CognitoWebUiClient;
 
   /**
    * Additional allowed client Ids.
@@ -70,7 +70,7 @@ export interface CognitoAuthenticationPluginOptions {
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _region: string;
   private _userPoolId: string;
-  private _webUiClient: CognitoWebUiClientAuthenticationOptions;
+  private _webUiClient: CognitoWebUiClient;
 
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{

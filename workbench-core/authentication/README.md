@@ -24,7 +24,7 @@ const cognitoAuthenticationPluginOptions: CognitoAuthenticationPluginOptions = {
     clientId: '<Cognito User Pool Client ID for WebUI>',
     clientSecret: '<Cognito User Pool Client Secret for WebUI>',
   },
-  allowedClientIds: ['<Optional Cognito User Pool ID for integration tests>'],
+  allowedClientIds: ['<Optional Cognito User Pool ID for programmatic access>'],
   websiteUrl: '<Website URL>'
 };
 

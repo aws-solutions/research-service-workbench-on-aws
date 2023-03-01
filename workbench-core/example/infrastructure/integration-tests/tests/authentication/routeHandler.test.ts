@@ -110,13 +110,13 @@ describe('authentication route handler integration tests', () => {
 
   describe('refreshAccessToken', () => {
     it('should return the id token if the access token is successfully refreshed', async () => {
+      // Log in using ALLOW_USER_PASSWORD_AUTH flow because ALLOW_ADMIN_USER_PASSWORD_AUTH is disabled for WebUI appClient
       const adminSession = await setup.createRootUserSession(
         setup.getSettings().get('ExampleCognitoUserPoolId'),
         setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId'),
         'USER'
-      ); // Log in using ALLOW_USER_PASSWORD_AUTH flow because ALLOW_ADMIN_USER_PASSWORD_AUTH is disabled for WebUI appClient
+      );
 
-      //const adminSession = await setup.createAdminSession();
       const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
 
       expect(data.idToken).toBeDefined();
