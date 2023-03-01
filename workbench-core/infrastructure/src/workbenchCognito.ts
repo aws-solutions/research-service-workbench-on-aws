@@ -17,7 +17,6 @@ import {
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
-import { cloneDeep } from 'lodash';
 import merge from 'lodash/merge';
 
 const userPoolDefaults: UserPoolProps = {
@@ -68,6 +67,12 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   refreshTokenValidity: Duration.days(7)
 };
 
+export interface UserPoolTokenValidity {
+  accessTokenValidity?: Duration;
+  idTokenValidity?: Duration;
+  refreshTokenValidity?: Duration;
+}
+
 export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrls: string[];
@@ -75,9 +80,8 @@ export interface WorkbenchCognitoProps {
   webUiUserPoolClientName?: string;
   programmaticAccessUserPoolName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
-  accessTokenValidity?: Duration;
-  idTokenValidity?: Duration;
-  refreshTokenValidity?: Duration;
+  webUiUserPoolTokenValidity?: UserPoolTokenValidity;
+  programmaticAccessUserPoolTokenValidity?: UserPoolTokenValidity;
   mfa?: Mfa;
   removalPolicy?: RemovalPolicy;
 }
@@ -103,7 +107,9 @@ export class WorkbenchCognito extends Construct {
       websiteUrls,
       webUiUserPoolClientName,
       programmaticAccessUserPoolName,
-      oidcIdentityProviders: oidcIdentityProviderProps
+      oidcIdentityProviders: oidcIdentityProviderProps,
+      webUiUserPoolTokenValidity,
+      programmaticAccessUserPoolTokenValidity
     } = props;
     super(scope, id);
 
@@ -113,7 +119,7 @@ export class WorkbenchCognito extends Construct {
       removalPolicy: props.removalPolicy
     };
 
-    const userPoolProps = merge(cloneDeep(userPoolDefaults), tempUserPoolProps);
+    const userPoolProps = merge({}, userPoolDefaults, tempUserPoolProps);
 
     this.userPool = new UserPool(this, 'WorkbenchUserPool', userPoolProps);
 
@@ -135,38 +141,42 @@ export class WorkbenchCognito extends Construct {
       this.userPool.registerIdentityProvider(provider);
     });
 
-    const tempUserPoolClientProps: UserPoolClientOptions = {
+    const baseUserPoolClientProps: UserPoolClientOptions = {
       oAuth: {
         callbackUrls: websiteUrls,
         logoutUrls: websiteUrls
       },
-      generateSecret: true,
-      accessTokenValidity: props.accessTokenValidity,
-      idTokenValidity: props.idTokenValidity,
-      refreshTokenValidity: props.refreshTokenValidity
+      generateSecret: true
     };
-    const userPoolClientProps = merge(cloneDeep(userPoolClientDefaults), tempUserPoolClientProps);
+
+    const webUiUserPoolClientProps = merge({}, userPoolClientDefaults, baseUserPoolClientProps);
     this.webUiUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-webUi', {
-      ...userPoolClientProps,
+      ...webUiUserPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: webUiUserPoolClientName
+      userPoolClientName: webUiUserPoolClientName,
+      ...webUiUserPoolTokenValidity
     });
 
-    const tempIntegrationTestUserPoolClientProps: UserPoolClientOptions = {
+    const tempProgrammaticAccessUserPoolClientProps: UserPoolClientOptions = {
       authFlows: {
         adminUserPassword: true
       }
     };
-    merge(userPoolClientProps, tempIntegrationTestUserPoolClientProps);
+    const programmaticAccessUserPoolClientProps = merge(
+      {},
+      webUiUserPoolClientProps,
+      tempProgrammaticAccessUserPoolClientProps
+    );
+
     this.programmaticAccessUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-iTest', {
-      ...userPoolClientProps,
+      ...programmaticAccessUserPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: programmaticAccessUserPoolName
+      userPoolClientName: programmaticAccessUserPoolName,
+      ...programmaticAccessUserPoolTokenValidity
     });
-    this.userPool.identityProviders.forEach((provider) => {
-      this.webUiUserPoolClient.node.addDependency(provider);
-      this.programmaticAccessUserPoolClient.node.addDependency(provider);
-    });
+    this.userPool.identityProviders.forEach((provider) =>
+      this.webUiUserPoolClient.node.addDependency(provider)
+    );
 
     this.cognitoDomain = this.userPoolDomain.baseUrl();
     this.userPoolId = this.userPool.userPoolId;

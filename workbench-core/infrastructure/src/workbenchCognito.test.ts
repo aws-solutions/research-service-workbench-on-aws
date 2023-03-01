@@ -128,9 +128,16 @@ describe('WorkbenchCognito tests', () => {
       userPoolName: 'Sample-User-Pool-Name',
       webUiUserPoolClientName: 'Sample-User-Pool-Client-Name-webUi',
       programmaticAccessUserPoolName: 'Sample-User-Pool-Client-Name-iTest',
-      accessTokenValidity: Duration.minutes(5),
-      idTokenValidity: Duration.hours(1),
-      refreshTokenValidity: Duration.hours(24),
+      webUiUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(5),
+        idTokenValidity: Duration.hours(1),
+        refreshTokenValidity: Duration.hours(24)
+      },
+      programmaticAccessUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(10),
+        idTokenValidity: Duration.hours(2),
+        refreshTokenValidity: Duration.hours(48)
+      },
       mfa: Mfa.REQUIRED,
       removalPolicy: RemovalPolicy.DESTROY
     };
@@ -228,9 +235,9 @@ describe('WorkbenchCognito tests', () => {
       GenerateSecret: true,
       LogoutURLs: workbenchCognitoProps.websiteUrls,
       PreventUserExistenceErrors: 'ENABLED',
-      IdTokenValidity: 60,
-      AccessTokenValidity: 5,
-      RefreshTokenValidity: 1440,
+      IdTokenValidity: 120,
+      AccessTokenValidity: 10,
+      RefreshTokenValidity: 2880,
       TokenValidityUnits: {
         IdToken: 'minutes',
         AccessToken: 'minutes',
