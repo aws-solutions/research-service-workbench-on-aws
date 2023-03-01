@@ -23,13 +23,15 @@ export HOSTING_ACCOUNT_ID=<HOSTING_ACCOUNT_ID>
 export HOSTING_ACCOUNT_REGION=<HOSTING_ACCOUNT_REGION>
 export MAIN_ACCOUNT_ID=<MAIN_ACCCOUNT_ID>
 export MAIN_ACCOUNT_REGION=<MAIN_ACCCOUNT_REGION>
+export EXTERNAL_ID=<RandomString> --> https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html
 ```
 
 ### Needs to be run one time to boostrap the main account
-**Set your main account credentials** and run:
+**Set your *Main account* credentials** and run:
 ```bash
-rushx cdk:bootstrap:main
+rushx cdk:bootstrap:main 
 ```
+*Note: Windows users might get an error while running the above command. Please use the actual [command](./package.json#L22) instead*
 
 ### Deploy the ExampleStack
 ```bash
@@ -53,13 +55,14 @@ After `rushx cdk:deploy:main` you can find the USER_POOL_ID [here](./src/config/
 Navigate to `workbench-core/example/infrastructure`
 
 ### Needs to be run one time to boostrap the hosting account to trust main account
-**Set your hosting account credentials** and run:
+**Set your *Hosting account* credentials** and run:
 ```bash
 rushx cdk:bootstrap:hosting
 ```
+*Note: Windows users might get an error while running the above command. Please use the actual [command](./package.json#L22) instead*
 
 ### Deploy the ExampleHostingStack
-**Set your main account credentials** and run:
+**Set your *Main account* credentials** and run:
 ```bash
 rushx cdk:deploy:hosting
 ```

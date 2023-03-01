@@ -53,6 +53,8 @@ import { createAccessLogsBucket } from './helpers/helper-function';
 export interface ExampleStackProps extends StackProps {
   hostingAccountId: string;
   lambdaRoleName: string;
+  crossAccountRoleName: string;
+  externalId: string;
 }
 
 export class ExampleStack extends Stack {
@@ -123,7 +125,9 @@ export class ExampleStack extends Stack {
     const exampleLambda: Function = this._createLambda(
       datasetBucket,
       props.hostingAccountId,
-      props.lambdaRoleName
+      props.lambdaRoleName,
+      props.crossAccountRoleName,
+      props.externalId
     );
 
     const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
@@ -502,7 +506,13 @@ export class ExampleStack extends Stack {
     );
   }
 
-  private _createLambda(datasetBucket: Bucket, hostingAccountId: string, lambdaRoleName: string): Function {
+  private _createLambda(
+    datasetBucket: Bucket,
+    hostingAccountId: string,
+    lambdaRoleName: string,
+    crossAccountRoleName: string,
+    externalId: string
+  ): Function {
     const exampleLambdaRole = new Role(this, lambdaRoleName, {
       roleName: lambdaRoleName,
       assumedBy: new ServicePrincipal('lambda.amazonaws.com')
@@ -608,7 +618,10 @@ export class ExampleStack extends Stack {
         new PolicyStatement({
           sid: 'crossAccountS3DatasetAccess',
           actions: ['sts:AssumeRole'],
-          resources: [`arn:${Aws.PARTITION}:iam::${hostingAccountId}:role/ExampleCrossAccountRole`]
+          resources: [`arn:${Aws.PARTITION}:iam::${hostingAccountId}:role/${crossAccountRoleName}`],
+          conditions: {
+            StringEquals: { 'sts:ExternalId': externalId }
+          }
         })
       ]
     });
@@ -616,10 +629,8 @@ export class ExampleStack extends Stack {
     //CFN NAG Suppression
     const exampleLambdaRoleNode = this.node.findChild('ExampleLambdaRole');
 
-    const exampleCrossAccountRoleMetaDataNode = exampleLambdaRoleNode.node.findChild(
-      'Resource'
-    ) as CfnResource;
-    exampleCrossAccountRoleMetaDataNode.addMetadata('cfn_nag', {
+    const exampleLambdaRoleMetaDataNode = exampleLambdaRoleNode.node.findChild('Resource') as CfnResource;
+    exampleLambdaRoleMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
         // Resource found with an explicit name, this disallows updates that require replacement of this resource

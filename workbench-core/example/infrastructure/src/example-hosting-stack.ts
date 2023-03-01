@@ -20,6 +20,8 @@ import { createAccessLogsBucket } from './helpers/helper-function';
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
   lambdaRoleName: string;
+  crossAccountRoleName: string;
+  externalId: string;
 }
 
 export class ExampleHostingStack extends Stack {
@@ -53,11 +55,13 @@ export class ExampleHostingStack extends Stack {
       }
     ).bucket;
 
-    const exampleCrossAccountRole = new Role(this, 'ExampleCrossAccountRole', {
-      roleName: 'ExampleCrossAccountRole',
+    const exampleCrossAccountRole = new Role(this, props.crossAccountRoleName, {
+      //   roleName: props.crossAccountRoleName,
       assumedBy: new ArnPrincipal(
         `arn:${Aws.PARTITION}:iam::${props.mainAccountId}:role/${props.lambdaRoleName}`
-      )
+      ).withConditions({
+        StringEquals: { 'sts:ExternalId': props.externalId }
+      })
     });
 
     exampleCrossAccountRole.addToPolicy(
@@ -88,7 +92,7 @@ export class ExampleHostingStack extends Stack {
     );
 
     //CFN NAG Suppression
-    const exampleCrossAccountRoleNode = this.node.findChild('ExampleCrossAccountRole');
+    const exampleCrossAccountRoleNode = this.node.findChild(props.crossAccountRoleName);
     const exampleCrossAccountRoleMetaDataNode = exampleCrossAccountRoleNode.node.findChild(
       'Resource'
     ) as CfnResource;
