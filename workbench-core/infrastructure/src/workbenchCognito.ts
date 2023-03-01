@@ -149,12 +149,16 @@ export class WorkbenchCognito extends Construct {
       generateSecret: true
     };
 
-    const webUiUserPoolClientProps = merge({}, userPoolClientDefaults, baseUserPoolClientProps);
+    const webUiUserPoolClientProps = merge(
+      {},
+      userPoolClientDefaults,
+      baseUserPoolClientProps,
+      webUiUserPoolTokenValidity
+    );
     this.webUiUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-webUi', {
       ...webUiUserPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: webUiUserPoolClientName,
-      ...webUiUserPoolTokenValidity
+      userPoolClientName: webUiUserPoolClientName
     });
 
     const tempProgrammaticAccessUserPoolClientProps: UserPoolClientOptions = {
@@ -164,15 +168,16 @@ export class WorkbenchCognito extends Construct {
     };
     const programmaticAccessUserPoolClientProps = merge(
       {},
-      webUiUserPoolClientProps,
-      tempProgrammaticAccessUserPoolClientProps
+      userPoolClientDefaults,
+      baseUserPoolClientProps,
+      tempProgrammaticAccessUserPoolClientProps,
+      programmaticAccessUserPoolTokenValidity
     );
 
     this.programmaticAccessUserPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient-iTest', {
       ...programmaticAccessUserPoolClientProps,
       userPool: this.userPool,
-      userPoolClientName: programmaticAccessUserPoolName,
-      ...programmaticAccessUserPoolTokenValidity
+      userPoolClientName: programmaticAccessUserPoolName
     });
     this.userPool.identityProviders.forEach((provider) =>
       this.webUiUserPoolClient.node.addDependency(provider)
