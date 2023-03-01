@@ -59,7 +59,7 @@ Navigate to `workbench-core/example/infrastructure`
 ```bash
 rushx cdk:bootstrap:hosting
 ```
-*Note: Windows users might get an error while running the above command. Please use the actual [command](./package.json#L22) instead*
+*Note: Windows users might get an error while running the above command. Please use the actual [command](./package.json#L21) instead*
 
 ### Deploy the ExampleHostingStack
 **Set your *Main account* credentials** and run:
