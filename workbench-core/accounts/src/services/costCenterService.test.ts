@@ -14,7 +14,7 @@ import { mockClient } from 'aws-sdk-client-mock';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
-import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
+import { CreateCostCenterRequest } from '../models/costCenters/createCostCenterRequest';
 import { ListCostCentersRequestParser } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostCenterRequest';
 import CostCenterService from './costCenterService';
