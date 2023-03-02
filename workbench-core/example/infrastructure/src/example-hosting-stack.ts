@@ -101,6 +101,10 @@ export class ExampleHostingStack extends Stack {
       })
     );
 
+    new CfnOutput(this, 'ExampleHostDatasetRoleOutput', {
+      value: exampleCrossAccountRole.roleArn
+    });
+
     //CFN NAG Suppression
     const exampleCrossAccountRoleNode = this.node.findChild('ExampleCrossAccountRole');
     const exampleCrossAccountRoleMetaDataNode = exampleCrossAccountRoleNode.node.findChild(

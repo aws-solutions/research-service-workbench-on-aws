@@ -31,6 +31,7 @@ export interface Setting {
 
   // Host CFN template outputs
   ExampleHostS3DataSetsBucketName: string;
+  ExampleHostDatasetRoleOutput: string;
   HostingAccountId: string;
   HostingAccountRegion: string;
 

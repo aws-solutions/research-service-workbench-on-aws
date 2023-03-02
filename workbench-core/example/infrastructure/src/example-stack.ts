@@ -666,10 +666,10 @@ export class ExampleStack extends Stack {
       true
     );
 
-    exampleLambda.role!.attachInlinePolicy(exampleLambdaPolicy);
+    exampleLambdaRole.attachInlinePolicy(exampleLambdaPolicy);
 
     new CfnOutput(this, 'ExampleLambdaRoleOutput', {
-      value: exampleLambda.role!.roleArn
+      value: exampleLambdaRole.roleArn
     });
 
     //CDK NAG Suppression
