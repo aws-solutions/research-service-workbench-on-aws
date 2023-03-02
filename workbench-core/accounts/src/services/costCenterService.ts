@@ -20,7 +20,7 @@ import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
-import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
+import { CreateCostCenterRequest } from '../models/costCenters/createCostCenterRequest';
 import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
