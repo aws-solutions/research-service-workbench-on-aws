@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Aws, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Effect,
   FederatedPrincipal,
@@ -40,6 +40,7 @@ export class GitHubOIDCStack extends Stack {
           },
           'sts:AssumeRoleWithWebIdentity'
         ),
+        maxSessionDuration: Duration.hours(2),
         managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('PowerUserAccess')]
       });
 
