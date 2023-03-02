@@ -84,6 +84,7 @@ jobs:
       aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
       aws-test-hosting-account-id: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_ID }}
       aws-test-hosting-account-region: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_REGION }}
+      external_id: ${{ secrets.EXTERNAL_ID }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   merge-develop-to-stage:

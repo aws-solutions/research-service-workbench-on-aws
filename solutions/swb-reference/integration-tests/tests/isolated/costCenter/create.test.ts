@@ -41,7 +41,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'name'"
+              message: 'name: Required'
             })
           );
         }
@@ -60,7 +60,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'description'"
+              message: 'description: Required'
             })
           );
         }
@@ -79,7 +79,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'accountId'"
+              message: 'accountId: Required'
             })
           );
         }
