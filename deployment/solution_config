@@ -1,3 +1,4 @@
 SOLUTION_ID='SO0231'
 SOLUTION_NAME='Service Workbench on AWS v2'
-SOLUTION_TRADEMARKEDNAME='Service Workbench v2.0 on AWS'
+SOLUTION_TRADEMARKEDNAME='solution-spark-on-aws'
+SOLUTION_VERSION='v0.1.0'
