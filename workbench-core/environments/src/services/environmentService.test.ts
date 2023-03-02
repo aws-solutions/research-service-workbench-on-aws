@@ -849,25 +849,28 @@ describe('EnvironmentService', () => {
       ddbMock
         .on(QueryCommand, {
           TableName: tableName,
-          IndexName: 'getResourceByOwner',
-          KeyConditionExpression: '#resourceType = :resourceType AND #owner = :owner',
+          IndexName: 'getResourceByDependency',
+          KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
           ExpressionAttributeNames: {
             '#resourceType': 'resourceType',
-            '#owner': 'owner'
+            '#dependency': 'dependency'
           },
           ExpressionAttributeValues: {
             ':resourceType': {
               S: 'environment'
             },
-            ':owner': {
-              S: 'owner-123'
+            ':dependency': {
+              S: 'project'
             }
           }
         })
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.listEnvironments({ roles: ['Researcher'], id: 'owner-123' });
+      const actualResponse = await envService.listEnvironments(
+        { roles: ['Researcher'], id: 'owner-123' },
+        { project: 'project' }
+      );
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
