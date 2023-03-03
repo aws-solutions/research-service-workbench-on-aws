@@ -859,29 +859,48 @@ describe('DataSetService', () => {
         });
       });
 
-      // check custom input token works
-      describe('when custom generation of pagination token', () => {
-        let customToken: string;
+      // check when result set from ddb is larger than pageSize, we call workbenchDataSetService.getPaginationToken and token from that
+      describe('when workbenchDataSetService returns a dataset length greater than pageSize', () => {
+        projectId = 'proj-projectId';
+        const mockDataSetWithoutID = {
+          owner: `${projectId}#ProjectAdmin`,
+          name: 'mockDataSet',
+          path: 'path',
+          storageName: 'storageName',
+          storageType: 'storageType',
+          createdAt: '2023-02-14T19:18:46'
+        };
+        let mockDataSetListWithID: DataSet[];
+        let customToken: string | undefined;
 
         beforeEach(() => {
-          customToken = 'sampleCustomToken';
-          mockWorkbenchDataSetService.listDataSets = jest.fn().mockImplementation(() => {
-            return {
-              data: [mockDataSet], // have one result to avoid infinite loop
-              paginationToken: customToken
-            };
+          mockDataSetListWithID = [
+            DataSetParser.parse({ ...mockDataSetWithoutID, id: 'dataSetId1' }),
+            DataSetParser.parse({ ...mockDataSetWithoutID, id: 'dataSetId2' })
+          ];
+
+          pageSize = 1;
+          console.log(mockDataSetListWithID);
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: mockDataSetListWithID, //length larger than pageSize
+            paginationToken: undefined
           });
+          customToken = 'customToken';
+          mockWorkbenchDataSetService.getPaginationToken = jest.fn().mockReturnValueOnce(customToken);
         });
 
-        test('custom pagination token is returned', async () => {
+        test('pagination token from .getPaginationToken is returned', async () => {
           // OPERATE
           const actualResponse = await dataSetService.listDataSetsForProject(
             projectId,
             mockUser,
             pageSize,
-            customToken
+            paginationToken
           );
           // CHECK
+          expect(mockWorkbenchDataSetService.getPaginationToken).toBeCalledWith(
+            actualResponse.data[pageSize - 1].id!
+          );
           expect(actualResponse.paginationToken).toEqual(customToken);
         });
       });
