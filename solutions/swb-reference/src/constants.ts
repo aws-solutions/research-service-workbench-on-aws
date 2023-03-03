@@ -94,19 +94,17 @@ function getConstants(region?: string): Constants {
 
   const IS_SOLUTIONS_BUILD = process.env.SOLUTION_ID === SolutionId;
   const AWS_REGION = IS_SOLUTIONS_BUILD ? region! : config.awsRegion;
-  const AWS_REGION_SHORT_NAME = IS_SOLUTIONS_BUILD
-    ? 'solution' // We do this since region is unknown at synth time, but we still need shortname for resource naming
-    : // eslint-disable-next-line security/detect-object-injection
-      config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this fills it in
+  // eslint-disable-next-line security/detect-object-injection
+  const AWS_REGION_SHORT_NAME = config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this can fill it in
 
   const STACK_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
+  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
-  const USER_POOL_NAME = `swb-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URLS = allowedOrigins;
   const USER_POOL_ID = config.userPoolId || '';
@@ -158,7 +156,7 @@ function getConstants(region?: string): Constants {
     USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
-    AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
+    AWS_REGION_SHORT_NAME,
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
