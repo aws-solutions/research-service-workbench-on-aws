@@ -280,7 +280,7 @@ echo Stage set to $STAGE
 # Remove dev.yaml if it exists, we'll start with a known config that works
 do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
 
-cognitoDomainRandomString=$(xxd -l 32 -c 32 -p < /dev/random)
+cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/random)
 
 echo "
 # Stage Name

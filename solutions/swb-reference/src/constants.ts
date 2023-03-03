@@ -7,7 +7,6 @@ import fs from 'fs';
 import { join } from 'path';
 import { AwsService } from '@aws/workbench-core-base';
 import yaml from 'js-yaml';
-import _ from 'lodash';
 
 interface Constants {
   STAGE: string;
@@ -95,11 +94,10 @@ function getConstants(region?: string): Constants {
 
   const IS_SOLUTIONS_BUILD = process.env.SOLUTION_ID === SolutionId;
   const AWS_REGION = IS_SOLUTIONS_BUILD ? region! : config.awsRegion;
-  const AWS_REGION_SHORT_NAME =
-    IS_SOLUTIONS_BUILD || _.isEmpty(config.awsRegionShortName)
-      ? // eslint-disable-next-line security/detect-object-injection
-        regionShortNamesMap[AWS_REGION]
-      : config.awsRegionShortName;
+  const AWS_REGION_SHORT_NAME = IS_SOLUTIONS_BUILD
+    ? 'solution' // We do this since region is unknown at synth time, but we still need shortname for resource naming
+    : // eslint-disable-next-line security/detect-object-injection
+      config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this fills it in
 
   const STACK_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
