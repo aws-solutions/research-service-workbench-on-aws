@@ -14,7 +14,7 @@ import {
   WorkbenchEncryptionKeyWithRotation
 } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
+import { App, Aws, CfnOutput, CfnParameter, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -123,12 +123,14 @@ export class SWBStack extends Stack {
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
       ALB_INTERNET_FACING,
-      FIELDS_TO_MASK_WHEN_AUDITING
+      FIELDS_TO_MASK_WHEN_AUDITING,
+      IS_SOLUTIONS_BUILD
+      // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
     } = getConstants();
 
     super(app, STACK_NAME, {
       env: {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
+        account: IS_SOLUTIONS_BUILD ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
@@ -338,11 +340,28 @@ export class SWBStack extends Stack {
       value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
+    const hostedZoneId = IS_SOLUTIONS_BUILD
+      ? new CfnParameter(this, 'HostedZoneId', {
+          type: 'String',
+          default: HOSTED_ZONE_ID,
+          description: 'The Route 53 Hosted Zone ID linked to your custom domain name.'
+        }).valueAsString
+      : HOSTED_ZONE_ID;
+
+    const domainName = IS_SOLUTIONS_BUILD
+      ? new CfnParameter(this, 'DomainName', {
+          type: 'String',
+          default: DOMAIN_NAME,
+          description:
+            'A custom domain name that you own. TLS certificates will be generated at the time of application deployment.'
+        }).valueAsString
+      : DOMAIN_NAME;
+
     this._createLoadBalancer(
       swbVpc,
       apiGwUrl,
-      DOMAIN_NAME,
-      HOSTED_ZONE_ID,
+      domainName,
+      hostedZoneId,
       ALB_INTERNET_FACING,
       this._accessLogsBucket
     );

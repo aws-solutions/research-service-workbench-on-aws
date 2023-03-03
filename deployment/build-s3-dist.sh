@@ -273,8 +273,29 @@ echo "--------------------------------------------------------------------------
 # Note: do not install using global (-g) option. This makes build-s3-dist.sh difficult
 # for customers and developers to use, as it globally changes their environment.
 
-STAGE=testEnv
+STAGE=dev
 echo Stage set to $STAGE
+
+# Create sample dev.yaml file with a random user pool domain
+# Remove dev.yaml if it exists, we'll start with a known config that works
+do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
+
+cognitoDomainRandomString=$(xxd -l 32 -c 32 -p < /dev/random)
+
+echo "
+# Stage Name
+stage: dev
+rootUserEmailParamStorePath: '/swb/dev/rootUser/email'  # This will be configurable to give the user a chance to change it
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+cognitoDomain: 'dev-domain-$cognitoDomainRandomString'
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
+" >> $source_dir/swb-reference/src/config/dev.yaml
 
 # Add local install to PATH
 export PATH=$(npm bin):$PATH
