@@ -32,6 +32,19 @@ export class SWBApplicationLoadBalancer extends Construct {
     const { IS_SOLUTIONS_BUILD } = getConstants();
     if (!IS_SOLUTIONS_BUILD) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
 
+    if (IS_SOLUTIONS_BUILD) {
+      const albMetadataNode = this.applicationLoadBalancer.node.defaultChild as CfnResource;
+      albMetadataNode.addMetadata('cfn_nag', {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        rules_to_suppress: [
+          {
+            id: 'W52',
+            reason: 'TODO: Enable access logging for Solutions Implementation'
+          }
+        ]
+      });
+    }
+
     const albSGMetadataNode = this.applicationLoadBalancer.node.findChild('SecurityGroup').node
       .defaultChild as CfnResource;
     albSGMetadataNode.addMetadata('cfn_nag', {
