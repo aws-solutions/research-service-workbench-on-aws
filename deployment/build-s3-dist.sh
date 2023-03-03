@@ -285,6 +285,8 @@ cognitoDomainRandomString=$(xxd -l 32 -c 32 -p < /dev/random)
 echo "
 # Stage Name
 stage: dev
+awsRegion: 'us-east-1'           # TODO: Keep this empty so that template picks it up automatically at deploy time
+awsRegionShortName: 'va'         # TODO: Remove this completely. Constants file should fill it in.
 rootUserEmailParamStorePath: '/swb/dev/rootUser/email'  # This will be configurable to give the user a chance to change it
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: 'dev-domain-$cognitoDomainRandomString'

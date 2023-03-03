@@ -6,7 +6,6 @@
 import fs from 'fs';
 import { join } from 'path';
 import { AwsService } from '@aws/workbench-core-base';
-import { Aws } from 'aws-cdk-lib';
 import yaml from 'js-yaml';
 import _ from 'lodash';
 
@@ -95,7 +94,7 @@ function getConstants(): Constants {
   const config = getConfig();
 
   const IS_SOLUTIONS_BUILD = process.env.SOLUTION_ID === SolutionId;
-  const AWS_REGION = IS_SOLUTIONS_BUILD ? Aws.REGION : config.awsRegion;
+  const AWS_REGION = config.awsRegion;
   const AWS_REGION_SHORT_NAME =
     IS_SOLUTIONS_BUILD || _.isEmpty(config.awsRegionShortName)
       ? // eslint-disable-next-line security/detect-object-injection
