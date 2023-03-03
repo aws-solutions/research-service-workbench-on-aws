@@ -54,9 +54,10 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     webUiClient: {
-      clientId: process.env.CLIENT_ID!,
-      clientSecret: process.env.CLIENT_SECRET!
-    }
+      clientId: process.env.WEB_UI_CLIENT_ID!,
+      clientSecret: process.env.WEB_UI_CLIENT_SECRET!
+    },
+    allowedClientIds: [process.env.PROGRAMMATIC_ACCESS_CLIENT_ID!]
   };
 
   const authenticationService = new AuthenticationService(

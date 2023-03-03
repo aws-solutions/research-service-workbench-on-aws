@@ -16,7 +16,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     clientId: process.env.WEB_UI_CLIENT_ID!,
     clientSecret: process.env.WEB_UI_CLIENT_SECRET!
   },
-  allowedClientIds: [process.env.INTEGRATION_TEST_CLIENT_ID!]
+  allowedClientIds: [process.env.PROGRAMMATIC_ACCESS_CLIENT_ID!]
 };
 
 export const authenticationService: AuthenticationService = new AuthenticationService(

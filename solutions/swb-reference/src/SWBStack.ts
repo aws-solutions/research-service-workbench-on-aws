@@ -71,8 +71,9 @@ export class SWBStack extends Stack {
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
-    CLIENT_ID: string;
-    CLIENT_SECRET: string;
+    WEB_UI_CLIENT_ID: string;
+    WEB_UI_CLIENT_SECRET: string;
+    PROGRAMMATIC_ACCESS_CLIENT_ID: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
@@ -108,8 +109,9 @@ export class SWBStack extends Stack {
       USER_POOL_NAME,
       WEBSITE_URLS,
       USER_POOL_ID,
-      CLIENT_ID,
-      CLIENT_SECRET,
+      WEB_UI_CLIENT_ID,
+      WEB_UI_CLIENT_SECRET,
+      PROGRAMMATIC_ACCESS_CLIENT_ID,
       VPC_ID,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
@@ -141,18 +143,21 @@ export class SWBStack extends Stack {
     );
 
     let cognitoDomain: string;
-    let clientId: string;
-    let clientSecret: string;
+    let webUiClientId: string;
+    let webUiClientSecret: string;
+    let programmaticAccessClientId: string;
     let userPoolId: string;
     if (process.env.LOCAL_DEVELOPMENT === 'true') {
       cognitoDomain = `https://${COGNITO_DOMAIN}.auth.${AWS_REGION}.amazoncognito.com`;
-      clientId = CLIENT_ID;
-      clientSecret = CLIENT_SECRET;
+      webUiClientId = WEB_UI_CLIENT_ID;
+      webUiClientSecret = WEB_UI_CLIENT_SECRET;
+      programmaticAccessClientId = PROGRAMMATIC_ACCESS_CLIENT_ID;
       userPoolId = USER_POOL_ID;
     } else {
       cognitoDomain = workbenchCognito.cognitoDomain;
-      clientId = workbenchCognito.webUiUserPoolClientId;
-      clientSecret = workbenchCognito.webUiUserPoolClientSecret.unsafeUnwrap();
+      webUiClientId = workbenchCognito.webUiUserPoolClientId;
+      webUiClientSecret = workbenchCognito.webUiUserPoolClientSecret.unsafeUnwrap();
+      programmaticAccessClientId = workbenchCognito.programmaticAccessUserPoolClientId;
       userPoolId = workbenchCognito.userPoolId;
     }
 
@@ -174,8 +179,9 @@ export class SWBStack extends Stack {
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN: cognitoDomain,
-      CLIENT_ID: clientId,
-      CLIENT_SECRET: clientSecret,
+      WEB_UI_CLIENT_ID: webUiClientId,
+      WEB_UI_CLIENT_SECRET: webUiClientSecret,
+      PROGRAMMATIC_ACCESS_CLIENT_ID: programmaticAccessClientId,
       USER_POOL_ID: userPoolId,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
@@ -1475,6 +1481,9 @@ export class SWBStack extends Stack {
       // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
       webUiUserPoolTokenValidity: {
         accessTokenValidity: Duration.minutes(60)
+      },
+      programmaticAccessUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(60)
       }
     };
 
@@ -1484,8 +1493,12 @@ export class SWBStack extends Stack {
       value: workbenchCognito.userPoolId
     });
 
-    new CfnOutput(this, 'cognitoUserPoolClientId', {
+    new CfnOutput(this, 'cognitoWebUiUserPoolClientId', {
       value: workbenchCognito.webUiUserPoolClientId
+    });
+
+    new CfnOutput(this, 'cognitoProgrammaticAccessUserPoolClientId', {
+      value: workbenchCognito.programmaticAccessUserPoolClientId
     });
 
     new CfnOutput(this, 'cognitoDomainName', {

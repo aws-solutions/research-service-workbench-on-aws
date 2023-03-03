@@ -44,7 +44,7 @@ export class ExampleStack extends Stack {
     USER_POOL_ID: string;
     WEB_UI_CLIENT_ID: string;
     WEB_UI_CLIENT_SECRET: string;
-    INTEGRATION_TEST_CLIENT_ID: string;
+    PROGRAMMATIC_ACCESS_CLIENT_ID: string;
     STACK_NAME: string;
   };
 
@@ -67,7 +67,7 @@ export class ExampleStack extends Stack {
       USER_POOL_ID: exampleCognito.userPoolId,
       WEB_UI_CLIENT_ID: exampleCognito.webUiUserPoolClientId,
       WEB_UI_CLIENT_SECRET: exampleCognito.webUiUserPoolClientSecret.unsafeUnwrap(),
-      INTEGRATION_TEST_CLIENT_ID: exampleCognito.programmaticAccessUserPoolClientId,
+      PROGRAMMATIC_ACCESS_CLIENT_ID: exampleCognito.programmaticAccessUserPoolClientId,
       STACK_NAME: Aws.STACK_NAME
     };
 
