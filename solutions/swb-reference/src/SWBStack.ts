@@ -85,6 +85,9 @@ export class SWBStack extends Stack {
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
 
   public constructor(app: App) {
+    const SolutionId: string = 'SO0231';
+    const isSolutionsBuild = process.env.SOLUTION_ID === SolutionId;
+
     const {
       STAGE,
       AWS_REGION,
@@ -126,7 +129,7 @@ export class SWBStack extends Stack {
       FIELDS_TO_MASK_WHEN_AUDITING,
       IS_SOLUTIONS_BUILD
       // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
-    } = getConstants();
+    } = getConstants(isSolutionsBuild ? Aws.REGION : undefined);
 
     super(app, STACK_NAME, {
       env: {
@@ -707,6 +710,8 @@ export class SWBStack extends Stack {
       versioned: true
     });
 
+    const { IS_SOLUTIONS_BUILD } = getConstants();
+
     s3Bucket.addToResourcePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
@@ -715,7 +720,7 @@ export class SWBStack extends Stack {
         resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
-            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+            'aws:SourceAccount': IS_SOLUTIONS_BUILD ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
           }
         }
       })

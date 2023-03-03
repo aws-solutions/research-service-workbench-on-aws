@@ -90,11 +90,11 @@ const regionShortNamesMap: { [id: string]: string } = {
 };
 
 //CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
-function getConstants(): Constants {
+function getConstants(region?: string): Constants {
   const config = getConfig();
 
   const IS_SOLUTIONS_BUILD = process.env.SOLUTION_ID === SolutionId;
-  const AWS_REGION = config.awsRegion;
+  const AWS_REGION = IS_SOLUTIONS_BUILD ? region! : config.awsRegion;
   const AWS_REGION_SHORT_NAME =
     IS_SOLUTIONS_BUILD || _.isEmpty(config.awsRegionShortName)
       ? // eslint-disable-next-line security/detect-object-injection
