@@ -859,7 +859,7 @@ describe('DataSetService', () => {
         });
       });
 
-      // check when result set from ddb is larger than pageSize, we call workbenchDataSetService.getPaginationToken and token from that
+      // check when result set from ddb is larger than pageSize, we call workbenchDataSetService.getPaginationToken and return token from that
       describe('when workbenchDataSetService returns a dataset length greater than pageSize', () => {
         projectId = 'proj-projectId';
         const mockDataSetWithoutID = {
@@ -880,7 +880,6 @@ describe('DataSetService', () => {
           ];
 
           pageSize = 1;
-          console.log(mockDataSetListWithID);
           mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
             data: mockDataSetListWithID, //length larger than pageSize
             paginationToken: undefined
