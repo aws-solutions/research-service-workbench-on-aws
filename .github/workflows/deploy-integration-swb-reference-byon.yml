@@ -61,6 +61,7 @@ jobs:
           aws-region: ${{ secrets.aws-dev-region }}
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
+          role-duration-seconds: 7200
 
       - name: Enter config settings from GH secrets
         shell: bash
