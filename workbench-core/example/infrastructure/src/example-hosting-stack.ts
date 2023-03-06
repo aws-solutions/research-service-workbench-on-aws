@@ -108,8 +108,7 @@ export class ExampleHostingStack extends Stack {
     exampleCrossAccountRole.addToPolicy(
       new PolicyStatement({
         actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
-        resources: [`arn:aws:kms:${Aws.REGION}:${this.account}:key/*`],
-        sid: 'KMSAccess'
+        resources: [`arn:${Aws.PARTITION}:kms:${this.region}:${this.account}:key/*`]
       })
     );
 
