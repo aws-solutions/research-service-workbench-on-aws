@@ -279,18 +279,16 @@ echo Stage set to $STAGE
 # Create sample dev.yaml file with a random user pool domain
 # Remove dev.yaml if it exists, we'll start with a known config that works
 do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
-
-cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/random)
-regionShortNameRandomString=$(xxd -l 3 -c 3 -p < /dev/random)
+randomString=$(xxd -l 2 -c 2 -p < /dev/urandom)
 
 echo "
 # Stage Name
 stage: dev
 awsRegion: ''           # Keep this empty so that template picks it up automatically at deploy time
-awsRegionShortName: $regionShortNameRandomString      # We do this since region is unknown at synth time, but we still need shortname for resource naming before deploying
+awsRegionShortName: $randomString      # We do this since region is unknown at synth time, but we still need shortname for resource naming before deploying
 rootUserEmailParamStorePath: '/swb/dev/rootUser/email'  # This is a sample path and will need to be updated before running post deployment
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
-cognitoDomain: 'dev-domain-$cognitoDomainRandomString'
+cognitoDomain: 'dev-domain-$randomString'
 vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
