@@ -77,25 +77,29 @@ export default class Datasets extends CollectionResource {
     const region = this._settings.get('MainAccountRegion');
 
     return {
-      datasetName: resource.datasetName ?? dataSetName,
+      name: resource.name ?? dataSetName,
       path: resource.path ?? dataSetName,
       storageName: resource.storageName ?? storageName,
       awsAccountId: resource.awsAccountId ?? awsAccountId,
       region: resource.region ?? region,
       owner: resource.owner,
       ownerType: resource.ownerType,
+      roleToAssume: resource.roleToAssume,
+      externalId: resource.externalId,
       permissions: resource.permissions ?? []
     };
   }
 }
 
 interface DataSetCreateRequest {
-  datasetName: string;
+  name: string;
   storageName: string;
   path: string;
   awsAccountId: string;
   region: string;
   owner?: string;
   ownerType?: string;
+  roleToAssume?: string;
+  externalId?: string;
   permissions?: DataSetPermission[];
 }

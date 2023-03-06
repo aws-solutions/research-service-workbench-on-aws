@@ -105,6 +105,14 @@ export class ExampleHostingStack extends Stack {
       })
     );
 
+    exampleCrossAccountRole.addToPolicy(
+      new PolicyStatement({
+        actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
+        resources: [`arn:aws:kms:${Aws.REGION}:${this.account}:key/*`],
+        sid: 'KMSAccess'
+      })
+    );
+
     new CfnOutput(this, 'ExampleHostDatasetRoleOutput', {
       value: exampleCrossAccountRole.roleArn
     });
