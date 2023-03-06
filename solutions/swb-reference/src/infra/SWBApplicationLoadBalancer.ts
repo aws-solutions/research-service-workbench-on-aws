@@ -8,7 +8,7 @@ import { IVpc, SubnetSelection } from 'aws-cdk-lib/aws-ec2';
 import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { getConstants } from '../constants';
+import { isSolutionsBuild } from '../constants';
 
 export interface SWBApplicationLoadBalancerProps {
   vpc: IVpc;
@@ -29,10 +29,8 @@ export class SWBApplicationLoadBalancer extends Construct {
       vpcSubnets: subnets,
       internetFacing
     });
-    const { IS_SOLUTIONS_BUILD } = getConstants();
-    if (!IS_SOLUTIONS_BUILD) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
-
-    if (IS_SOLUTIONS_BUILD) {
+    if (!isSolutionsBuild()) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
+    if (isSolutionsBuild()) {
       const albMetadataNode = this.applicationLoadBalancer.node.defaultChild as CfnResource;
       albMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention

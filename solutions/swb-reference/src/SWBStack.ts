@@ -48,7 +48,7 @@ import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
-import { getConstants } from './constants';
+import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
 import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
 import { SWBVpc } from './infra/SWBVpc';
@@ -83,11 +83,9 @@ export class SWBStack extends Stack {
   private _s3AccessLogsPrefix: string;
   private _swbDomainNameOutputKey: string;
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
+  private _isSolutionsBuild: boolean = isSolutionsBuild();
 
   public constructor(app: App) {
-    const SolutionId: string = 'SO0231';
-    const isSolutionsBuild = process.env.SOLUTION_ID === SolutionId;
-
     const {
       STAGE,
       AWS_REGION,
@@ -126,14 +124,13 @@ export class SWBStack extends Stack {
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
       ALB_INTERNET_FACING,
-      FIELDS_TO_MASK_WHEN_AUDITING,
-      IS_SOLUTIONS_BUILD
+      FIELDS_TO_MASK_WHEN_AUDITING
       // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
-    } = getConstants(isSolutionsBuild ? Aws.REGION : undefined);
+    } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
     super(app, STACK_NAME, {
       env: {
-        account: IS_SOLUTIONS_BUILD ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
+        account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
@@ -343,7 +340,7 @@ export class SWBStack extends Stack {
       value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
-    const hostedZoneId = IS_SOLUTIONS_BUILD
+    const hostedZoneId = this._isSolutionsBuild
       ? new CfnParameter(this, 'HostedZoneId', {
           type: 'String',
           default: HOSTED_ZONE_ID,
@@ -351,7 +348,7 @@ export class SWBStack extends Stack {
         }).valueAsString
       : HOSTED_ZONE_ID;
 
-    const domainName = IS_SOLUTIONS_BUILD
+    const domainName = this._isSolutionsBuild
       ? new CfnParameter(this, 'DomainName', {
           type: 'String',
           default: DOMAIN_NAME,
@@ -710,8 +707,6 @@ export class SWBStack extends Stack {
       versioned: true
     });
 
-    const { IS_SOLUTIONS_BUILD } = getConstants();
-
     s3Bucket.addToResourcePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
@@ -720,7 +715,7 @@ export class SWBStack extends Stack {
         resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
-            'aws:SourceAccount': IS_SOLUTIONS_BUILD ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
+            'aws:SourceAccount': this._isSolutionsBuild ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
           }
         }
       })

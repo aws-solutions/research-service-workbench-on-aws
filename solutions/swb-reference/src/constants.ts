@@ -28,7 +28,6 @@ interface Constants {
   API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY: string;
-  IS_SOLUTIONS_BUILD: boolean;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
   COGNITO_DOMAIN: string;
@@ -92,7 +91,7 @@ const regionShortNamesMap: { [id: string]: string } = {
 function getConstants(region?: string): Constants {
   const config = getConfig();
 
-  const IS_SOLUTIONS_BUILD = process.env.SOLUTION_ID === SolutionId;
+  const IS_SOLUTIONS_BUILD = isSolutionsBuild();
   const AWS_REGION = IS_SOLUTIONS_BUILD ? region! : config.awsRegion;
   // eslint-disable-next-line security/detect-object-injection
   const AWS_REGION_SHORT_NAME = config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this can fill it in
@@ -165,7 +164,6 @@ function getConstants(region?: string): Constants {
     WEBSITE_URLS,
     USER_POOL_ID,
     CLIENT_ID,
-    IS_SOLUTIONS_BUILD,
     CLIENT_SECRET,
     VPC_ID,
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
@@ -182,6 +180,14 @@ function getConstants(region?: string): Constants {
     ALB_INTERNET_FACING,
     FIELDS_TO_MASK_WHEN_AUDITING
   };
+}
+
+function getSolutionId(): string {
+  return 'SO0231';
+}
+
+function isSolutionsBuild(): boolean {
+  return process.env.SOLUTION_ID === getSolutionId();
 }
 
 async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
@@ -262,6 +268,7 @@ const enum SwbAuthZSubject {
 }
 
 export {
+  isSolutionsBuild,
   getConstants,
   getConstantsWithSecrets,
   dataSetPrefix,
