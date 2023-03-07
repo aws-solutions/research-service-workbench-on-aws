@@ -19,7 +19,6 @@ import { addAccessPointDelegationStatement, createAccessLogsBucket } from './hel
 
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
-  lambdaRoleName: string;
   crossAccountRoleName: string;
   externalId: string;
 }

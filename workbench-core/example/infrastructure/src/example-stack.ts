@@ -12,16 +12,7 @@ import {
   WorkbenchSecureS3Bucket,
   WorkbenchDynamodb
 } from '@aws/workbench-core-infrastructure';
-import {
-  Aws,
-  aws_cognito,
-  CfnOutput,
-  CfnResource,
-  Duration,
-  RemovalPolicy,
-  Stack,
-  StackProps
-} from 'aws-cdk-lib';
+import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   CfnDeployment,
@@ -50,7 +41,6 @@ import { addAccessPointDelegationStatement, createAccessLogsBucket } from './hel
 
 export interface ExampleStackProps extends StackProps {
   hostingAccountId: string;
-  lambdaRoleName: string;
   crossAccountRoleName: string;
   externalId: string;
 }
@@ -123,7 +113,6 @@ export class ExampleStack extends Stack {
     const exampleLambda: Function = this._createLambda(
       datasetBucket,
       props.hostingAccountId,
-      props.lambdaRoleName,
       props.crossAccountRoleName,
       props.externalId
     );
@@ -495,12 +484,10 @@ export class ExampleStack extends Stack {
   private _createLambda(
     datasetBucket: Bucket,
     hostingAccountId: string,
-    lambdaRoleName: string,
     crossAccountRoleName: string,
     externalId: string
   ): Function {
-    const exampleLambdaRole = new Role(this, lambdaRoleName, {
-      roleName: lambdaRoleName,
+    const exampleLambdaRole = new Role(this, 'ExampleLambdaRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com')
     });
 
@@ -613,20 +600,6 @@ export class ExampleStack extends Stack {
     });
 
     //CFN NAG Suppression
-    const exampleLambdaRoleNode = this.node.findChild('ExampleLambdaRole');
-
-    const exampleLambdaRoleMetaDataNode = exampleLambdaRoleNode.node.findChild('Resource') as CfnResource;
-    exampleLambdaRoleMetaDataNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        // Resource found with an explicit name, this disallows updates that require replacement of this resource
-        {
-          id: 'W28',
-          reason: 'Explicit rolename required here'
-        }
-      ]
-    });
-
     const exampleLambdaNode = exampleLambda.node.defaultChild as CfnFunction;
     exampleLambdaNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention

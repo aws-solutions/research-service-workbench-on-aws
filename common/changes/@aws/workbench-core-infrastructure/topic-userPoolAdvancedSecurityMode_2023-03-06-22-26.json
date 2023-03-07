@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "Adding support for user pool advanced security mode",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}
