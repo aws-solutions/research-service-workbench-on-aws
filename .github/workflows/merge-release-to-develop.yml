@@ -3,7 +3,7 @@ name: merge-release-to-develop
 on:
   push:
     branches:
-      - 'release/**'
+      - 'release/*'
 
 jobs:
   merge-release-to-develop:

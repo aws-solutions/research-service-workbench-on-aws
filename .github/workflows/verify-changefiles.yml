@@ -4,7 +4,7 @@ on:
     types: [opened, synchronize, edited, reopened]
     branches:
       - develop
-      - 'release/**'
+      - 'release/*'
 
 jobs:
   run-rush-change-verify:

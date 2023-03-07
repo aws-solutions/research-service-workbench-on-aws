@@ -13,7 +13,6 @@ on:
         required: true
 
 jobs:
-  ## Verify that PR has gotten the correct approvals and required status checks are passing
   ## TODO add integration test for main
   merge-release-pr-to-main:
     runs-on: ubuntu-20.04
