@@ -1,0 +1,145 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import { AwsService } from '@aws/workbench-core-base';
+import { AddDataSetExternalEndpointResponse } from '@aws/workbench-core-datasets';
+import { v4 as uuidv4 } from 'uuid';
+import ClientSession from '../../support/clientSession';
+import { DatasetHelper } from '../../support/complex/datasetHelper';
+import Dataset from '../../support/resources/datasets/dataset';
+import Setup from '../../support/setup';
+import { accessPointS3AliasRegExp, endpointIdRegExp } from '../../support/utils/regExpressions';
+
+describe('datasets byob integration test', () => {
+  let setup: Setup;
+  let adminSession: ClientSession;
+  let byobCreateParams: Record<string, string>;
+
+  let hostRegion: string;
+  let roleToAssume: string;
+  let externalId: string;
+
+  beforeEach(() => {
+    expect.hasAssertions();
+
+    hostRegion = adminSession.getSettings().get('HostingAccountRegion');
+    roleToAssume = adminSession.getSettings().get('ExampleHostDatasetRoleOutput');
+    externalId = process.env.EXTERNAL_ID!;
+
+    byobCreateParams = {
+      storageName: adminSession.getSettings().get('ExampleHostS3DataSetsBucketName'),
+      awsAccountId: adminSession.getSettings().get('HostingAccountId'),
+      region: hostRegion,
+      roleToAssume,
+      externalId
+    };
+  });
+
+  beforeAll(async () => {
+    setup = new Setup();
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
+  describe('ProvisionDataSet', () => {
+    it('creates an external dataset', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { roleToAssume, externalId, ...expected } = byobCreateParams;
+
+      const { data } = await adminSession.resources.datasets.create(byobCreateParams);
+
+      expect(data).toMatchObject(expected);
+    });
+  });
+
+  describe('AddExternalEndpointForUser', () => {
+    it('creates an endpoint for a user for an external dataset', async () => {
+      const { data: userData } = await adminSession.resources.users.create({
+        firstName: 'Test',
+        lastName: 'User',
+        email: `success+add-external-endpoint-${uuidv4()}@simulator.amazonses.com`
+      });
+
+      const { data: datasetData } = await adminSession.resources.datasets.create({
+        ...byobCreateParams,
+        permissions: [
+          {
+            identityType: 'USER',
+            identity: userData.id,
+            accessLevel: 'read-only'
+          }
+        ]
+      });
+      const dataset = adminSession.resources.datasets.children.get(datasetData.id) as Dataset;
+
+      const response = await dataset.share({
+        userId: userData.id,
+        region: hostRegion,
+        roleToAssume,
+        externalId
+      });
+
+      expect(response).toMatchObject<AddDataSetExternalEndpointResponse>({
+        data: {
+          mountObject: {
+            name: dataset.storagePath,
+            bucket: expect.stringMatching(accessPointS3AliasRegExp),
+            prefix: dataset.storagePath,
+            endpointId: expect.stringMatching(endpointIdRegExp)
+          }
+        }
+      });
+    });
+  });
+
+  describe('PresignedSinglePartUpload', () => {
+    it('generates a presigned URL and upload a file using that URL for an external dataset', async () => {
+      const { data: datasetData } = await adminSession.resources.datasets.create(byobCreateParams);
+      const dataset = adminSession.resources.datasets.children.get(datasetData.id) as Dataset;
+
+      const fileName = uuidv4();
+      const { data } = await dataset.generateSinglePartFileUploadUrl({
+        fileName,
+        region: hostRegion,
+        roleToAssume,
+        externalId
+      });
+
+      await adminSession.getAxiosInstance().put(data.url, { fake: 'data' });
+
+      const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const { Credentials } = await mainAwsService.clients.sts.assumeRole({
+        RoleArn: roleToAssume,
+        RoleSessionName: 'Main-Account-File-Upload',
+        ExternalId: externalId
+      });
+
+      if (!Credentials) {
+        throw new Error('Invalid assumed role');
+      }
+
+      const hostAwsService = new AwsService({
+        region: hostRegion,
+        credentials: {
+          accessKeyId: Credentials.AccessKeyId!,
+          secretAccessKey: Credentials.SecretAccessKey!,
+          sessionToken: Credentials.SessionToken,
+          expiration: Credentials.Expiration
+        }
+      });
+
+      const files = await DatasetHelper.listDatasetFileNames(
+        hostAwsService,
+        dataset.storageName,
+        dataset.storagePath
+      );
+      expect(files.length > 0).toBe(true);
+      expect(files).toContain(`${dataset.storagePath}/${fileName}`);
+    });
+  });
+});
