@@ -135,6 +135,16 @@ export class SWBStack extends Stack {
       }
     });
 
+    if (this._isSolutionsBuild) {
+      new CfnParameter(this, 'RequiredStackName', {
+        type: 'String',
+        default: STACK_NAME,
+        allowedValues: [STACK_NAME],
+        description:
+          'Please use this value as the CloudFormation stack name above. Using any other stack name will result in failures later on.'
+      });
+    }
+
     const workbenchCognito = this._createCognitoResources(
       COGNITO_DOMAIN,
       WEBSITE_URLS,
