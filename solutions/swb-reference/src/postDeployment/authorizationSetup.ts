@@ -69,7 +69,7 @@ export default class AuthorizationSetup {
       ],
       adminUser
     );
-
+    console.log('test');
     await this.assignUserToGroup(adminUser.id, itAdmin, adminUser);
   }
 
