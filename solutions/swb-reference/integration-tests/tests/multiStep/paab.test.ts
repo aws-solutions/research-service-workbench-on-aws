@@ -252,6 +252,14 @@ describe('multiStep environment test', () => {
       checkHttpError(err, unauthorizedHttpError);
     }
 
+    console.log('Verifying Researcher1 CAN see Environment1');
+    // List Environments for Project
+    const { data: researcherProj1Environments }: ListEnvironmentResponse = await rs1Session.resources.projects
+      .project(project1Id)
+      .environments()
+      .listProjectEnvironments();
+    expect(researcherProj1Environments.data.filter((env) => env.id === env1.id).length).toEqual(1);
+
     console.log('Verifying Researcher1 CANNOT see Environment2...');
     // List Environments for Project
     const { data: researcherEnvironments }: ListEnvironmentResponse = await rs1Session.resources.projects
