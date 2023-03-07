@@ -24,8 +24,15 @@ export default class Endpoint extends Resource {
 
   public async cleanup(): Promise<void> {
     try {
-      const dataSetHelper = new DatasetHelper();
-      await dataSetHelper.deleteS3AccessPoint(this._name, this._awsAccountId);
+      const mainAwsService = this._setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const hostAwsService = await this._setup.getHostAwsClient(
+        'Main-Account-Cleanup-DataSet',
+        'ExampleDataSetDDBTableName'
+      );
+      const awsService =
+        this._awsAccountId === this._settings.get('HostingAccountId') ? hostAwsService : mainAwsService;
+
+      await DatasetHelper.deleteS3AccessPoint(awsService, this._name, this._awsAccountId);
     } catch (error) {
       console.warn(`Error caught in cleanup of endpoint '${this.id}: ${error}`);
     }

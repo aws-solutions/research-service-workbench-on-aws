@@ -73,6 +73,30 @@ export default class Setup {
     });
   }
 
+  public async getHostAwsClient(sessionName: string, tableName: keyof Setting): Promise<AwsService> {
+    const mainAwsService = this.getMainAwsClient(tableName);
+    const { Credentials } = await mainAwsService.clients.sts.assumeRole({
+      RoleArn: this._settings.get('ExampleHostDatasetRoleOutput'),
+      RoleSessionName: sessionName,
+      ExternalId: process.env.EXTERNAL_ID
+    });
+
+    if (!Credentials) {
+      throw new Error('Invalid assumed role');
+    }
+
+    return new AwsService({
+      region: this._settings.get('HostingAccountRegion'),
+      ddbTableName: this._settings.get(tableName),
+      credentials: {
+        accessKeyId: Credentials.AccessKeyId!,
+        secretAccessKey: Credentials.SecretAccessKey!,
+        sessionToken: Credentials.SessionToken,
+        expiration: Credentials.Expiration
+      }
+    });
+  }
+
   public async cleanup(): Promise<void> {
     // We need to reverse the order of the queue before we cleanup the sessions
     const sessions = _.reverse(_.slice(this._sessions));
