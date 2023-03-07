@@ -32,6 +32,16 @@ jobs:
           pull_number: ${{ inputs.pr_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+
+      - name: Bump versions on release branch
+        run:
+          echo 'Rush version to bump updates'
+          git checkout ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+          node common/scripts/install-run-rush.js version --bump -b ${{fromJson(steps.pr_info.outputs.data).head.ref}} --ignore-git-hooks
 
       - name: enable merge commits
         if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
