@@ -17,7 +17,6 @@ config({ path: './src/config/appReg.env' });
 
 const app: App = new cdk.App();
 
-const lambdaRoleName: string = 'ExampleLambdaRole';
 const crossAccountRoleName: string = 'ExampleCrossAccountRole';
 const externalId: string = process.env.EXTERNAL_ID!;
 
@@ -35,7 +34,6 @@ const hostingEnv: Environment = {
 const exampleStack: ExampleStack = new ExampleStack(app, 'ExampleStack', {
   env: mainEnv,
   hostingAccountId: process.env.HOSTING_ACCOUNT_ID!,
-  lambdaRoleName,
   crossAccountRoleName,
   externalId
 });
@@ -55,7 +53,6 @@ new WorkbenchAppRegistry(exampleStack, 'ExampleStack', {
 const exampleHostingStack: ExampleHostingStack = new ExampleHostingStack(app, 'ExampleHostingStack', {
   env: hostingEnv,
   mainAccountId: process.env.CDK_DEFAULT_ACCOUNT!,
-  lambdaRoleName,
   crossAccountRoleName,
   externalId
 });

@@ -9,7 +9,7 @@ import {
   WorkbenchSecureS3Bucket
 } from '@aws/workbench-core-infrastructure';
 import { Aws, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { ArnPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
+import { AccountPrincipal, PolicyStatement, PrincipalWithConditions, Role } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -19,7 +19,6 @@ import { createAccessLogsBucket } from './helpers/helper-function';
 
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
-  lambdaRoleName: string;
   crossAccountRoleName: string;
   externalId: string;
 }
@@ -57,9 +56,7 @@ export class ExampleHostingStack extends Stack {
 
     const exampleCrossAccountRole = new Role(this, props.crossAccountRoleName, {
       roleName: props.crossAccountRoleName,
-      assumedBy: new ArnPrincipal(
-        `arn:${Aws.PARTITION}:iam::${props.mainAccountId}:role/${props.lambdaRoleName}`
-      ).withConditions({
+      assumedBy: new PrincipalWithConditions(new AccountPrincipal(props.mainAccountId), {
         StringEquals: { 'sts:ExternalId': props.externalId }
       })
     });
