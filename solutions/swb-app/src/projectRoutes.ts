@@ -31,6 +31,10 @@ import {
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
+import {
+  DisassociateUserToProjectRequest,
+  DisassociateUserToProjectRequestParser
+} from './projects/disassociateProjectUserRequest';
 import { ProjectPlugin } from './projects/projectPlugin';
 import {
   ProjectDatasetMetadata,
@@ -228,9 +232,14 @@ export function setUpProjectRoutes(
   router.delete(
     '/projects/:projectId/users/:userId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      const userId = req.params.userId;
-      const projectId = req.params.projectId;
-
+      const validatedRequest = validateAndParse<DisassociateUserToProjectRequest>(
+        DisassociateUserToProjectRequestParser,
+        {
+          projectId: req.params.projectId,
+          userId: req.params.userId
+        }
+      );
+      const { userId, projectId } = validatedRequest;
       try {
         await Promise.all([userService.getUser(userId), projectService.getProject({ projectId })]);
 
