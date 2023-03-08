@@ -13,6 +13,17 @@ on:
         required: true
 
 jobs:
+  readme-commit:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
+    inputs:
+      branch: develop
+    secrets:
+      gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      passphrase: ${{ secrets.PASSPHRASE }}
+      merge-token: ${{ secrets.MERGE_TOKEN }}
+      bot-user: ${{ secrets.BOT_USER }}
+      bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
   ## TODO add integration test for main
   merge-release-pr-to-main:
     runs-on: ubuntu-20.04
@@ -49,6 +60,7 @@ jobs:
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
       - name: Temporarily disable branch protection on ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
@@ -59,6 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Bump versions on release branch
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         run:
           echo 'Rush version to bump updates'
           git checkout ${{fromJson(steps.pr_info.outputs.data).head.ref}}
@@ -76,6 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Rush Publish
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         run: |
           PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch ${{fromJson(steps.pr_info.outputs.data).head.ref}} --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
