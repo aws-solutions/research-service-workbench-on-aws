@@ -1091,8 +1091,6 @@ export class SWBStack extends Stack {
     fieldsToMaskWhenAuditing: string[],
     accountEncryptionKey: Key
   ): Function {
-    const { AWS_REGION } = getConstants();
-
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
@@ -1109,22 +1107,22 @@ export class SWBStack extends Stack {
         statements: [
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
+            resources: [`arn:aws:events:${this.region}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
             actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-            resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
+            resources: [`arn:aws:cloudformation:${this.region}:*:stack/${this.stackName}*`],
             sid: 'CfnAccess'
           }),
           new PolicyStatement({
             actions: ['servicecatalog:ListLaunchPaths'],
-            resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+            resources: [`arn:aws:catalog:${this.region}:*:product/*`],
             sid: 'ScAccess'
           }),
           new PolicyStatement({
             actions: ['cognito-idp:DescribeUserPoolClient'],
-            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            resources: [`arn:aws:cognito-idp:${this.region}:${this.account}:userpool/*`],
             sid: 'CognitoAccess'
           }),
           new PolicyStatement({
