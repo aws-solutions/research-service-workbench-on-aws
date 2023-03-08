@@ -6,11 +6,11 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const DisassociateUserToProjectRequestParser = z
+export const DisassociateUserFromProjectRequestParser = z
   .object({
     userId: z.string(),
     projectId: z.string()
   })
   .strict();
 
-export type DisassociateUserToProjectRequest = z.infer<typeof DisassociateUserToProjectRequestParser>;
+export type DisassociateUserFromProjectRequest = z.infer<typeof DisassociateUserFromProjectRequestParser>;

@@ -32,9 +32,9 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import {
-  DisassociateUserToProjectRequest,
-  DisassociateUserToProjectRequestParser
-} from './projects/disassociateProjectUserRequest';
+  DisassociateUserFromProjectRequest,
+  DisassociateUserFromProjectRequestParser
+} from './projects/disassociateUserFromProjectRequest';
 import { ProjectPlugin } from './projects/projectPlugin';
 import {
   ProjectDatasetMetadata,
@@ -232,8 +232,8 @@ export function setUpProjectRoutes(
   router.delete(
     '/projects/:projectId/users/:userId/relationships',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<DisassociateUserToProjectRequest>(
-        DisassociateUserToProjectRequestParser,
+      const validatedRequest = validateAndParse<DisassociateUserFromProjectRequest>(
+        DisassociateUserFromProjectRequestParser,
         {
           projectId: req.params.projectId,
           userId: req.params.userId
