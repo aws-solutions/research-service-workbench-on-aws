@@ -5,7 +5,7 @@
 
 import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { Mfa, ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
+import { AdvancedSecurityMode, Mfa, ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
 import {
   WorkbenchCognito,
   WorkbenchCognitoProps,
@@ -58,6 +58,9 @@ describe('WorkbenchCognito tests', () => {
       UsernameAttributes: ['email'],
       UsernameConfiguration: {
         CaseSensitive: false
+      },
+      UserPoolAddOns: {
+        AdvancedSecurityMode: 'ENFORCED'
       }
     });
 
@@ -106,7 +109,8 @@ describe('WorkbenchCognito tests', () => {
       idTokenValidity: Duration.hours(1),
       refreshTokenValidity: Duration.hours(24),
       mfa: Mfa.REQUIRED,
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      advancedSecurityMode: AdvancedSecurityMode.AUDIT
     };
     const stack = new Stack();
     new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
@@ -149,7 +153,10 @@ describe('WorkbenchCognito tests', () => {
       UsernameConfiguration: {
         CaseSensitive: false
       },
-      UserPoolName: workbenchCognitoProps.userPoolName
+      UserPoolName: workbenchCognitoProps.userPoolName,
+      UserPoolAddOns: {
+        AdvancedSecurityMode: 'AUDIT'
+      }
     });
 
     // test removal policy
