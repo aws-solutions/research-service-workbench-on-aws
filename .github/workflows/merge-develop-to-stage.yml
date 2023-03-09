@@ -12,7 +12,7 @@ on:
 jobs:
   readme-commit:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
-    inputs:
+    with:
       branch: develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
