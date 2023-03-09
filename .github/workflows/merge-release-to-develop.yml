@@ -7,7 +7,7 @@ on:
 
 jobs:
   readme-commit:
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@${{ github.ref_name }}
+    uses: ./.github/workflows/readme-commit.yml
     with:
       branch: ${{ github.ref_name }}
     secrets:
