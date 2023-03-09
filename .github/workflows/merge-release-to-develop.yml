@@ -1,29 +1,34 @@
-name: Publish-and-merge-to-develop
+name: merge-release-to-develop
+
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
     branches:
-      - main
+      - 'release/*'
 
 jobs:
-  rush-publish:
-    if: github.event.pull_request.merged == true
+  readme-commit:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@${{ github.ref_name }}
+    inputs:
+      branch: ${{ github.ref_name }}
+    secrets:
+      gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      passphrase: ${{ secrets.PASSPHRASE }}
+      merge-token: ${{ secrets.MERGE_TOKEN }}
+      bot-user: ${{ secrets.BOT_USER }}
+      bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+  merge-release-to-develop:
+    needs: [readme-commit]
     runs-on: ubuntu-20.04
-    permissions:
-      id-token: write
-      contents: read
+    env:
+      COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
+      CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.MERGE_TOKEN }}
-          ref: ${{ steps.set-ref.outputs.ref }}
           fetch-depth: 0
-
-      - name: Base Action
-        uses: ./.github/actions/baseAction
-
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -37,33 +42,6 @@ jobs:
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
-
-      - name: Rush Publish
-        run: |
-          PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch main --publish"
-          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-          
-  merge-to-develop:
-    runs-on: ubuntu-20.04
-    needs: [rush-publish]
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: git checkout
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.MERGE_TOKEN }}
-          fetch-depth: 0
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
 
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
@@ -77,12 +55,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
-      - name: Set git config
-        run: |
-          git config user.email ${{ secrets.BOT-USER-EMAIL }}
-          git config user.name ${{ secrets.BOT-USER }}
-          git config commit.gpgsign true
-
       - name: enable merge commits
         uses: octokit/request-action@v2.x
         with:
@@ -95,14 +67,21 @@ jobs:
 
       - name: Merge to develop
         run: |
-          echo "Set the COMMIT_ID to merge to develop to current workflow commit id"
-          COMMIT_ID=$GITHUB_SHA
+          echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no readme commit was made"
+          echo "Else"
+          echo "Set the COMMIT_ID to README commit id"
+          COMMIT_ID=''
+          if $CHANGES_DETECTED; then
+            COMMIT_ID=$COMMIT_HASH
+          else
+            COMMIT_ID=$GITHUB_SHA
+          fi
           git checkout develop
           echo
-          echo "  Attempting to merge the 'main' branch ($COMMIT_ID)"
-          echo "  into the 'develop' branch"
+          echo "  Attempting to merge the '${{ github.ref_name }}' branch ($COMMIT_ID)"
+          echo "  into the 'develop' branch ($(git log -1 --pretty=%H develop))"
           echo
-          git merge $COMMIT_ID --ff --no-edit -m "Merge main to develop"
+          git merge $COMMIT_ID --ff-only --no-edit
           git push origin develop
 
       - name: disable merge commits
