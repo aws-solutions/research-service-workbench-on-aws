@@ -8,7 +8,7 @@ on:
 jobs:
   readme-commit:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@${{ github.ref_name }}
-    inputs:
+    with:
       branch: ${{ github.ref_name }}
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
