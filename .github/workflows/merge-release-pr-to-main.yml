@@ -13,17 +13,6 @@ on:
         required: true
 
 jobs:
-  readme-commit:
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
-    inputs:
-      branch: develop
-    secrets:
-      gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-      passphrase: ${{ secrets.PASSPHRASE }}
-      merge-token: ${{ secrets.MERGE_TOKEN }}
-      bot-user: ${{ secrets.BOT_USER }}
-      bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
   ## TODO add integration test for main
   merge-release-pr-to-main:
     runs-on: ubuntu-20.04

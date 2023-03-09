@@ -9,6 +9,7 @@ on:
     inputs:
       branch:
         required: true
+        type: string
     secrets: 
       gpg-private-key:
         required: true
