@@ -18,22 +18,21 @@ export default class Dataset extends Resource {
   }
 
   public async associateWithProject(
-    projectId: string,
+    associatedProjectId: string,
     accessLevel: 'read-only' | 'read-write'
   ): Promise<AxiosResponse> {
-    return this._axiosInstance.put(`/projects/${projectId}/datasets/${this._id}/relationships`, {
+    return this._axiosInstance.put(`/projects/${associatedProjectId}/datasets/${this._id}/relationships`, {
       accessLevel
     });
   }
 
-  public async deleteFromProject(projectId: string): Promise<void> {
-    return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/softDelete`);
+  public async disassociateFromProject(associatedProjectId: string): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(`/projects/${associatedProjectId}/datasets/${this._id}/relationships`);
   }
 
-  public async disassociateFromProject(projectId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.delete(`/projects/${projectId}/datasets/${this._id}/relationships`);
+  public async listAccessPermissions(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/permissions`);
   }
-
   public async getFileUploadUrls(filenames?: string | string[]): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/upload-requests`, { params: { filenames } });
   }

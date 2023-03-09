@@ -17,6 +17,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter } from '../models/costCenters/costCenter';
 import AccountService from './accountService';
@@ -350,7 +351,8 @@ describe('AccountService', () => {
             pk: costCenterPK,
             sk: costCenterPK,
             id: expectedCCId,
-            name: 'cost center 1'
+            name: 'cost center 1',
+            status: CostCenterStatus.AVAILABLE
           };
         });
 

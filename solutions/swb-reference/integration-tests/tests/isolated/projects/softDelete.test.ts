@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Soft Delete Project negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('Soft Delete Project negative tests', () => {
 
     test('it throws 404 error', async () => {
       try {
-        await adminSession.resources.projects.project(invalidProjectId).softDelete();
+        await adminSession.resources.projects.project(invalidProjectId).delete();
       } catch (e) {
         checkHttpError(
           e,

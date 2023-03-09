@@ -2,8 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { ConflictError } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
+import { ConflictError, ProjectDeletedError } from '@aws/swb-app';
+import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
 import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
@@ -54,7 +54,7 @@ describe('projectEnvTypeConfigService', () => {
       mockDynamicAuthService.deleteIdentityPermissions = jest.fn().mockReturnValue({});
       mockMetadataService.deleteRelationships = jest.fn().mockReturnValue({});
     });
-    test('excecutes successfully when there are no conflicting environments', async () => {
+    test('executes successfully when there are no conflicting environments', async () => {
       // OPERATE n CHECK
       await expect(() => projectEnvTypeConfigPlugin.disassociateProjectAndEnvTypeConfig(disassociateRequest))
         .resolves;
@@ -68,7 +68,7 @@ describe('projectEnvTypeConfigService', () => {
         projectEnvTypeConfigPlugin.disassociateProjectAndEnvTypeConfig(disassociateRequest)
       ).rejects.toThrow(ConflictError);
     });
-    test('excecutes successfully when there is only failed environments using configuration ', async () => {
+    test('executes successfully when there is only failed environments using configuration ', async () => {
       mockEnvironmentService.listEnvironments = jest
         .fn()
         .mockReturnValue({ data: [{ id: 'activeEnv', status: 'FAILED', projectId: projectId }] });
@@ -76,7 +76,7 @@ describe('projectEnvTypeConfigService', () => {
       await expect(() => projectEnvTypeConfigPlugin.disassociateProjectAndEnvTypeConfig(disassociateRequest))
         .resolves;
     });
-    test('excecutes successfully and removes identity permissions', async () => {
+    test('executes successfully and removes identity permissions', async () => {
       // OPERATE n CHECK
       await projectEnvTypeConfigPlugin.disassociateProjectAndEnvTypeConfig(disassociateRequest);
       expect(mockDynamicAuthService.deleteIdentityPermissions).toHaveBeenCalledTimes(1);
@@ -85,23 +85,25 @@ describe('projectEnvTypeConfigService', () => {
 
   describe('associateProjectAndEnvTypeConfig', () => {
     beforeEach(() => {
-      mockProjectService.getProject = jest.fn().mockReturnValue({});
+      mockProjectService.getProject = jest.fn().mockReturnValue({
+        status: ProjectStatus.AVAILABLE
+      });
       mockEnvironmentTypeConfigService.getEnvironmentTypeConfig = jest.fn().mockReturnValue({});
       mockMetadataService.updateRelationship = jest.fn().mockReturnValue({});
       mockDynamicAuthService.createIdentityPermissions = jest.fn().mockReturnValue({});
       mockDynamicAuthService.getIdentityPermissionsBySubject = jest.fn().mockReturnValue({});
     });
-    test('excecutes successfully', async () => {
+    test('executes successfully', async () => {
       // OPERATE n CHECK
       await expect(() => projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest))
         .resolves;
     });
-    test('excecutes successfully and adds identity permissions', async () => {
+    test('executes successfully and adds identity permissions', async () => {
       // OPERATE n CHECK
       await projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest);
       expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledTimes(1);
     });
-    test('excecutes successfully and when association already exists', async () => {
+    test('executes successfully and when association already exists', async () => {
       mockDynamicAuthService.getIdentityPermissionsBySubject = jest
         .fn()
         .mockReturnValue({ data: { identityPermissions: [{ id: 'mockObject' }] } });
@@ -109,6 +111,16 @@ describe('projectEnvTypeConfigService', () => {
       await expect(
         projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest)
       ).resolves.not.toThrow();
+    });
+    test('fails when project was deleted', async () => {
+      mockProjectService.getProject = jest.fn().mockReturnValue({
+        status: ProjectStatus.DELETED
+      });
+
+      // OPERATE n CHECK
+      await expect(() =>
+        projectEnvTypeConfigPlugin.associateProjectWithEnvTypeConfig(associateRequest)
+      ).rejects.toThrowError(ProjectDeletedError);
     });
   });
 });

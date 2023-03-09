@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { ProjectDeletedError } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
@@ -27,6 +28,7 @@ describe('ProjectEnvService', () => {
 
   const fakeEnvId: string = 'env-fake-id';
   let mockEnv: Environment;
+  let mockProject: Project;
   const fakeProjectId: string = 'proj-fake-id';
   const fakeDate: string = '2021-02-26T22:42:16.652Z';
 
@@ -67,7 +69,7 @@ describe('ProjectEnvService', () => {
       dependency: fakeProjectId
     };
 
-    const mockProject: Project = {
+    mockProject = {
       id: fakeProjectId,
       name: 'fakeProjectName',
       description: 'fakeProjectDescription',
@@ -108,7 +110,10 @@ describe('ProjectEnvService', () => {
         identityId: identityId,
         identityType: identityType,
         subjectId: subjectId,
-        subjectType: envConnectionSubjectType
+        subjectType: envConnectionSubjectType,
+        conditions: {
+          projectId: { $eq: fakeProjectId }
+        }
       });
       for (const action of actions) {
         envIdentityPermissions.push({
@@ -117,7 +122,10 @@ describe('ProjectEnvService', () => {
           identityId: identityId,
           identityType: identityType,
           subjectId: subjectId,
-          subjectType: envSubjectType
+          subjectType: envSubjectType,
+          conditions: {
+            projectId: { $eq: fakeProjectId }
+          }
         });
       }
     }
@@ -150,6 +158,16 @@ describe('ProjectEnvService', () => {
         identityPermissions: envConnectionIdentityPermissions
       });
       expect(env).toEqual(mockEnv);
+    });
+
+    test('fails when project is deleted', async () => {
+      mockWorkbenchProjectService.getProject = jest
+        .fn()
+        .mockReturnValue({ ...mockProject, status: ProjectStatus.DELETED });
+
+      await expect(projectEnvService.createEnvironment(createEnvReq, mockUser)).rejects.toThrowError(
+        ProjectDeletedError
+      );
     });
   });
 

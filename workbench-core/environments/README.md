@@ -5,7 +5,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-86.02%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-81.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.15%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-85.99%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-85.98%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-83.01%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-84.46%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-86.07%25-yellow.svg?style=flat) |
 
 
 This project provides the library and utilities function for setting up and managing environments. For an example of how this project can be used, please refer to [swb-reference](../../solutions/swb-reference).

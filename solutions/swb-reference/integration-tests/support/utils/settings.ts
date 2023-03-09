@@ -9,10 +9,8 @@ import _ from 'lodash';
 interface Setting {
   envTypeId: string;
   envTypeConfigId: string;
-  projectId: string;
   envType: string;
   runId: string;
-  terminatedEnvId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
   researcher1UserNameParamStorePath: string;

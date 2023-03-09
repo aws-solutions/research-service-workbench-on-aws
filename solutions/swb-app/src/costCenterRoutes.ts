@@ -5,6 +5,8 @@
 
 import {
   CostCenterService,
+  CreateCostCenterRequest,
+  CreateCostCenterRequestParser,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
@@ -13,13 +15,10 @@ import {
   DeleteCostCenterRequestParser,
   ProjectService
 } from '@aws/workbench-core-accounts';
-import CreateCostCenterSchema from '@aws/workbench-core-accounts/lib/schemas/createCostCenter';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
 
 export function setUpCostCenterRoutes(
   router: Router,
@@ -29,13 +28,16 @@ export function setUpCostCenterRoutes(
   router.post(
     '/costCenters',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateCostCenterSchema));
-      res.status(201).send(await costCenterService.create({ ...req.body }));
+      const validatedRequest = validateAndParse<CreateCostCenterRequest>(
+        CreateCostCenterRequestParser,
+        req.body
+      );
+      res.status(201).send(await costCenterService.create(validatedRequest));
     })
   );
 
-  router.put(
-    '/costCenters/:id/softDelete',
+  router.delete(
+    '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
       const deleteCostCenterRequest = { id: req.params.id };
       const validatedRequest = validateAndParse<DeleteCostCenterRequest>(

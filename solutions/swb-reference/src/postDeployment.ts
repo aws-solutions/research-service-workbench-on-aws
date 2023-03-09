@@ -14,15 +14,11 @@ import {
   CASLAuthorizationPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
-import {
-  AuthorizationSetup,
-  CognitoSetup,
-  ServiceCatalogSetup,
-  EnvironmentTypeSetup
-} from '@aws/workbench-core-environments';
+import { CognitoSetup, ServiceCatalogSetup, EnvironmentTypeSetup } from '@aws/workbench-core-environments';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { UserManagementService, CognitoUserManagementPlugin } from '@aws/workbench-core-user-management';
 import { authorizationGroupPrefix, getConstants, getConstantsWithSecrets } from './constants';
+import AuthorizationSetup from './postDeployment/authorizationSetup';
 
 async function run(): Promise<void> {
   const {

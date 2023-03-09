@@ -22,7 +22,7 @@ export default class HttpError extends Error {
     const isErrorEqual =
       error instanceof HttpError && error.statusCode === this.statusCode && _.isEqual(error.body, this.body);
     if (!isErrorEqual) {
-      console.log(
+      console.error(
         `Errors do not match. Expected error is ${JSON.stringify(this)}. Actual error is ${JSON.stringify(
           error
         )}`

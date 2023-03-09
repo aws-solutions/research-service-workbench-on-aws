@@ -3,159 +3,216 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('create environment type configs', () => {
-  const setup: Setup = new Setup();
-  let adminSession: ClientSession;
+  const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
+  const paabHelper: PaabHelper = new PaabHelper();
+  let itAdminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
-  test('fails when trying to create without name', async () => {
-    try {
-      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
-        {
-          type: 'typeTest',
-          description: 'description',
-          params: []
-        },
-        false
-      );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: 'name: Required'
-        })
-      );
-    }
-  });
-
-  test('fails when trying to create without type', async () => {
-    try {
-      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
-        {
-          name: 'name',
-          description: 'description',
-          params: []
-        },
-        false
-      );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: 'type: Required'
-        })
-      );
-    }
-  });
-
-  test('fails when trying to create without params', async () => {
-    try {
-      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
-        {
-          name: 'name',
-          description: 'description',
-          type: 'type'
-        },
-        false
-      );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: 'params: Required'
-        })
-      );
-    }
-  });
-
-  test('fails when trying to create with invalid prop', async () => {
-    try {
-      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
-        {
-          type: 'typeTest',
-          description: 'description',
-          name: 'name',
-          invalidProp: 'invalidValue',
-          params: []
-        },
-        false
-      );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: ": Unrecognized key(s) in object: 'invalidProp'"
-        })
-      );
-    }
-  });
-
-  test('fails when trying to create with invalid environment Type Id', async () => {
-    try {
-      await adminSession.resources.environmentTypes
-        .environmentType('et-prod-0123456789012,pa-0123456789012')
-        .configurations()
-        .create(
+  describe('ITAdmin tests', () => {
+    test('fails when trying to create without name', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
           {
             type: 'typeTest',
             description: 'description',
-            name: 'name',
             params: []
           },
           false
         );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: `Could not create environment type config because environment type et-prod-0123456789012,pa-0123456789012 does not exist`
-        })
-      );
-    }
-  });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: 'name: Required'
+          })
+        );
+      }
+    });
 
-  test('fails when trying to create with invalid environment Type id format', async () => {
-    try {
-      await adminSession.resources.environmentTypes
-        .environmentType('wrong-foramt-env-type-id')
-        .configurations()
-        .create(
+    test('fails when trying to create without type', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
           {
-            type: 'typeTest',
-            description: 'description',
             name: 'name',
+            description: 'description',
             params: []
           },
           false
         );
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: 'type: Required'
+          })
+        );
+      }
+    });
+
+    test('fails when trying to create without params', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            name: 'name',
+            description: 'description',
+            type: 'type'
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: 'params: Required'
+          })
+        );
+      }
+    });
+
+    test('fails when trying to create with invalid prop', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            type: 'typeTest',
+            description: 'description',
+            name: 'name',
+            invalidProp: 'invalidValue',
+            params: []
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: ": Unrecognized key(s) in object: 'invalidProp'"
+          })
+        );
+      }
+    });
+
+    test('fails when trying to create with invalid environment Type Id', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes
+          .environmentType('et-prod-0123456789012,pa-0123456789012')
+          .configurations()
+          .create(
+            {
+              type: 'typeTest',
+              description: 'description',
+              name: 'name',
+              params: []
+            },
+            false
+          );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `Could not create environment type config because environment type et-prod-0123456789012,pa-0123456789012 does not exist`
+          })
+        );
+      }
+    });
+
+    test('fails when trying to create with invalid environment Type id format', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes
+          .environmentType('wrong-foramt-env-type-id')
+          .configurations()
+          .create(
+            {
+              type: 'typeTest',
+              description: 'description',
+              name: 'name',
+              params: []
+            },
+            false
+          );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message:
+              'Could not create environment type config because environment type wrong-foramt-env-type-id does not exist'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Project Admin tests', () => {
+    test('unauthorized to create ETC', async () => {
+      try {
+        await paSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            name: 'this should fail',
+            type: 'typeTest',
+            description: 'description',
+            params: []
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Researcher tests', () => {
+    test('unauthorized to create ETC', async () => {
+      try {
+        await researcherSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            name: 'this should fail',
+            type: 'typeTest',
+            description: 'description',
+            params: []
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 });

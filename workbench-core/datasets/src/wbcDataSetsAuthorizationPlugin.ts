@@ -117,12 +117,14 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
 
   public async getAllDataSetAccessPermissions(
     datasetId: string,
-    pageToken?: string
+    pageToken?: string,
+    pageSize?: number
   ): Promise<PermissionsResponse> {
     const identityResponse = await this._authorizer.getIdentityPermissionsBySubject({
       subjectId: datasetId,
       subjectType: dataSetSubjectType,
-      paginationToken: pageToken
+      paginationToken: pageToken,
+      limit: pageSize
     });
     const identityPermissions = _.filter(
       identityResponse.data.identityPermissions,

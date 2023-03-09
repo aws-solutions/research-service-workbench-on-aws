@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "updated to use CreateCostCenterParser",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

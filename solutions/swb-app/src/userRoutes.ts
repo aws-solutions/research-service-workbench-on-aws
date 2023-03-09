@@ -74,7 +74,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   );
 
   router.delete(
-    '/users/:userId',
+    '/users/:userId/purge',
     wrapAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId;
       try {

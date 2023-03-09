@@ -5,7 +5,7 @@ import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Cost Center negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let validCreateRequest: { name: string; description: string; accountId: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
@@ -41,7 +41,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'name'"
+              message: 'name: Required'
             })
           );
         }
@@ -60,7 +60,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'description'"
+              message: 'description: Required'
             })
           );
         }
@@ -79,7 +79,7 @@ describe('Cost Center negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'accountId'"
+              message: 'accountId: Required'
             })
           );
         }

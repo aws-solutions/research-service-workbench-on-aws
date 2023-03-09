@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { ProjectStatus } from './constants/projectStatus';
 import AccountHandler from './handlers/accountHandler';
 import {
   AwsAccountTemplateUrlsRequest,
@@ -12,7 +13,10 @@ import { CreateAccountRequest, CreateAccountRequestParser } from './models/accou
 import { GetAccountRequest, GetAccountRequestParser } from './models/accounts/getAccountRequest';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
 import { UpdateAccountRequest, UpdateAccountRequestParser } from './models/accounts/updateAccountRequest';
-import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
+import {
+  CreateCostCenterRequest,
+  CreateCostCenterRequestParser
+} from './models/costCenters/createCostCenterRequest';
 import {
   DeleteCostCenterRequestParser,
   DeleteCostCenterRequest
@@ -32,7 +36,12 @@ import {
 import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
+import { GetProjectsRequest, GetProjectsRequestParser } from './models/projects/getProjectsRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import {
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from './models/projects/listUsersForRoleRequest';
 import { Project } from './models/projects/project';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import AccountService from './services/accountService';
@@ -49,6 +58,7 @@ export {
   CostCenterService,
   ProjectService,
   CreateCostCenterRequest,
+  CreateCostCenterRequestParser,
   CreateProjectRequest,
   CreateProjectRequestParser,
   ListProjectsRequest,
@@ -57,6 +67,8 @@ export {
   UpdateProjectRequestParser,
   GetProjectRequest,
   GetProjectRequestParser,
+  GetProjectsRequest,
+  GetProjectsRequestParser,
   DeleteProjectRequest,
   DeleteProjectRequestParser,
   ListCostCentersRequest,
@@ -77,5 +89,8 @@ export {
   GetAccountRequest,
   AssignUserToProjectRequestParser,
   AssignUserToProjectRequest,
-  Project
+  Project,
+  ProjectStatus,
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
 };

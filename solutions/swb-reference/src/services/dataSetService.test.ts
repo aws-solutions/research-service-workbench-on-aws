@@ -10,6 +10,7 @@ import {
   DataSetStoragePlugin,
   PermissionsResponse
 } from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequestParser } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import {
@@ -108,7 +109,7 @@ describe('DataSetService', () => {
     });
 
     test('for listDataSets', async () => {
-      await dataSetService.listDataSets({} as AuthenticatedUser);
+      await dataSetService.listDataSets({} as AuthenticatedUser, 1, undefined);
       expect(mockWorkbenchDataSetService.listDataSets).toHaveBeenCalled();
     });
   });
@@ -172,7 +173,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(createDatasetRequest);
+            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
@@ -185,10 +186,10 @@ describe('DataSetService', () => {
           beforeEach(() => {
             identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
-            subjectId = `${projectId}-dataSetId`;
+            subjectId = `dataSetId`;
             subjectType = SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL;
             effect = 'ALLOW';
-            actions = ['READ', 'UPDATE'];
+            actions = ['READ', 'UPDATE', 'DELETE'];
 
             identityPermissions = actions.map((action: Action) => {
               return {
@@ -203,7 +204,7 @@ describe('DataSetService', () => {
           });
 
           test('from the AuthZ service', async () => {
-            await dataSetService.provisionDataSet(createDatasetRequest);
+            await dataSetService.provisionDataSet(projectId, createDatasetRequest);
 
             expect(mockDynamicAuthService.createIdentityPermissions).toHaveBeenCalledWith({
               authenticatedUser: mockUser,
@@ -260,7 +261,7 @@ describe('DataSetService', () => {
 
         test('it throws an error', async () => {
           await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
-            `DataSet ${mockDataSet.id!} cannot be removed because it is associated with project(s) ['${externalProjectId}']`
+            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the following project(s) ['${externalProjectId}']`
           );
         });
       });
@@ -317,14 +318,14 @@ describe('DataSetService', () => {
 
           describe('for DATASET_ACCESS_LEVEL', () => {
             beforeEach(() => {
-              const actions: Action[] = ['READ', 'UPDATE'];
+              const actions: Action[] = ['READ', 'UPDATE', 'DELETE'];
               identityPermissions = actions.map((action: Action) => {
                 return {
                   action,
                   effect: 'ALLOW',
                   identityId: `${projectId}#ProjectAdmin`,
                   identityType: 'GROUP',
-                  subjectId: `${projectId}-dataSetId`,
+                  subjectId: `dataSetId`,
                   subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL
                 };
               });
@@ -649,6 +650,257 @@ describe('DataSetService', () => {
               });
             });
           });
+        });
+      });
+    });
+  });
+
+  describe('listDataSetAccessPermissions', () => {
+    beforeEach(() => {
+      const response: PermissionsResponse = {
+        data: {
+          dataSetId: mockDataSet.id!,
+          permissions: [
+            {
+              accessLevel: 'read-only',
+              identity: `${projectId}#Researcher`,
+              identityType: 'GROUP'
+            }
+          ]
+        }
+      };
+      mockWorkbenchDataSetService.getAllDataSetAccessPermissions = jest.fn().mockReturnValueOnce(response);
+    });
+
+    test('it delegates to the workbench-core DataSetService method', async () => {
+      const request = ListDataSetAccessPermissionsRequestParser.parse({
+        dataSetId: mockDataSet.id!,
+        authenticatedUser: mockUser,
+        paginationToken: ''
+      });
+
+      await dataSetService.listDataSetAccessPermissions(request);
+
+      expect(mockWorkbenchDataSetService.getAllDataSetAccessPermissions).toHaveBeenCalled();
+    });
+  });
+
+  describe('listDataSetsForProject', () => {
+    let pageSize: number;
+    let paginationToken: string | undefined;
+
+    beforeEach(() => {
+      pageSize = 1;
+      paginationToken = '';
+    });
+
+    describe('when user role contains ITAdmin', () => {
+      beforeEach(() => {
+        mockUser = {
+          id: 'sampleId',
+          roles: ['ITAdmin']
+        };
+      });
+
+      describe('role only has ITAdmin', () => {
+        test('it succeeds, and response with empty data list and undefined pagination', async () => {
+          // BUILD
+          const mockResponse = {
+            data: [],
+            paginationToken: undefined
+          };
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            paginationToken
+          );
+          // CHECK
+          expect(actualResponse).toEqual(mockResponse);
+        });
+      });
+
+      describe('role contains ITAdmin and ProjectAdmin', () => {
+        beforeEach(() => {
+          mockUser.roles.push(getProjectAdminRole(projectId));
+        });
+
+        test('it succeeds, and response with empty data list and undefined pagination', async () => {
+          const mockResponse = {
+            data: [],
+            paginationToken: undefined
+          };
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            paginationToken
+          );
+          expect(actualResponse).toEqual(mockResponse);
+        });
+      });
+    });
+
+    describe('when user role does not contains ITAdmin', () => {
+      beforeEach(() => {
+        mockUser = {
+          id: 'sampleId',
+          roles: []
+        };
+      });
+
+      // check filtering by project works
+      describe('when workbenchDataSetService returns datasets from multiple projects', () => {
+        let queriedProjectId: string;
+        let otherProjectId: string;
+        let mockDataSetWithoutOwner: DataSet;
+        let mockDataSetListWithOwner: DataSet[];
+
+        beforeEach(() => {
+          queriedProjectId = 'proj-queriedProjectId';
+          otherProjectId = 'proj-otherProjectId';
+
+          mockDataSetWithoutOwner = DataSetParser.parse({
+            id: 'dataSetId',
+            name: 'mockDataSet',
+            path: 'path',
+            storageName: 'storageName',
+            storageType: 'storageType',
+            createdAt: '2023-02-14T19:18:46'
+          });
+
+          // have different projectIds as owner
+          mockDataSetListWithOwner = [
+            { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` },
+            { ...mockDataSetWithoutOwner, owner: `${otherProjectId}#ProjectAdmin` },
+            { ...mockDataSetWithoutOwner, owner: `${otherProjectId}#Researcher` },
+            { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#Researcher` }
+          ];
+
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: mockDataSetListWithOwner,
+            paginationToken: undefined
+          });
+
+          mockWorkbenchDataSetService.getPaginationToken = jest.fn().mockReturnValueOnce('');
+        });
+
+        describe('when results from workbenchDataSetService is less or equal to pageSize', () => {
+          beforeEach(() => {
+            pageSize = 5;
+          });
+          test('response only contains queried projectId', async () => {
+            const mockResponseData = [
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` },
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#Researcher` }
+            ];
+
+            const actualResponse = await dataSetService.listDataSetsForProject(
+              queriedProjectId,
+              mockUser,
+              pageSize,
+              paginationToken
+            );
+
+            expect(actualResponse.data).toEqual(mockResponseData);
+            expect(actualResponse.data.length).toBeLessThanOrEqual(pageSize);
+          });
+        });
+
+        describe('when results from workbenchDataSetService is greater than pageSize', () => {
+          beforeEach(() => {
+            pageSize = 1;
+          });
+
+          test('response only contains queried projectId, and length is pageSIze', async () => {
+            const mockResponseData = [
+              { ...mockDataSetWithoutOwner, owner: `${queriedProjectId}#ProjectAdmin` }
+            ];
+
+            const actualResponse = await dataSetService.listDataSetsForProject(
+              queriedProjectId,
+              mockUser,
+              pageSize,
+              paginationToken
+            );
+
+            expect(actualResponse.data).toEqual(mockResponseData);
+            expect(actualResponse.data.length).toEqual(pageSize);
+          });
+        });
+      });
+
+      // check paginationToken gets returned if mock of workbenchDataSetService returns a pagination token
+      describe('when workbenchDataSetService returns a pagination token', () => {
+        let mockReturnedToken: string;
+        let randomInputToken: string;
+
+        beforeEach(() => {
+          mockReturnedToken = 'samplePaginationToken';
+          randomInputToken = '';
+
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: [mockDataSet], // have one result to avoid infinite loop
+            paginationToken: mockReturnedToken
+          });
+        });
+
+        test('this pagination get returned', async () => {
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            randomInputToken
+          );
+          // CHECK
+          expect(actualResponse.paginationToken).toEqual(mockReturnedToken);
+        });
+      });
+
+      // check when result set from ddb is larger than pageSize, we call workbenchDataSetService.getPaginationToken and return token from that
+      describe('when workbenchDataSetService returns a dataset length greater than pageSize', () => {
+        projectId = 'proj-projectId';
+        const mockDataSetWithoutID = {
+          owner: `${projectId}#ProjectAdmin`,
+          name: 'mockDataSet',
+          path: 'path',
+          storageName: 'storageName',
+          storageType: 'storageType',
+          createdAt: '2023-02-14T19:18:46'
+        };
+        let mockDataSetListWithID: DataSet[];
+        let customToken: string | undefined;
+
+        beforeEach(() => {
+          mockDataSetListWithID = [
+            DataSetParser.parse({ ...mockDataSetWithoutID, id: 'dataSetId1' }),
+            DataSetParser.parse({ ...mockDataSetWithoutID, id: 'dataSetId2' })
+          ];
+
+          pageSize = 1;
+          mockWorkbenchDataSetService.listDataSets = jest.fn().mockReturnValueOnce({
+            data: mockDataSetListWithID, //length larger than pageSize
+            paginationToken: undefined
+          });
+          customToken = 'customToken';
+          mockWorkbenchDataSetService.getPaginationToken = jest.fn().mockReturnValueOnce(customToken);
+        });
+
+        test('pagination token from .getPaginationToken is returned', async () => {
+          // OPERATE
+          const actualResponse = await dataSetService.listDataSetsForProject(
+            projectId,
+            mockUser,
+            pageSize,
+            paginationToken
+          );
+          // CHECK
+          expect(mockWorkbenchDataSetService.getPaginationToken).toBeCalledWith(
+            actualResponse.data[pageSize - 1].id!
+          );
+          expect(actualResponse.paginationToken).toEqual(customToken);
         });
       });
     });

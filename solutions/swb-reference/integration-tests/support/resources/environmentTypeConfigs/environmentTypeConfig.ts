@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../clientSession';
+import { ListProjectsResponse } from '../../models/projects';
 import { DEFLAKE_DELAY_IN_MILLISECONDS } from '../../utils/constants';
 import { sleep } from '../../utils/utilities';
 import Resource from '../base/resource';
@@ -34,6 +35,28 @@ export default class EnvironmentTypeConfig extends Resource {
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //Avoid throttling when terminating multiple environment type configs
+    const { data: associatedProjects }: ListProjectsResponse =
+      await defAdminSession.resources.environmentTypes
+        .environmentType(this._parentId)
+        .configurations()
+        .environmentTypeConfig(this._id)
+        .projects()
+        .get();
+
+    if (associatedProjects.data) {
+      await Promise.all(
+        associatedProjects.data?.map(async (project) => {
+          await defAdminSession.resources.projects
+            .project(project.id)
+            .environmentTypes()
+            .environmentType(this._parentId)
+            .configurations()
+            .environmentTypeConfig(this._id)
+            .disassociate();
+        })
+      );
+    }
+
     await defAdminSession.resources.environmentTypes
       .environmentType(this._parentId)
       .configurations()

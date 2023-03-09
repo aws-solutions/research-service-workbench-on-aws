@@ -5,18 +5,18 @@
 
 import { AwsServiceError, isAwsServiceError } from './awsServiceError';
 import { ConflictError, isConflictError } from './conflictError';
-import { DatabaseError, isDatabaseError } from './databaseError';
+import {
+  ConnectionInfoNotDefinedError,
+  isConnectionInfoNotDefinedError
+} from './connectionInfoNotDefinedError';
 import { DuplicateKeyError, isDuplicateKeyError } from './duplicateKeyError';
 import { Ec2Error, isEc2Error } from './ec2Error';
+import { isNoInstanceFoundError, NoInstanceFoundError } from './noInstanceFoundError';
 import { isNoKeyExistsError, NoKeyExistsError } from './noKeyExistsError';
 import { isNonUniqueKeyError, NonUniqueKeyError } from './nonUniqueKeyError';
+import { isProjectDeletedError, ProjectDeletedError } from './projectDeletedError';
 
 describe('custom error tests', () => {
-  test('databaseError', () => {
-    const databaseError = new DatabaseError();
-    expect(isDatabaseError(databaseError)).toBe(true);
-  });
-
   test('noKeyExistsError', () => {
     const noKeyExistsError = new NoKeyExistsError();
     expect(isNoKeyExistsError(noKeyExistsError)).toBe(true);
@@ -47,15 +47,26 @@ describe('custom error tests', () => {
     expect(isDuplicateKeyError(duplicateKeyError)).toBe(true);
   });
 
+  test('connectionInfoNotDefinedError', () => {
+    const connectionInfoNotDefinedError = new ConnectionInfoNotDefinedError();
+    expect(isConnectionInfoNotDefinedError(connectionInfoNotDefinedError)).toBe(true);
+  });
+
+  test('noInstanceFoundError', () => {
+    const noInstanceFoundError = new NoInstanceFoundError();
+    expect(isNoInstanceFoundError(noInstanceFoundError)).toBe(true);
+  });
+
+  test('projectDeletedError', () => {
+    const projectDeletedError = new ProjectDeletedError();
+    expect(isProjectDeletedError(projectDeletedError)).toBe(true);
+  });
+
   describe('is not *Error', () => {
     let error: Error;
 
     beforeEach(() => {
       error = new Error();
-    });
-
-    test('not databaseError', () => {
-      expect(isDatabaseError(error)).toBe(false);
     });
 
     test('not noKeyExistsError', () => {
@@ -80,6 +91,18 @@ describe('custom error tests', () => {
 
     test('not duplicateKeyError', () => {
       expect(isDuplicateKeyError(error)).toBe(false);
+    });
+
+    test('not connectionInfoNotDefinedError', () => {
+      expect(isConnectionInfoNotDefinedError(error)).toBe(false);
+    });
+
+    test('not noInstanceFoundError', () => {
+      expect(isNoInstanceFoundError(error)).toBe(false);
+    });
+
+    test('not projectDeletedError', () => {
+      expect(isProjectDeletedError(error)).toBe(false);
     });
   });
 });

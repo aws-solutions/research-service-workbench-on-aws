@@ -86,7 +86,7 @@
         {
           "name": "Soft Delete Cost Center",
           "request": {
-            "method": "PUT",
+            "method": "DELETE",
             "header": [
               {
                 "key": "Cookie",
@@ -109,9 +109,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/costCenters/:id/softDelete",
+              "raw": "{{API_URL}}/costCenters/:id",
               "host": ["{{API_URL}}"],
-              "path": ["costCenters", ":id", "softDelete"],
+              "path": ["costCenters", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -1291,7 +1291,7 @@
         {
           "name": "Delete project",
           "request": {
-            "method": "PUT",
+            "method": "DELETE",
             "header": [
               {
                 "key": "Cookie",
@@ -1305,9 +1305,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/softDelete",
+              "raw": "{{API_URL}}/projects/:projectId",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "softDelete"],
+              "path": ["projects", ":projectId"],
               "variable": [
                 {
                   "key": "projectId",
@@ -1509,9 +1509,16 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/ProjectAdmin",
+              "raw": "{{API_URL}}/projects/:projectId/users",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", "ProjectAdmin"],
+              "path": ["projects", ":projectId", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "ProjectAdmin",
+                  "disabled": true
+                }
+              ],
               "variable": [
                 {
                   "key": "projectId",
@@ -1548,9 +1555,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", ":userId"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
               "variable": [
                 {
                   "key": "projectId",
@@ -1582,9 +1589,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "users", ":userId"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
               "variable": [
                 {
                   "key": "projectId",
@@ -1747,9 +1754,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/users/:userId",
+              "raw": "{{API_URL}}/users/:userId/purge",
               "host": ["{{API_URL}}"],
-              "path": ["users", ":userId"],
+              "path": ["users", ":userId", "purge"],
               "variable": [
                 {
                   "key": "userId",
@@ -1984,9 +1991,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/sshKeys/:sshKeyId",
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys/:sshKeyId/purge",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "sshKeys", ":sshKeyId"],
+              "path": ["projects", ":projectId", "sshKeys", ":sshKeyId", "purge"],
               "variable": [
                 {
                   "key": "projectId",
@@ -2024,6 +2031,36 @@
               "variable": [
                 {
                   "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send SSH Public Key",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environments/:environmentId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":environmentId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "environmentId",
                   "value": ""
                 }
               ]

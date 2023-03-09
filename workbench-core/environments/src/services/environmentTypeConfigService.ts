@@ -12,6 +12,7 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
+import { EnvironmentTypeConfigStatus } from '../constants/environmentTypeConfigStatus';
 import { CreateEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/createEnvironmentTypeConfigRequest';
 import { DeleteEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
 import {
@@ -46,7 +47,7 @@ export default class EnvironmentTypeConfigService {
       await this._dynamoDbService.updateExecuteAndFormat({
         key: this._buildEnvTypeConfigPkSk(envTypeConfigId),
         params: {
-          item: { resourceType: `${this._resourceType}_deleted` }
+          item: { resourceType: `${this._resourceType}_deleted`, status: EnvironmentTypeConfigStatus.DELETED }
         }
       });
     } catch (e) {
@@ -159,7 +160,8 @@ export default class EnvironmentTypeConfigService {
       id: envTypeConfigId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      ...request
+      ...request,
+      status: EnvironmentTypeConfigStatus.AVAILABLE
     });
     const dynamoItem: Record<string, unknown> = {
       ...newEnvTypeConfig,

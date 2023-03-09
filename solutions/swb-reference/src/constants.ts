@@ -27,6 +27,7 @@ interface Constants {
   ACCT_HANDLER_ARN_OUTPUT_KEY: string;
   API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
+  STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
   COGNITO_DOMAIN: string;
@@ -95,6 +96,7 @@ function getConstants(): Constants {
   const ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
   const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+  const STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY = 'StatusHandlerLambdaRoleOutput';
   const S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3DatasetsEncryptionKeyOutput';
   const S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3ArtifactEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
@@ -125,6 +127,7 @@ function getConstants(): Constants {
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
+    STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY,
     COGNITO_DOMAIN,
     WEBSITE_URLS,
     USER_POOL_ID,
@@ -215,6 +218,9 @@ const endPointPrefix: string = 'ENDPOINT';
 const authorizationGroupPrefix: string = 'GROUP';
 
 const enum SwbAuthZSubject {
+  SWB_AWS_ACCOUNT = 'SWB_AWS_ACCOUNT',
+  SWB_AWS_ACCOUNT_TEMPLATE_URL = 'SWB_AWS_ACCOUNT_TEMPLATE_URL',
+  SWB_COST_CENTER = 'SWB_COST_CENTER',
   SWB_DATASET = 'SWB_DATASET',
   SWB_DATASET_ACCESS_LEVEL = 'SWB_DATASET_ACCESS_LEVEL',
   SWB_ENVIRONMENT = 'SWB_ENVIRONMENT',
@@ -222,6 +228,7 @@ const enum SwbAuthZSubject {
   SWB_ENVIRONMENT_TYPE = 'SWB_ENVIRONMENT_TYPE',
   SWB_ETC = 'SWB_ETC',
   SWB_PROJECT = 'SWB_PROJECT',
+  SWB_PROJECT_USER_ASSOCIATION = 'SWB_PROJECT_USER_ASSOCIATION',
   SWB_SSH_KEY = 'SWB_SSH_KEY',
   SWB_USER = 'SWB_USER'
 }

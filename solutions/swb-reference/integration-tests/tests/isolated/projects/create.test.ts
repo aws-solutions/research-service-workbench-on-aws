@@ -16,17 +16,23 @@ interface CreateRequest {
 }
 
 describe('Create Project negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   let existingProjectName: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let createRequest: CreateRequest;
 
+  beforeAll(async () => {
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterAll(async () => {
+    await setup.cleanup();
+  });
+
   beforeEach(async () => {
     expect.hasAssertions();
-
-    adminSession = await setup.getDefaultAdminSession();
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'project integration test cost center',
@@ -35,13 +41,6 @@ describe('Create Project negative tests', () => {
     });
     costCenterId = costCenter.id;
 
-    existingProjectName = randomTextGenerator.getFakeText('test-project-name');
-    await adminSession.resources.projects.create({
-      name: existingProjectName,
-      description: 'Project for TOP SECRET dragon research',
-      costCenterId
-    });
-
     createRequest = {
       name: 'valid name',
       description: 'valid description',
@@ -49,13 +48,15 @@ describe('Create Project negative tests', () => {
     };
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
-  });
-
   describe('with a name', () => {
     describe('that belongs to an existing project', () => {
       beforeEach(async () => {
+        existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+        await adminSession.resources.projects.create({
+          name: existingProjectName,
+          description: 'Create Project negative tests--Project for TOP SECRET dragon research',
+          costCenterId
+        });
         createRequest.name = existingProjectName;
       });
 
@@ -123,14 +124,14 @@ describe('Create Project negative tests', () => {
         createRequest.costCenterId = 'cc-invalid-cost-center';
       });
 
-      test('it throws 404 error', async () => {
+      test('it throws 400 error', async () => {
         try {
           await adminSession.resources.projects.create(createRequest);
         } catch (e) {
           checkHttpError(
             e,
-            new HttpError(404, {
-              error: 'Not Found',
+            new HttpError(400, {
+              error: 'Bad Request',
               message: `Could not find cost center cc-invalid-cost-center`
             })
           );
@@ -152,6 +153,38 @@ describe('Create Project negative tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message: 'costCenterId: Required'
+            })
+          );
+        }
+      });
+    });
+
+    describe('that was deleted', () => {
+      beforeEach(async () => {
+        const { data: costCenter } = await adminSession.resources.costCenters.create({
+          name: 'project integration test cost center',
+          accountId: setup.getSettings().get('defaultHostingAccountId'),
+          description: 'a test costcenter'
+        });
+        costCenterId = costCenter.id;
+
+        await adminSession.resources.costCenters.costCenter(costCenterId).delete();
+      });
+
+      test('it throws 400 error', async () => {
+        try {
+          existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+          await adminSession.resources.projects.create({
+            name: existingProjectName,
+            description: 'Project for TOP SECRET dragon research',
+            costCenterId
+          });
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Cost center ${costCenterId} was deleted`
             })
           );
         }

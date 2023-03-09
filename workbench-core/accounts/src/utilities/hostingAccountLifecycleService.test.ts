@@ -65,6 +65,7 @@ describe('HostingAccountLifecycleService', () => {
     process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
     process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
     process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY = 'StatusHandlerLambdaRoleOutput';
     process.env.AWS_REGION = 'us-east-1';
     process.env.MAIN_ACCT_ID = '123456789012';
 
@@ -124,6 +125,10 @@ describe('HostingAccountLifecycleService', () => {
             {
               OutputKey: process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+            },
+            {
+              OutputKey: process.env.STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-statusHandlerLambdaServiceRoleXXXXXXX-XXXXXXXXXXXX`
             },
             {
               OutputKey: process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
@@ -764,7 +769,7 @@ describe('HostingAccountLifecycleService', () => {
         }
       );
 
-    const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
+    const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-statusHandlerLambdaServiceRoleXXXXXXX-XXXXXXXXXXXX&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
     const expectedUpdateUrl =
       'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
 

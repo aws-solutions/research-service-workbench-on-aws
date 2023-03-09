@@ -10,7 +10,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('remove user from project negative tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let project: { id: string };
 
@@ -29,7 +29,7 @@ describe('remove user from project negative tests', () => {
 
     const { data } = await adminSession.resources.projects.create({
       name: `TestProject-${uuidv4()}`,
-      description: 'Project for list users for project tests',
+      description: 'Project for remove user from project negative tests',
       costCenterId: costCenter.id
     });
 

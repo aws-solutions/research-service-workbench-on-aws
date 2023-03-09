@@ -87,6 +87,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-service-quotas",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-ssm",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -473,10 +477,6 @@
     {
       "name": "jest",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "jest-circus",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "jest-fast-check",

@@ -56,8 +56,10 @@ export default class Dataset extends Resource {
     });
   }
 
-  public async getAllAccess(): Promise<PermissionsResponse> {
-    const response: AxiosResponse = await this._axiosInstance.get(`${this._api}/permissions`);
+  public async getAllAccess(query?: Record<string, string>): Promise<PermissionsResponse> {
+    const response: AxiosResponse = await this._axiosInstance.get(`${this._api}/permissions`, {
+      params: query
+    });
     return validateAndParse(PermissionsResponseParser, response.data);
   }
 

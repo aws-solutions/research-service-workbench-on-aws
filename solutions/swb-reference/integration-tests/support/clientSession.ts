@@ -18,9 +18,10 @@ export default class ClientSession {
   private _axiosInstance: AxiosInstance;
   private _setup: Setup;
   private _userId?: string;
+  public accessToken?: string;
   public resources: Resources;
 
-  public constructor(setup: Setup, accessToken?: string) {
+  public constructor(setup: Setup, accessToken?: string, outputError?: boolean) {
     this._settings = setup.getSettings();
     this._setup = setup;
     this._isAnonymousSession = accessToken === undefined;
@@ -34,6 +35,7 @@ export default class ClientSession {
 
     // For anonymous sessions, access token cookie is not required
     if (!this._isAnonymousSession) {
+      this.accessToken = accessToken;
       const csrf = new Csrf();
       const secret = csrf.secretSync();
       const token = csrf.create(secret);
@@ -63,8 +65,10 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
+          if (outputError) {
+            console.error(JSON.stringify(error));
+          }
           const httpError = new HttpError(error.response.status, error.response.data);
-          console.error(JSON.stringify(httpError));
           return Promise.reject(httpError);
         }
         return Promise.reject(error);

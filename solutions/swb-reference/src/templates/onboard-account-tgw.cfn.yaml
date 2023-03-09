@@ -72,12 +72,10 @@ Parameters:
     Default: ""
 
   IsPublicVPC:
-    AllowedValues:
-      - "true"
-      - "false"
-    Default: "true"
-    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
     Type: String
+    AllowedValues: [true, false]
+    Default: true
+    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
 
   GLBEndpointServiceName:
     Type: String
@@ -128,10 +126,18 @@ Parameters:
     Type: String
     Default: '*'
 
-
 Conditions:
   enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
-  PublicVPC: !Equals [!Ref "IsPublicVPC", "true"]
+  PublicVPC: !Equals [!Ref IsPublicVPC, true]
+
+Mappings:
+  Solution:
+    Data:
+      ID: "SO0231"
+      Version: "2.0.0"
+      AppRegistryApplicationName: 'SWBAppReg'
+      SolutionName: 'Service Workbench on AWS v2'
+      ApplicationType: 'AWS-Solutions'
 
 Resources:
   # A role used for launching environments using AWS Service Catalog
@@ -247,6 +253,7 @@ Resources:
                 - ec2:CreateTags
                 - ec2:DeleteTags
                 - ec2:DescribeInternetGateways
+                - ec2:DescribeInstances
               Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
@@ -302,7 +309,14 @@ Resources:
                 - ec2-instance-connect:SendSSHPublicKey
               Resource:
                 - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*'
-
+        - PolicyName: servicequotas-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicequotas:GetServiceQuota
+              Resource:
+                - !Sub 'arn:aws:servicequotas:${AWS::Region}:${AWS::AccountId}:servicecatalog/L-360CDF2E'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
     Metadata: 
       cfn_nag:
@@ -330,6 +344,8 @@ Resources:
               - ssm:*
               - config:*
               - servicecatalog:*
+              - servicequotas:*
+              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:
@@ -658,6 +674,7 @@ Resources:
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
+    Condition: PublicVPC
     DependsOn: VPCGatewayAttachment
     Properties:
       RouteTableId: !Ref PublicRouteTable
@@ -786,6 +803,49 @@ Resources:
       VpcEndpointType: GatewayLoadBalancer
       VpcId: !Ref VPC
 
+  Application:
+    Type: AWS::ServiceCatalogAppRegistry::Application
+    Properties:
+      Description: Service Catalog application to track and manage all your resources for the solution Workspaces Cost Optimizer (Replace this with your solution name)
+      Name: #There is a character limit for this name. Please refer to point # 5 in the above section "Use cases not supported with below setup" for more details. 
+        !Join
+          - "-"
+          - - !Ref AWS::StackName
+            - !FindInMap [Solution, Data, "AppRegistryApplicationName"]
+            - !Ref AWS::AccountId
+      Tags: {
+        'Solutions:SolutionID': !FindInMap [Solution, Data, "ID"],
+        'Solutions:SolutionVersion': !FindInMap [Solution, Data, "Version"],
+        'Solutions:SolutionName': !FindInMap [Solution, Data, "SolutionName"],
+        'Solutions:ApplicationType': !FindInMap [Solution, Data, "ApplicationType"]
+      }
+
+  AppRegistryApplicationStackAssociation:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !GetAtt Application.Id
+      Resource:
+        !Ref AWS::StackId
+      ResourceType: CFN_STACK
+
+  DefaultApplicationAttributes:
+    Type: AWS::ServiceCatalogAppRegistry::AttributeGroup
+    Properties:
+      Name: !Join ['-', [!Ref 'AWS::StackName', !Ref AWS::AccountId]]
+      Description: Attribute group for solution information.
+      Attributes:       
+        { "ApplicationType" : !FindInMap [Solution, Data, "ApplicationType"],
+          "Version": !FindInMap [Solution, Data, "Version"],
+          "SolutionID": !FindInMap [Solution, Data, "ID"],
+          "SolutionName": !FindInMap [Solution, Data, "SolutionName"]
+        }
+        
+  AppRegistryApplicationAttributeAssociation:
+    Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation
+    Properties: 
+      Application: !GetAtt Application.Id
+      AttributeGroup: !GetAtt DefaultApplicationAttributes.Id
+
 Outputs:
   EnvMgmtRoleArn:
     Description: The arn of the hosting account role for environment management using AWS Service Catalog
@@ -810,4 +870,8 @@ Outputs:
   PublicRouteTableId:
     Description: The public route table assigned to the workspace VPC
     Value: !Ref PublicRouteTable
+  
+  AppRegistryApplicationARN:
+    Description: App Registry Application ARN
+    Value: !GetAtt Application.Id
     

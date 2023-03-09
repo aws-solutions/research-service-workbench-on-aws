@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "switch from delete to purge",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

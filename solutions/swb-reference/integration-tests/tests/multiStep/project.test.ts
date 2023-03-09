@@ -7,15 +7,17 @@ import Setup from '../../support/setup';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
 describe('multiStep project tests', () => {
-  const setup: Setup = new Setup();
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let projectName: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+  });
 
+  beforeEach(async () => {
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'project integration test cost center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
@@ -34,7 +36,7 @@ describe('multiStep project tests', () => {
     console.log('Creating Project');
     const { data: createdProject } = await adminSession.resources.projects.create({
       name: projectName,
-      description: 'Project for TOP SECRET dragon research',
+      description: 'happy path--Project for TOP SECRET dragon research',
       costCenterId
     });
 
@@ -50,7 +52,7 @@ describe('multiStep project tests', () => {
 
     console.log('Updating Project');
     const newName = randomTextGenerator.getFakeText('test-project-name');
-    const newDescription = 'Not a Project studying dragons!';
+    const newDescription = 'Happy path--Not a Project studying dragons!';
     const { data: updatedProject } = await adminSession.resources.projects
       .project(createdProject.id)
       .update({ name: newName, description: newDescription }, true);
@@ -58,7 +60,7 @@ describe('multiStep project tests', () => {
 
     console.log('Deleting Project');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject.id).softDelete()).resolves;
+    expect(await adminSession.resources.projects.project(createdProject.id).delete()).resolves;
 
     console.log("Listing projects doesn't return deleted project");
     const { data: listProjectAfterDelete } = await adminSession.resources.projects.get({
@@ -78,7 +80,7 @@ describe('multiStep project tests', () => {
 
     console.log('Delete Project');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject1.id).softDelete()).resolves;
+    expect(await adminSession.resources.projects.project(createdProject1.id).delete()).resolves;
 
     console.log('Creating Project with name of deleted project');
     // eslint-disable-next-line no-unused-expressions
@@ -90,7 +92,7 @@ describe('multiStep project tests', () => {
 
     console.log('Deleting New Project');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject2.id).softDelete()).resolves;
+    expect(await adminSession.resources.projects.project(createdProject2.id).delete()).resolves;
   });
 
   test('updateProject', async () => {
@@ -110,7 +112,7 @@ describe('multiStep project tests', () => {
 
     console.log('Deleting Project');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject1.id).softDelete()).resolves;
+    expect(await adminSession.resources.projects.project(createdProject1.id).delete()).resolves;
 
     console.log('Updating remaining project to have the same name as the deleted one');
     const newName = createdProject1.name;
@@ -122,6 +124,6 @@ describe('multiStep project tests', () => {
 
     console.log('Deleting Updated Project');
     // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject2.id).softDelete()).resolves;
+    expect(await adminSession.resources.projects.project(createdProject2.id).delete()).resolves;
   });
 });

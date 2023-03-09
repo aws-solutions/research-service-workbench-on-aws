@@ -11,9 +11,10 @@ import {
   ConflictError,
   GetProjectEnvTypeConfigRequest,
   ListEnvTypeConfigProjectsRequest,
-  Project
+  Project,
+  ProjectDeletedError
 } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
+import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
 import {
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
@@ -72,7 +73,12 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     request: AssociateProjectEnvTypeConfigRequest
   ): Promise<void> {
     const { projectId, envTypeId, envTypeConfigId, user } = request;
-    await this._projectService.getProject({ projectId });
+    const project = await this._projectService.getProject({ projectId });
+
+    if (project.status === ProjectStatus.DELETED) {
+      throw new ProjectDeletedError(`Project ${projectId} was deleted`);
+    }
+
     await this._envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     const composedId = `${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
     await this._metadataService.updateRelationship(

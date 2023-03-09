@@ -18,6 +18,7 @@ export const wrapAsync = (fn: any): any => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const boomErrorHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
+  console.error('Error:', err);
   if (err.isBoom) {
     delete err.output.payload.statusCode;
     res.status(err.output.statusCode).send(err.output.payload);

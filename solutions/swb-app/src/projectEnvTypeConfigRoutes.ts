@@ -8,6 +8,7 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { isConflictError } from './errors/conflictError';
+import { isProjectDeletedError } from './errors/projectDeletedError';
 import {
   AssociateProjectEnvTypeConfigRequest,
   AssociateProjectEnvTypeConfigRequestParser
@@ -47,7 +48,20 @@ export function setUpProjectEnvTypeConfigRoutes(
           user: res.locals.user
         }
       );
-      await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(request);
+      try {
+        await projectEnvTypeConfigService.associateProjectWithEnvTypeConfig(request);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+        if (isProjectDeletedError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        console.error(e);
+        throw Boom.badImplementation(
+          `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
+        );
+      }
       res.status(201).send();
     })
   );
@@ -68,10 +82,16 @@ export function setUpProjectEnvTypeConfigRoutes(
         await projectEnvTypeConfigService.disassociateProjectAndEnvTypeConfig(request);
         res.status(204).send();
       } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
         if (isConflictError(e)) {
           throw Boom.conflict(e.message);
         }
-        throw e;
+        console.error(e);
+        throw Boom.badImplementation(
+          `There was a problem disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
+        );
       }
     })
   );
@@ -83,8 +103,18 @@ export function setUpProjectEnvTypeConfigRoutes(
         ListProjectEnvTypeConfigsRequestParser,
         { envTypeId: req.params.envTypeId, projectId: req.params.projectId, ...req.body }
       );
-      const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
-      res.status(201).send(relationships);
+      try {
+        const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
+        res.status(201).send(relationships);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+        console.error(e);
+        throw Boom.badImplementation(
+          `There was a problem list ETCs associated with project ${req.body.projectId}`
+        );
+      }
     })
   );
 
