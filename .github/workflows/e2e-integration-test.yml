@@ -12,7 +12,7 @@ jobs:
           path: |
             ~/.cache/Cypress
             node_modules
-        key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Cypress 📥
         run: npm i cypress
       - name: Cypress run
