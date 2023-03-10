@@ -145,8 +145,18 @@ export class SWBStack extends Stack {
       });
     }
 
+    const cognitoDomainToUse = this._isSolutionsBuild
+      ? new CfnParameter(this, 'CognitoDomainPrefix', {
+          type: 'String',
+          default: COGNITO_DOMAIN,
+          minLength: 5,
+          description:
+            'Please provide a value to be used for your Cognito domain name prefix. Cognito domain names must be globally unique.'
+        }).valueAsString
+      : COGNITO_DOMAIN;
+
     const workbenchCognito = this._createCognitoResources(
-      COGNITO_DOMAIN,
+      cognitoDomainToUse,
       WEBSITE_URLS,
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
