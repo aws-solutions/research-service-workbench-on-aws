@@ -9,9 +9,9 @@ jobs:
       # Install NPM dependencies, cache them correctly
       - uses: actions/cache@v2
         with:
-        path: |
-          ~/.cache/Cypress
-          node_modules
+          path: |
+            ~/.cache/Cypress
+            node_modules
         key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Cypress 📥
         run: npm i cypress
