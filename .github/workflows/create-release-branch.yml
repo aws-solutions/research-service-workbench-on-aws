@@ -5,17 +5,20 @@ jobs:
     if: ${{github.ref_name == 'stage'}}
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions-cool/check-user-permission@v2
+        id: check_admin
+        with:
+          require: 'admin'
+          username: ${{ github.triggering_actor }}
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
       - name: create release branch
+        if: steps.check_admin.outputs.require-result
         run: |
           echo "Create UUID"
           uuid=`uuidgen`
           echo 'Creating release branch'
           git checkout -b release/$uuid
-
-          echo 'Rush version to bump updates'
-          node common/scripts/install-run-rush.js version --bump -b release/$uuid --ignore-git-hooks
-
+          git push origin release/$uuid

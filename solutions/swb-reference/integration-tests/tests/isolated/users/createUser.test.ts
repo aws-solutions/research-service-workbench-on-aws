@@ -85,7 +85,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `requires property 'email'`
+          message: `email: Required`
         })
       );
     }
@@ -101,7 +101,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `email is not of a type(s) string`
+          message: `email: Expected string, received number`
         })
       );
     }
@@ -117,7 +117,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `requires property 'firstName'`
+          message: `firstName: Required`
         })
       );
     }
@@ -133,7 +133,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `firstName is not of a type(s) string`
+          message: `firstName: Expected string, received number`
         })
       );
     }
@@ -149,7 +149,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `requires property 'lastName'`
+          message: `lastName: Required`
         })
       );
     }
@@ -165,7 +165,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `lastName is not of a type(s) string`
+          message: `lastName: Expected string, received number`
         })
       );
     }
