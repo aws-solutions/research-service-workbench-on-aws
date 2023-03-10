@@ -281,13 +281,12 @@ echo Stage set to $STAGE
 do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
 
 cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/urandom)
-regionShortNameRandomString=$(xxd -l 3 -c 3 -p < /dev/urandom)
 
 echo "
 # Stage Name
 stage: dev
 awsRegion: ''           # Keep this empty so that template picks it up automatically at deploy time
-awsRegionShortName: $regionShortNameRandomString      # We do this since region is unknown at synth time, but we still need shortname for resource naming before deploying
+awsRegionShortName: test
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: 'dev-domain-$cognitoDomainRandomString'  # This is a sample cognito domain prefix and user will be given a change to update before running post deployment
 vpcId: ''
