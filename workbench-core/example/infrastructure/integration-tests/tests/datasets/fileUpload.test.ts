@@ -47,7 +47,7 @@ describe('datasets list integration test', () => {
 
       await adminSession.getAxiosInstance().put(response.data.url, { fake: 'data' });
 
-      const aws = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const aws = setup.getMainAwsClient();
       const files = await DatasetHelper.listDatasetFileNames(aws, dataset.storageName, dataset.storagePath);
       expect(files.length > 0).toBe(true);
       expect(files).toContain(`${dataset.storagePath}/${fileName}`);

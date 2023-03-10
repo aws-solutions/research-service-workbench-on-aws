@@ -24,11 +24,8 @@ export default class Endpoint extends Resource {
 
   public async cleanup(): Promise<void> {
     try {
-      const mainAwsService = this._setup.getMainAwsClient('ExampleDataSetDDBTableName');
-      const hostAwsService = await this._setup.getHostAwsClient(
-        'Main-Account-Cleanup-DataSet',
-        'ExampleDataSetDDBTableName'
-      );
+      const mainAwsService = this._setup.getMainAwsClient();
+      const hostAwsService = await this._setup.getHostAwsClient('Main-Account-Cleanup-Endpoint');
       const awsService =
         this._awsAccountId === this._settings.get('HostingAccountId') ? hostAwsService : mainAwsService;
 

@@ -72,7 +72,6 @@ async function getHostingAccountStoragePlugin(
 
     const awsService = new AwsService({
       region,
-      ddbTableName: process.env.DATASET_DDB_TABLE_NAME!,
       credentials: {
         accessKeyId: Credentials.AccessKeyId!,
         secretAccessKey: Credentials.SecretAccessKey!,

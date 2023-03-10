@@ -112,26 +112,7 @@ describe('datasets byob integration test', () => {
 
       await adminSession.getAxiosInstance().put(data.url, { fake: 'data' });
 
-      const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
-      const { Credentials } = await mainAwsService.clients.sts.assumeRole({
-        RoleArn: roleToAssume,
-        RoleSessionName: 'Main-Account-File-Upload',
-        ExternalId: externalId
-      });
-
-      if (!Credentials) {
-        throw new Error('Invalid assumed role');
-      }
-
-      const hostAwsService = new AwsService({
-        region: hostRegion,
-        credentials: {
-          accessKeyId: Credentials.AccessKeyId!,
-          secretAccessKey: Credentials.SecretAccessKey!,
-          sessionToken: Credentials.SessionToken,
-          expiration: Credentials.Expiration
-        }
-      });
+      const hostAwsService = await setup.getHostAwsClient('Main-Account-File-Upload');
 
       const files = await DatasetHelper.listDatasetFileNames(
         hostAwsService,

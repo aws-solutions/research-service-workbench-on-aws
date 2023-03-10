@@ -190,10 +190,7 @@ export default class Dataset extends Resource {
 
     try {
       // Delete path folder from bucket
-      const hostAwsService = await this._setup.getHostAwsClient(
-        'Main-Account-Cleanup-DataSet',
-        'ExampleDataSetDDBTableName'
-      );
+      const hostAwsService = await this._setup.getHostAwsClient('Main-Account-Cleanup-DataSet');
       const awsService =
         this._awsAccountId === this._settings.get('HostingAccountId') ? hostAwsService : mainAwsService;
       await DatasetHelper.deleteS3Resources(awsService, this.storageName, this.storagePath);

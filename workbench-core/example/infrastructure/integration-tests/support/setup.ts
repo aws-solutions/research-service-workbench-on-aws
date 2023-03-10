@@ -66,14 +66,14 @@ export default class Setup {
     return `ExampleStack`;
   }
 
-  public getMainAwsClient(tableName: keyof Setting): AwsService {
+  public getMainAwsClient(tableName?: keyof Setting): AwsService {
     return new AwsService({
       region: this._settings.get('MainAccountRegion'),
-      ddbTableName: this._settings.get(tableName)
+      ddbTableName: tableName ? this._settings.get(tableName) : undefined
     });
   }
 
-  public async getHostAwsClient(sessionName: string, tableName: keyof Setting): Promise<AwsService> {
+  public async getHostAwsClient(sessionName: string, tableName?: keyof Setting): Promise<AwsService> {
     const mainAwsService = this.getMainAwsClient(tableName);
     const { Credentials } = await mainAwsService.clients.sts.assumeRole({
       RoleArn: this._settings.get('ExampleHostDatasetRoleOutput'),
@@ -87,7 +87,6 @@ export default class Setup {
 
     return new AwsService({
       region: this._settings.get('HostingAccountRegion'),
-      ddbTableName: this._settings.get(tableName),
       credentials: {
         accessKeyId: Credentials.AccessKeyId!,
         secretAccessKey: Credentials.SecretAccessKey!,
