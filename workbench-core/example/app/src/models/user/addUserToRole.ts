@@ -11,7 +11,11 @@ export const AddUserToRoleRequestParser = z
     /**
      * User id associated to user to be assigned to the role
      */
-    userId: z.string()
+    userId: z.string().min(1),
+    /**
+     * Role to assign to user
+     */
+    roleName: z.string().min(1)
   })
   .strict();
 

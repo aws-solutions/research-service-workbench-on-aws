@@ -5,32 +5,34 @@
 
 import { validateAndParse } from '@aws/workbench-core-base';
 import {
-  CreateRoleSchema,
-  CreateUserSchema,
   Status,
-  UpdateRoleSchema,
   UserManagementService,
   isUserNotFoundError,
   isRoleNotFoundError,
   isInvalidParameterError,
-  isUserAlreadyExistsError,
-  UpdateUserRequest,
-  UpdateUserRequestParser
+  isUserAlreadyExistsError
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import _ from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { CreateRoleRequest, CreateRoleRequestParser } from './users/createRoleRequest';
+import { CreateUserRequest, CreateUserRequestParser } from './users/createUserRequest';
+import { DeleteUserRequest, DeleteUserRequestParser } from './users/deleteUserRequest';
+import { GetUserRequest, GetUserRequestParser } from './users/getUserRequest';
+import { UpdateRoleRequest, UpdateRoleRequestParser } from './users/updateRoleRequest';
+import { UpdateUserRequest, UpdateUserRequestParser } from './users/updateUserRequest';
 
 export function setUpUserRoutes(router: Router, userService: UserManagementService): void {
   router.post(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        processValidatorResult(validate(req.body, CreateUserSchema));
-        const response = await userService.createUser(req.body);
+        const validatedRequest = validateAndParse<CreateUserRequest>(CreateUserRequestParser, {
+          ...req.body
+        });
+
+        const response = await userService.createUser(validatedRequest);
         res.status(201).send(response);
       } catch (err) {
         if (isInvalidParameterError(err)) {
@@ -61,7 +63,10 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.get(
     '/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
-      const userId = req.params.userId;
+      const validatedRequest = validateAndParse<GetUserRequest>(GetUserRequestParser, {
+        userId: req.params.userId
+      });
+      const { userId } = validatedRequest;
       try {
         const user = await userService.getUser(userId);
         res.status(200).json(user);
@@ -76,7 +81,10 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.delete(
     '/users/:userId/purge',
     wrapAsync(async (req: Request, res: Response) => {
-      const userId = req.params.userId;
+      const validatedRequest = validateAndParse<DeleteUserRequest>(DeleteUserRequestParser, {
+        userId: req.params.userId
+      });
+      const { userId } = validatedRequest;
       try {
         const existingUser = await userService.getUser(userId);
         if (existingUser.status !== Status.INACTIVE) {
@@ -100,10 +108,12 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.patch(
     '/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
-      const updateUserRequest = validateAndParse<UpdateUserRequest>(UpdateUserRequestParser, req.body);
+      const updateUserRequest = validateAndParse<UpdateUserRequest>(UpdateUserRequestParser, {
+        ...req.body,
+        userId: req.params.userId
+      });
 
-      const userId = req.params.userId;
-      const { status, roles, ...rest } = updateUserRequest;
+      const { userId, status, roles, ...rest } = updateUserRequest;
       try {
         const existingUser = await userService.getUser(userId);
 
@@ -151,8 +161,8 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateRoleSchema));
-      const response = await userService.createRole(req.body.roleName);
+      const validatedRequest = validateAndParse<CreateRoleRequest>(CreateRoleRequestParser, req.body);
+      const response = await userService.createRole(validatedRequest.roleName);
       res.status(201).send(response);
     })
   );
@@ -160,11 +170,15 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.put(
     '/roles/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateRoleSchema));
-      if (!_.isString(req.params.roleName)) {
+      const validatedRequest = validateAndParse<UpdateRoleRequest>(UpdateRoleRequestParser, {
+        ...req.body,
+        roleName: req.params.roleName
+      });
+
+      if (!_.isString(validatedRequest.roleName)) {
         throw Boom.badRequest('roleName must be a string.');
       }
-      const response = await userService.addUserToRole(req.body.username, req.params.roleName);
+      const response = await userService.addUserToRole(validatedRequest.username, validatedRequest.roleName);
       res.send(response);
     })
   );

@@ -6,8 +6,6 @@
 // User management
 import { validateAndParse } from '@aws/workbench-core-base';
 import {
-  CreateRoleSchema,
-  CreateUserSchema,
   isInvalidParameterError,
   isRoleAlreadyExistsError,
   isRoleNotFoundError,
@@ -18,18 +16,25 @@ import {
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
+import { ActivateUserRequest, ActivateUserRequestParser } from '../models/user/activateUserRequest';
 import { AddUserToRoleRequest, AddUserToRoleRequestParser } from '../models/user/addUserToRole';
+import { CreateRoleRequest, CreateRoleRequestParser } from '../models/user/createRoleRequest';
+import { CreateUserRequest, CreateUserRequestParser } from '../models/user/createUserRequest';
+import { DeactivateUserRequest, DeactivateUserRequestParser } from '../models/user/deactivateUserRequest';
+import { DeleteUserRequest, DeleteUserRequestParser } from '../models/user/deleteUserRequest';
+import { GetRolesRequest, GetRolesRequestParser } from '../models/user/getRolesRequest';
+import { GetUserRequest, GetUserRequestParser } from '../models/user/getUserRequest';
 import { wrapAsync } from '../utilities/errorHandlers';
-import { processValidatorResult } from '../utilities/validatorHelper';
 
 export function setUpUserRoutes(router: Router, service: UserManagementService): void {
   router.post(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateUserSchema));
+      const validatedRequest = validateAndParse<CreateUserRequest>(CreateUserRequestParser, {
+        ...req.body
+      });
       try {
-        const user = await service.createUser(req.body);
+        const user = await service.createUser(validatedRequest);
         res.status(201).send(user);
       } catch (e) {
         if (isUserAlreadyExistsError(e) || isInvalidParameterError(e)) {
@@ -61,8 +66,11 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.get(
     '/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetUserRequest>(GetUserRequestParser, {
+        userId: req.params.userId
+      });
       try {
-        const user = await service.getUser(req.params.userId);
+        const user = await service.getUser(validatedRequest.userId);
         res.status(200).json(user);
       } catch (e) {
         if (isUserNotFoundError(e)) {
@@ -79,8 +87,11 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.delete(
     '/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DeleteUserRequest>(DeleteUserRequestParser, {
+        userId: req.params.userId
+      });
       try {
-        const user = await service.deleteUser(req.params.userId);
+        const user = await service.deleteUser(validatedRequest.userId);
         res.status(200).json(user);
       } catch (e) {
         if (isUserNotFoundError(e)) {
@@ -97,8 +108,11 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.put(
     '/users/:userId/activate',
     wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<ActivateUserRequest>(ActivateUserRequestParser, {
+        userId: req.params.userId
+      });
       try {
-        const user = await service.activateUser(req.params.userId);
+        const user = await service.activateUser(validatedRequest.userId);
         res.status(200).json(user);
       } catch (e) {
         if (isUserNotFoundError(e)) {
@@ -115,8 +129,11 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.put(
     '/users/:userId/deactivate',
     wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DeactivateUserRequest>(DeactivateUserRequestParser, {
+        userId: req.params.userId
+      });
       try {
-        const user = await service.deactivateUser(req.params.userId);
+        const user = await service.deactivateUser(validatedRequest.userId);
         res.status(200).json(user);
       } catch (e) {
         if (isUserNotFoundError(e)) {
@@ -133,8 +150,11 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.get(
     '/users/:userId/roles',
     wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetRolesRequest>(GetRolesRequestParser, {
+        userId: req.params.userId
+      });
       try {
-        const roles = await service.getUserRoles(req.params.userId);
+        const roles = await service.getUserRoles(validatedRequest.userId);
         res.status(200).json(roles);
       } catch (e) {
         if (isUserNotFoundError(e)) {
@@ -151,9 +171,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateRoleSchema));
+      const validatedRequest = validateAndParse<CreateRoleRequest>(CreateRoleRequestParser, req.body);
       try {
-        const response = await service.createRole(req.body.roleName);
+        const response = await service.createRole(validatedRequest.roleName);
         res.status(201).send(response);
       } catch (e) {
         if (isRoleAlreadyExistsError(e)) {
@@ -170,12 +190,15 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.put(
     '/roles/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
+      const addUserToRoleRequest = validateAndParse<AddUserToRoleRequest>(AddUserToRoleRequestParser, {
+        ...req.body,
+        roleName: req.params.roleName
+      });
       try {
-        const addUserToRoleRequest = validateAndParse<AddUserToRoleRequest>(
-          AddUserToRoleRequestParser,
-          req.body
+        const response = await service.addUserToRole(
+          addUserToRoleRequest.userId,
+          addUserToRoleRequest.roleName
         );
-        const response = await service.addUserToRole(addUserToRoleRequest.userId, req.params.roleName);
         res.send(response);
       } catch (e) {
         if (isUserNotFoundError(e) || isRoleNotFoundError(e)) {
