@@ -43,7 +43,7 @@ The requirements below are for running the lambda locally
 5. Uncomment `rootUserEmail` and provide the main account user's email address
 6. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
-Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to a random 3 letter word since that's required for synthesizing the CDK template.
+Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
 
 ## Running Code Locally
 
