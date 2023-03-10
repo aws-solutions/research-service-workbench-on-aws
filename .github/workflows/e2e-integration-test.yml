@@ -7,10 +7,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
+      - uses: actions/cache@v2
+        with:
+        path: |
+          ~/.cache/Cypress
+          node_modules
+        key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npm i cypress
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
-          build: npm install
+          install: false
           working-directory: workbench-core/example/infrastructure/e2e-tests
           config: baseUrl="https://example-app-domain-155208731242-us-east-1.auth.us-east-1.amazoncognito.com/login?client_id=5l3lr5v12gbk0ollb2sc7c0o8r&response_type=code&scope=openid&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F"
