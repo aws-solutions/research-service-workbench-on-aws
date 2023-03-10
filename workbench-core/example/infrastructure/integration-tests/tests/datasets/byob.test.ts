@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
 import { AddDataSetExternalEndpointResponse } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
