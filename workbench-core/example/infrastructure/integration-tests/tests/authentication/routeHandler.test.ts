@@ -110,6 +110,12 @@ describe('authentication route handler integration tests', () => {
 
   describe('refreshAccessToken', () => {
     it('should return the id token if the access token is successfully refreshed', async () => {
+      const anonymousSession = await setup.createAnonymousSession();
+
+      const response = await anonymousSession.getAxiosInstance().get('/hosted-ui/login');
+
+      console.error(response.data);
+
       // Log in using ALLOW_USER_PASSWORD_AUTH flow because ALLOW_ADMIN_USER_PASSWORD_AUTH is disabled for WebUI appClient
       const adminSession = await setup.createRootUserSession(
         setup.getSettings().get('ExampleCognitoUserPoolId'),
