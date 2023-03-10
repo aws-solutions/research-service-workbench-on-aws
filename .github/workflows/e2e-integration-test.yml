@@ -11,5 +11,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
-          working-directory: workbench-core/example/infrastructure
+          build: npm install
+          working-directory: workbench-core/example/infrastructure/e2e-tests
           config: baseUrl="https://example-app-domain-155208731242-us-east-1.auth.us-east-1.amazoncognito.com/login?client_id=5l3lr5v12gbk0ollb2sc7c0o8r&response_type=code&scope=openid&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F"
