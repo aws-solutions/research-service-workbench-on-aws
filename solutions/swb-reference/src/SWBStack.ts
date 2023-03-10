@@ -14,7 +14,7 @@ import {
   WorkbenchEncryptionKeyWithRotation
 } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
+import { App, Aws, CfnOutput, CfnParameter, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -48,7 +48,7 @@ import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
-import { getConstants } from './constants';
+import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
 import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
 import { SWBVpc } from './infra/SWBVpc';
@@ -83,6 +83,7 @@ export class SWBStack extends Stack {
   private _s3AccessLogsPrefix: string;
   private _swbDomainNameOutputKey: string;
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
+  private _isSolutionsBuild: boolean = isSolutionsBuild();
 
   public constructor(app: App) {
     const {
@@ -124,17 +125,38 @@ export class SWBStack extends Stack {
       DOMAIN_NAME,
       ALB_INTERNET_FACING,
       FIELDS_TO_MASK_WHEN_AUDITING
-    } = getConstants();
+      // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
+    } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
     super(app, STACK_NAME, {
       env: {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
+        account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
 
+    if (this._isSolutionsBuild) {
+      new CfnParameter(this, 'RequiredStackName', {
+        type: 'String',
+        default: STACK_NAME,
+        allowedValues: [STACK_NAME],
+        description:
+          'Please use this value as the CloudFormation stack name above. Using any other stack name will result in failures later on.'
+      });
+    }
+
+    const cognitoDomainToUse = this._isSolutionsBuild
+      ? new CfnParameter(this, 'CognitoDomainPrefix', {
+          type: 'String',
+          default: COGNITO_DOMAIN,
+          minLength: 5,
+          description:
+            'Please provide a value to be used for your Cognito domain name prefix. Cognito domain names must be globally unique.'
+        }).valueAsString
+      : COGNITO_DOMAIN;
+
     const workbenchCognito = this._createCognitoResources(
-      COGNITO_DOMAIN,
+      cognitoDomainToUse,
       WEBSITE_URLS,
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
@@ -338,11 +360,28 @@ export class SWBStack extends Stack {
       value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
+    const hostedZoneId = this._isSolutionsBuild
+      ? new CfnParameter(this, 'HostedZoneId', {
+          type: 'String',
+          default: HOSTED_ZONE_ID,
+          description: 'The Route 53 Hosted Zone ID linked to your custom domain name.'
+        }).valueAsString
+      : HOSTED_ZONE_ID;
+
+    const domainName = this._isSolutionsBuild
+      ? new CfnParameter(this, 'DomainName', {
+          type: 'String',
+          default: DOMAIN_NAME,
+          description:
+            'A custom domain name that you own. TLS certificates will be generated at the time of application deployment.'
+        }).valueAsString
+      : DOMAIN_NAME;
+
     this._createLoadBalancer(
       swbVpc,
       apiGwUrl,
-      DOMAIN_NAME,
-      HOSTED_ZONE_ID,
+      domainName,
+      hostedZoneId,
       ALB_INTERNET_FACING,
       this._accessLogsBucket
     );
@@ -696,7 +735,7 @@ export class SWBStack extends Stack {
         resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
-            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+            'aws:SourceAccount': this._isSolutionsBuild ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
           }
         }
       })
@@ -1062,8 +1101,6 @@ export class SWBStack extends Stack {
     fieldsToMaskWhenAuditing: string[],
     accountEncryptionKey: Key
   ): Function {
-    const { AWS_REGION } = getConstants();
-
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
@@ -1080,22 +1117,22 @@ export class SWBStack extends Stack {
         statements: [
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
+            resources: [`arn:aws:events:${this.region}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
             actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-            resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
+            resources: [`arn:aws:cloudformation:${this.region}:*:stack/${this.stackName}*`],
             sid: 'CfnAccess'
           }),
           new PolicyStatement({
             actions: ['servicecatalog:ListLaunchPaths'],
-            resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+            resources: [`arn:aws:catalog:${this.region}:*:product/*`],
             sid: 'ScAccess'
           }),
           new PolicyStatement({
             actions: ['cognito-idp:DescribeUserPoolClient'],
-            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            resources: [`arn:aws:cognito-idp:${this.region}:${this.account}:userpool/*`],
             sid: 'CognitoAccess'
           }),
           new PolicyStatement({
