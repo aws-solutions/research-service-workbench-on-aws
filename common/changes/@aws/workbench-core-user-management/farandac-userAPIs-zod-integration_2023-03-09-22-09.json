@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "Add zod validations to user APIs",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}
