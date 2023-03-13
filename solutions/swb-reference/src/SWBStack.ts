@@ -32,7 +32,6 @@ import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
-  AccountPrincipal,
   AnyPrincipal,
   Effect,
   Policy,
@@ -74,7 +73,8 @@ export class SWBStack extends Stack {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ID: string;
   };
@@ -111,7 +111,8 @@ export class SWBStack extends Stack {
       CLIENT_ID,
       CLIENT_SECRET,
       VPC_ID,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       SWB_DOMAIN_NAME_OUTPUT_KEY,
       MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
@@ -177,7 +178,8 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       MAIN_ACCT_ID
     };
@@ -186,15 +188,20 @@ export class SWBStack extends Stack {
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
     this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
-    const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+
+    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
-      mainAcctEncryptionKey
+      S3DatasetsEncryptionKey.key
     );
+
+    const S3ArtifactEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
-      mainAcctEncryptionKey
+      S3ArtifactEncryptionKey.key
     );
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
@@ -203,7 +210,8 @@ export class SWBStack extends Stack {
       datasetBucket,
       artifactS3Bucket,
       FIELDS_TO_MASK_WHEN_AUDITING,
-      mainAcctEncryptionKey
+      S3DatasetsEncryptionKey.key,
+      S3ArtifactEncryptionKey.key
     );
 
     // Application DynamoDB Encryption Key
@@ -486,29 +494,6 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createEncryptionKey(): Key {
-    const mainKeyPolicy = new PolicyDocument({
-      statements: [
-        new PolicyStatement({
-          actions: ['kms:*'],
-          principals: [new AccountPrincipal(this.account)],
-          resources: ['*'],
-          sid: 'main-key-share-statement'
-        })
-      ]
-    });
-
-    const key = new Key(this, 'mainAccountKey', {
-      enableKeyRotation: true,
-      policy: mainKeyPolicy
-    });
-
-    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY, {
-      value: key.keyArn
-    });
-    return key;
-  }
-
   private _createLaunchConstraintIAMRole(
     launchConstraintRoleNameOutput: string,
     artifactS3Bucket: Bucket
@@ -783,12 +768,12 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
-    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, mainAcctEncryptionKey);
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, s3ArtifactsEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, s3ArtifactsEncryptionKey);
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
-    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
+  private _createS3DatasetsBuckets(s3DatasetsName: string, s3DatasetsEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, s3DatasetsEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
 
     const metadatanode = bucket.node.defaultChild as CfnResource;
@@ -807,13 +792,13 @@ export class SWBStack extends Stack {
     return bucket;
   }
 
-  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, mainAcctEncryptionKey: Key): Bucket {
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, encryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, s3BucketId, {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
-      encryptionKey: mainAcctEncryptionKey,
+      encryptionKey: encryptionKey,
       versioned: true
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
@@ -1060,7 +1045,8 @@ export class SWBStack extends Stack {
     datasetBucket: Bucket,
     artifactS3Bucket: Bucket,
     fieldsToMaskWhenAuditing: string[],
-    accountEncryptionKey: Key
+    datasetsEncryptionKey: Key,
+    artifactEncryptionKey: Key
   ): Function {
     const { AWS_REGION } = getConstants();
 
@@ -1113,7 +1099,7 @@ export class SWBStack extends Stack {
               'kms:DescribeKey',
               'kms:ReEncrypt*'
             ],
-            resources: [accountEncryptionKey.keyArn],
+            resources: [datasetsEncryptionKey.keyArn, artifactEncryptionKey.keyArn],
             sid: 'KMSAccess'
           }),
           new PolicyStatement({
