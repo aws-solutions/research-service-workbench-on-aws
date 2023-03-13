@@ -62,7 +62,7 @@ npm install -g @microsoft/rush
 rush update
 cd solutions/swb-reference
 STAGE=dev rushx run-postDeployment
-# STAGE=dev rushx run-postDeployment  # Need to run this twice to create env type after service catalog has been created
+STAGE=dev rushx run-postDeployment  # Need to run this twice to create env type after service catalog has been created
 # This completes post deployment setup
 
 ```
