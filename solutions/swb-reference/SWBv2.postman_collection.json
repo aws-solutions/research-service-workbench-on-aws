@@ -242,7 +242,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n}",
+              "raw": "{\n    \"name\": \"testDs\",\n    \"region\": \"us-east-1\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -315,8 +315,8 @@
               "path": ["projects", ":projectId", "datasets", ":datasetId", "upload-requests"],
               "query": [
                 {
-                  "key": "filenames",
-                  "value": "file1.txt",
+                  "key": "filenames[]",
+                  "value": "file1.txt,file2.txt",
                   "disabled": false
                 }
               ]
@@ -436,6 +436,15 @@
                 "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accessLevel\": \"<'read-only' or 'read-write'>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
               "host": ["{{API_URL}}"],
