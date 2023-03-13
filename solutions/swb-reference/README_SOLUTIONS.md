@@ -25,7 +25,9 @@ Currently Service Workbench contains some steps that can only be performed upon 
 
 ```shell
 export EMAIL=<YOUR_EMAIL>
+```
 
+```shell
 git clone https://github.com/aws-solutions/solution-spark-on-aws.git
 cd solution-spark-on-aws
 git checkout origin/develop
@@ -60,6 +62,7 @@ npm install -g @microsoft/rush
 rush update
 cd solutions/swb-reference
 STAGE=dev rushx run-postDeployment
+STAGE=dev rushx run-postDeployment  # Need to run this twice to create env type after service catalog has been created
 # This completes post deployment setup
 
 ```
