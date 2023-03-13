@@ -16,10 +16,6 @@ import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
-  CreateExternalEndpointRequest,
-  CreateExternalEndpointRequestParser
-} from './dataSets/createExternalEndpointRequestParser';
-import {
   DataSetFileUploadRequest,
   DataSetFileUploadRequestParser
 } from './dataSets/DataSetFileUploadRequestParser';
