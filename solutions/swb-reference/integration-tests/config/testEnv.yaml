@@ -3,13 +3,9 @@
 ## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
 # Default Env Config for launching a new environment
-envTypeId: 'et-prod-q5jnmlalb4eya,pa-lszlpvcp7wukg'
-envTypeConfigId: 'etc-7f7bd246-1d51-47e9-a5bd-a4530dd8e040'
-projectId: 'proj-8b0d7813-bd0c-41f3-80e6-67129a3d7460'
+envTypeId: 'et-prod-q5jnmlalb4eya,pa-cvkrd2iam46bw'
+envTypeConfigId: 'etc-57b1fcc6-7097-4db6-8c85-7d0455a1b43f'
 envType: 'sagemakerNotebook'
-
-# Negative Testing
-terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environment that has already been terminated
 
 #Cognito Integ Test Client
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
@@ -25,7 +21,7 @@ researcher1UserNameParamStorePath: '/swb/testEnv/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/testEnv/researcher1/password'
 
 ## Default Hosting Account
-defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
+defaultHostingAccountId: 'acc-5b26cd48-2f78-48e3-a011-2ae7c585c3c6'
 
 ## Hosting account used for Account Creation tests
 hostAwsAccountIdParamStorePath: '/swb/testEnv/accountsTest/awsAccountId'

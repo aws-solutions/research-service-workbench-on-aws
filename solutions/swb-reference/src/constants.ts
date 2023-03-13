@@ -36,7 +36,8 @@ interface Constants {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   VPC_ID: string;
-  MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   SWB_DOMAIN_NAME_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
@@ -130,7 +131,8 @@ function getConstants(region?: string): Constants {
   const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const STATUS_HANDLER_ROLE_ARN_OUTPUT_KEY = 'StatusHandlerLambdaRoleOutput';
-  const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
+  const S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3DatasetsEncryptionKeyOutput';
+  const S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3ArtifactEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
@@ -166,7 +168,8 @@ function getConstants(region?: string): Constants {
     CLIENT_ID,
     CLIENT_SECRET,
     VPC_ID,
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     SWB_DOMAIN_NAME_OUTPUT_KEY,
     MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
