@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import {
   AdminCreateUserCommand,
   CognitoIdentityProviderClient,
@@ -15,8 +16,36 @@ describe('CognitoSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     ROOT_USER_EMAIL: 'user@example.com',
-    USER_POOL_NAME: 'swb-userpool-test-va'
+    USER_POOL_NAME: 'swb-userpool-test-va',
+    STACK_NAME: 'swb-dev-test'
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
+    cfMock.on(DescribeStacksCommand).resolves({
+      Stacks: [
+        {
+          StackName: 'swb-dev-va',
+          StackStatus: 'CREATE_COMPLETE',
+          CreationTime: new Date(),
+          Outputs: [
+            {
+              OutputKey: 'cognitoUserPoolId',
+              OutputValue: 'sample-user-pool-id'
+            }
+          ]
+        }
+      ]
+    });
+  }
+
+  const cfMock = mockClient(CloudFormationClient);
+  beforeAll(() => {
+    mockCloudformationOutputs(cfMock);
+  });
+
+  afterAll(() => {
+    cfMock.reset();
+  });
 
   describe('execute private methods', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
