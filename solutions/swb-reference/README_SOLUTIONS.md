@@ -1,4 +1,4 @@
-# SWBv2 Single-Click Deployment
+# SWBv2 Solutions Deployment
 
 ## Deploy Solutions Implementation CloudFormation template
 - Navigate here <TODO: Enter valid URL> to the SWBv2 Solutions Implementation page and download the Cloudformation template.
@@ -34,7 +34,7 @@ region=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output t
 cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
 cognitoUserPoolClientId=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolClientId`].OutputValue')
 dynamicAuthDDBTableName=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`dynamicAuthDDBTableName`].OutputValue')
-aws ssm put-parameter --name "/swb/dev/rootUser/email/$regionShortName" --value $EMAIL --type 'SecureString'
+aws ssm put-parameter --name "/swb/dev/rootUser/email/$regionShortName" --value $EMAIL --type 'SecureString' > /dev/null
 
 rm -rf ./solutions/swb-reference/src/config/dev.yaml
 rm -rf ./solutions/swb-reference/src/config/dev.json
@@ -61,20 +61,13 @@ rush update
 cd solutions/swb-reference
 STAGE=dev rushx run-postDeployment
 # This completes post deployment setup
+
 ```
 
 ## Optional: Initial setup for base resources
 This section creates base Service Workbench resources required to provision workspaces in your onboarded hosting account. It is recommended to use the same Cloud9 instance from the previous step. 
 
-The following Service Workbench-specific resources will be created in the database:
-- Hosting Account
-- Cost Center
-- Project
-- Environment Type Config
-
-A few notes:
-- Enter your desired password and hosting account output ARNs as requested in the initial section of this script.
-- This code snippet will assign your IT admin user to your new hosting account's project admin role as well (for easier setup).
+Copy the code snippet below and enter your desired password and hosting account output ARNs. Execute this snippet it in your workspace terminal.
 
 ```shell
 # Enter your desired password for the root email
@@ -85,10 +78,18 @@ export envMgmtRoleArn=<ENV_MGMT_ROLE_ARN>
 export hostingAccountHandlerRoleArn=<HOSTING_ACCOUNT_HANDLER_ROLE_ARN>
 # Parameter value from Hosting Account CloudFormation stack:
 export externalId=<EXTERNAL_ID_PARAM_VALUE>
+```
 
+Now, run the code snippet below to have the following Service Workbench-specific resources created in the database:
+- Hosting Account
+- Cost Center
+- Project
+- Environment Type Config
+  
+```shell
 cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
 swbDomainName=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
-aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $EMAIL --password $newPassword --permanent
+aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $EMAIL --password $newPassword --permanent > /dev/null
 
 STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
 accessToken=$(grep 'accessToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
@@ -96,63 +97,97 @@ csrfCookie=$(grep 'csrfCookie' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/
 csrfToken=$(grep 'csrfToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 
 # Set up Hosting Account
-hostingAccount=$(curl --location `$swbDomainName/api/awsAccounts` --header `Cookie: access_token=$accessToken;_csrf=$csrfCookie` --header `csrf-token: $csrfToken` --header 'Content-Type: application/json' \
---data `{
-    "name": "FirstHostingAccount",
-    "awsAccountId": "$hostingAccountId",
-    "envMgmtRoleArn": "$envMgmtRoleArn",
-    "hostingAccountHandlerRoleArn": "$hostingAccountHandlerRoleArn",
-    "externalId": "$externalId"
-}`)
+hostingAccount=$(curl --location "https://$swbDomainName/api/awsAccounts" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
+--data "{
+    \"name\": \"TestAccount\",
+    \"awsAccountId\": \"$hostingAccountId\",
+    \"envMgmtRoleArn\": \"$envMgmtRoleArn\",
+    \"hostingAccountHandlerRoleArn\": \"$hostingAccountHandlerRoleArn\",
+    \"externalId\": \"$externalId\"
+}")
 
 # Set up Cost Center
 accountId=$(grep 'awsAccountId' $hostingAccount | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 2)
-costCenter=$(curl --location `$swbDomainName/api/costCenters/` --header `Cookie: access_token=$accessToken;_csrf=$csrfCookie` --header `csrf-token: $csrfToken` --header 'Content-Type: application/json' \
---data '{
-    "name": "cost center name",
-    "accountId": "acc-123",
-    "description": "a description of the cost center"
-}')
+costCenter=$(curl --location "https://$swbDomainName/api/costCenters/" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
+--data "{
+    \"name\": \"TestCostCenter\",
+    \"accountId\": \"$accountId\",
+    \"description\": \"a description of the cost center\"
+}")
 
 # Set up Project
-project=$(curl --location `$swbDomainName/api/projects` --header `Cookie: access_token=$accessToken;_csrf=$csrfCookie` --header `csrf-token: $csrfToken` --header 'Content-Type: application/json' \
---data `{
-    "name": "Example Project 1",
-    "description": "Example Project 1",
-    "costCenterId": "cc-exampleCostCenterId"
-}`)
+costCenterId=$(echo $costCenter | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
+project=$(curl --location "https://$swbDomainName/api/projects" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken"  --header 'Content-Type: application/json' \
+--data "{
+    \"name\": \"TestProject\",
+    \"description\": \"Example Project 1\",
+    \"costCenterId\": \"$costCenterId\"
+}")
+
+# Add root user to project as Project Admin
+projectId=$(echo $project | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
+aws cognito-idp admin-add-user-to-group --user-pool-id $cognitoUserPoolId --username $EMAIL --group-name "$projectId#ProjectAdmin" > /dev/null
 
 # Get Environment Type ID
-envTypes=$(curl --location `$swbDomainName/api/environmentTypes` --header `Cookie: access_token=$accessToken;_csrf=$csrfCookie` --header 'csrf-token: $csrfToken')
+envTypes=$(curl --location "https://$swbDomainName/api/environmentTypes" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken")
+
+# Approve Env Type ID
+envTypeId=$(echo $envTypes | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 4)
+approveEnvType=$(curl --location --request PATCH "https://$swbDomainName/api/environmentTypes/$envTypeId" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
+--data "{
+    \"description\": \"An Amazon SageMaker Jupyter Notebook\",
+    \"name\": \"Jupyter Notebook\",
+    \"status\": \"APPROVED\"
+}")
 
 # Set up Environment Type Config
-envTypeConfig=$(curl --location `$swbDomainName/api/environmentTypes/et-prod-jve66d5p3iica,pa-spxhutayva5rm/configurations` --header `Cookie: access_token=$accessToken;_csrf=$csrfCookie` --header `csrf-token: $csrfToken` --header 'Content-Type: application/json' \
---data `{
-    "type": "sagemakerNotebook",
-    "description": "Example config 1",
-    "name": "config 1",
-    "estimatedCost": "estimated cost",
-    "params": [
+envTypeConfig=$(curl --location "https://$swbDomainName/api/environmentTypes/$envTypeId/configurations" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken"  --header 'Content-Type: application/json' \
+--data "{
+    \"type\": \"sagemakerNotebook\",
+    \"description\": \"Example config 1\",
+    \"name\": \"config 1\",
+    \"estimatedCost\": \"estimated cost\",
+    \"params\": [
         {
-      "key": "IamPolicyDocument",
-      "value": "${iamPolicyDocument}"
+      \"key\": \"IamPolicyDocument\",
+      \"value\": \"${iamPolicyDocument}\"
      },
      {
-      "key": "InstanceType",
-      "value": "ml.t3.medium"      
+      \"key\": \"InstanceType\",
+      \"value\": \"ml.t3.medium\"      
      },
      {
-      "key": "AutoStopIdleTimeInMinutes",
-      "value": "0"
+      \"key\": \"AutoStopIdleTimeInMinutes\",
+      \"value\": \"0\"
      },
      {
-       "key": "CIDR",
-       "value": "0.0.0.0/0"
+       \"key\": \"CIDR\",
+       \"value\": \"0.0.0.0/0\"
      }
     ]
-}`)
+}")
+envTypeConfigId=$(echo $envTypeConfig | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
+# This completes base resource setup
 
 ```
+
+**And you're all set!**
+
+You can try to deploy a workspace by running this command in your terminal:
+```shell
+curl --location "https://$swbDomainName/api/projects/$projectId/environments" \
+--header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header "Content-Type: application/json" \
+--data "{
+    \"description\": \"test 123\",
+    \"name\": \"testEnvironment\",
+    \"envTypeId\": \"$envTypeId\",
+    \"envTypeConfigId\": \"$envTypeConfigId\",
+    \"datasetIds\": [],
+    \"envType\": \"sagemakerNotebook\"
+}"
+
+```
+
 
 <br/>
 
