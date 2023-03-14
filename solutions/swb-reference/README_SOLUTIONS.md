@@ -81,6 +81,7 @@ export envMgmtRoleArn=<ENV_MGMT_ROLE_ARN>
 export hostingAccountHandlerRoleArn=<HOSTING_ACCOUNT_HANDLER_ROLE_ARN>
 # Parameter value from Hosting Account CloudFormation stack:
 export externalId=<EXTERNAL_ID_PARAM_VALUE>
+
 ```
 
 Now, run the code snippet below to have the following Service Workbench-specific resources created in the database:
@@ -108,15 +109,19 @@ hostingAccount=$(curl --location "https://$swbDomainName/api/awsAccounts" --head
     \"hostingAccountHandlerRoleArn\": \"$hostingAccountHandlerRoleArn\",
     \"externalId\": \"$externalId\"
 }")
+echo "Hosting account record is getting created..."
+sleep 2
 
 # Set up Cost Center
-accountId=$(grep 'awsAccountId' $hostingAccount | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 2)
+accountId=$(echo $hostingAccount | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
 costCenter=$(curl --location "https://$swbDomainName/api/costCenters/" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
 --data "{
     \"name\": \"TestCostCenter\",
     \"accountId\": \"$accountId\",
     \"description\": \"a description of the cost center\"
 }")
+echo "Cost center record is getting created..."
+sleep 2
 
 # Set up Project
 costCenterId=$(echo $costCenter | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
@@ -126,10 +131,19 @@ project=$(curl --location "https://$swbDomainName/api/projects" --header "Cookie
     \"description\": \"Example Project 1\",
     \"costCenterId\": \"$costCenterId\"
 }")
+echo "Project record is getting created..."
+sleep 2
 
 # Add root user to project as Project Admin
 projectId=$(echo $project | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
 aws cognito-idp admin-add-user-to-group --user-pool-id $cognitoUserPoolId --username $EMAIL --group-name "$projectId#ProjectAdmin" > /dev/null
+
+# Recreate credentials
+rm -rf ./tempCreds
+STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
+accessToken=$(grep 'accessToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
+csrfCookie=$(grep 'csrfCookie' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
+csrfToken=$(grep 'csrfToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 
 # Get Environment Type ID
 envTypes=$(curl --location "https://$swbDomainName/api/environmentTypes" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken")
@@ -142,6 +156,8 @@ approveEnvType=$(curl --location --request PATCH "https://$swbDomainName/api/env
     \"name\": \"Jupyter Notebook\",
     \"status\": \"APPROVED\"
 }")
+echo "Env type is getting updated..."
+sleep 2
 
 # Set up Environment Type Config
 envTypeConfig=$(curl --location "https://$swbDomainName/api/environmentTypes/$envTypeId/configurations" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken"  --header 'Content-Type: application/json' \
@@ -169,16 +185,30 @@ envTypeConfig=$(curl --location "https://$swbDomainName/api/environmentTypes/$en
      }
     ]
 }")
+
+echo "Env type config record is getting created..."
+sleep 2
+
 envTypeConfigId=$(echo $envTypeConfig | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
-# This completes base resource setup
+
+echo "
+-------------------------------------------------------------------------\"
+\"Summary:\"
+\"-------------------------------------------------------------------------\"
+\"Stage Name                          : dev\"
+\"Account Id                          : $accountId\"
+\"Project Id                          : $projectId\"
+\"Env Type ID                         : $envTypeId\"
+\"Env Type Config Id                  : $envTypeConfigId\"
+"
 
 ```
 
 **And you're all set!**
 
-You can try to deploy a workspace by running this command in your terminal:
+You can now deploy a workspace by running this command in your terminal:
 ```shell
-curl --location "https://$swbDomainName/api/projects/$projectId/environments" \
+environment=$(curl --location "https://$swbDomainName/api/projects/$projectId/environments" \
 --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header "Content-Type: application/json" \
 --data "{
     \"description\": \"test 123\",
@@ -187,7 +217,8 @@ curl --location "https://$swbDomainName/api/projects/$projectId/environments" \
     \"envTypeConfigId\": \"$envTypeConfigId\",
     \"datasetIds\": [],
     \"envType\": \"sagemakerNotebook\"
-}"
+}")
+echo $environment
 
 ```
 
