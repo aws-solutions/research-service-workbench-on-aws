@@ -120,25 +120,33 @@ export default class EnvironmentLifecycleHelper {
    * Get multiple main account CFN stack outputs
    *
    * @returns output values retrieved from main CFN stack:
-   *    datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn
+   *    datasetsBucketArn, mainAccountRegion, mainAccountId, s3ArtifactEncryptionArn, s3DatasetsEncryptionArn
    */
   public async getCfnOutputs(): Promise<{ [id: string]: string }> {
     const cfService = this.aws.helpers.cloudformation;
     const {
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
       [process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!]: datasetsBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
+      [process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctS3ArtifactEncryptionArn,
+      [process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctS3DatasetsEncryptionArn
     } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
+      process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
+      process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     const mainAccountRegion = statusHandlerArn.split(':')[3];
     const mainAccountId = statusHandlerArn.split(':')[4];
 
     // We create these at deploy time so this will be present in the stack
-    return { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn };
+    return {
+      datasetsBucketArn,
+      mainAccountRegion,
+      mainAccountId,
+      mainAcctS3ArtifactEncryptionArn,
+      mainAcctS3DatasetsEncryptionArn
+    };
   }
 
   /**
@@ -204,7 +212,7 @@ export default class EnvironmentLifecycleHelper {
    * Get the mount strings for all datasets attached to a given workspace.
    * @param dataSetIds - the list of dataset IDs attached.
    * @param envMetadata - the environment on which to mount the dataset(s)
-   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
+   * @param mainAcctEncryptionArnList - the list of encryption key ARN for main account buckets
    *
    * @returns an object containing:
    *  1. datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
@@ -214,7 +222,7 @@ export default class EnvironmentLifecycleHelper {
   public async getDatasetsToMount(
     datasetIds: Array<string>,
     envMetadata: Environment,
-    mainAcctEncryptionArn: string
+    mainAcctEncryptionArnList: string[]
   ): Promise<{ [id: string]: string }> {
     if (_.isEmpty(datasetIds)) return { s3Mounts: '[]', iamPolicyDocument: '{}' };
 
@@ -269,7 +277,7 @@ export default class EnvironmentLifecycleHelper {
     const iamPolicyDocument = this.generateIamPolicy(
       endpointsCreated,
       envMetadata.PROJ.encryptionKeyArn,
-      mainAcctEncryptionArn
+      mainAcctEncryptionArnList
     );
     const s3Mounts = JSON.stringify(datasetsToMount);
 
@@ -328,14 +336,14 @@ export default class EnvironmentLifecycleHelper {
    * Get the workspace IAM policy for accessing all datasets attached.
    * @param endpointsCreated - the external endpoints created for this environment
    * @param encryptionKeyArn - the encryption key ARN for env data traffic
-   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
+   * @param mainAcctEncryptionArnList - the encryption key ARNs for main account bucket
    *
    * @returns iamPolicy - A stringified IAM policy
    */
   public generateIamPolicy(
     endpointsCreated: { [id: string]: string }[],
     encryptionKeyArn: string,
-    mainAcctEncryptionArn: string
+    mainAcctEncryptionArnList: string[]
   ): string {
     // Build policy statements for object-level permissions
     const statements = [];
@@ -401,7 +409,7 @@ export default class EnvironmentLifecycleHelper {
         'kms:GenerateDataKey'
       ],
       Effect: 'Allow',
-      Resource: [encryptionKeyArn, mainAcctEncryptionArn]
+      Resource: mainAcctEncryptionArnList.concat([encryptionKeyArn])
     });
 
     // Build final policyDoc
