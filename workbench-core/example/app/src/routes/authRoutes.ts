@@ -31,8 +31,4 @@ export function setUpAuthRoutes(router: Router, auth: AuthenticationService, log
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger, sameSite: 'none' })));
 
   router.get('/loggedIn', wrapAsync(isUserLoggedIn(auth, { loggingService: logger, sameSite: 'none' })));
-
-  router.get('/hosted-ui/login', (req: Request, res: Response) => {
-    res.status(200).send(process.env.HOSTED_UI_LOGIN_URL!);
-  });
 }

@@ -126,8 +126,5 @@ export const routesIgnored: RoutesIgnored = {
   '/loggedIn': {
     GET: true
   },
-  '/hosted-ui/login': {
-    GET: true
-  },
   ...routesUsedByStaticAuthorization
 };
