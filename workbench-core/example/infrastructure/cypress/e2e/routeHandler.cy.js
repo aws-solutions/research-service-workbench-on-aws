@@ -30,7 +30,9 @@ describe('refreshAccessToken', () => {
     // There are two sets of UI elements (mobile and desktop)
     cy.get(':nth-child(2) > :nth-child(1) > :nth-child(1) > .cognito-asf').as('modal');
     cy.get('@modal').find('#signInFormUsername').type(username);
-    cy.get('@modal').find('#signInFormPassword').type(Cypress.env('PASSWORD'));
+    cy.get('@modal').find('#signInFormPassword').type(Cypress.env('PASSWORD'), {
+      log: false
+    });
 
     cy.get('@modal').find('input[type=submit]').click();
 
@@ -59,11 +61,11 @@ describe('refreshAccessToken', () => {
         };
 
         const verifyIdToken = (idToken) => {
-          cy.wrap(idToken).should('not.be.undefined');
+          expect(idToken).to.not.be.undefined;
           const tokenData = window.jwt_decode(idToken);
 
-          cy.wrap(tokenData.iss).should('equal', `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`);
-          cy.wrap(tokenData.email).should('equal', username);
+          expect(tokenData.iss).to.equal(`https://cognito-idp.${region}.amazonaws.com/${userPoolId}`);
+          expect(tokenData.email).to.equal(username);
         };
 
         const tokenExchangeRequest = (code, next) => {
@@ -80,8 +82,8 @@ describe('refreshAccessToken', () => {
             },
             form: true
           }).then(({ body: { id_token, access_token, refresh_token } }) => {
-            cy.wrap(access_token).should('not.be.undefined');
-            cy.wrap(refresh_token).should('not.be.undefined');
+            expect(access_token).to.not.be.undefined;
+            expect(refresh_token).to.not.be.undefined;
 
             verifyIdToken(id_token);
 

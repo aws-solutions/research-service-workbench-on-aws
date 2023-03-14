@@ -13,7 +13,7 @@ import {
   refreshAccessToken
 } from '@aws/workbench-core-authentication';
 import { LoggingService } from '@aws/workbench-core-logging';
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpAuthRoutes(router: Router, auth: AuthenticationService, logger: LoggingService): void {
