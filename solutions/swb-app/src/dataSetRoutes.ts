@@ -16,10 +16,6 @@ import { Request, Response, Router } from 'express';
 import { toNumber } from 'lodash';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
-  CreateExternalEndpointRequest,
-  CreateExternalEndpointRequestParser
-} from './dataSets/createExternalEndpointRequestParser';
-import {
   DataSetFileUploadRequest,
   DataSetFileUploadRequestParser
 } from './dataSets/DataSetFileUploadRequestParser';
@@ -59,45 +55,6 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       });
 
       res.status(201).send(dataSet);
-    })
-  );
-
-  // import new prefix (assumes S3 bucket and path exist already)
-  router.post(
-    '/projects/:projectsId/datasets/import',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<CreateDataSetRequest>(req.body, CreateDataSetRequestParser);
-      const dataSet = await dataSetService.importDataSet({
-        name: validatedRequest.name,
-        storageName: validatedRequest.storageName,
-        path: validatedRequest.path,
-        awsAccountId: validatedRequest.awsAccountId,
-        region: validatedRequest.region,
-        storageProvider: dataSetService.storagePlugin,
-        type: validatedRequest.type,
-        authenticatedUser: res.locals.user
-      });
-      res.status(201).send(dataSet);
-    })
-  );
-
-  // share dataset
-  router.post(
-    '/projects/:projectsId/datasets/:id/share',
-    wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
-      }
-      const validatedRequest = validateAndParse<CreateExternalEndpointRequest>(
-        req.body,
-        CreateExternalEndpointRequestParser
-      );
-      await dataSetService.addDataSetExternalEndpoint({
-        ...validatedRequest,
-        dataSetId: req.params.id,
-        authenticatedUser: res.locals.user
-      });
-      res.status(201).send();
     })
   );
 
