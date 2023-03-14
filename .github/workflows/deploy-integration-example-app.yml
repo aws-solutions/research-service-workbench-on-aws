@@ -49,6 +49,11 @@ jobs:
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
 
+      - name: Example package end to end test
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js test:cypress --verbose
+
       - name: Slack Failure Notification
         if: failure()
         uses: ./.github/actions/notification

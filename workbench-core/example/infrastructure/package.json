@@ -33,11 +33,13 @@
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only",
     "test-cdk-deploy": "rush build -t @aws/workbench-core-example-infrastructure && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
+    "test:cypress": "node scripts/runCypress.js",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {
     "@aws-cdk/aws-iam": "^1.159.0",
     "@aws-sdk/client-cloudformation": "^3.212.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
     "@aws-sdk/client-s3": "^3.212.0",
     "@aws-sdk/client-s3-control": "^3.212.0",
     "@aws-sdk/client-sagemaker": "^3.212.0",
@@ -57,10 +59,13 @@
     "constructs": "^10.0.0",
     "cookie-parser": "^1.4.6",
     "csrf": "^3.1.0",
+    "cypress": "^12.7.0",
     "dotenv": "^16.0.3",
     "express": "^4.17.3",
     "js-yaml": "^4.1.0",
+    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {
@@ -89,6 +94,7 @@
     "@types/heft-jest": "1.0.2",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.181",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^14",
     "@types/uuid": "^8.3.4",
     "@vendia/serverless-express": "^4.5.4",

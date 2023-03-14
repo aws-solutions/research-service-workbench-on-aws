@@ -13,7 +13,7 @@ import {
   refreshAccessToken
 } from '@aws/workbench-core-authentication';
 import { LoggingService } from '@aws/workbench-core-logging';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpAuthRoutes(router: Router, auth: AuthenticationService, logger: LoggingService): void {
@@ -31,4 +31,8 @@ export function setUpAuthRoutes(router: Router, auth: AuthenticationService, log
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger, sameSite: 'none' })));
 
   router.get('/loggedIn', wrapAsync(isUserLoggedIn(auth, { loggingService: logger, sameSite: 'none' })));
+
+  router.get('/hosted-ui/login', (req: Request, res: Response) => {
+    res.status(200).send(process.env.HOSTED_UI_LOGIN_URL!);
+  });
 }
