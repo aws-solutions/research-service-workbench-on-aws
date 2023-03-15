@@ -273,8 +273,30 @@ echo "--------------------------------------------------------------------------
 # Note: do not install using global (-g) option. This makes build-s3-dist.sh difficult
 # for customers and developers to use, as it globally changes their environment.
 
-STAGE=testEnv
+STAGE=dev
 echo Stage set to $STAGE
+
+# Create sample dev.yaml file with a random user pool domain
+# Remove dev.yaml if it exists, we'll start with a known config that works
+do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
+
+cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/urandom)
+
+echo "
+# Stage Name
+stage: dev
+awsRegion: ''           # Keep this empty so that template picks it up automatically at deploy time
+awsRegionShortName: test
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+cognitoDomain: 'dev-domain-$cognitoDomainRandomString'  # This is a sample cognito domain prefix and user will be given a change to update before running post deployment
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
+" >> $source_dir/swb-reference/src/config/dev.yaml
 
 # Add local install to PATH
 export PATH=$(npm bin):$PATH
@@ -301,17 +323,6 @@ if fn_exists create_template_${template_format}; then
 else
     echo "Invalid setting for \$template_format: $template_format"
     exit 255
-fi
-
-# <STAGE>.json must exist in the deployment folder (same folder as this file). 
-# This is a dummy file that we copy over to the solutions/swb-reference/src/config folder
-# to unblock SWBUIStack synth
-echo "cp $template_dir/$STAGE.json $source_dir/swb-reference/src/config"
-if [[ -e "$template_dir/$STAGE.json" ]]; then
-    cp $template_dir/$STAGE.json $source_dir/swb-reference/src/config
-else
-    echo "$STAGE.json is missing from the solution root."
-    exit 1
 fi
 
 echo "------------------------------------------------------------------------------"
