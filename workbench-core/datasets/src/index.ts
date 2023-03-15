@@ -35,6 +35,7 @@ export {
 } from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 export { DataSet, DataSetParser, DataSetArrayParser, CreateDataSet } from './models/dataSet';
+export { DataSetMetadataParser } from './models/dataSetMetadata';
 export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
@@ -54,6 +55,7 @@ export {
   CreateExternalEndpoint,
   ExternalEndpointArrayParser
 } from './models/externalEndpoint';
+export { ExternalEndpointMetadataParser } from './models/externalEndpointMetadata';
 export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { StorageLocation } from './models/storageLocation';
 
