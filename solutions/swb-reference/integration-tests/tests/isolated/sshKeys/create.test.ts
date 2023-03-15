@@ -67,7 +67,7 @@ describe('cannot create SSH key', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `The keypair '${existingSshKeyId}' already exists.`
+              message: `The keypair already exists`
             })
           );
         }
