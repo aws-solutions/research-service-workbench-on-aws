@@ -13,7 +13,7 @@ export default class SshKey extends Resource {
   protected async cleanup(): Promise<void> {
     try {
       console.log(`Attempting to delete SSH Key ${this._id}.`);
-      await this.delete();
+      await this.purge();
     } catch (e) {
       console.warn(
         `Could not delete SSH Key ${this._id}". 
