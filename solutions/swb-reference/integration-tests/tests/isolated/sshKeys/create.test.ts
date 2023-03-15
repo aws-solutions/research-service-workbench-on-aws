@@ -29,8 +29,6 @@ describe('cannot create SSH key', () => {
   });
 
   describe('when the user already has a key for that project', () => {
-    let existingSshKeyId: string;
-
     const testBundle = [
       {
         username: 'projectAdmin1',
@@ -52,11 +50,7 @@ describe('cannot create SSH key', () => {
       beforeEach(async () => {
         session = sessionFunc();
         project1Id = projectIdFunc();
-        const { data: existingSshKey } = await session.resources.projects
-          .project(project1Id)
-          .sshKeys()
-          .create();
-        existingSshKeyId = existingSshKey.id;
+        await session.resources.projects.project(project1Id).sshKeys().create();
       });
 
       test(`it throws 400 error as ${username}`, async () => {
