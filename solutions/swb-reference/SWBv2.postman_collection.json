@@ -225,7 +225,7 @@
       "name": "datasets",
       "item": [
         {
-          "name": "Create DataSet",
+          "name": "Create Internal DataSet",
           "request": {
             "method": "POST",
             "header": [
@@ -242,7 +242,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n,\n    \"owner\": \"proj-123#PA\"\n}",
+              "raw": "{\n    \"name\": \"testDs\",\n    \"region\": \"us-east-1\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -250,17 +250,44 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/datasets/",
+              "raw": "{{API_URL}}/projects/:projectId/datasets/",
               "host": ["{{API_URL}}"],
-              "path": ["datasets", ""]
+              "path": ["projects", ":projectId", "datasets", ""]
             }
           },
           "response": []
         },
         {
-          "name": "Import DataSet",
+          "name": "Soft Delete Internal DataSet",
           "request": {
-            "method": "POST",
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Files to DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
             "header": [
               {
                 "key": "Cookie",
@@ -275,7 +302,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"existingFolderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "raw": "",
               "options": {
                 "raw": {
                   "language": "json"
@@ -283,9 +310,16 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/datasets/import",
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/upload-requests",
               "host": ["{{API_URL}}"],
-              "path": ["datasets", "import"]
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "upload-requests"],
+              "query": [
+                {
+                  "key": "filenames[]",
+                  "value": "file1.txt,file2.txt",
+                  "disabled": false
+                }
+              ]
             }
           },
           "response": []
@@ -327,7 +361,43 @@
           "response": []
         },
         {
-          "name": "List DataSets",
+          "name": "Get Internal DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List DataSets for Project",
           "request": {
             "method": "GET",
             "header": [
@@ -343,9 +413,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/datasets/",
+              "raw": "{{API_URL}}/projects/:projectId/datasets",
               "host": ["{{API_URL}}"],
-              "path": ["datasets", ""]
+              "path": ["projects", ":projectId", "datasets"]
             }
           },
           "response": []
@@ -366,10 +436,67 @@
                 "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accessLevel\": \"<'read-only' or 'read-write'>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
               "host": ["{{API_URL}}"],
               "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove DataSet from Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Permissions for Dataset",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/permissions",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "permissions"]
             }
           },
           "response": []
@@ -401,6 +528,11 @@
               "path": ["projects", ":projectId", "environments", ":id", "terminate"],
               "variable": [
                 {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
                   "key": "id",
                   "value": null,
                   "description": "ID of environment to terminate"
@@ -428,7 +560,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemakerNotebook\"\n}",
+              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemakerNotebook\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -465,6 +597,11 @@
               "path": ["projects", ":projectId", "environments", ":id", "start"],
               "variable": [
                 {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
                   "key": "id",
                   "value": null,
                   "description": "ID of environment to start"
@@ -495,6 +632,11 @@
               "host": ["{{API_URL}}"],
               "path": ["projects", ":projectId", "environments", ":id", "stop"],
               "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
                 {
                   "key": "id",
                   "value": null,
@@ -527,6 +669,11 @@
               "path": ["projects", ":projectId", "environments", ":id"],
               "variable": [
                 {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
                   "key": "id",
                   "value": null,
                   "description": "ID of environment to GET metadata"
@@ -556,52 +703,14 @@
               "raw": "{{API_URL}}/projects/:projectId/environments",
               "host": ["{{API_URL}}"],
               "path": ["projects", ":projectId", "environments"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                }
+              ],
               "query": [
-                {
-                  "key": "status",
-                  "value": "COMPLETED",
-                  "disabled": true
-                },
-                {
-                  "key": "name",
-                  "value": "testEnv",
-                  "disabled": true
-                },
-                {
-                  "key": "createdAtFrom",
-                  "value": "2022-05-13T20:03:54.055Z",
-                  "disabled": true
-                },
-                {
-                  "key": "createdAtTo",
-                  "value": "2022-05-13T20:03:54.055Z",
-                  "disabled": true
-                },
-                {
-                  "key": "owner",
-                  "value": "user-123",
-                  "disabled": true
-                },
-                {
-                  "key": "type",
-                  "value": "envType-123",
-                  "disabled": true
-                },
-                {
-                  "key": "project",
-                  "value": "project-123",
-                  "disabled": true
-                },
-                {
-                  "key": "ascending",
-                  "value": "name",
-                  "disabled": true
-                },
-                {
-                  "key": "descending",
-                  "value": "name",
-                  "disabled": true
-                },
                 {
                   "key": "paginationToken",
                   "value": "",
@@ -719,6 +828,11 @@
               "host": ["{{API_URL}}"],
               "path": ["projects", ":projectId", "environments", ":id", "connections"],
               "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
                 {
                   "key": "id",
                   "value": null,
@@ -1032,6 +1146,54 @@
                 }
               ],
               "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List envTypeConfigs for Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
                 {
                   "key": "envTypeId",
                   "value": "",

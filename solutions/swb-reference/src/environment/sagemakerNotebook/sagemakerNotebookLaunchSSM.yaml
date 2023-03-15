@@ -76,9 +76,13 @@ parameters:
     type: String
     description: The region of application deployment in main account
     allowedPattern: ^\w{2,3}-\w+-\d{1}$
-  MainAccountKeyArn:
+  MainAccountS3ArtifactKeyArn:
     type: String
-    description: The ARN of main account bucket encryption key
+    description: The ARN of main account S3 Artifact bucket encryption key
+    allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+  MainAccountS3DatasetsKeyArn:
+    type: String
+    description: The ARN of main account S3 Datasets bucket encryption key
     allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
 mainSteps:
   - name: Launch
@@ -119,8 +123,10 @@ mainSteps:
           Value: '{{ MainAccountId }}'
         - Key: MainAccountRegion
           Value: '{{ MainAccountRegion }}'
-        - Key: MainAccountKeyArn
-          Value: '{{ MainAccountKeyArn }}'
+        - Key: MainAccountS3ArtifactKeyArn
+          Value: '{{ MainAccountS3ArtifactKeyArn }}'
+        - Key: MainAccountS3DatasetsKeyArn
+          Value: '{{ MainAccountS3DatasetsKeyArn }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'

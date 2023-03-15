@@ -33,7 +33,7 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
       alias: `alias/${id}`
     });
 
-    new CfnOutput(this, `${id}-Output`, {
+    new CfnOutput(this, id, {
       value: this.key.keyArn
     });
   }

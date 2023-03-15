@@ -30,17 +30,23 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
       .value!;
 
-    const { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn } =
-      await this.helper.getCfnOutputs();
+    const {
+      datasetsBucketArn,
+      mainAccountRegion,
+      mainAccountId,
+      mainAcctS3ArtifactEncryptionArn,
+      mainAcctS3DatasetsEncryptionArn
+    } = await this.helper.getCfnOutputs();
 
     const datasetIds: string[] =
       envMetadata.DATASETS?.map((dataSet: { id: string }) => {
         return dataSet.id;
       }) || [];
+    const mainAcctEncryptionArnList = [mainAcctS3ArtifactEncryptionArn, mainAcctS3DatasetsEncryptionArn];
     const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
       datasetIds,
       envMetadata,
-      mainAcctEncryptionArn
+      mainAcctEncryptionArnList
     );
 
     const ssmParameters = {
@@ -59,7 +65,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
       IamPolicyDocument: [iamPolicyDocument],
       S3Mounts: [s3Mounts],
-      MainAccountKeyArn: [mainAcctEncryptionArn],
+      MainAccountS3ArtifactKeyArn: [mainAcctS3ArtifactEncryptionArn],
+      MainAccountS3DatasetsKeyArn: [mainAcctS3DatasetsEncryptionArn],
       MainAccountRegion: [mainAccountRegion],
       MainAccountId: [mainAccountId]
     };

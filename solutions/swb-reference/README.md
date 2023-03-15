@@ -25,7 +25,7 @@ To test the new Service Workbench on AWS v2 r0.1.0, follow the deployment instru
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-95.8%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.76%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-95.42%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.37%25-brightgreen.svg?style=flat) |
 
 ## Requirements
 
@@ -42,6 +42,8 @@ The requirements below are for running the lambda locally
 4. Uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing.
 5. Uncomment `rootUserEmail` and provide the main account user's email address
 6. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
+
+Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
 
 ## Running Code Locally
 

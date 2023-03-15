@@ -14,7 +14,7 @@ import {
   WorkbenchEncryptionKeyWithRotation
 } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
+import { App, Aws, CfnOutput, CfnParameter, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -32,7 +32,6 @@ import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
-  AccountPrincipal,
   AnyPrincipal,
   Effect,
   Policy,
@@ -48,7 +47,7 @@ import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
-import { getConstants } from './constants';
+import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
 import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
 import { SWBVpc } from './infra/SWBVpc';
@@ -74,7 +73,8 @@ export class SWBStack extends Stack {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ID: string;
   };
@@ -83,6 +83,7 @@ export class SWBStack extends Stack {
   private _s3AccessLogsPrefix: string;
   private _swbDomainNameOutputKey: string;
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
+  private _isSolutionsBuild: boolean = isSolutionsBuild();
 
   public constructor(app: App) {
     const {
@@ -111,7 +112,8 @@ export class SWBStack extends Stack {
       CLIENT_ID,
       CLIENT_SECRET,
       VPC_ID,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       SWB_DOMAIN_NAME_OUTPUT_KEY,
       MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
@@ -124,17 +126,38 @@ export class SWBStack extends Stack {
       DOMAIN_NAME,
       ALB_INTERNET_FACING,
       FIELDS_TO_MASK_WHEN_AUDITING
-    } = getConstants();
+      // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
+    } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
     super(app, STACK_NAME, {
       env: {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
+        account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
 
+    if (this._isSolutionsBuild) {
+      new CfnParameter(this, 'RequiredStackName', {
+        type: 'String',
+        default: STACK_NAME,
+        allowedValues: [STACK_NAME],
+        description:
+          'Please use this value as the CloudFormation stack name above. Using any other stack name will result in failures later on.'
+      });
+    }
+
+    const cognitoDomainToUse = this._isSolutionsBuild
+      ? new CfnParameter(this, 'CognitoDomainPrefix', {
+          type: 'String',
+          default: COGNITO_DOMAIN,
+          minLength: 5,
+          description:
+            'Please provide a value to be used for your Cognito domain name prefix. Cognito domain names must be globally unique.'
+        }).valueAsString
+      : COGNITO_DOMAIN;
+
     const workbenchCognito = this._createCognitoResources(
-      COGNITO_DOMAIN,
+      cognitoDomainToUse,
       WEBSITE_URLS,
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
@@ -177,7 +200,8 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       MAIN_ACCT_ID
     };
@@ -186,15 +210,20 @@ export class SWBStack extends Stack {
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
     this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
-    const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+
+    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
-      mainAcctEncryptionKey
+      S3DatasetsEncryptionKey.key
     );
+
+    const S3ArtifactEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
-      mainAcctEncryptionKey
+      S3ArtifactEncryptionKey.key
     );
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
@@ -203,7 +232,8 @@ export class SWBStack extends Stack {
       datasetBucket,
       artifactS3Bucket,
       FIELDS_TO_MASK_WHEN_AUDITING,
-      mainAcctEncryptionKey
+      S3DatasetsEncryptionKey.key,
+      S3ArtifactEncryptionKey.key
     );
 
     // Application DynamoDB Encryption Key
@@ -338,11 +368,28 @@ export class SWBStack extends Stack {
       value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
+    const hostedZoneId = this._isSolutionsBuild
+      ? new CfnParameter(this, 'HostedZoneId', {
+          type: 'String',
+          default: HOSTED_ZONE_ID,
+          description: 'The Route 53 Hosted Zone ID linked to your custom domain name.'
+        }).valueAsString
+      : HOSTED_ZONE_ID;
+
+    const domainName = this._isSolutionsBuild
+      ? new CfnParameter(this, 'DomainName', {
+          type: 'String',
+          default: DOMAIN_NAME,
+          description:
+            'A custom domain name that you own. TLS certificates will be generated at the time of application deployment.'
+        }).valueAsString
+      : DOMAIN_NAME;
+
     this._createLoadBalancer(
       swbVpc,
       apiGwUrl,
-      DOMAIN_NAME,
-      HOSTED_ZONE_ID,
+      domainName,
+      hostedZoneId,
       ALB_INTERNET_FACING,
       this._accessLogsBucket
     );
@@ -484,29 +531,6 @@ export class SWBStack extends Stack {
     new CfnOutput(this, 'awsRegionShortName', {
       value: awsRegionName
     });
-  }
-
-  private _createEncryptionKey(): Key {
-    const mainKeyPolicy = new PolicyDocument({
-      statements: [
-        new PolicyStatement({
-          actions: ['kms:*'],
-          principals: [new AccountPrincipal(this.account)],
-          resources: ['*'],
-          sid: 'main-key-share-statement'
-        })
-      ]
-    });
-
-    const key = new Key(this, 'mainAccountKey', {
-      enableKeyRotation: true,
-      policy: mainKeyPolicy
-    });
-
-    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY, {
-      value: key.keyArn
-    });
-    return key;
   }
 
   private _createLaunchConstraintIAMRole(
@@ -696,7 +720,7 @@ export class SWBStack extends Stack {
         resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
-            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+            'aws:SourceAccount': this._isSolutionsBuild ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
           }
         }
       })
@@ -783,12 +807,12 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
-    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, mainAcctEncryptionKey);
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, s3ArtifactsEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, s3ArtifactsEncryptionKey);
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
-    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
+  private _createS3DatasetsBuckets(s3DatasetsName: string, s3DatasetsEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, s3DatasetsEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
 
     const metadatanode = bucket.node.defaultChild as CfnResource;
@@ -807,13 +831,13 @@ export class SWBStack extends Stack {
     return bucket;
   }
 
-  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, mainAcctEncryptionKey: Key): Bucket {
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, encryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, s3BucketId, {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
-      encryptionKey: mainAcctEncryptionKey,
+      encryptionKey: encryptionKey,
       versioned: true
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
@@ -1060,10 +1084,9 @@ export class SWBStack extends Stack {
     datasetBucket: Bucket,
     artifactS3Bucket: Bucket,
     fieldsToMaskWhenAuditing: string[],
-    accountEncryptionKey: Key
+    datasetsEncryptionKey: Key,
+    artifactEncryptionKey: Key
   ): Function {
-    const { AWS_REGION } = getConstants();
-
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
@@ -1080,22 +1103,22 @@ export class SWBStack extends Stack {
         statements: [
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
+            resources: [`arn:aws:events:${this.region}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
             actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-            resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
+            resources: [`arn:aws:cloudformation:${this.region}:*:stack/${this.stackName}*`],
             sid: 'CfnAccess'
           }),
           new PolicyStatement({
             actions: ['servicecatalog:ListLaunchPaths'],
-            resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+            resources: [`arn:aws:catalog:${this.region}:*:product/*`],
             sid: 'ScAccess'
           }),
           new PolicyStatement({
             actions: ['cognito-idp:DescribeUserPoolClient'],
-            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            resources: [`arn:aws:cognito-idp:${this.region}:${this.account}:userpool/*`],
             sid: 'CognitoAccess'
           }),
           new PolicyStatement({
@@ -1113,7 +1136,7 @@ export class SWBStack extends Stack {
               'kms:DescribeKey',
               'kms:ReEncrypt*'
             ],
-            resources: [accountEncryptionKey.keyArn],
+            resources: [datasetsEncryptionKey.keyArn, artifactEncryptionKey.keyArn],
             sid: 'KMSAccess'
           }),
           new PolicyStatement({
