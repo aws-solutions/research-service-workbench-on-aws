@@ -71,7 +71,15 @@
     "<rootDir>/src/projectEnvTypeConfigs/disassociateProjectEnvTypeConfigRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigs/getProjectEnvTypeConfigRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigs/project.ts",
-    "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts"
+    "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
+
+    "<rootDir>/src/users/authenticatedUser.ts",
+    "<rootDir>/src/users/createRoleRequest.ts",
+    "<rootDir>/src/users/createUserRequest.ts",
+    "<rootDir>/src/users/deleteUserRequest.ts",
+    "<rootDir>/src/users/getUserRequest.ts",
+    "<rootDir>/src/users/updateRoleRequest.ts",
+    "<rootDir>/src/users/updateUserRequest.ts"
   ],
   "coverageThreshold": {
     "global": {
