@@ -34,7 +34,7 @@ export EMAIL=<YOUR_EMAIL>
 git clone https://github.com/aws-solutions/solution-spark-on-aws.git
 cd solution-spark-on-aws
 git checkout release/4debe38e-5796-47b6-96ec-881a87e0df2
-sh ./scripts/solutions-implementation/postSolutionDeployment.sh
+sh ./solutions/swb-reference/scripts/solutions-implementation/postSolutionDeployment.sh
 ```
 ----
 ## Optional: Initial setup for base resources
