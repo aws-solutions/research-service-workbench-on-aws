@@ -2,12 +2,20 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { z } from 'zod';
+import JSONValue from '../types/json';
+import { getPaginationParser } from './validatorHelper';
 
-import JSONValue from '@aws/workbench-core-base/lib/types/json';
-import { ListEnvTypeConfigProjectsRequestParser } from './listEnvTypeConfigProjectsRequest';
-
-describe('ListEnvTypeConfigProjectsRequestParser', () => {
+describe('getPaginationProperties', () => {
   let requestObject: Record<string, JSONValue>;
+  const paginationParser = z.object({ ...getPaginationParser() });
+  const customMinValue = 5;
+  const customMaxValue = 10;
+  const customPaginationParser = z.object({ ...getPaginationParser(customMinValue, customMaxValue) });
+  const parsersList = [
+    { parser: paginationParser, minValue: 1, maxValue: 100 },
+    { parser: customPaginationParser, minValue: customMinValue, maxValue: customMaxValue }
+  ];
   describe('when pageSize', () => {
     let expectedPageSize: number;
 
@@ -16,15 +24,13 @@ describe('ListEnvTypeConfigProjectsRequestParser', () => {
         // BUILD
         expectedPageSize = 5;
         requestObject = {
-          pageSize: `${expectedPageSize}`,
-          envTypeId: 'envTypeId',
-          envTypeConfigId: 'envTypeConfigId'
+          pageSize: `${expectedPageSize}`
         };
       });
 
       test('it parses the page size into a number', () => {
         // OPERATE
-        const parsed = ListEnvTypeConfigProjectsRequestParser.safeParse(requestObject);
+        const parsed = paginationParser.safeParse(requestObject);
 
         // CHECK
         expect(parsed.success).toEqual(true);
@@ -38,15 +44,13 @@ describe('ListEnvTypeConfigProjectsRequestParser', () => {
       beforeEach(() => {
         // BUILD
         requestObject = {
-          pageSize: 'nonNumber',
-          envTypeId: 'envTypeId',
-          envTypeConfigId: 'envTypeConfigId'
+          pageSize: 'nonNumber'
         };
       });
 
       test('it returns an error', () => {
         // OPERATE
-        const parsed = ListEnvTypeConfigProjectsRequestParser.safeParse(requestObject);
+        const parsed = paginationParser.safeParse(requestObject);
 
         // CHECK
         expect(parsed.success).toEqual(false);
@@ -62,40 +66,11 @@ describe('ListEnvTypeConfigProjectsRequestParser', () => {
         }
       });
     });
-    describe('is less than 0', () => {
-      beforeEach(() => {
-        // BUILD
-        expectedPageSize = -1;
-        requestObject = {
-          pageSize: `${expectedPageSize}`,
-          envTypeId: 'envTypeId',
-          envTypeConfigId: 'envTypeConfigId'
-        };
-      });
-
-      test('it returns an error', () => {
+    describe('is out of range', () => {
+      test.each(parsersList)('it returns an error when lower than min value', (parserItem) => {
         // OPERATE
-        const parsed = ListEnvTypeConfigProjectsRequestParser.safeParse(requestObject);
-
-        // CHECK
-        expect(parsed.success).toEqual(false);
-        if (!parsed.success) {
-          const expectedIssues = [
-            {
-              code: 'custom',
-              message: 'Must be Between 1 and 100',
-              path: ['pageSize']
-            }
-          ];
-          expect(parsed.error.issues).toEqual(expectedIssues);
-        }
-      });
-
-      test('it returns an error when greater than 100', () => {
-        // OPERATE
-        const parsed = ListEnvTypeConfigProjectsRequestParser.safeParse({
-          ...requestObject,
-          pageSize: '101'
+        const parsed = parserItem.parser.safeParse({
+          pageSize: `${parserItem.minValue - 1}`
         });
 
         // CHECK
@@ -104,7 +79,27 @@ describe('ListEnvTypeConfigProjectsRequestParser', () => {
           const expectedIssues = [
             {
               code: 'custom',
-              message: 'Must be Between 1 and 100',
+              message: `Must be Between ${parserItem.minValue} and ${parserItem.maxValue}`,
+              path: ['pageSize']
+            }
+          ];
+          expect(parsed.error.issues).toEqual(expectedIssues);
+        }
+      });
+
+      test.each(parsersList)('it returns an error when greater than max value', (parserItem) => {
+        // OPERATE
+        const parsed = parserItem.parser.safeParse({
+          pageSize: `${parserItem.maxValue + 1}`
+        });
+
+        // CHECK
+        expect(parsed.success).toEqual(false);
+        if (!parsed.success) {
+          const expectedIssues = [
+            {
+              code: 'custom',
+              message: `Must be Between ${parserItem.minValue} and ${parserItem.maxValue}`,
               path: ['pageSize']
             }
           ];

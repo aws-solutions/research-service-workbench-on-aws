@@ -16,6 +16,8 @@
     "<rootDir>/src/environmentTypeRoutes.ts",
     "<rootDir>/src/generateRouter.ts",
     "<rootDir>/src/index.ts",
+    "<rootDir>/src/projectEnvironmentRoutes.ts",
+    "<rootDir>/src/projectEnvTypeConfigRoutes.ts",
     "<rootDir>/src/sshKeyRoutes.ts",
     "<rootDir>/src/projectRoutes.ts",
     "<rootDir>/src/staticPermissionsConfig.ts",
@@ -66,10 +68,13 @@
     "<rootDir>/src/envTypeConfigs/envTypeConfigPlugin.ts",
     "<rootDir>/src/envTypeConfigs/getEnvironmentTypeConfigRequest.ts",
     "<rootDir>/src/envTypeConfigs/updateEnvironmentTypeConfigsRequest.ts",
+    "<rootDir>/src/envTypeConfigs/listEnvironmentTypeConfigsRequest.ts",
 
     "<rootDir>/src/projectEnvTypeConfigs/associateProjectEnvTypeConfigRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigs/disassociateProjectEnvTypeConfigRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigs/getProjectEnvTypeConfigRequest.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/listEnvTypeConfigProjectsRequest.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigs/project.ts",
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
 

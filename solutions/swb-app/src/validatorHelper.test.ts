@@ -4,16 +4,25 @@
  */
 
 import JSONValue from '@aws/workbench-core-base/lib/types/json';
-import { ListAccountsRequestParser } from './listAccountsRequest';
+import { z } from 'zod';
+import { getPaginationParser } from './validatorHelper';
 
-describe('ListAccountsRequestParser', () => {
+describe('getPaginationProperties', () => {
   let requestObject: Record<string, JSONValue>;
-
+  const paginationParser = z.object({ ...getPaginationParser() });
+  const customMinValue = 5;
+  const customMaxValue = 10;
+  const customPaginationParser = z.object({ ...getPaginationParser(customMinValue, customMaxValue) });
+  const parsersList = [
+    { parser: paginationParser, minValue: 1, maxValue: 100 },
+    { parser: customPaginationParser, minValue: customMinValue, maxValue: customMaxValue }
+  ];
   describe('when pageSize', () => {
     let expectedPageSize: number;
 
     describe('is valid', () => {
       beforeEach(() => {
+        // BUILD
         expectedPageSize = 5;
         requestObject = {
           pageSize: `${expectedPageSize}`
@@ -21,7 +30,10 @@ describe('ListAccountsRequestParser', () => {
       });
 
       test('it parses the page size into a number', () => {
-        const parsed = ListAccountsRequestParser.safeParse(requestObject);
+        // OPERATE
+        const parsed = paginationParser.safeParse(requestObject);
+
+        // CHECK
         expect(parsed.success).toEqual(true);
         if (parsed.success) {
           expect(parsed.data.pageSize).toEqual(expectedPageSize);
@@ -31,15 +43,18 @@ describe('ListAccountsRequestParser', () => {
 
     describe('is NaN', () => {
       beforeEach(() => {
+        // BUILD
         requestObject = {
           pageSize: 'nonNumber'
         };
       });
 
       test('it returns an error', () => {
-        const parsed = ListAccountsRequestParser.safeParse(requestObject);
-        expect(parsed.success).toEqual(false);
+        // OPERATE
+        const parsed = paginationParser.safeParse(requestObject);
 
+        // CHECK
+        expect(parsed.success).toEqual(false);
         if (!parsed.success) {
           const expectedIssues = [
             {
@@ -52,47 +67,40 @@ describe('ListAccountsRequestParser', () => {
         }
       });
     });
+    describe('is out of range', () => {
+      test.each(parsersList)('it returns an error when lower than min value', (parserItem) => {
+        // OPERATE
+        const parsed = parserItem.parser.safeParse({
+          pageSize: `${parserItem.minValue - 1}`
+        });
 
-    describe('is greater than 100', () => {
-      beforeEach(() => {
-        requestObject = {
-          pageSize: '101'
-        };
-      });
-
-      test('it returns an error', () => {
-        const parsed = ListAccountsRequestParser.safeParse(requestObject);
+        // CHECK
         expect(parsed.success).toEqual(false);
-
         if (!parsed.success) {
           const expectedIssues = [
             {
               code: 'custom',
-              message: 'Must be between 1 and 100',
+              message: `Must be Between ${parserItem.minValue} and ${parserItem.maxValue}`,
               path: ['pageSize']
             }
           ];
           expect(parsed.error.issues).toEqual(expectedIssues);
         }
       });
-    });
 
-    describe('is less than 1', () => {
-      beforeEach(() => {
-        requestObject = {
-          pageSize: '0'
-        };
-      });
+      test.each(parsersList)('it returns an error when greater than max value', (parserItem) => {
+        // OPERATE
+        const parsed = parserItem.parser.safeParse({
+          pageSize: `${parserItem.maxValue + 1}`
+        });
 
-      test('it throws an error', () => {
-        const parsed = ListAccountsRequestParser.safeParse(requestObject);
+        // CHECK
         expect(parsed.success).toEqual(false);
-
         if (!parsed.success) {
           const expectedIssues = [
             {
               code: 'custom',
-              message: 'Must be between 1 and 100',
+              message: `Must be Between ${parserItem.minValue} and ${parserItem.maxValue}`,
               path: ['pageSize']
             }
           ];
