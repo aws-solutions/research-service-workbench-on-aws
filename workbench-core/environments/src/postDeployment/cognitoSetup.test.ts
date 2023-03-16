@@ -98,11 +98,15 @@ describe('CognitoSetup', () => {
       const cognitoSetup = new CognitoSetup(constants);
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
-      jest.spyOn(cognitoSetup, 'adminCreateUser');
+      jest.spyOn(cognitoSetup, 'getUserPoolId');
+      const describeStackParam = {
+        StackName: 'swb-test-va'
+      };
+      expect(cfMock.on(DescribeStacksCommand)).toBeCalledWith(describeStackParam);
 
-      const returnVal = await cognitoSetup.run();
-      expect(returnVal).toBeUndefined();
-      expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
+      const returnVal = await cognitoSetup.getUserPoolId();
+      expect(returnVal).toEqual('swb-test-va');
+      expect(cognitoSetup.getUserPoolId).toBeCalledTimes(1);
     });
   });
 });
