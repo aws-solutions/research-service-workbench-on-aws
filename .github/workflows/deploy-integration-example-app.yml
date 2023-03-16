@@ -6,6 +6,10 @@
 name: Deploy-and-integration-test-example-app
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
     secrets:
       aws-region:
         required: true
@@ -15,13 +19,11 @@ on:
         required: true
       slack_webhook_url:
         required: true
-      environment:
-        required: true
 
 jobs:
   deploy-and-integration-test-example:
     runs-on: ubuntu-20.04
-    environment: "${{ secrets.environment }}"
+    environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read
