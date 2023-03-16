@@ -14,15 +14,9 @@ export default class CognitoSetup {
     AWS_REGION: string;
     ROOT_USER_EMAIL: string;
     USER_POOL_NAME: string;
-    STACK_NAME: string;
   };
 
-  public constructor(constants: {
-    AWS_REGION: string;
-    ROOT_USER_EMAIL: string;
-    USER_POOL_NAME: string;
-    STACK_NAME: string;
-  }) {
+  public constructor(constants: { AWS_REGION: string; ROOT_USER_EMAIL: string; USER_POOL_NAME: string }) {
     this._constants = constants;
 
     const { AWS_REGION } = constants;
@@ -111,9 +105,12 @@ export default class CognitoSetup {
    * @returns user pool id
    */
   public async getUserPoolId(): Promise<string | undefined> {
-    const { STACK_NAME } = this._constants;
+    const { USER_POOL_NAME } = this._constants;
+    const poolNameParts = USER_POOL_NAME.split('-');
+    // We extract STACK_NAME (eg. swb-stage-region) from USER_POOL_NAME (eg. swb-userpool-stage-region)
+    const stackName = `${poolNameParts[0]}-${poolNameParts[2]}-${poolNameParts[3]}`;
     const describeStackParam = {
-      StackName: STACK_NAME
+      StackName: stackName
     };
 
     const stackDetails = await this._aws.clients.cloudformation.describeStacks(describeStackParam);

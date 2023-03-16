@@ -16,15 +16,14 @@ describe('CognitoSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     ROOT_USER_EMAIL: 'user@example.com',
-    USER_POOL_NAME: 'swb-userpool-test-va',
-    STACK_NAME: 'swb-dev-test'
+    USER_POOL_NAME: 'swb-userpool-test-va'
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
         {
-          StackName: 'swb-dev-va',
+          StackName: 'swb-test-va',
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
@@ -90,6 +89,17 @@ describe('CognitoSetup', () => {
         })
       );
       jest.spyOn(cognitoSetup, 'adminCreateUser').mockImplementation();
+      const returnVal = await cognitoSetup.run();
+      expect(returnVal).toBeUndefined();
+      expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
+    });
+
+    test('run: getUserPoolId returns user pool ID', async () => {
+      const cognitoSetup = new CognitoSetup(constants);
+      const cognitoMock = mockClient(CognitoIdentityProviderClient);
+      mockCognito(cognitoMock);
+      jest.spyOn(cognitoSetup, 'adminCreateUser');
+
       const returnVal = await cognitoSetup.run();
       expect(returnVal).toBeUndefined();
       expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
