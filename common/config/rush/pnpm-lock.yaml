@@ -1289,7 +1289,6 @@ importers:
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
-      minimist: ^1.2.8
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -1325,7 +1324,6 @@ importers:
       js-yaml: 4.1.0
       jwt-decode: 3.1.2
       lodash: 4.17.21
-      minimist: 1.2.8
       source-map-support: 0.5.21
     devDependencies:
       '@aws-cdk/assert': 2.26.0_stizkriylkq6dm3dx3d7eqslem

@@ -24,6 +24,7 @@
     "cdk:synth": "rushx compile && cdk synth",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "compile": "node scripts/buildLambda.js",
+    "cypress": "cypress",
     "depcheck": "depcheck",
     "integration-tests": "rushx build && jest lib/integration-tests -i --verbose",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
@@ -33,7 +34,6 @@
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only",
     "test-cdk-deploy": "rush build -t @aws/workbench-core-example-infrastructure && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
-    "test:cypress": "node scripts/runCypress.js",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {
@@ -65,7 +65,6 @@
     "js-yaml": "^4.1.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "minimist": "^1.2.8",
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {

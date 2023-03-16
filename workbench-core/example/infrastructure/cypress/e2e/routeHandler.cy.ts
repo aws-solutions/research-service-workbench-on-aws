@@ -3,6 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+
+declare const jwt_decode: typeof jwtDecode;
+
 describe('refreshAccessToken', () => {
   it('should return the id token if the access token is successfully refreshed', () => {
     const clientId = Cypress.env('COGNITO_USER_POOL_CLIENT_ID');
@@ -54,7 +58,7 @@ describe('refreshAccessToken', () => {
         const loadJwtDecode = (next) => {
           cy.request('https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js').then(
             ({ body }) => {
-              eval(body); // Load JWT token library as global window.jwt_token
+              eval(body); // Load JWT token library as global jwt_token
               next?.();
             }
           );
@@ -62,7 +66,7 @@ describe('refreshAccessToken', () => {
 
         const verifyIdToken = (idToken) => {
           expect(idToken).to.not.be.undefined;
-          const tokenData = window.jwt_decode(idToken);
+          const tokenData = jwt_decode<JwtPayload & { email: string }>(idToken);
 
           expect(tokenData.iss).to.equal(`https://cognito-idp.${region}.amazonaws.com/${userPoolId}`);
           expect(tokenData.email).to.equal(username);
