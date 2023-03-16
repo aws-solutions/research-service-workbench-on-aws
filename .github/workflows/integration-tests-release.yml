@@ -3,7 +3,7 @@ name: release integration tests
 on:
   push:
     branches:
-      - 'release/4debe38e-5796-47b6-96ec-881a87e0df21'
+      - 'testRelease/integTests'
 
 
 jobs:
