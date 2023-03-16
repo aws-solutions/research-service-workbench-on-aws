@@ -81,10 +81,11 @@ jobs:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
     secrets:
-      aws-test-region: ${{ secrets.AWS_TEST_REGION }}
-      test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
-      aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
+      aws-region: ${{ secrets.AWS_TEST_REGION }}
+      role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
+      aws-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      environment: test
 
   merge-develop-to-stage:
     name: Merge develop to stage
