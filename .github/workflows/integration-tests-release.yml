@@ -1,0 +1,28 @@
+name: release integration tests
+
+on:
+  push:
+    branches:
+      - 'release/4debe38e-5796-47b6-96ec-881a87e0df21'
+
+
+jobs:
+  pre-deployment-check:
+    name: Pre deployment check
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    steps:
+      - name: "Block Concurrent Deployments"
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy-example-app:
+    needs: [pre-deployment-check]
+    uses: ./.github/workflows/deploy-integration-example-app.yml
+    secrets:
+      aws-test-region: ${{ secrets.AWS_RELEASE_REGION }}
+      test-role-to-assume: ${{ secrets.RELEASE_ASSUME_ROLE }}
+      aws-test-account-region: ${{ secrets.AWS_EXAMPLE_APP_RELEASE_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
