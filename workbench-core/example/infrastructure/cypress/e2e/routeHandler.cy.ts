@@ -55,7 +55,7 @@ describe('refreshAccessToken', () => {
 
         // Load JWT from CDN since libraries are not accessible from cy.origin and Cy.require is
         // still experimental
-        const loadJwtDecode = (next) => {
+        const loadJwtDecode = (next?: () => void) => {
           cy.request('https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js').then(
             ({ body }) => {
               eval(body); // Load JWT token library as global jwt_token
@@ -64,7 +64,7 @@ describe('refreshAccessToken', () => {
           );
         };
 
-        const verifyIdToken = (idToken) => {
+        const verifyIdToken = (idToken: string) => {
           expect(idToken).to.not.be.undefined;
           const tokenData = jwt_decode<JwtPayload & { email: string }>(idToken);
 
@@ -72,7 +72,10 @@ describe('refreshAccessToken', () => {
           expect(tokenData.email).to.equal(username);
         };
 
-        const tokenExchangeRequest = (code, next) => {
+        const tokenExchangeRequest = (
+          code: string,
+          next?: (accessToken: string, refreshToken: string) => void
+        ) => {
           // Exchange authorization code for tokens (see step 5 in https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
           cy.request({
             method: 'POST',
@@ -95,7 +98,7 @@ describe('refreshAccessToken', () => {
           });
         };
 
-        const refreshTokenRequest = (accessToken, refreshToken) => {
+        const refreshTokenRequest = (accessToken: string, refreshToken: string) => {
           cy.request({
             method: 'GET',
             url: `${restApiEndpoint}refresh`,
@@ -113,7 +116,7 @@ describe('refreshAccessToken', () => {
             const searchParams = new URLSearchParams(search);
             const code = searchParams.get('code');
 
-            loadJwtDecode(() => tokenExchangeRequest(code, refreshTokenRequest));
+            loadJwtDecode(() => tokenExchangeRequest(code!, refreshTokenRequest));
           });
       }
     );
