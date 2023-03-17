@@ -6,6 +6,10 @@
 name: Deploy-and-integration-test-swb-reference
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
     secrets:
       aws-dev-region:
         required: true
@@ -27,7 +31,7 @@ on:
 jobs:
   deploy-and-integration-test-swb-reference:
     runs-on: ubuntu-20.04
-    environment: dev
+    environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read

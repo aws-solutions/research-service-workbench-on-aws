@@ -37,6 +37,8 @@ jobs:
   deploy-swb-reference:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    with:
+      environment: dev
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -50,6 +52,8 @@ jobs:
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
+    with:
+      environment: dev    
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION_BYON }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -71,6 +75,8 @@ jobs:
   deploy-swb-demo:
     needs: [deploy-swb-reference]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    with:
+      environment: dev    
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}

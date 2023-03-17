@@ -28,3 +28,28 @@ jobs:
       role-to-assume: ${{ secrets.RELEASE_ASSUME_ROLE }}
       aws-account-region: ${{ secrets.AWS_EXAMPLE_APP_RELEASE_ACCOUNT_REGION }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+  deploy-swb-reference:
+    needs: [pre-deployment-check]
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    with:
+      environment: release-swb
+    secrets:
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
+      CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
+      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_RELEASE }}
+      DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_RELEASE }}
+
+  deploy-swb-demo:
+    needs: [deploy-swb-reference]
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    with:
+      environment: release-swb    
+    secrets:
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_RELEASE }}
+      DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_RELEASE }}
