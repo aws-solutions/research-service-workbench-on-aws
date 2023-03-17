@@ -1,3 +1,5 @@
+#!/bin/bash
+
 environment=$(curl --location "https://$swbDomainName/api/projects/$projectId/environments" \
 --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header "Content-Type: application/json" \
 --data "{

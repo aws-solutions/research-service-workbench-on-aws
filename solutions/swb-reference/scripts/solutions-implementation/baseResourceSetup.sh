@@ -1,3 +1,5 @@
+#!/bin/bash
+
 read -p "Enter your desired password for the email address you provided: " newPassword
 
 echo "Now we enter the outputs from Hosting Account CloudFormation stack: "

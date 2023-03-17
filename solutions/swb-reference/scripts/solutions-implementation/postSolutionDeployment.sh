@@ -1,3 +1,5 @@
+#!/bin/bash
+
 read -p "Please enter your email address: " EMAIL
 export regionShortName=test
 export region=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
