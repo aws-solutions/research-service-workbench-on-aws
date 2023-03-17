@@ -1,12 +1,8 @@
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=workbench-core-infrastructure)](https://codecov.io/github/aws-solutions/solution-spark-on-aws)
+
 # Workbench Core Infrastructure
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
-## Code Coverage
-
-| Statements                                                                               | Branches                                                                            | Functions                                                                              | Lines                                                                          |
-| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-99.28%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-95.08%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-99.28%25-brightgreen.svg?style=flat) |
 
 ## Description
 

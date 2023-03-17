@@ -1,12 +1,8 @@
-# Workbench Core ESLint Config Custom
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=workbench-core-base)](https://codecov.io/github/aws-solutions/solution-spark-on-aws)
+
+# `base`
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
-## Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-78.97%25-red.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-71.76%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-70.58%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-79.91%25-red.svg?style=flat) |
-# `base`
 
 > This package is intended to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires. We use `aws-sdk` V3 to improve the load-time of the modules imported at runtime.
 

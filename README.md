@@ -2,6 +2,7 @@
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # Workflow Status
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=root)](https://codecov.io/github/aws-solutions/solution-spark-on-aws)
 [![Build Status](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-stage](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
 [![Publish-and-merge-to-develop](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
@@ -10,12 +11,6 @@
 [![Lint-PR](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-
-# Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-91.34%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-89.54%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.8%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-91.57%25-brightgreen.svg?style=flat) |
-
 
 # Contributing Guidelines
 
