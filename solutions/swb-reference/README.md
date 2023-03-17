@@ -6,7 +6,6 @@ The 0.1.0 beta release is available for customers to test the newly re-architect
 
 This release includes:
 
-* New user experience for workspace based on the AWS UI Design System
 * Sagemaker Notebook as a compute environment (connect, start, stop, terminate)
 * Data set attachment to Sagemaker Notebooks
 * Research user creation
@@ -341,11 +340,22 @@ const { data: response } = await adminSession.resources.environments.get({status
 
 Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
+## Reset User Password
+1. Go to the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home) in your main account. If prompted, enter your AWS credentials.
+1. Choose **User Pools**.
+1. Choose your SWB user pool with name `swb-userpool-<STAGE>-<Region>`.
+1. Choose the **App integration** tab.
+1. Under **App client list** choose SWB app client with name `swb-client-<STAGE>-<Region>`.
+1. Under **Hosted UI** choose **View Hosted UI**.
+1. If the user has a temporary password, login with your user crendentials and follow isntructions to set a new password.
+1. If the user already has a non temporary password follow instructions [here](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-hosted-ui-user-forgot-password.html) to reset password.
+
 ## Obtain Access Token for making authenticated API requests
+1. If you are tying to get a token from a user that still has its temporary password assigned please follow instructions [here](README.md#Reset-User-Password) to reset user password.
 1. Go to `swb-reference/scripts` folder
-2. Pull down all required dependencies by running `rushx build`
-3. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
-4. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests.
+1. Pull down all required dependencies by running `rushx build`
+1. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
+1. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests.
 
 ## Troubleshooting Guides
 
