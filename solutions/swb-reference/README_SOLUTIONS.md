@@ -23,13 +23,8 @@ Currently Service Workbench contains some steps that can only be performed upon 
 
 1. Using the same IAM role/user you used for deploying the CloudFormation stack, create a Cloud9 environment (in the same AWS account and region) as your CloudFormation stack deployment
    - Note: Please use instance type `m5.large` or higher for quick execution.
-2. Run the following steps on the environment:
-   - Note: Replace `<YOUR_EMAIL>` with your email address in the first line of the code snippet. This will be the IT Admin user
+2. Run the following code snipper on the environment:
 
-```shell
-export EMAIL=<YOUR_EMAIL>
-```
-3. Paste the following code snippet:
 ```shell
 git clone https://github.com/aws-solutions/solution-spark-on-aws.git
 cd solution-spark-on-aws
@@ -41,35 +36,21 @@ sh ./solutions/swb-reference/scripts/solutions-implementation/postSolutionDeploy
 
 This section creates base Service Workbench resources required to provision workspaces in your onboarded hosting account. It is recommended to use the same Cloud9 instance from the previous step. 
 
-Copy the code snippet below and enter your desired password and hosting account output ARNs. Execute this snippet it in your workspace terminal.
-
-```shell
-# Enter your desired password for the root email
-export newPassword=<YOUR_PASSWORD>
-# Outputs from Hosting Account CloudFormation stack:
-export hostingAccountId=<HOST_AWS_ACCOUNT_ID>
-export envMgmtRoleArn=<ENV_MGMT_ROLE_ARN>
-export hostingAccountHandlerRoleArn=<HOSTING_ACCOUNT_HANDLER_ROLE_ARN>
-# Parameter value from Hosting Account CloudFormation stack:
-export externalId=<EXTERNAL_ID_PARAM_VALUE>
-
-```
-
-Now, run the code snippet below to have the following Service Workbench-specific resources created in the database:
+Run the code snippet below to have the following Service Workbench-specific resources created in the database:
 - Hosting Account
 - Cost Center
 - Project
 - Environment Type Config
 
 ```shell
-sh ./scripts/solutions-implementation/baseResourceSetup.sh
+. ./scripts/solutions-implementation/baseResourceSetup.sh
 ```
 
 **And you're all set!**
 
 You can now deploy a workspace by running this command in your terminal:
 ```shell
-sh ./scripts/solutions-implementation/createEnvironment.sh
+. ./scripts/solutions-implementation/createEnvironment.sh
 ```
 ----
 ## Explore SWBv2
