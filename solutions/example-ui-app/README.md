@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=example-ui-app)](https://codecov.io/github/aws-solutions/solution-spark-on-aws)
+[![codecov](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov/branch/codecov/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
 
 # MA Foundation Starter App - POC
 

@@ -2,14 +2,13 @@
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # Workflow Status
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=root)](https://codecov.io/github/aws-solutions/solution-spark-on-aws)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/codecov/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
 [![Build Status](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-stage](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
 [![Publish-and-merge-to-develop](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
 [![Cfn-nag-scan](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
 [![Lint-PR](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
-[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 # Contributing Guidelines
