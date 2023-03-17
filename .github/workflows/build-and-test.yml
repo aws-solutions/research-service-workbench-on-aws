@@ -22,8 +22,23 @@ jobs:
       - name: Rush test
         run: node common/scripts/install-run-rush.js test:only --verbose
 
+      - name: Generates common coverage summary reports for all packages in ./coverage dir
+        run: node common/scripts/install-run-rush.js common-coverage-report
+
       - name: Generate Codecov for @aws/workbench-core-accounts
         uses: codecov/codecov-action@v3
         with:
-          directory: workbench-core/accounts/temp/coverage
+          files: workbench-core/accounts/temp/coverage/coverage-final.json
           flags: workbench-core-accounts
+
+      - name: Generate Codecov for @aws/workbench-core-accounts-ui
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/accounts-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-accounts-ui
+
+      - name: Generate common Codecov for Root
+        uses: codecov/codecov-action@v3
+        with:
+          directory: workbench-core/coverage
+          flags: root
