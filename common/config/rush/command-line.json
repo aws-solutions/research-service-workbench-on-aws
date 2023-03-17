@@ -249,7 +249,7 @@
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json \"*/**/temp/coverage/coverage-final.json\""
     },
     {
       "name": "common-coverage",

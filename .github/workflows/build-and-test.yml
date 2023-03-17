@@ -40,5 +40,5 @@ jobs:
       - name: Generate common Codecov for Root
         uses: codecov/codecov-action@v3
         with:
-          directory: coverage
+          files: coverage/coverage-final.json
           flags: root
