@@ -49,9 +49,9 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. (Optional) Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
 1. Uncomment `cognitoDomain` and provide a unique string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
-1. If your SWB instance is going to use a custom network, uncomment `vpcId`, `albSubnetIds` and `ecsSubnetIds` and provide their respective values from your network.
+1. If your SWB instance is going to use a custom network, uncomment `vpcId` and `albSubnetIds` and provide their respective values from your network.
 1. Uncomment `albInternetFacing` and set it's value true if you want an internet-facing AWB instance, otherwize set to false.
-1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone.
+1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone. If you dont have a domain configured, follow instructions to [create a Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
 Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
@@ -106,13 +106,14 @@ After post deployment is complete a temporary password will be sent to the main 
 ## Deploy to the Hosting Account
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
-1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. Upload [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml)
+1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. 
+1. Upload the corresponding .yaml file from [templates](./src/templates) depending on your installation type. Default installation uses [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml), for BYON or TGW see [Hosting Account Templates](./src/templates/README.md)
 1. For the stack name, use the following value: `swb-<stage>-<awsRegionShortName>-hosting-account`, for example `swb-dev-va-hosting-account`
 1. For the parameters provide the following values
 ```yaml
 Namespace: swb-<stage>-<awsRegionShortName>      # These values should be the same as in your config file
 MainAccountId: <12 digit Account ID of Main Account>
-ExternalId: workbench
+ExternalId: <externalIdValue>
 VpcCidr: 10.0.0.0/16
 PublicSubnetCidr: 10.0.0.0/19
 AccountHandlerRoleArn: <CFN_OUTPUT.AccountHandlerLambdaRoleOutput> 
@@ -163,7 +164,9 @@ To get the `accessToken`, `csrfCookie`, and `csrfToken` for making authenticated
 
 ## POSTMAN Setup
 In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have four variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
+Your environment should have four variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value from [Deploy the code step](#deploy-the-code).
+
+Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
 
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
@@ -194,7 +197,7 @@ POST `{{API_URL}}/aws-accounts`
 Once the request excecute successfully a response with the following format will be displayed
 ```json
 {
-    "id": "acc-3123a751-2f5c-4b8e-bda7-e70e878257ty",
+    "id": "acc-########-####-####-####-############",
     "name": "<Unique account name>",
     "awsAccountId": "<Hosting Account 12 Digit ID>",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
@@ -216,7 +219,7 @@ In the params tab set accountId parameter to the `ACCOUNT_ID` value from previou
 A response with the status property will be displayed 
 ```json
 {
-    "id": "acc-3123a751-2f5c-4b8e-bda7-e70e878257ty",
+    "id": "acc-########-####-####-####-############",
     "name": "<Unique account name>",
     "awsAccountId": "<Hosting Account 12 Digit ID>",
     "status": "PENDING"
@@ -230,7 +233,7 @@ In **SWBv2 Official** Postman Collection under **costCenters** folder choose **C
 
 In the body tab set `accountId` parameter to the `ACCOUNT_ID` value from [Onboard hosting account step](#onboard-hosting-account).
 
-Send a **Create Hosting Account** request 
+Send a **Create Cost Center** request 
 
 POST `{{API_URL}}/costCenters/`
 ```json
@@ -704,7 +707,7 @@ const { data: response } = await adminSession.resources.users.get();
 1. Choose the **App integration** tab.
 1. Under **App client list** choose SWB app client with name `swb-client-<STAGE>-<Region>`.
 1. Under **Hosted UI** choose **View Hosted UI**.
-1. If the user has a temporary password, login with your user crendentials and follow isntructions to set a new password.
+1. If the user has a temporary password, login with your user crendentials and you will be prompted to set a new password.
 1. If the user already has a non temporary password follow instructions [here](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-hosted-ui-user-forgot-password.html) to reset password.
 
 ## Obtain Access Token for making authenticated API requests
