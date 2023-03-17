@@ -40,5 +40,5 @@ jobs:
       - name: Generate common Codecov for Root
         uses: codecov/codecov-action@v3
         with:
-          directory: workbench-core/coverage
+          directory: coverage
           flags: root

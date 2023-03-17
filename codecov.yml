@@ -1,9 +1,10 @@
 coverage:
   status:
     project:
-      default:
+      root:
         target: 90% #overall project/ repo coverage
-    patch:
+        flags:
+          - root
       workbench-core-accounts:
         target: 90%
         flags:
@@ -12,10 +13,6 @@ coverage:
         target: 90%
         flags:
           - workbench-core-accounts-ui
-      root:
-        target: 90%
-        flags:
-          - root
 
 github_checks:
     annotations: true
