@@ -159,7 +159,7 @@ Follow these steps to request a quota increase for App Registry application reso
 
 ## Get access token
 
-To get the `accessToken`, `csrfCookie`, and `csrfToken` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
+To get the `accessToken`, `csrfCookie`, and `csrfToken` for making authenticated API requests please refer [here](#obtain-access-token-for-making-authenticated-api-requests).  
 
 ## POSTMAN Setup
 In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
@@ -174,9 +174,9 @@ In **SWBv2 Official** Postman Collection under **hosting account** folder choose
 Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
-In the body tab set `envMgmtRoleArn` parameter to the `CFN_OUTPUT.EnvMgmtRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
+In the body tab set `envMgmtRoleArn` parameter to the `EnvMgmtRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
 
-In the body tab set `hostingAccountHandlerRoleArn` parameter to the `CFN_OUTPUT.HostingAccountHandlerRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
+In the body tab set `hostingAccountHandlerRoleArn` parameter to the `HostingAccountHandlerRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
 
 
 Send a **Create Hosting Account** request 
@@ -576,271 +576,126 @@ Note: Integration tests will create resources in the environment they are execut
 
 ### Prerequisite
 
-Follow instructions [here](./SETUP_v2p1.md##installation) to setup installation of API and Postman collection.
-
-#### Resources to create through SWB UI:
-
-**Test Administrator:** Create an internal admin-role user for running integration tests. (**Note the rootUsername and rootPassword**)
+Follow instructions [here](##installation) to setup installation of API and Postman collection.
 
 
+### Setup Integration Test Config File
 
-#### Resources for Advanced Tests
+1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config values.
 
-- **Environment Type:** Follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create an environmentType.
+1. For `envTypeId` and `envType`, follow instructions in [Retrieve environment type id step](#retrieve-environment-type-id) and choose the Environment Type that integration test will use as default when creating any Environment, copy the values from properties `id` and `type` from request and assign `id` value to `envTypeId` property and `type` value to `envType` property in `./integration-tests/config/<STAGE>.yaml` file
 
-- **Environment Configuration:** Follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a configuration for every corresponding environment type that was created.
+1. Follow these steps to assign a value to the `envTypeConfigId` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **List envTypeConfigs** API.
+    1. In the params tab set `envTypeId` parameter to the `envTypeId` value from your `./integration-tests/config/<STAGE>.yaml`.
+    1. Send **List envTypeConfigs** request. If there are no environment type configs displayed please follow instructions in [Setup Environment Type Config step](#setup-environmenttypeconfig) to create a new environment type config for selected environment type.
+    1. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
+    1. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
 
+1. Follow these steps to assign a value to `projectId` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. In **SWBv2 Official** Postman Collection under **projects** folder choose **List projects** API.
+    1. Send **List projects** request. If there are no projects displayed please follow instructions in [Setup Project step](#setup-project) to create a new project.
+    1. Choose the Project that integration test will use as default when creating any Environment and testing project functionality and copy the `id` value from the response.
+    1. In `./integration-tests/config` directory assign `id` to `projectId` in `<STAGE>.yaml` file 
 
+1. Follow these steps to assign a value to `terminatedEnvId` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Follow instructions in [Launch Sagemaker Notebook Environment](#launch-sagemaker-notebook-instance) to create a new Sagemaker environment and wait for COMPLETED status.
+    1. Copy the `id` value from the response
+    1. Use the `id` of the new environment to [Stop the environment](#stop-an-environment) and wait for STOPPED status.
+    1. Use the `id` of the new environment to [Terminate the environment](#terminate-the-environment).
+    1. Use new instance information to [Terminate](#terminate-the-environment)
+    1. In `./integration-tests/config` directory assign the `id` of the new environment to the `terminatedEnvId` in `<STAGE>.yaml` file  
 
-To run integration tests
+1. Follow these steps to assign a value to `rootUserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `rootUserNameParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<STAGE>/rootUser/email`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserNameParamStorePath` and the value as the main account user's email address.
 
-1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config value.
+1. Follow these steps to assign a value to `rootPasswordParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `rootPasswordParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<STAGE>/rootUser/password`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootPasswordParamStorePath` and the value as the main account user's password from [Reset User Password Step](#reset-user-password).
 
+1. Follow these steps to assign a value to `projectAdmin1UserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `projectAdmin1UserNameParamStorePath` and provide a name for a SSM parameter that will contain a Project Admin user's email address, e.g. `/swb/<STAGE>/PA/email`.
+    1. Follow instructions in [Create User Step](#create-users) to create a new Project Admin user for the integration tests
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `projectAdmin1UserNameParamStorePath` and the value as the created Project Admin's email.
 
-2. For `envTypeId` and `envType` open Postman Collection and select `List envTypes` inside `envType` folder (If Postman collection is not setup follow instructions [here](./SETUP_v2p1.md##postman-setup))
+1. Follow these steps to assign a value to `projectAdmin1PasswordParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `projectAdmin1PasswordParamStorePath` and provide a name for a SSM parameter that will contain the Project Admin's password, e.g. `/swb/<STAGE>/PA/password`.
+    1. Follow instructions in [Reset User Password Step](#reset-user-password) to assign a password to the Project Admin assigned to `projectAdmin1UserNameParamStorePath`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `projectAdmin1PasswordParamStorePath` and the value as the Project Admin's new password.
 
-    1. Execute `List envTypes` request, you should get a json response with the next information
-        ```
-            {
-            "data": [
-                {
-                    "status": "APPROVED",
-                    "createdAt": "2022-08-11T15:27:53.895Z",
-                    "updatedBy": "########-####-####-####-############",
-                    "createdBy": "########-####-####-####-############",
-                    "name": "Sagemaker Jupyter Notebook",
-                    "allowedRoleIds": [],
-                    "resourceType": "envType",
-                    "provisioningArtifactId": "<artifact id>",
-                    "params": [
-                        {
-                            "DefaultValue": "ml.t3.xlarge",
-                            "IsNoEcho": false,
-                            "ParameterConstraints": {
-                                "AllowedValues": []
-                            },
-                            "ParameterType": "String",
-                            "Description": "EC2 instance type to launch",
-                            "ParameterKey": "InstanceType"
-                        },
-                        {
-                            "IsNoEcho": false,
-                            "ParameterConstraints": {
-                                "AllowedValues": []
-                            },
-                            "ParameterType": "Number",
-                            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-                            "ParameterKey": "AutoStopIdleTimeInMinutes"
-                        },
-                        {
-                            "IsNoEcho": false,
-                            "ParameterConstraints": {
-                                "AllowedValues": []
-                            },
-                            "ParameterType": "String",
-                            "Description": "The IAM policy to be associated with the launched workstation",
-                            "ParameterKey": "IamPolicyDocument"
-                        },
-                        {
-                            "DefaultValue": "1.1.1.1/1",
-                            "IsNoEcho": false,
-                            "ParameterConstraints": {
-                                "AllowedValues": []
-                            },
-                            "ParameterType": "String",
-                            "Description": "CIDR to restrict IPs that can access the environment",
-                            "ParameterKey": "CIDR"
-                        }
-                    ],
-                    "updatedAt": "2022-08-11T15:27:53.895Z",
-                    "sk": "ET#<id number>",
-                    "owner": "########-####-####-####-############",
-                    "description": "An Amazon SageMaker Jupyter Notebook",
-                    "id": "########-####-####-####-############",
-                    "pk": "ET#<id number>",
-                    "productId": "<product id>",
-                    "type": "sagemakerNotebook"
-                }
-            ]
-        }
-        ```
-        If there are no environment types displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type
+1. Follow these steps to assign a value to `projectAdmin2UserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `projectAdmin2UserNameParamStorePath` and provide a name for a SSM parameter that will contain a second Project Admin user's email address, e.g. `/swb/<STAGE>/PA2/email`.
+    1. Follow instructions in [Create User Step](#create-users) to create a new Project Admin user for the integration tests
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `projectAdmin2UserNameParamStorePath` and the value as the created second Project Admin's email.
 
-    2. Choose the Environment Type that integration test will use as default when creating any Environment and copy the values from properties `id` and `type` from request.
+1. Follow these steps to assign a value to `projectAdmin2PasswordParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `projectAdmin2PasswordParamStorePath` and provide a name for a SSM parameter that will contain the second Project Admin's password, e.g. `/swb/<STAGE>/PA2/password`.
+    1. Follow instructions in [Reset User Password Step](#reset-user-password) to assign a password to the second Project Admin assigned to `projectAdmin2UserNameParamStorePath`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `projectAdmin2PasswordParamStorePath` and the value as the second Project Admin's new password.
 
-    3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in `<STAGE>.yaml` file 
+1. Follow these steps to assign a value to `researcher1UserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `researcher1UserNameParamStorePath` and provide a name for a SSM parameter that will contain a Researcher's email address, e.g. `/swb/<STAGE>/Researcher/email`.
+    1. Follow instructions in [Create User Step](#create-users) to create a new Researcher user for the integration tests
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `researcher1UserNameParamStorePath` and the value as the created Researcher's email.
 
+1. Follow these steps to assign a value to `researcher1PasswordParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `researcher1PasswordParamStorePath` and provide a name for a SSM parameter that will contain the Researcher's password, e.g. `/swb/<STAGE>/Researcher/password`.
+    1. Follow instructions in [Reset User Password Step](#reset-user-password) to assign a password to the Researcher assigned to `researcher1UserNameParamStorePath`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `researcher1PasswordParamStorePath` and the value as the Researcher's new password.
 
-3. For `envTypeConfigId` open Postman Collection and select `List envTypeConfigs` inside `envTypeConfig` folder.
-    
-    1. Replace `:envTypeId` in the URL request `{{API_URL}}/environmentTypes/:envTypeId/configurations` with value of the environment type id from the previous step.
+1. Follow these steps to assign a value to `hostAwsAccountIdParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `researcher1PasswordParamStorePath` and provide a name for a SSM parameter that will contain the 12 Digit Hosting Account Id, e.g. `/swb/<STAGE>/accountsTest/awsAccountId`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostAwsAccountIdParamStorePath` and the value as the the 12 Digit Hosting Account Id.
 
-    2. Execute `List envTypeConfigs` request, you should get a json response with the next information
-        ```
-        {
-            "data": [
-                {
-                    "createdAt": "2022-08-11T15:29:15.935Z",
-                    "updatedBy": "########-####-####-####-############",
-                    "createdBy": "########-####-####-####-############",
-                    "name": "Config 1",
-                    "allowedRoleIds": [],
-                    "resourceType": "envTypeConfig",
-                    "provisioningArtifactId": "<artifact id>",
-                    "params": [
-                        {
-                            "value": "${iamPolicyDocument}",
-                            "key": "IamPolicyDocument"
-                        },
-                        {
-                            "value": "ml.t3.medium",
-                            "key": "InstanceType"
-                        },
-                        {
-                            "value": "0",
-                            "key": "AutoStopIdleTimeInMinutes"
-                        },
-                        {
-                            "value": "0.0.0.0/0",
-                            "key": "CIDR"
-                        }
-                    ],
-                    "updatedAt": "2022-08-11T15:29:15.935Z",
-                    "sk": "ET#<id number>}",
-                    "owner": "########-####-####-####-############",
-                    "description": "Description for config 1",
-                    "id": "########-####-####-####-############",
-                    "pk": "ETC",
-                    "productId": "<product id>",
-                    "type": "sagemakerNotebook"
-                }
-            ]
-        }
-        ```
-        If there are no environment type configs displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type config.
+1. Follow these steps to assign a value to `hostingAccountHandlerRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `hostingAccountHandlerRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account handler role ARN, e.g. `/swb/<STAGE>/accountsTest/hostingAccountHandlerRoleArn`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostingAccountHandlerRoleArnParamStorePath` and the value as the `HostingAccountHandlerRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
 
-    3. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
+1. Follow these steps to assign a value to `envMgmtRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `envMgmtRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account event management role ARN, e.g. `/swb/<STAGE>/accountsTest/envMgmtRoleArn`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `envMgmtRoleArnParamStorePath` and the value as the `EnvMgmtRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
 
-    4. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
+1. Follow these steps to assign a value to `encryptionKeyArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `encryptionKeyArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account encryption key ARN, e.g. `/swb/<STAGE>/accountsTest/encryptionKeyArn`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `encryptionKeyArnParamStorePath` and the value as the `EncryptionKeyArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
 
+1. Uncomment `defaultHostingAccountId` and in `./integration-tests/config/<STAGE>.yaml` file and assign value `ACCOUNT_ID` from [Onboard Hosting Account Step](#onboard-hosting-account).
 
-4. For `projectId`, `costCenterId`, and `projectName`, open Postman Collection and select `List projects` inside `projects` folder.
+1. In this root directory run `STAGE=<STAGE> rushx integration-tests`
 
-    1. Execute `List projects` request, you should get a json response with the next information
-        ```
-        {
-            "data": [
-                {
-                "id": "proj-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "name": "Project Name",
-                "description": "Project Description",
-                "costCenterId": "cc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "status": "AVAILABLE",
-                "createdAt": "2022-12-22T16:43:10.617Z",
-                "updatedAt": "2023-01-09T22:51:52.026Z",
-                "awsAccountId": "XXXXXXXXXXXX",
-                "envMgmtRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/swb-<stage>-<region>-env-mgmt",
-                "hostingAccountHandlerRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/    swb-<stage>-<region>-hosting-account-role",
-                "vpcId": "vpc-xxxxxxxxxxxxxxxxx",
-                "subnetId": "subnet-xxxxxxxxxxxxxxxxx",
-                "environmentInstanceFiles": "s3://swb-<stage>-<region>-s3artifactsXXXXXXXXXX/environment-files",
-                "encryptionKeyArn": "arn:aws:kms:us-east-2:XXXXXXXXXXXX:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "externalId": "workbench",
-                "accountId": "acc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                }
-            ]
-        }
-        ```
-
-    2. Choose the Project that integration test will use as default when creating any Environment and testing project functionality.
-
-    3. In `./integration-tests/config` directory assign the `id` value from the above request to the `projectId` property in `<STAGE>.yaml` file. 
-
-    4. In `./integration-tests/config` directory assign the `name` value from the above request to the `projectName` property in `<STAGE>.yaml` file.
-
-    5. In `./integration-tests/config` directory assign the `costCenterId` value from the above request to the `costCenterId` property in `<STAGE>.yaml` file.
-
-5. For `terminatedEnvId` we need the id of an environment that has been terminated, Postman collection request `List Environments` does not show terminated environments ,so we need to save the id of a stopped environment before we terminate it.
-
-    1. Create an environment by opening Postman Collection and select `Launch Environment` inside `environments` folder
-    
-    2. Click on the Body section of the request and fill the next values 
-        ```
-        {
-            "description": "test 123",
-            "name": "testEnv1",
-            "envTypeId": "<environment type id>",
-            "envTypeConfigId": "<environment type config id>",
-            "projectId": "<project id>",
-            "datasetIds": [],
-            "envType": "<environemnt type>"
-        }
-        ```
-        We can use the values from previous steps to fill the create request body
-
-    3. Execute `Launch Environment` request and copy the id property from the response
-        ```
-        {
-            "id": "########-####-####-####-############",
-            "instanceId": "",
-            "cidr": "",
-            "description": "description",
-            "name": "environment Name",
-            "outputs": [],
-            ......
-        ```
-
-    4. In `./integration-tests/config` directory assign value copied to `terminatedEnvId` property in `<STAGE>.yaml` file. 
-
-    5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and execute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and execute `List Environments` request again.
-
-    6. Once environment is completed select `Stop Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id/stop` with the id of the environment created in previous step.
-
-    7. Execute `Stop Environment` and wait until environment has status `STOPPED`, use `List Environments` request to monitor status.
-
-    8. Once environemnt is stopped select `Terminate Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id` with the id of the environment created in previous step.
-
-    9. Execute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
-   
-
-5. For `rootUsername`, type the email of the root user that is going to login into the application to run the integration tests, this is configured in `<STAGE>.yaml` file in `./src/config` directory for the installation step
-
-6. For `rootPasswordParamsStorePath`, go to the AWS console for your Main account, and [create a parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) to store the root user password. 
-The name of the parameter should be  `/swb/<STAGE>/rootUser/password`
-Temporary root password is created and sent to root user after running the [post deployment step](./SETUP_v2p1.md###deploy-the-code) of installation and is updated the first time the root user login.
-
-7. In this root directory run `STAGE=<STAGE> rushx integration-tests`
+### Implement Integreation tests
 
 To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
 
-Example code for creating new environment
+Example code for creating new user
+
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.getDefaultAdminSession();
+const { data } = await adminSession.resources.users.create({
+      firstName: 'Test',
+      lastName: 'User',
+      email: `test@test.test`
+    });
+```
+
+Example code for GET one user
 
 ```ts
 const setup: Setup = new Setup();
 const adminSession = await setup.createAdminSession();
-const { data: response } = await adminSession.resources.environments.create();
+const userId = 'userId';
+const { data: user } = await adminSession.resources.users.user(userId).get();
 ```
 
-Example code for GET one environment
+Example code for GETTING all users
 
 ```ts
 const setup: Setup = new Setup();
 const adminSession = await setup.createAdminSession();
-const envId='abc';
-const { data: response } = await adminSession.resources.environments.environment(envId).get();
+const { data: response } = await adminSession.resources.users.get();
 ```
-
-Example code for GETTING all environment with status "COMPLETED"
-
-```ts
-const setup: Setup = new Setup();
-const adminSession = await setup.createAdminSession();
-const { data: response } = await adminSession.resources.environments.get({status: 'COMPLETED'});
-```
-
-## Update static auth permissions
-
-Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
 ## Reset User Password
 1. Go to the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home) in your main account. If prompted, enter your AWS credentials.
@@ -853,7 +708,7 @@ Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermission
 1. If the user already has a non temporary password follow instructions [here](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-hosted-ui-user-forgot-password.html) to reset password.
 
 ## Obtain Access Token for making authenticated API requests
-1. If you are tying to get a token from a user that still has its temporary password assigned please follow instructions [here](README.md#Reset-User-Password) to reset user password.
+1. If you are tying to get a token from a user that still has its temporary password assigned please follow instructions [here](#reset-user-password) to reset user password.
 1. Go to `swb-reference/scripts` folder
 1. Pull down all required dependencies by running `rushx build`
 1. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
