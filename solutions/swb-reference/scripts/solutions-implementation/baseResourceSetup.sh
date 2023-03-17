@@ -122,12 +122,12 @@ sleep 2
 export envTypeConfigId=$(echo $envTypeConfig | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "\"" -f 1)
 
 echo "
--------------------------------------------------------------------------\"
-\"Summary:\"
-\"-------------------------------------------------------------------------\"
-\"Stage Name                          : dev\"
-\"Account Id                          : $accountId\"
-\"Project Id                          : $projectId\"
-\"Env Type ID                         : $envTypeId\"
-\"Env Type Config Id                  : $envTypeConfigId\"
+-------------------------------------------------------------------------
+Summary:
+-------------------------------------------------------------------------
+Stage Name                          : dev
+Account Id                          : $accountId
+Project Id                          : $projectId
+Env Type ID                         : $envTypeId
+Env Type Config Id                  : $envTypeConfigId
 "
