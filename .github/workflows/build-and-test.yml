@@ -25,5 +25,5 @@ jobs:
       - name: Generate Codecov for @aws/workbench-core-accounts
         uses: codecov/codecov-action@v3
         with:
-          files: workbench-core/accounts/temp/coverage
+          directory: workbench-core/accounts/temp/coverage
           flags: workbench-core-accounts
