@@ -321,7 +321,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}*'
               - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*presigned-url-sagemaker-notebook-role'
           - Effect: Allow
             Action:
@@ -332,7 +332,7 @@ Resources:
               - iam:DeletePolicy
               - iam:DeletePolicyVersion
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}*'
           - Effect: Allow
             Action:
               - iam:GetGroup
@@ -403,7 +403,7 @@ Resources:
               - iam:UpdateRoleDescription
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
-            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
+            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint*'
           - Effect: Allow
             Action:
               - iam:GetRole

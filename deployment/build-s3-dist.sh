@@ -276,7 +276,6 @@ echo "--------------------------------------------------------------------------
 STAGE=dev
 echo Stage set to $STAGE
 
-# Create sample dev.yaml file with a random user pool domain
 # Remove dev.yaml if it exists, we'll start with a known config that works
 do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
 
@@ -288,7 +287,7 @@ stage: dev
 awsRegion: ''           # Keep this empty so that template picks it up automatically at deploy time
 awsRegionShortName: test
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
-cognitoDomain: 'dev-domain-$cognitoDomainRandomString'  # This is a sample cognito domain prefix and user will be given a change to update before running post deployment
+cognitoDomain: ''  # This is purposely kept empty. User will be given a change to update before running post deployment
 vpcId: ''
 albSubnetIds: []
 ecsSubnetIds: []
