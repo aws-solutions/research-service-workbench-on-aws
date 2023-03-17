@@ -149,8 +149,10 @@ In **SWBv2 Official** Postman Collection under **hosting account** folder choose
 Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
-In the body tab set `envMgmtRoleArn` parameter to the `CFN_OUTPUT.EnvMgmtRoleArn` value from [Deploy to the Hosting Account step](SETUP_v2p1.md#deploy-to-the-hosting-account).
-In the body tab set `hostingAccountHandlerRoleArn` parameter to the `CFN_OUTPUT.HostingAccountHandlerRoleArn` value from [Deploy to the Hosting Account step](SETUP_v2p1.md#deploy-to-the-hosting-account).
+In the body tab set `envMgmtRoleArn` parameter to the `CFN_OUTPUT.EnvMgmtRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
+
+In the body tab set `hostingAccountHandlerRoleArn` parameter to the `CFN_OUTPUT.HostingAccountHandlerRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
+
 
 Send a **Create Hosting Account** request 
 
@@ -178,13 +180,14 @@ Once the request excecute successfully a response with the following format will
     "createdAt": "2023-03-07T22:31:40.783Z"
 }
 ```
-
 Take note of the `id` that was returned. We'll need it for the next step. We'll refer to this value as `ACCOUNT_ID`.
 
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status is listed as `CURRENT`.
 
 To monitor the account status, in **SWBv2 Official** Postman Collection under **hosting account** folder choose **Get Hosting Account** API.
+
 In the params tab set accountId parameter to the `ACCOUNT_ID` value from previous step and send request.
+
 A response with the status property will be displayed 
 ```json
 {
@@ -199,7 +202,8 @@ You can also find cloudwatch logs for the account handler in the `Main account`.
 
 ### Setup Cost Center
 In **SWBv2 Official** Postman Collection under **costCenters** folder choose **Create Cost Center** API. 
-In the body tab set `accountId` parameter to the `ACCOUNT_ID` value from [Onboard hosting account step](SETUP_v2p1.md#onboard-hosting-account).
+
+In the body tab set `accountId` parameter to the `ACCOUNT_ID` value from [Onboard hosting account step](#onboard-hosting-account).
 
 Send a **Create Hosting Account** request 
 
@@ -215,7 +219,8 @@ Take note of the `id` from the **Create Cost Center** response. We'll need it fo
 
 ### Setup Project
 In **SWBv2 Official** Postman Collection under **projects** folder choose **Create project** API. 
-In the body tab set `costCenterId` parameter to the `COST_CENTER_ID` value from [Retrieve Environment Type Id step](SETUP_v2p1.md#retrieve-environment-type-id).
+
+In the body tab set `costCenterId` parameter to the `COST_CENTER_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
 Send a **Create project** request 
 
@@ -231,8 +236,9 @@ In the response take note of the `id` that was returned. We'll refer to this val
 
 ## Setup EnvironmentTypeConfig
 ### Retrieve Environment Type Id
-In **SWBv2 Official** Postman Collection under **envType** folder choose **List envTypes** API and send request. 
+In **SWBv2 Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
 If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
+
 Once the account handler finishes, running the **List envTypes** request in postman should return a json with the following format
 ```json
 {
@@ -308,12 +314,12 @@ Once the account handler finishes, running the **List envTypes** request in post
         }
 }
 ```
-
 In the response take note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
 In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environemnt type.
-In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](SETUP_v2p1.md#retrieve-environment-type-id).
+
+In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
 Send an **Update envType** request
 
@@ -326,7 +332,8 @@ PATCH `{{API_URL}}/environmentTypes/:id`
 
 ### Create Environment Type Config
 In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **Create envTypeConfig** API.
-In the params tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](SETUP_v2p1.md#retrieve-environment-type-id).
+
+In the params tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
 Send a **Create envTypeConfig** request
 
@@ -358,7 +365,21 @@ POST `{{API_URL}}/environmentTypes/:envTypeId/configurations`
 }
 ```
 In the response take note of the `id` that was returned. We'll refer to this value as `ENV_TYPE_CONFIG_ID`.
+
 If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
+
+### Associate Project to Environment Type Configuration
+In **SWBv2 Official** Postman Collection under **project** folder choose **Associate project with EnvTypeConfig** API.
+
+In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
+
+In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
+
+In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from [Create Environment Type Config step](#create-environment-type-config).
+
+Send **Associate project with EnvTypeConfig** request.
+
+PUT `{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships`
 
 
 ## Create new DataSet
@@ -381,15 +402,18 @@ Once registered a DataSet using this API, you could also upload files to its buc
 
 ## Launch Sagemaker Notebook Instance
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
-In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](SETUP_v2p1.md#setup-project).
-In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](SETUP_v2p1.md#retrieve-environment-type-id).
-In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from [Create Environment Type Config step](SETUP_v2p1.md#create-environment-type-config).
 
-Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assigning Projects to Users]() , [Assigning Projects to Environment type configurations]().
+In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
+
+In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
+
+In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from [Create Environment Type Config step](#create-environment-type-config).
+
+Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user) , [Associate Project to Environment Type Configuration](#associate-project-to-environment-type-configuration).
 
 Send **Launch Environment** request.
 
-POST `{{API_URL}}/environments`
+POST `{{API_URL}}/projects/:projectId/environments`
 
 ```json
 {
@@ -402,66 +426,77 @@ POST `{{API_URL}}/environments`
     "envType": "sagemakerNotebook"
 }
 ```
-
 In the response take note of the `id` and `projectId` that were returned. We'll refer to the `id` value as `ENV_ID` and the `projectId` value as `ENV_PROJECT_ID`.
 
 ## Check Environment Status
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Environment** API.
-In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
-In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
 
-Note: The user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assigning Projects to Users]() , [Assigning Projects to Environment type configurations]().
+In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+Note: The user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
 
 Send **Get Environment** request.
 
-GET `{{API_URL}}/environments/:id`
+GET `{{API_URL}}/projects/:projectId/environments/:id`
 
 In the response you'll see the status of the environment.
 `PENDING` means the environment is being provisioned. `COMPLETED` means the environment is ready to be used.
 
 ## Connect to Environment
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Connection** API.
-In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
-In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
 
-Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assigning Projects to Users]() , [Assigning Projects to Environment type configurations]().
+In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+Note: Only Researchers and Project Admins can access this API, the user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
 
 Send **Get Connection** request.
 
-GET `{{API_URL}}/environments/:id/connections`
-In the response you'll find a `url`. Copy and paste that `url`
-into the browser to view your Sagemaker Notebook instance.
+GET `{{API_URL}}/projects/:projectId/environments/:id/connections`
+
+In the response you'll find a `url`. Copy and paste that `url` into the browser to view your Sagemaker Notebook instance.
 
 ## Stop an Environment
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Stop Environment** API.
-In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
-In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
 
-Note: The user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assigning Projects to Users]() , [Assigning Projects to Environment type configurations]().
+In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+Note: The user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
 
 Send **Stop Environment** request.
 
-PUT `{{API_URL}}/environments/:id/stop`
+PUT `{{API_URL}}/projects/:projectId/environments/:id/stop`
 
 ## Start an Environment
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Start Environment** API.
-In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
-In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
 
-Note: The user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assigning Projects to Users]() , [Assigning Projects to Environment type configurations]().
+In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+Note: The user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
 
 Send **Start Environment** request.
 
-PUT `{{API_URL}}/environments/:id/start`
+PUT `{{API_URL}}/projects/:projectId/environments/:id/start`
 
 ## Terminate the Environment
 In **SWBv2 Official** Postman Collection under **environments** folder choose **Terminate Environment** API.
-In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
-In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](SETUP_v2p1.md#launch-sagemaker-notebook-instance).
+
+In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+In the params tab set `projectId` parameter to the `ENV_PROJECT_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
+
+Note: The user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
 
 Send **Terminate Environment** request.
 
-DELETE `{{API_URL}}/environments/:id`
+PUT `{{API_URL}}/projects/:projectId/environments/:id/terminate`
 
 # User Management
 In order to create new Admins:
@@ -469,3 +504,40 @@ In order to create new Admins:
 1. Under **User pools**, look for and click on `swb-userpool-<stage>-<abbreviation>`.
 1. Under the **Users tab**, choose **Create user**.
 1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the Admin group.
+
+## Create Users
+In **SWBv2 Official** Postman Collection under **users** folder choose **Create User** API.
+
+Send **Create User** request.
+
+POST `{{API_URL}}/users`
+
+```json
+{
+    "firstName": "<first name>",
+    "lastName": "<last name>",
+    "email": "<email address>"
+}
+```
+In the response take note of the `id` that was returned. We'll refer to this value as `USER_ID`.
+
+## Assign Project to User
+Note: By default `ITAdmin` users have access permissions to all projects, only `Researchers` and `ProjectAdmin` require project association.
+
+In **SWBv2 Official** Postman Collection under **projects** folder choose **Add User To Project** API.
+
+In the params tab set `userId` parameter to the `USER_ID` value from [Create User step](#create-user).
+
+In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
+
+In the body tab set `role` parameter to the role the user is going to be assigned for the provided project(`ProjectAdmin`/`Researcher`).
+
+Send **Add User To Project** request.
+
+POST `{{API_URL}}/projects/:projectId/users/:userId/relationships`
+
+```json
+{
+    "roles": ["Researcher"]
+}
+```
