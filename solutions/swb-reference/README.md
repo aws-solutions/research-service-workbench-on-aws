@@ -677,9 +677,9 @@ Example code for creating new user
 const setup: Setup = new Setup();
 const adminSession = await setup.getDefaultAdminSession();
 const { data } = await adminSession.resources.users.create({
-      firstName: 'Test',
-      lastName: 'User',
-      email: `test@test.test`
+      firstName: '<first name>',
+      lastName: '<Last name>',
+      email: `<email address>`
     });
 ```
 
