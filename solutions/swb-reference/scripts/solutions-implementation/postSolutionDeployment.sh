@@ -1,4 +1,4 @@
-read -p "Please enter your email address:" EMAIL
+read -p "Please enter your email address: " EMAIL
 export regionShortName=test
 export region=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
 export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
@@ -30,3 +30,4 @@ npm install -g @microsoft/rush
 rush update
 cd solutions/swb-reference
 STAGE=dev rushx run-postDeployment
+STAGE=dev rushx run-postDeployment  # Need to run this twice currently

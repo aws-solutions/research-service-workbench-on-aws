@@ -18,18 +18,21 @@ describe('CognitoSetup', () => {
     ROOT_USER_EMAIL: 'user@example.com',
     USER_POOL_NAME: 'swb-userpool-test-va'
   };
+  const poolNameParts = constants.USER_POOL_NAME.split('-');
+  const stackName = `${poolNameParts[0]}-${poolNameParts[2]}-${poolNameParts[3]}`;
+  const userPoolId = 'us-east-1_random';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
         {
-          StackName: 'swb-test-va',
+          StackName: stackName,
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
             {
               OutputKey: 'cognitoUserPoolId',
-              OutputValue: 'sample-user-pool-id'
+              OutputValue: userPoolId
             }
           ]
         }
@@ -96,17 +99,10 @@ describe('CognitoSetup', () => {
 
     test('run: getUserPoolId returns user pool ID', async () => {
       const cognitoSetup = new CognitoSetup(constants);
-      const cognitoMock = mockClient(CognitoIdentityProviderClient);
-      mockCognito(cognitoMock);
       jest.spyOn(cognitoSetup, 'getUserPoolId');
-      const describeStackParam = {
-        StackName: 'swb-test-va'
-      };
-      expect(cfMock.on(DescribeStacksCommand)).toBeCalledWith(describeStackParam);
 
       const returnVal = await cognitoSetup.getUserPoolId();
-      expect(returnVal).toEqual('swb-test-va');
-      expect(cognitoSetup.getUserPoolId).toBeCalledTimes(1);
+      expect(returnVal).toEqual(userPoolId);
     });
   });
 });
