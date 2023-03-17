@@ -57,20 +57,54 @@ interface SecretConstants {
   DYNAMIC_AUTH_TABLE_NAME: string;
 }
 
+const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
+const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
+const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
+const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
+
+const regionShortNamesMap: { [id: string]: string } = {
+  'us-east-2': 'oh',
+  'us-east-1': 'va',
+  'us-west-1': 'ca',
+  'us-west-2': 'or',
+  'ap-east-1': 'hk',
+  'ap-south-1': 'mum',
+  'ap-northeast-3': 'osa',
+  'ap-northeast-2': 'sel',
+  'ap-southeast-1': 'sg',
+  'ap-southeast-2': 'syd',
+  'ap-northeast-1': 'ty',
+  'ca-central-1': 'ca',
+  'cn-north-1': 'cn',
+  'cn-northwest-1': 'nx',
+  'eu-central-1': 'fr',
+  'eu-west-1': 'irl',
+  'eu-west-2': 'ldn',
+  'eu-west-3': 'par',
+  'eu-north-1': 'sth',
+  'me-south-1': 'bhr',
+  'sa-east-1': 'sao',
+  'us-gov-east-1': 'gce',
+  'us-gov-west-1': 'gcw'
+};
+
 //CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
-function getConstants(): Constants {
+function getConstants(region?: string): Constants {
   const config = getConfig();
 
-  const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
-  const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
-  const AWS_REGION = config.awsRegion;
-  const AWS_REGION_SHORT_NAME = config.awsRegionShortName;
+  const IS_SOLUTIONS_BUILD = isSolutionsBuild();
+  const AWS_REGION = IS_SOLUTIONS_BUILD ? region! : config.awsRegion;
+  // eslint-disable-next-line security/detect-object-injection
+  const AWS_REGION_SHORT_NAME = config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this can fill it in
+
+  const STACK_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const SC_PORTFOLIO_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
+  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
-  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URLS = allowedOrigins;
   const USER_POOL_ID = config.userPoolId || '';
@@ -123,7 +157,7 @@ function getConstants(): Constants {
     USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
-    AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
+    AWS_REGION_SHORT_NAME,
     ACCT_HANDLER_ARN_OUTPUT_KEY,
     API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
@@ -149,6 +183,14 @@ function getConstants(): Constants {
     ALB_INTERNET_FACING,
     FIELDS_TO_MASK_WHEN_AUDITING
   };
+}
+
+function getSolutionId(): string {
+  return 'SO0231';
+}
+
+function isSolutionsBuild(): boolean {
+  return process.env.SOLUTION_ID === getSolutionId();
 }
 
 async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
@@ -208,11 +250,6 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
   return response.Parameter!.Value!;
 }
 
-const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
-const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
-const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
-const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
-
 const dataSetPrefix: string = 'DATASET';
 const endPointPrefix: string = 'ENDPOINT';
 const authorizationGroupPrefix: string = 'GROUP';
@@ -234,6 +271,7 @@ const enum SwbAuthZSubject {
 }
 
 export {
+  isSolutionsBuild,
   getConstants,
   getConstantsWithSecrets,
   dataSetPrefix,

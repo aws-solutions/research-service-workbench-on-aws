@@ -17,7 +17,7 @@ This release includes:
 
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-95.81%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.77%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-95.42%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.37%25-brightgreen.svg?style=flat) |
 
 
 
@@ -53,6 +53,8 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Uncomment `albInternetFacing` and set it's value true if you want an internet-facing AWB instance, otherwize set to false.
 1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone.
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
+
+Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
 
 ### Setup CDK
 We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onboard CDK onto your AWS `Main Account`.
