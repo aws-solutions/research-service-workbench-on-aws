@@ -61,7 +61,7 @@ jobs:
       - name: Generate Codecov for workbench-core-authentication
         uses: codecov/codecov-action@v3
         with:
-          files: workbench-core/audit/temp/coverage/coverage-final.json
+          files: workbench-core/authentication/temp/coverage/coverage-final.json
           flags: workbench-core-authentication
 
       - name: Generate Codecov for workbench-core-authorization
