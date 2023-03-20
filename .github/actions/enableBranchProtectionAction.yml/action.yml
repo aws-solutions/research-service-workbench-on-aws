@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: |
         require_status_check_json="$(cat <<EOF
-        { "strict": true, "contexts": ['Only create PR against develop/release branch, not main branch', 'Only create PR against develop/release branch, not stage branch', 'Scan for secrets', 'Run cfn-nag scan', 'Validate PR title', 'build-and-test', 'license-checker'] }
+        { "strict": true, "contexts": ['Only create PR against develop/release branch, not main branch', 'Only create PR against develop/release branch, not stage branch', 'Scan for secrets', 'Run cfn-nag scan', 'Validate PR title', 'build-and-test', 'license-checker', 'pnpm-audit', 'run-rush-change-verify', 'check-license-header', 'Viperlight scan'] }
         EOF
         )"
         echo "::set-output name=require_status_check::${require_status_check_json}"
