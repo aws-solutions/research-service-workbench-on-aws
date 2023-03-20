@@ -45,7 +45,6 @@ runs:
 
     - name: Enable branch protection on ${{ github.ref_name }}
       uses: octokit/request-action@v2.x
-      shell: bash
       with:
         route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
         owner: aws-solutions
