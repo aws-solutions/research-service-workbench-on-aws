@@ -16,11 +16,9 @@ jobs:
           fetch-depth: 0
       - name: create release branch
         if: steps.check_admin.outputs.require-result
-        id: release
         run: |
           echo "Create UUID"
           uuid=`uuidgen`
           echo 'Creating release branch'
           git checkout -b release/$uuid
           git push origin release/$uuid
-          echo "::set-output name=branch-name::${release/$uuid}"
