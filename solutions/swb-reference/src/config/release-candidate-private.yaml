@@ -2,7 +2,7 @@ stage: release-candidate-private # Stage Name
 awsRegion: us-west-1
 awsRegionShortName: ca #two or three letter abbreviation for the region. You can choose your own abbreviation
 rootUserEmailParamStorePath: '/swb/release-candidate-private/rootUser/email' # Log into your AWS account and store root user email in SSM Param store
-allowedOrigins: ['http://localhost:3000', 'swb-release-candidate-byon.ma-foundations.wwps.aws.dev'] # SWB API will allow this domains to make requests.
+allowedOrigins: ['http://localhost:3000'] # SWB API will allow this domains to make requests.
 cognitoDomain: 'swb-release-candidate-private' # Must be globally unique
 
 albInternetFacing: true
