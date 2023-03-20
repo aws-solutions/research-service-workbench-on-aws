@@ -11,7 +11,7 @@ on:
 # PR from being merged into main.
 jobs:
   main-protection:
-    name: Only create PR against develop branch, not main branch
+    name: Only create PR against develop/release branch, not main branch
     runs-on: ubuntu-20.04
     steps:
       - name: Get branch name

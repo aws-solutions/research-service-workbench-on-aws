@@ -1,16 +1,10 @@
-#
-#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#  SPDX-License-Identifier: Apache-2.0
-#
-
-# This workflow enables branch protection when a branch name containing 'feat/' is created
-name: "enable feat protection"
+name: "enable release protection"
 on:
   create
 
 jobs:
-  enable-feat-branch-protection:
-    if: startsWith(github.ref_name, 'feat/')
+  enable-release-branch-protection:
+    if: startsWith(github.ref_name, 'release/')
     runs-on: ubuntu-20.04
     steps:
       - name: 'Construct required_pull_request_reviews object'
@@ -40,7 +34,7 @@ jobs:
           )"
           echo "::set-output name=restrictions::${restrictions_json}"
 
-      - name: Enable branch protection on feat/*
+      - name: Enable branch protection on release/*
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
