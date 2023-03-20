@@ -38,6 +38,7 @@ jobs:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
     with:
+      stage: testEnv
       environment: dev
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
@@ -53,7 +54,8 @@ jobs:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
     with:
-      environment: dev    
+      stage: swbv2-private
+      environment: dev
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION_BYON }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}

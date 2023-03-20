@@ -10,6 +10,9 @@ on:
       environment:
         required: true
         type: string
+      stage:
+        required: true
+        type: string
     secrets:
       aws-dev-region:
         required: true
@@ -77,20 +80,20 @@ jobs:
           clientSecret: ${{ secrets.CLIENT_SECRET }}
           albSubnetIds: [${{ secrets.ALB_SUBNET_1 }}, ${{ secrets.ALB_SUBNET_2 }}]
           ecsSubnetIds: [${{ secrets.ECS_SUBNET_1 }}, ${{ secrets.ECS_SUBNET_2 }}]
-          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "solutions/swb-reference/src/config/swbv2-private.yaml"
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "solutions/swb-reference/src/config/${{inputs.stage}}.yaml"
 
       - name: Deploy SWB-Reference
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
-          STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
-          STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js cdk-deploy
-          STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js run-postDeployment
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
       - name: Run Integration tests
         run: |
           cd solutions/swb-reference
-          STAGE='swbv2-private' node ../../common/scripts/install-run-rushx.js integration-tests
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js integration-tests
 
       - name: Slack Failure Notification
         if: failure()
