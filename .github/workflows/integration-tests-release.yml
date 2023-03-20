@@ -30,7 +30,7 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
   deploy-swb-reference:
     needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: ./.github/workflows/deploy-integration-swb-reference.yml
     with:
       environment: release-swb
       stage: release-candidate
@@ -45,7 +45,7 @@ jobs:
       DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_RELEASE }}
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
+    uses: ./.github/workflows/deploy-integration-swb-reference-byon.yml
     with:
       environment: release-swb-byon
       stage: release-candidate-private
