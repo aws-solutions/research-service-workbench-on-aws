@@ -12,7 +12,6 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           token: ${{ secrets.MERGE_TOKEN }}
-          fetch-depth: 0
 
       - name: enable-release-branch-protection
         uses: ./.github/actions/enableBranchProtectionAction
