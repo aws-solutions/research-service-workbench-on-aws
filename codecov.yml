@@ -1,8 +1,6 @@
 coverage:
   status:
     project:
-      default:
-        target: 90%
       root:
         target: 90% #overall project/ repo coverage
         flags:
@@ -134,6 +132,6 @@ comment:
   require_changes: false  # if true: only post the comment if coverage changes
   require_base: false        # [yes :: must have a base report to post]
   require_head: true       # [yes :: must have a head report to post]
-  show_carryforward_flags: true 
+  show_carryforward_flags: true
   show_critical_paths: true #new option to labeled critical files
   hide_comment_details: true #collapse all the "detailed info" for the PR comment
