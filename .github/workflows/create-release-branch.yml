@@ -16,9 +16,22 @@ jobs:
           fetch-depth: 0
       - name: create release branch
         if: steps.check_admin.outputs.require-result
+        id: release
         run: |
           echo "Create UUID"
           uuid=`uuidgen`
           echo 'Creating release branch'
           git checkout -b release/$uuid
           git push origin release/$uuid
+          echo "::set-output name=branch-name::${release/$uuid}"
+
+      - name: Enable branch protection on ${{ steps.release.outputs.branch-name }}
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          branch:  ${{ steps.release.outputs.branch-name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
