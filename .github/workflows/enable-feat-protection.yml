@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.ref_name }}
           token: ${{ secrets.MERGE_TOKEN }}
 
       - name: enable-feat-branch-protection
