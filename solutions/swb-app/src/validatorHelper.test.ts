@@ -5,7 +5,7 @@
 
 import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { z } from 'zod';
-import { getPaginationParser } from './validatorHelper';
+import { getPaginationParser, validateAndParse } from './validatorHelper';
 
 describe('getPaginationProperties', () => {
   let requestObject: Record<string, JSONValue>;
@@ -108,5 +108,27 @@ describe('getPaginationProperties', () => {
         }
       });
     });
+  });
+});
+describe('validateAndParse', () => {
+  const testParser = z
+    .object({
+      prop1: z.string(),
+      prop2: z.number()
+    })
+    .strict();
+  type TestType = z.infer<typeof testParser>;
+  describe('is valid', () => {
+    const objectToParse = { prop1: 'prop1', prop2: 3 };
+    const expectedParse = { prop1: 'prop1', prop2: 3 };
+    expect(validateAndParse<TestType>(testParser, objectToParse)).toEqual(expectedParse);
+  });
+  describe('is not valid', () => {
+    const objectToParse = { prop1: 2 };
+    try {
+      validateAndParse<TestType>(testParser, objectToParse);
+    } catch (e) {
+      expect(e.message).toEqual('prop1: Expected string, received number. prop2: Required');
+    }
   });
 });
