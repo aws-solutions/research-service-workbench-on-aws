@@ -42,7 +42,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
@@ -1248,7 +1248,7 @@ export class SWBStack extends Stack {
 
   // API Gateway
   private _createRestApi(apiLambda: Function): string {
-    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
+    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs', { retention: RetentionDays.TEN_YEARS });
     const metadatanode = logGroup.node.defaultChild as CfnResource;
     metadatanode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
