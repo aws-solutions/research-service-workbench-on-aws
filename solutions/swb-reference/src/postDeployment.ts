@@ -30,9 +30,7 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    DYNAMIC_AUTH_TABLE_NAME,
-    STAGE,
-    AWS_REGION_SHORT_NAME
+    DYNAMIC_AUTH_TABLE_NAME
   } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -46,8 +44,7 @@ async function run(): Promise<void> {
     AWS_REGION,
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    STAGE,
-    AWS_REGION_SHORT_NAME
+    STACK_NAME
   });
 
   const dynamicAuthAwsService = new AwsService({

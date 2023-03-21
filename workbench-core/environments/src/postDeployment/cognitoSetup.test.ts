@@ -17,8 +17,7 @@ describe('CognitoSetup', () => {
     AWS_REGION: 'us-east-1',
     ROOT_USER_EMAIL: 'user@example.com',
     USER_POOL_NAME: 'swb-userpool-test-va',
-    STAGE: 'test',
-    AWS_REGION_SHORT_NAME: 'va'
+    STACK_NAME: 'swb-test-va'
   };
   const poolNameParts = constants.USER_POOL_NAME.split('-');
   const stackName = `${poolNameParts[0]}-${poolNameParts[2]}-${poolNameParts[3]}`;
