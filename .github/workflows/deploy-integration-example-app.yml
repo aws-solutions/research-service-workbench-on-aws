@@ -16,12 +16,15 @@ on:
       role-to-assume:
         required: true
       aws-account-region:
+<<<<<<< HEAD
         required: true
       aws-test-hosting-account-id:
         required: true
       aws-test-hosting-account-region:
         required: true
       external_id:
+=======
+>>>>>>> 56ced419 (feat: integration tests for release branches (#958))
         required: true
       slack_webhook_url:
         required: true
