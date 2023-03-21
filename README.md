@@ -2,7 +2,7 @@
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # Workflow Status
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 [![Build Status](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-stage](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
 [![Publish-and-merge-to-develop](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)

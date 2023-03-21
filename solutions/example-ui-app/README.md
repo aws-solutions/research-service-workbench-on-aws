@@ -1,8 +1,11 @@
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # MA Foundation Starter App - POC
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 This is a prototype app and you should expect to modify the source code to reflect your project needs.
 

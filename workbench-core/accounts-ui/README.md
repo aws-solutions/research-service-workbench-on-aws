@@ -1,3 +1,6 @@
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-accounts-ui)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
+# Workbench Core Environments Accounts-UI
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=workbench-core-accounts-ui)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
-# # Workbench Core Environments Accounts-UI
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-accounts-ui)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)

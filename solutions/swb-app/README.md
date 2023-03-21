@@ -1,7 +1,10 @@
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=swb-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # swb-app
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=swb-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=swb-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 This project is the routing package for `swb-reference`. It is used by `swb-reference` to generate routes for SWB API. Please refer  [here](../swb-reference/README.md) for more information on how to use this project.

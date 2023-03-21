@@ -1,8 +1,11 @@
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # Workbench Core Base
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 > This package is intended to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires. We use `aws-sdk` V3 to improve the load-time of the modules imported at runtime.
 
