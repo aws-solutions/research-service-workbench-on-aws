@@ -6,23 +6,8 @@ on:
       - 'release/*'
 
 jobs:
-  readme-commit:
-    uses: ./.github/workflows/readme-commit.yml
-    with:
-      branch: ${{ github.ref_name }}
-    secrets:
-      gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-      passphrase: ${{ secrets.PASSPHRASE }}
-      merge-token: ${{ secrets.MERGE_TOKEN }}
-      bot-user: ${{ secrets.BOT_USER }}
-      bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
   merge-release-to-develop:
-    needs: [readme-commit]
     runs-on: ubuntu-20.04
-    env:
-      COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
-      CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
@@ -67,15 +52,7 @@ jobs:
 
       - name: Merge to develop
         run: |
-          echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no readme commit was made"
-          echo "Else"
-          echo "Set the COMMIT_ID to README commit id"
-          COMMIT_ID=''
-          if $CHANGES_DETECTED; then
-            COMMIT_ID=$COMMIT_HASH
-          else
-            COMMIT_ID=$GITHUB_SHA
-          fi
+          COMMIT_ID=$GITHUB_SHA
           git checkout develop
           echo
           echo "  Attempting to merge the '${{ github.ref_name }}' branch ($COMMIT_ID)"
