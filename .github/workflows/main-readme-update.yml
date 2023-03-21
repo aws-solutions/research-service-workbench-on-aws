@@ -1,0 +1,23 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-develop-to-stage
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  readme-commit:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@main
+    with:
+      branch: main
+    secrets:
+      gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      passphrase: ${{ secrets.PASSPHRASE }}
+      merge-token: ${{ secrets.MERGE_TOKEN }}
+      bot-user: ${{ secrets.BOT_USER }}
+      bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
