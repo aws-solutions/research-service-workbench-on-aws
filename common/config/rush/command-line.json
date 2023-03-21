@@ -181,23 +181,9 @@
       "enableParallelism": true
     },
     {
-      "name": "test:only",
-      "commandKind": "bulk",
-      "summary": "Used to perform tests on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
       "name": "sort-package-json",
       "commandKind": "bulk",
       "summary": "Sort package.json file",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "make-badges",
-      "commandKind": "bulk",
-      "summary": "Used to update README file with code coverage report for the packages",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
@@ -250,22 +236,6 @@
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-combine -d coverage -p summary -r json \"*/**/temp/coverage/coverage-final.json\""
-    },
-    {
-      "name": "common-coverage",
-      "commandKind": "global",
-      "summary": "Updates the common code coverage report in root README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
-    },
-    {
-      "name": "common-coverage-make-badge",
-      "commandKind": "global",
-      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
     },
     {
       "name": "commitlint",
@@ -339,18 +309,6 @@
       "longName": "--ci",
       "description": "Option to run make install in ci jobs",
       "associatedCommands": ["git-secrets-scan"]
-    },
-    {
-      "parameterKind": "flag",
-      "longName": "--ci",
-      "description": "Throws an error if the badges generated do not match what is already in the README.md",
-      "associatedCommands": ["make-badges"]
-    },
-    {
-      "parameterKind": "flag",
-      "longName": "--ci",
-      "description": "Throws an error if the badges generated do not match what is already in the README.md",
-      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**

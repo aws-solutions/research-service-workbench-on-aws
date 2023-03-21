@@ -22,11 +22,9 @@
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
-    "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only",
-    "test:only": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build"
   },
   "dependencies": {
     "@rushstack/eslint-config": "^3.0.0",
