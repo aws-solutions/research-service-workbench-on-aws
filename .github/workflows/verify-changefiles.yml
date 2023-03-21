@@ -17,4 +17,4 @@ jobs:
       - name: rush-change-verify
         run: |
           echo "checking if all changefiles were created"
-          node common/scripts/install-run-rush.js change --verify -b origin/develop
+          node common/scripts/install-run-rush.js change --verify -b origin/${{ github.event.pull_request.base.ref }}
