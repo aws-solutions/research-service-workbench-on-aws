@@ -117,6 +117,7 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       SWB_DOMAIN_NAME_OUTPUT_KEY,
       MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
       VPC_ID_OUTPUT_KEY,
       ALB_SUBNET_IDS,
       ECS_SUBNET_IDS,
@@ -210,7 +211,9 @@ export class SWBStack extends Stack {
     this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
     this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
-
+    const mainAccountALBAccessLogsBucket = this._isSolutionsBuild
+      ? this._createAccessLogsBucket(MAIN_ACCT_ALB_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY)
+      : this._accessLogsBucket;
     const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
       new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
@@ -390,7 +393,7 @@ export class SWBStack extends Stack {
       domainName,
       hostedZoneId,
       ALB_INTERNET_FACING,
-      this._accessLogsBucket
+      mainAccountALBAccessLogsBucket
     );
   }
 
@@ -704,7 +707,8 @@ export class SWBStack extends Stack {
    * @returns S3Bucket
    */
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-access-logs', {
+    const bucketId = this._isSolutionsBuild ? 'solution-build-s3-access-logs' : 's3-access-logs';
+    const s3Bucket = new Bucket(this, bucketId, {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
       versioned: true

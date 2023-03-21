@@ -41,6 +41,7 @@ interface Constants {
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   SWB_DOMAIN_NAME_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
   VPC_ID_OUTPUT_KEY: string;
   ALB_SUBNET_IDS: string[];
   ECS_SUBNET_IDS: string[];
@@ -136,6 +137,7 @@ function getConstants(region?: string): Constants {
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
+  const MAIN_ACCT_ALB_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketSolutionBuildAccessLogsNameOutput';
   const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
   const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
   const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
@@ -173,6 +175,7 @@ function getConstants(region?: string): Constants {
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     SWB_DOMAIN_NAME_OUTPUT_KEY,
     MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
+    MAIN_ACCT_ALB_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
     VPC_ID_OUTPUT_KEY,
     HOSTED_ZONE_ID,
     DOMAIN_NAME,
