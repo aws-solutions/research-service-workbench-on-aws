@@ -78,7 +78,7 @@ jobs:
     needs: [deploy-swb-reference]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     with:
-      environment: dev    
+      environment: dev
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
