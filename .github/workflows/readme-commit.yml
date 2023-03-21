@@ -75,13 +75,13 @@ jobs:
 
         # There's no way for github actions to push to a protected branch. This is a workaround
         # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on release/*
+      - name: Temporarily disable branch protection on  ${{ inputs.branch }}
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
           repo: solution-spark-on-aws
-          branch: release/*
+          branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
@@ -96,14 +96,14 @@ jobs:
           file_pattern: "README.md **/README.md"
           branch: ${{ inputs.branch }}
 
-      - name: Enable branch protection on release/*
+      - name: Enable branch protection on  ${{ inputs.branch }}
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
           repo: solution-spark-on-aws
-          branch: release/*
+          branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
