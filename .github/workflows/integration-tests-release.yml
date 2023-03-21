@@ -3,7 +3,7 @@ name: release integration tests
 on:
   push:
     branches:
-      - 'testRelease/rc1'
+      - 'release/4debe38e-5796-47b6-96ec-881a87e0df21'
 
 
 jobs:
@@ -66,14 +66,3 @@ jobs:
       ECS_SUBNET_1: ${{ secrets.ECS_SUBNET_1_BYON }}
       ECS_SUBNET_2: ${{ secrets.ECS_SUBNET_2_BYON }}
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_BYON }}
-
-  # slack-notification:
-  #   name: Merge develop to stage
-  #   runs-on: ubuntu-20.04
-  #   needs: [deploy-swb-reference, deploy-swb-reference-byon, deploy-example-app]
-  #   steps:
-  #     - name: Slack Failure Notification
-  #       if: failure()
-  #       uses: ./.github/actions/notification
-  #       with:
-  #         slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
