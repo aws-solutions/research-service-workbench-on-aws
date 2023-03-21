@@ -43,7 +43,8 @@ async function run(): Promise<void> {
   const cognitoSetup = new CognitoSetup({
     AWS_REGION,
     ROOT_USER_EMAIL,
-    USER_POOL_NAME
+    USER_POOL_NAME,
+    STACK_NAME
   });
 
   const dynamicAuthAwsService = new AwsService({
