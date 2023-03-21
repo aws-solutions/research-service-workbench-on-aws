@@ -24,7 +24,7 @@ researcher1UserNameParamStorePath: '/swb/release-candidate-private/researcher1/e
 researcher1PasswordParamStorePath: '	/swb/release-candidate-private/researcher1/password'
 
 ## Default Hosting Account
-defaultHostingAccountId: 'acc-b008f21d-351e-4069-96de-07346e0bdedb' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+defaultHostingAccountId: 'acc-de0fd7ce-1737-4f9c-8142-b8f4f0f700f0' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 
 ## Pre-requisite for running aws-accounts integration test
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:
