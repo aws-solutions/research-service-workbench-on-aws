@@ -4,11 +4,11 @@
 
 ## Default Env Config for launching a new environment
 envTypeId: 'et-prod-p6qkyfrcfgnvq,pa-jf2w4a36do3da'
-envTypeConfigId: 'etc-19719fa0-ca16-4da5-ab77-2cb3c44cbe96'
+envTypeConfigId: 'etc-f5eb0560-16ef-4a4d-bc4e-841b89aa756d'
 envType: 'sagemakerNotebook'
 
 ## Negative Testing
-terminatedEnvId: 'env-6d105a20-f934-465d-9562-f475d7c0b5cc' # id of an environment that has already been terminated
+terminatedEnvId: 'env-d4920f56-8b6a-487c-b442-e3d87a53f7f9' # id of an environment that has already been terminated
 
 ## Cognito Integ Test Client
 rootUserNameParamStorePath: '/swb/release-candidate-private/rootUser/email'
