@@ -3,14 +3,14 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Merge-develop-to-stage
+name: Main-readme-update
 on:
   push:
     branches:
       - 'main'
 
 jobs:
-  readme-commit:
+  main-readme-update:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@main
     with:
       branch: main

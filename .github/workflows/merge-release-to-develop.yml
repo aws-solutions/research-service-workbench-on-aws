@@ -1,4 +1,4 @@
-name: merge-release-to-develop
+name: merge-release-to-develop-notification
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'release/*'
 
 jobs:
-  merge-release-to-develop:
+  merge-release-to-develop-notification:
     runs-on: ubuntu-20.04
     steps:
       - name: git checkout
