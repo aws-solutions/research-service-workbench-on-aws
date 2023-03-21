@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/codecov)
 
-# `base`
+# Workbench Core Base
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
