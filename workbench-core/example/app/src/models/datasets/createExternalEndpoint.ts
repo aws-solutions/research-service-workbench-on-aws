@@ -15,7 +15,10 @@ export const CreateExternalEndpointParser = z
     userId: z.string().optional(),
     externalRoleName: z.string().optional(),
     kmsKeyArn: z.string().optional(),
-    vpcId: z.string().optional()
+    vpcId: z.string().optional(),
+    region: z.string().optional(),
+    roleToAssume: z.string().optional(),
+    externalId: z.string().optional()
   })
   .strict();
 

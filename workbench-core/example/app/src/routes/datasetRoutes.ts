@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import {
+  AwsService,
   DEFAULT_API_PAGE_SIZE,
   uuidRegExpAsString,
   uuidWithLowercasePrefixRegExp,
@@ -13,7 +14,6 @@ import {
 import {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleSchema,
-  CreateDataSetSchema,
   createRegisterExternalBucketRole,
   CreateRegisterExternalBucketRoleSchema,
   DataSetService,
@@ -27,7 +27,8 @@ import {
   isNotAuthorizedError,
   isEndpointExistsError,
   isInvalidPermissionError,
-  PermissionsResponse
+  PermissionsResponse,
+  S3DataSetStoragePlugin
 } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -42,14 +43,48 @@ import {
   CreateExternalEndpoint,
   CreateExternalEndpointParser
 } from '../models/datasets/createExternalEndpoint';
+import { CreateImportDataSet, CreateImportDataSetParser } from '../models/datasets/createImportDataSet';
 import {
   CreatePresignedSinglePartFileUploadUrl,
   CreatePresignedSinglePartFileUploadUrlParser
 } from '../models/datasets/createPresignedFileUpload.ts';
+import { aws, dataSetsStoragePlugin } from '../services';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
 const timeToLiveSeconds: number = 60 * 1; // 1 minute
+
+async function getHostingAccountStoragePlugin(
+  roleToAssume: string,
+  externalId: string,
+  region: string
+): Promise<DataSetsStoragePlugin> {
+  try {
+    const { Credentials } = await aws.clients.sts.assumeRole({
+      RoleArn: roleToAssume,
+      RoleSessionName: 'Main-Account-Create-DataSet',
+      ExternalId: externalId
+    });
+
+    if (!Credentials) {
+      throw Boom.badRequest('Invalid roleToAssume param.');
+    }
+
+    const awsService = new AwsService({
+      region,
+      credentials: {
+        accessKeyId: Credentials.AccessKeyId!,
+        secretAccessKey: Credentials.SecretAccessKey!,
+        sessionToken: Credentials.SessionToken,
+        expiration: Credentials.Expiration
+      }
+    });
+
+    return new S3DataSetStoragePlugin(awsService);
+  } catch (e) {
+    throw Boom.badRequest(e.message);
+  }
+}
 
 export function setUpDSRoutes(
   router: Router,
@@ -60,21 +95,20 @@ export function setUpDSRoutes(
   router.post(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateDataSetSchema));
-
+      const validatedRequest = validateAndParse<CreateImportDataSet>(CreateImportDataSetParser, req.body);
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
 
+      const { roleToAssume, externalId, ...createDataSetParams } = validatedRequest;
+
+      const storageProvider =
+        roleToAssume && externalId
+          ? await getHostingAccountStoragePlugin(roleToAssume, externalId, createDataSetParams.region)
+          : dataSetsStoragePlugin;
+
       const dataSet = await dataSetService.provisionDataSet({
-        name: req.body.datasetName,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
-        storageProvider: dataSetStoragePlugin,
-        authenticatedUser,
-        owner: req.body.owner,
-        ownerType: req.body.ownerType,
-        permissions: req.body.permissions
+        ...createDataSetParams,
+        storageProvider,
+        authenticatedUser
       });
       res.status(201).send(dataSet);
     })
@@ -84,21 +118,13 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateDataSetSchema));
-
+      const validatedRequest = validateAndParse<CreateImportDataSet>(CreateImportDataSetParser, req.body);
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
 
       const dataSet = await dataSetService.importDataSet({
-        name: req.body.datasetName,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
+        ...validatedRequest,
         storageProvider: dataSetStoragePlugin,
-        authenticatedUser,
-        owner: req.body.owner,
-        ownerType: req.body.ownerType,
-        permissions: req.body.permissions
+        authenticatedUser
       });
       res.status(201).send(dataSet);
     })
@@ -118,7 +144,8 @@ export function setUpDSRoutes(
           res.locals.user
         );
 
-        const { userId, groupId } = validatedRequest;
+        const { userId, groupId, roleToAssume, externalId, region, ...addExternalEndpointRequest } =
+          validatedRequest;
 
         if (!userId && !groupId) {
           throw Boom.badRequest('Request body must have either "userId" or "groupId" defined.');
@@ -128,11 +155,16 @@ export function setUpDSRoutes(
           throw Boom.badRequest('Request body must not have both "userId" and "groupId" defined.');
         }
 
+        const storageProvider =
+          roleToAssume && externalId && region
+            ? await getHostingAccountStoragePlugin(roleToAssume, externalId, region)
+            : dataSetsStoragePlugin;
+
         if (groupId) {
           const { data } = await dataSetService.addDataSetExternalEndpointForGroup({
-            ...validatedRequest,
+            ...addExternalEndpointRequest,
             dataSetId: req.params.datasetId,
-            storageProvider: dataSetStoragePlugin,
+            storageProvider,
             groupId,
             authenticatedUser
           });
@@ -140,9 +172,9 @@ export function setUpDSRoutes(
         }
 
         const { data } = await dataSetService.addDataSetExternalEndpointForUser({
-          ...validatedRequest,
+          ...addExternalEndpointRequest,
           dataSetId: req.params.datasetId,
-          storageProvider: dataSetStoragePlugin,
+          storageProvider,
           userId: userId!,
           authenticatedUser
         });
@@ -229,11 +261,18 @@ export function setUpDSRoutes(
           res.locals.user
         );
 
+        const { fileName, roleToAssume, externalId, region } = validatedRequest;
+
+        const storageProvider =
+          roleToAssume && externalId && region
+            ? await getHostingAccountStoragePlugin(roleToAssume, externalId, region)
+            : dataSetsStoragePlugin;
+
         const url = await dataSetService.getPresignedSinglePartUploadUrl(
           req.params.datasetId,
-          validatedRequest.fileName,
+          fileName,
           timeToLiveSeconds,
-          dataSetStoragePlugin,
+          storageProvider,
           authenticatedUser
         );
         res.status(200).send({ url });

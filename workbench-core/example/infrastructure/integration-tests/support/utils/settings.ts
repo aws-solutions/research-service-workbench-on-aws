@@ -7,15 +7,14 @@
 import _ from 'lodash';
 
 export interface Setting {
-  hostAwsAccountId: string;
-  hostAwsAccountIdParamStorePath: string;
   runId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
 
   // Main CFN template outputs
   ExampleS3BucketExampleS3BucketDatasetsArnOutput393A6D8B: string;
-  AwsRegion: string;
+  MainAccountId: string;
+  MainAccountRegion: string;
   ExampleCognitoWebUiUserPoolClientId: string;
   ExampleCognitoIntegrationTestUserPoolClientId: string;
   ExampleEncryptionKeyEncryptionKeyOutput172B0370: string;
@@ -31,8 +30,13 @@ export interface Setting {
   ExampleDynamicAuthDDBTableArn: string;
   ExampleDynamicAuthDDBTableName: string;
 
+  // Host CFN template outputs
+  ExampleHostS3DataSetsBucketName: string;
+  ExampleHostDatasetRoleOutput: string;
+  HostingAccountId: string;
+  HostingAccountRegion: string;
+
   // Derived
-  mainAccountId: string;
   rootUserId: string;
 }
 

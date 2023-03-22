@@ -115,6 +115,7 @@ solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.
 # example package
 workbench-core/example/infrastructure/build
 workbench-core/example/infrastructure/src/config/testEnv.json
+workbench-core/example/infrastructure/src/config/hostingEnv.json
 
 #next static export
 solutions/swb-ui/ui/out
