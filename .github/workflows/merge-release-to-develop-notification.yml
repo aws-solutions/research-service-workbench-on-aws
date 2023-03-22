@@ -18,4 +18,4 @@ jobs:
       - name: Merge release to develop
         if: always()
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"A new PR with COMMIT_ID: ${{ github.sha }} has been merged to \"release\" branch. Please create a PR to merge the changes back to \"develop\" branch"}' ${{ inputs.slack_webhook_url }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"A new PR with COMMIT_ID: ${{ github.sha }} has been merged to ${{ github.ref_name }} branch. Please create a PR to merge the changes to \"develop\" branch"}' ${{ secrets.slack_webhook_url }}
