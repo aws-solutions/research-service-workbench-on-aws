@@ -51,3 +51,8 @@ export const ExternalEndpointParser = z.object({
 });
 
 export type ExternalEndpoint = z.infer<typeof ExternalEndpointParser>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const ExternalEndpointArrayParser = z.array(ExternalEndpointParser);
+
+export type CreateExternalEndpoint = Omit<ExternalEndpoint, 'id' | 'createdAt'>;

@@ -26,9 +26,9 @@ import { DataSetExistsError } from './errors/dataSetExistsError';
 import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
-import { CreateDataSetMetadata, DataSetMetadata } from './models/dataSetMetadata';
+import { CreateDataSet, DataSet } from './models/dataSet';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
-import { CreateExternalEndpointMetadata, ExternalEndpointMetadata } from './models/externalEndpointMetadata';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { StorageLocation } from './models/storageLocation';
 
 describe('DdbDataSetMetadataPlugin', () => {
@@ -94,7 +94,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
 
       const response = await plugin.listDataSets(1, undefined);
-      expect(response).toMatchObject<PaginatedResponse<DataSetMetadata>>({
+      expect(response).toMatchObject<PaginatedResponse<DataSet>>({
         data: [
           {
             id: mockDataSetId,
@@ -113,7 +113,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('returns an empty array if there are no DataSets to list', async () => {
       mockDdb.on(QueryCommand).resolves({});
 
-      const response: PaginatedResponse<DataSetMetadata> = await plugin.listDataSets(1, undefined);
+      const response: PaginatedResponse<DataSet> = await plugin.listDataSets(1, undefined);
       expect(response.data).toBeDefined();
       expect(response.data).toHaveLength(0);
       expect(response.data).toStrictEqual([]);
@@ -136,7 +136,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       const response = await plugin.getDataSetMetadata(mockDataSetId);
 
-      expect(response).toMatchObject<DataSetMetadata>({
+      expect(response).toMatchObject<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -179,7 +179,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
 
   describe('addDataSet', () => {
-    let exampleDS: CreateDataSetMetadata;
+    let exampleDS: CreateDataSet;
 
     beforeEach(() => {
       exampleDS = {
@@ -200,7 +200,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
-      expect(newDataSet).toMatchObject<DataSetMetadata>({
+      expect(newDataSet).toMatchObject<DataSet>({
         ...exampleDS,
         id: mockDataSetId,
         createdAt: mockCreatedAt
@@ -229,7 +229,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
 
   describe('updateDataSet', () => {
-    let exampleDS: DataSetMetadata;
+    let exampleDS: DataSet;
 
     beforeEach(() => {
       exampleDS = {
@@ -256,7 +256,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('adds optional external endpoints.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
 
-      const withEndpointDS: DataSetMetadata = {
+      const withEndpointDS: DataSet = {
         ...exampleDS,
         externalEndpoints: ['some-endpoint']
       };
@@ -291,7 +291,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(QueryCommand).resolves({});
 
-      const exampleEndpoint: CreateExternalEndpointMetadata = {
+      const exampleEndpoint: CreateExternalEndpoint = {
         name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -302,9 +302,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         accessLevel: mockAccessLevel
       };
 
-      await expect(
-        plugin.addExternalEndpoint(exampleEndpoint)
-      ).resolves.toMatchObject<ExternalEndpointMetadata>({
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toMatchObject<ExternalEndpoint>({
         id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -351,7 +349,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      const exampleEndpoint: CreateExternalEndpointMetadata = {
+      const exampleEndpoint: CreateExternalEndpoint = {
         name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -401,7 +399,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       await expect(
         plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)
-      ).resolves.toMatchObject<ExternalEndpointMetadata>({
+      ).resolves.toMatchObject<ExternalEndpoint>({
         id: mockEndpointId,
         name: mockEndpointName,
         dataSetId: mockDataSetId,

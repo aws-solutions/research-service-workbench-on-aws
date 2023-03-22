@@ -34,13 +34,8 @@ export {
   AddRemoveAccessPermissionParser
 } from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
-export { DataSet, DataSetParser } from './models/dataSet';
-export {
-  DataSetMetadata,
-  DataSetMetadataParser,
-  DataSetMetadataArrayParser,
-  CreateDataSetMetadata
-} from './models/dataSetMetadata';
+export { DataSet, DataSetParser, DataSetArrayParser, CreateDataSet } from './models/dataSet';
+export { DataSetMetadataParser, ExternalEndpointMetadataParser } from './models/ddbMetadata';
 export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
@@ -54,13 +49,12 @@ export {
 } from './models/addStorageExternalEndpoint';
 export { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 export { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
-export { ExternalEndpoint, ExternalEndpointParser } from './models/externalEndpoint';
 export {
-  ExternalEndpointMetadata,
-  ExternalEndpointMetadataParser,
-  ExternalEndpointMetadataArrayParser,
-  CreateExternalEndpointMetadata
-} from './models/externalEndpointMetadata';
+  ExternalEndpoint,
+  ExternalEndpointParser,
+  ExternalEndpointArrayParser,
+  CreateExternalEndpoint
+} from './models/externalEndpoint';
 export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { StorageLocation } from './models/storageLocation';
 

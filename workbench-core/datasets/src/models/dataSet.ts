@@ -68,3 +68,8 @@ export const DataSetParser = z.object({
 });
 
 export type DataSet = z.infer<typeof DataSetParser>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DataSetArrayParser = z.array(DataSetParser);
+
+export type CreateDataSet = Omit<DataSet, 'id' | 'createdAt'>;
