@@ -19,7 +19,7 @@ This release includes:
 * Improved performance on workspace page with pagination
 
 
-# Setup Instructions for SWBv2p1
+# Setup Instructions for SWBv2
 
 Follow the instructions below to deploy SWBv2 with Sagemaker Notebook lifecycle support. You'll be able to 
 launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
