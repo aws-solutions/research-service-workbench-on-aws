@@ -15,7 +15,7 @@ jobs:
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
     runs-on: ubuntu-20.04
     steps:
-      - name: Delete release/* branch protection after merge to develop
+      - name: Delete release/* branch protection after merge to main
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection
@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
-      - name: Delete release/* branch after merge to develop
+      - name: Delete release/* branch after merge to main
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{ github.token }}

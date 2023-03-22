@@ -48,12 +48,6 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: Rush test and update the README file in each package with the coverage badge
-        run: node common/scripts/install-run-rush.js test --verbose
-
-      - name: Update root README file with common coverage badge
-        run: node common/scripts/install-run-rush.js common-coverage-make-badge
-
       - name: Update package info in root README file
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
@@ -93,7 +87,7 @@ jobs:
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.bot-user }} # defaults to "github-actions[bot]"
           commit_user_email: ${{ secrets.bot-user-email }}
-          file_pattern: "README.md **/README.md"
+          file_pattern: "README.md"
           branch: ${{ inputs.branch }}
 
       - name: Enable branch protection on  ${{ inputs.branch }}

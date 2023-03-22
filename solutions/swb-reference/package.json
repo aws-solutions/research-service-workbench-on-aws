@@ -15,7 +15,7 @@
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "heft build --clean && rushx pkg-json-lint",
-    "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
+    "build:test": "heft test --clean && rushx pkg-json-lint",
     "cdk": "cdk",
     "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
@@ -29,12 +29,10 @@
     "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "run-postDeployment": "rush build && node lib/src/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only && rushx make-badges",
-    "test:only": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build"
   },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.212.0",
@@ -100,7 +98,6 @@
     "depcheck": "^1.4.3",
     "esbuild": "^0.14.21",
     "eslint": "^8.7.0",
-    "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "jwt-decode": "^3.1.2",
     "license-check-and-add": "^4.0.5",
