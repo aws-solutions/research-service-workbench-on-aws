@@ -8,14 +8,14 @@ import {
   WorkbenchEncryptionKeyWithRotation,
   WorkbenchSecureS3Bucket
 } from '@aws/workbench-core-infrastructure';
-import { Aws, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, CfnOutput, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { AccountPrincipal, PolicyStatement, PrincipalWithConditions, Role } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { createAccessLogsBucket } from './helpers/helper-function';
+import { addAccessPointDelegationStatement, createAccessLogsBucket } from './helpers/helper-function';
 
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
@@ -54,6 +54,20 @@ export class ExampleHostingStack extends Stack {
       }
     ).bucket;
 
+    new CfnOutput(this, 'ExampleHostS3DataSetsBucketName', {
+      value: examplehostingDataSetBucket.bucketName
+    });
+
+    new CfnOutput(this, 'HostingAccountId', {
+      value: Aws.ACCOUNT_ID
+    });
+
+    new CfnOutput(this, 'HostingAccountRegion', {
+      value: Aws.REGION
+    });
+
+    addAccessPointDelegationStatement(examplehostingDataSetBucket);
+
     const exampleCrossAccountRole = new Role(this, props.crossAccountRoleName, {
       roleName: props.crossAccountRoleName,
       assumedBy: new PrincipalWithConditions(new AccountPrincipal(props.mainAccountId), {
@@ -74,6 +88,7 @@ export class ExampleHostingStack extends Stack {
           's3:PutObject',
           's3:PutObjectAcl',
           's3:PutObjectTagging',
+          's3:DeleteObject',
           's3:ListBucket',
           's3:PutAccessPointPolicy',
           's3:GetAccessPointPolicy',
@@ -87,6 +102,17 @@ export class ExampleHostingStack extends Stack {
         ]
       })
     );
+
+    exampleCrossAccountRole.addToPolicy(
+      new PolicyStatement({
+        actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
+        resources: [`arn:${Aws.PARTITION}:kms:${this.region}:${this.account}:key/*`]
+      })
+    );
+
+    new CfnOutput(this, 'ExampleHostDatasetRoleOutput', {
+      value: exampleCrossAccountRole.roleArn
+    });
 
     //CFN NAG Suppression
     const exampleCrossAccountRoleNode = this.node.findChild(props.crossAccountRoleName);

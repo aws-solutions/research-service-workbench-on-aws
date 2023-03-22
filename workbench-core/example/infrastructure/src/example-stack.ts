@@ -24,9 +24,7 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
-  AnyPrincipal,
   CfnPolicy,
-  Effect,
   ManagedPolicy,
   Policy,
   PolicyStatement,
@@ -39,7 +37,7 @@ import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { createAccessLogsBucket } from './helpers/helper-function';
+import { addAccessPointDelegationStatement, createAccessLogsBucket } from './helpers/helper-function';
 
 export interface ExampleStackProps extends StackProps {
   hostingAccountId: string;
@@ -110,7 +108,7 @@ export class ExampleStack extends Stack {
       value: datasetBucket.bucketName
     });
 
-    this._addAccessPointDelegationStatement(datasetBucket);
+    addAccessPointDelegationStatement(datasetBucket);
 
     const exampleLambda: Function = this._createLambda(
       datasetBucket,
@@ -196,7 +194,11 @@ export class ExampleStack extends Stack {
       ]
     });
 
-    new CfnOutput(this, 'AwsRegion', {
+    new CfnOutput(this, 'MainAccountId', {
+      value: Aws.ACCOUNT_ID
+    });
+
+    new CfnOutput(this, 'MainAccountRegion', {
       value: Aws.REGION
     });
 
@@ -347,22 +349,6 @@ export class ExampleStack extends Stack {
     });
 
     return dynamicAuthDDBTable.table;
-  }
-
-  private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {
-    s3Bucket.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        principals: [new AnyPrincipal()],
-        actions: ['s3:*'],
-        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
-        conditions: {
-          StringEquals: {
-            's3:DataAccessPointAccount': Aws.ACCOUNT_ID
-          }
-        }
-      })
-    );
   }
 
   private _createRestApi(exampleLambda: Function): void {
@@ -664,10 +650,10 @@ export class ExampleStack extends Stack {
       true
     );
 
-    exampleLambda.role!.attachInlinePolicy(exampleLambdaPolicy);
+    exampleLambdaRole.attachInlinePolicy(exampleLambdaPolicy);
 
     new CfnOutput(this, 'ExampleLambdaRoleOutput', {
-      value: exampleLambda.role!.roleArn
+      value: exampleLambdaRole.roleArn
     });
 
     //CDK NAG Suppression
