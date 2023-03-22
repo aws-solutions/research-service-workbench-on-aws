@@ -23,7 +23,7 @@ import {
 } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
-import { DataSet } from './models/dataSet';
+import { CreateDataSet, DataSet } from './models/dataSet';
 import { DataSetMountObject } from './models/dataSetMountObject';
 import { DataSetPermission } from './models/dataSetPermission';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
@@ -86,16 +86,13 @@ export class DataSetService {
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
 
-      const datasetMetadata = await this._dbProvider.addDataSet({
+      const provisioned: CreateDataSet = {
         ...dataSet,
         storageType: storageProvider.getStorageType()
-      });
-      const datasetPermissions = await this._updateNewDataSetPermissions(datasetMetadata.id, request);
-
-      const response: DataSet = {
-        ...datasetMetadata,
-        permissions: datasetPermissions
       };
+      const response = await this._dbProvider.addDataSet(provisioned);
+      response.permissions = await this._updateNewDataSetPermissions(response.id, request);
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -128,16 +125,13 @@ export class DataSetService {
 
       await storageProvider.importStorage(dataSet.storageName, dataSet.path);
 
-      const datasetMetadata = await this._dbProvider.addDataSet({
+      const imported: CreateDataSet = {
         ...dataSet,
         storageType: storageProvider.getStorageType()
-      });
-      const datasetPermissions = await this._updateNewDataSetPermissions(datasetMetadata.id, request);
-
-      const response: DataSet = {
-        ...datasetMetadata,
-        permissions: datasetPermissions
       };
+      const response = await this._dbProvider.addDataSet(imported);
+      response.permissions = await this._updateNewDataSetPermissions(response.id, request);
+
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
