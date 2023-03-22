@@ -1,6 +1,11 @@
-# swb-reference
-
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
+# swb-reference
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
+
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 The 0.1.0 beta release is available for customers to test the newly re-architected Service Workbench solution from AWS.
 
@@ -20,12 +25,6 @@ To test the new Service Workbench on AWS v2 r0.1.0, follow the deployment instru
 * Adding a [new environment type](./AddingNewEnvironmentType.md)
 
 *Note:* API based updates to the database are required for some functionalities.
-
-# Code Coverage
-
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-95.42%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.5%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-95.37%25-brightgreen.svg?style=flat) |
 
 ## Requirements
 
