@@ -1,11 +1,9 @@
 lockfileVersion: 5.4
 
 specifiers:
-  istanbul-badges-readme: 1.8.1
   istanbul-combine: 0.3.0
 
 dependencies:
-  istanbul-badges-readme: 1.8.1
   istanbul-combine: 0.3.0
 
 packages:
@@ -142,11 +140,6 @@ packages:
 
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
-    dev: false
-
-  /istanbul-badges-readme/1.8.1:
-    resolution: {integrity: sha512-I7cEFAFlWc5VB17a71U0TgQbez5+U78F0f4kky1w33L4t3BC4/8gbN1tbmX4LVaki52Op4LrkttpvcdZ6kd/jg==}
-    hasBin: true
     dev: false
 
   /istanbul-combine/0.3.0:
