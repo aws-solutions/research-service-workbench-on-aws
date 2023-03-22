@@ -95,6 +95,7 @@ AccountHandlerLambdaRoleOutput
 ApiLambdaRoleOutput
 StatusHandlerLambdaRoleOutput
 APIGatewayAPIEndpoint
+DataSetsBucketName
 ```
 
 Run the post deployment step
@@ -411,18 +412,26 @@ PUT `{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/
 
 
 ## Create new DataSet
-In **SWBv2 Official** Postman Collection under **datasets** folder choose **Create DataSet** API.
+In **SWBv2 Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
 
-During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket from the CFN stack output (key named `DataSetsBucketName`) in the main account and construct the following API call
+In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
-POST `{{API_URL}}/datasets`
+In the body tab set `region` parameter to the `awsRegion` value from [Setup Config File Step](#setup-config-file).
+
+In the body tab set `storageName` parameter to the `DataSetsBucketName` value from [Deploy The Code Step](#deploy-the-code).
+
+Note: Only Researchers and Project Admins can access this API, the user calling this API needs to have access permissions to the project assigned in the request, for more information see [Assig Project to User](#assign-project-to-user).
+
+POST `{{API_URL}}/projects/:projectId/datasets/`
 
 ```json
 {
-    "datasetName": "<Enter a unique DataSet name>",
+    "name": "<Enter a unique DataSet name>",
+    "region": "<awsRegion>",
     "storageName": "<Enter the main account DataSets bucket name>",
     "path": "<Folder name to be created for this in the bucket>",
-    "awsAccountId": "<Main account ID>"
+    "awsAccountId": "<Main account ID>",
+    "type": "internal"
 }
 ```
 At this point you'll receive a JSON response. That response will have an `id` value. You could use that `id` value in the `datasetIds` array while launching an environment.
