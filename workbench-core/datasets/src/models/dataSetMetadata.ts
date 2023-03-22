@@ -64,3 +64,10 @@ export const DataSetMetadataParser = z.object({
    */
   resourceType: z.literal('dataset')
 });
+
+export type DataSetMetadata = Omit<z.infer<typeof DataSetMetadataParser>, 'resourceType'>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DataSetMetadataArrayParser = z.array(DataSetMetadataParser);
+
+export type CreateDataSetMetadata = Omit<DataSetMetadata, 'id' | 'createdAt'>;

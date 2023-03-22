@@ -26,9 +26,9 @@ import { DataSetExistsError } from './errors/dataSetExistsError';
 import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
-import { CreateDataSet, DataSet } from './models/dataSet';
+import { CreateDataSetMetadata, DataSetMetadata } from './models/dataSetMetadata';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
-import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { CreateExternalEndpointMetadata, ExternalEndpointMetadata } from './models/externalEndpointMetadata';
 import { StorageLocation } from './models/storageLocation';
 
 describe('DdbDataSetMetadataPlugin', () => {
@@ -47,11 +47,13 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockDataSetType = 'Sample-DataSet-Type';
   const mockDataSetOwner = 'Sample-DataSet-Owner';
   const mockDataSetRegion = 'Sample-DataSet-Region';
+  const mockDataSetResourceType = 'dataset';
   const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
   const mockEndpointName = `${endpointKeyTypeId}-Sample-Access-Point`;
   const mockEndpointRole = 'Sample-Role';
   const mockEndpointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndpointName}/${mockDataSetPath}/`;
   const mockEndpointAlias = `${mockEndpointName}-s3alias`;
+  const mockEndpointResourceType = 'endpoint';
   const mockCreatedAt = 'Sample-Created-At-ISO-String';
   const mockAccessLevel: DataSetsAccessLevel = 'read-only';
 
@@ -85,13 +87,14 @@ describe('DdbDataSetMetadataPlugin', () => {
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
-            storageName: { S: mockDataSetStorageName }
+            storageName: { S: mockDataSetStorageName },
+            resourceType: { S: mockDataSetResourceType }
           }
         ]
       });
 
       const response = await plugin.listDataSets(1, undefined);
-      expect(response).toMatchObject<PaginatedResponse<DataSet>>({
+      expect(response).toMatchObject<PaginatedResponse<DataSetMetadata>>({
         data: [
           {
             id: mockDataSetId,
@@ -110,7 +113,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('returns an empty array if there are no DataSets to list', async () => {
       mockDdb.on(QueryCommand).resolves({});
 
-      const response: PaginatedResponse<DataSet> = await plugin.listDataSets(1, undefined);
+      const response: PaginatedResponse<DataSetMetadata> = await plugin.listDataSets(1, undefined);
       expect(response.data).toBeDefined();
       expect(response.data).toHaveLength(0);
       expect(response.data).toStrictEqual([]);
@@ -127,12 +130,13 @@ describe('DdbDataSetMetadataPlugin', () => {
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName }
+          storageName: { S: mockDataSetStorageName },
+          resourceType: { S: mockDataSetResourceType }
         }
       });
       const response = await plugin.getDataSetMetadata(mockDataSetId);
 
-      expect(response).toMatchObject<DataSet>({
+      expect(response).toMatchObject<DataSetMetadata>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -175,7 +179,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
 
   describe('addDataSet', () => {
-    let exampleDS: CreateDataSet;
+    let exampleDS: CreateDataSetMetadata;
 
     beforeEach(() => {
       exampleDS = {
@@ -196,7 +200,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
-      expect(newDataSet).toMatchObject<DataSet>({
+      expect(newDataSet).toMatchObject<DataSetMetadata>({
         ...exampleDS,
         id: mockDataSetId,
         createdAt: mockCreatedAt
@@ -214,7 +218,8 @@ describe('DdbDataSetMetadataPlugin', () => {
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
-            storageName: { S: mockDataSetStorageName }
+            storageName: { S: mockDataSetStorageName },
+            resourceType: { S: mockDataSetResourceType }
           }
         ]
       });
@@ -224,7 +229,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
 
   describe('updateDataSet', () => {
-    let exampleDS: DataSet;
+    let exampleDS: DataSetMetadata;
 
     beforeEach(() => {
       exampleDS = {
@@ -251,7 +256,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('adds optional external endpoints.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
 
-      const withEndpointDS: DataSet = {
+      const withEndpointDS: DataSetMetadata = {
         ...exampleDS,
         externalEndpoints: ['some-endpoint']
       };
@@ -279,13 +284,14 @@ describe('DdbDataSetMetadataPlugin', () => {
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName }
+          storageName: { S: mockDataSetStorageName },
+          resourceType: { S: mockDataSetResourceType }
         }
       });
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(QueryCommand).resolves({});
 
-      const exampleEndpoint: CreateExternalEndpoint = {
+      const exampleEndpoint: CreateExternalEndpointMetadata = {
         name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -296,7 +302,9 @@ describe('DdbDataSetMetadataPlugin', () => {
         accessLevel: mockAccessLevel
       };
 
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toMatchObject<ExternalEndpoint>({
+      await expect(
+        plugin.addExternalEndpoint(exampleEndpoint)
+      ).resolves.toMatchObject<ExternalEndpointMetadata>({
         id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -319,6 +327,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
           storageName: { S: mockDataSetStorageName },
+          resourceType: { S: mockDataSetResourceType },
           externalEndpoints: { L: [{ S: mockEndpointName }] },
           createdAt: { S: mockCreatedAt },
           accessLevel: { S: mockAccessLevel }
@@ -334,6 +343,7 @@ describe('DdbDataSetMetadataPlugin', () => {
             endPointUrl: { S: mockEndpointUrl },
             endPointAlias: { S: mockEndpointAlias },
             allowedRoles: { L: [{ S: mockEndpointRole }] },
+            resourceType: { S: mockEndpointResourceType },
             id: { S: mockEndpointName },
             createdAt: { S: mockCreatedAt },
             accessLevel: { S: mockAccessLevel }
@@ -341,7 +351,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         ]
       });
 
-      const exampleEndpoint: CreateExternalEndpoint = {
+      const exampleEndpoint: CreateExternalEndpointMetadata = {
         name: mockEndpointName,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -385,12 +395,13 @@ describe('DdbDataSetMetadataPlugin', () => {
           endPointAlias: { S: mockEndpointAlias },
           allowedRoles: { L: [{ S: mockEndpointRole }] },
           createdAt: { S: mockCreatedAt },
-          accessLevel: { S: mockAccessLevel }
+          accessLevel: { S: mockAccessLevel },
+          resourceType: { S: mockEndpointResourceType }
         }
       });
       await expect(
         plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)
-      ).resolves.toMatchObject<ExternalEndpoint>({
+      ).resolves.toMatchObject<ExternalEndpointMetadata>({
         id: mockEndpointId,
         name: mockEndpointName,
         dataSetId: mockDataSetId,
@@ -416,6 +427,7 @@ describe('DdbDataSetMetadataPlugin', () => {
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
             storageName: { S: mockDataSetStorageName },
+            resourceType: { S: mockDataSetResourceType },
             region: { S: mockAwsBucketRegion },
             createdAt: { S: mockCreatedAt }
           }

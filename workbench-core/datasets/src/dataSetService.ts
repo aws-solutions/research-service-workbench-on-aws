@@ -7,7 +7,6 @@ import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { AuthenticatedUser, isForbiddenError } from '@aws/workbench-core-authorization';
 import { PaginatedResponse } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
-import _ from 'lodash';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
@@ -24,11 +23,12 @@ import {
 } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
-import { CreateDataSet, DataSet } from './models/dataSet';
+import { DataSet } from './models/dataSet';
 import { DataSetMountObject } from './models/dataSetMountObject';
 import { DataSetPermission } from './models/dataSetPermission';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
-import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { ExternalEndpoint } from './models/externalEndpoint';
+import { CreateExternalEndpointMetadata } from './models/externalEndpointMetadata';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
 import { PermissionsResponse } from './models/permissionsResponse';
@@ -69,8 +69,10 @@ export class DataSetService {
    * @returns the DataSet object which is stored in the backing datastore.
    */
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const { storageProvider, authenticatedUser, ...dataSet } = request;
+
     const metadata: Metadata = {
-      actor: request.authenticatedUser,
+      actor: authenticatedUser,
       action: this.provisionDataSet.name,
       source: {
         serviceName: DataSetService.name
@@ -79,19 +81,22 @@ export class DataSetService {
     };
 
     try {
-      if (request.owner && !request.ownerType) {
+      if (dataSet.owner && !dataSet.ownerType) {
         throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
       }
-      const { storageProvider, ...dataSet } = request;
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
 
-      const provisioned: CreateDataSet = {
+      const datasetMetadata = await this._dbProvider.addDataSet({
         ...dataSet,
         storageType: storageProvider.getStorageType()
+      });
+      const datasetPermissions = await this._updateNewDataSetPermissions(datasetMetadata.id, request);
+
+      const response: DataSet = {
+        ...datasetMetadata,
+        permissions: datasetPermissions
       };
-      const response = await this._dbProvider.addDataSet(provisioned);
-      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -107,8 +112,10 @@ export class DataSetService {
    * @returns the DataSet object which is stored in the backing datastore.
    */
   public async importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const { storageProvider, authenticatedUser, ...dataSet } = request;
+
     const metadata: Metadata = {
-      actor: request.authenticatedUser,
+      actor: authenticatedUser,
       action: this.importDataSet.name,
       source: {
         serviceName: DataSetService.name
@@ -116,19 +123,22 @@ export class DataSetService {
       requestBody: request
     };
     try {
-      if (request.owner && !request.ownerType) {
+      if (dataSet.owner && !dataSet.ownerType) {
         throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
       }
-      const { storageProvider, ...dataSet } = request;
 
       await storageProvider.importStorage(dataSet.storageName, dataSet.path);
 
-      const imported: CreateDataSet = {
+      const datasetMetadata = await this._dbProvider.addDataSet({
         ...dataSet,
         storageType: storageProvider.getStorageType()
+      });
+      const datasetPermissions = await this._updateNewDataSetPermissions(datasetMetadata.id, request);
+
+      const response: DataSet = {
+        ...datasetMetadata,
+        permissions: datasetPermissions
       };
-      const response = await this._dbProvider.addDataSet(imported);
-      response.permissions = await this._updateNewDataSetPermissions(response, request);
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
@@ -821,7 +831,7 @@ export class DataSetService {
       vpcId
     });
 
-    const endpointParam: CreateExternalEndpoint = {
+    const endpointParam: CreateExternalEndpointMetadata = {
       name: externalEndpointName,
       dataSetId: targetDS.id,
       dataSetName: targetDS.name,
@@ -890,25 +900,26 @@ export class DataSetService {
   }
 
   private async _updateNewDataSetPermissions(
-    dataset: DataSet,
+    dataSetId: string,
     request: CreateProvisionDatasetRequest
   ): Promise<DataSetPermission[]> {
-    let permissions: DataSetPermission[];
+    const { authenticatedUser, ...dataSet } = request;
 
-    if (_.isEmpty(request.permissions)) {
+    let permissions: DataSetPermission[];
+    if (dataSet.permissions?.length) {
+      permissions = dataSet.permissions;
+    } else {
       permissions = [
         {
-          identity: request.owner ? request.owner : request.authenticatedUser.id,
-          identityType: request.owner ? request.ownerType! : 'USER',
+          identity: dataSet.owner ? dataSet.owner : authenticatedUser.id,
+          identityType: dataSet.owner ? dataSet.ownerType! : 'USER',
           accessLevel: 'read-only'
         }
       ];
-    } else {
-      permissions = request.permissions!;
     }
     const response: PermissionsResponse = await this._authzPlugin.addAccessPermission({
-      authenticatedUser: request.authenticatedUser,
-      dataSetId: dataset.id,
+      authenticatedUser,
+      dataSetId,
       permission: permissions
     });
 

@@ -21,15 +21,18 @@ import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidEndpointError } from './errors/invalidEndpointError';
-import { CreateDataSet, DataSet, DataSetArrayParser, DataSetParser } from './models/dataSet';
-import { DataSetMetadataParser } from './models/dataSetMetadata';
 import {
-  CreateExternalEndpoint,
-  ExternalEndpoint,
-  ExternalEndpointArrayParser,
-  ExternalEndpointParser
-} from './models/externalEndpoint';
-import { ExternalEndpointMetadataParser } from './models/externalEndpointMetadata';
+  CreateDataSetMetadata,
+  DataSetMetadata,
+  DataSetMetadataArrayParser,
+  DataSetMetadataParser
+} from './models/dataSetMetadata';
+import {
+  CreateExternalEndpointMetadata,
+  ExternalEndpointMetadata,
+  ExternalEndpointMetadataArrayParser,
+  ExternalEndpointMetadataParser
+} from './models/externalEndpointMetadata';
 import { StorageLocation } from './models/storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
@@ -43,7 +46,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     this._endpointKeyType = endpointKeyTypeId;
   }
 
-  public async getDataSetEndPointDetails(dataSetId: string, endpointId: string): Promise<ExternalEndpoint> {
+  public async getDataSetEndPointDetails(
+    dataSetId: string,
+    endpointId: string
+  ): Promise<ExternalEndpointMetadata> {
     const response = (await this._aws.helpers.ddb
       .get({
         pk: buildDynamoDbKey(dataSetId, this._dataSetKeyType),
@@ -54,13 +60,13 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!response.Item) {
       throw new EndpointNotFoundError(`Could not find the endpoint '${endpointId}' on '${dataSetId}'.`);
     }
-    return ExternalEndpointParser.parse(response.Item);
+    return ExternalEndpointMetadataParser.parse(response.Item);
   }
 
   public async listDataSets(
     pageSize: number,
     paginationToken: string | undefined
-  ): Promise<PaginatedResponse<DataSet>> {
+  ): Promise<PaginatedResponse<DataSetMetadata>> {
     const query: QueryParams = addPaginationToken(paginationToken, {
       key: { name: 'resourceType', value: 'dataset' },
       index: 'getResourceByCreatedAt',
@@ -69,7 +75,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     const response = await this._aws.helpers.ddb.getPaginatedItems(query);
 
-    const dataSets = DataSetArrayParser.parse(response.data) || [];
+    const dataSets = DataSetMetadataArrayParser.parse(response.data) || [];
 
     return {
       data: dataSets,
@@ -77,7 +83,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
   }
 
-  public async getDataSetMetadata(id: string): Promise<DataSet> {
+  public async getDataSetMetadata(id: string): Promise<DataSetMetadata> {
     const response = (await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(id, this._dataSetKeyType))
       .execute()) as GetItemCommandOutput;
@@ -85,7 +91,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!response.Item) {
       throw new DataSetNotFoundError(`Could not find DataSet '${id}'.`);
     }
-    return DataSetParser.parse(response.Item);
+    return DataSetMetadataParser.parse(response.Item);
   }
 
   public async listDataSetObjects(dataSetName: string): Promise<string[]> {
@@ -99,10 +105,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     throw new Error('Method not implemented.');
   }
 
-  public async addDataSet(dataSet: CreateDataSet): Promise<DataSet> {
+  public async addDataSet(dataSet: CreateDataSetMetadata): Promise<DataSetMetadata> {
     await this._validateCreateDataSet(dataSet);
 
-    const createdDataSet: DataSet = {
+    const createdDataSet: DataSetMetadata = {
       ...dataSet,
       id: uuidWithLowercasePrefix(this._dataSetKeyType),
       createdAt: new Date().toISOString()
@@ -113,7 +119,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return createdDataSet;
   }
 
-  public async updateDataSet(dataSet: DataSet): Promise<DataSet> {
+  public async updateDataSet(dataSet: DataSetMetadata): Promise<DataSetMetadata> {
     await this._storeDataSetToDdb(dataSet);
     return dataSet;
   }
@@ -126,10 +132,12 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._aws.helpers.ddb.delete(buildDynamoDBPkSk(dataSetId, this._dataSetKeyType)).execute();
   }
 
-  public async addExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<ExternalEndpoint> {
+  public async addExternalEndpoint(
+    endpoint: CreateExternalEndpointMetadata
+  ): Promise<ExternalEndpointMetadata> {
     await this._validateCreateExternalEndpoint(endpoint);
 
-    const createdEndpoint: ExternalEndpoint = {
+    const createdEndpoint: ExternalEndpointMetadata = {
       ...endpoint,
       id: uuidWithLowercasePrefix(this._endpointKeyType),
       createdAt: new Date().toISOString()
@@ -140,7 +148,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return createdEndpoint;
   }
 
-  public async listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpoint[]> {
+  public async listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpointMetadata[]> {
     const params: QueryParams = {
       key: { name: 'pk', value: buildDynamoDbKey(dataSetId, this._dataSetKeyType) },
       sortKey: 'sk',
@@ -152,10 +160,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!response.Items) {
       return [];
     }
-    return ExternalEndpointArrayParser.parse(response.Items);
+    return ExternalEndpointMetadataArrayParser.parse(response.Items);
   }
 
-  public async updateExternalEndpoint(endpoint: ExternalEndpoint): Promise<ExternalEndpoint> {
+  public async updateExternalEndpoint(endpoint: ExternalEndpointMetadata): Promise<ExternalEndpointMetadata> {
     await this._storeEndpointToDdb(endpoint);
     return endpoint;
   }
@@ -181,7 +189,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
   }
 
-  private async _validateCreateExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<void> {
+  private async _validateCreateExternalEndpoint(endpoint: CreateExternalEndpointMetadata): Promise<void> {
     const targetDS = await this.getDataSetMetadata(endpoint.dataSetId);
     const endpoints = await this.listEndpointsForDataSet(targetDS.id!);
 
@@ -191,7 +199,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       );
   }
 
-  private async _validateCreateDataSet(dataSet: CreateDataSet): Promise<void> {
+  private async _validateCreateDataSet(dataSet: CreateDataSetMetadata): Promise<void> {
     const queryParams: QueryParams = {
       index: 'getResourceByName',
       key: { name: 'resourceType', value: 'dataset' },
@@ -207,7 +215,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
   }
 
-  private async _storeEndpointToDdb(endpoint: ExternalEndpoint): Promise<void> {
+  private async _storeEndpointToDdb(endpoint: ExternalEndpointMetadata): Promise<void> {
     const endpointKey = {
       pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
       sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)
@@ -228,7 +236,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     });
   }
 
-  private async _storeDataSetToDdb(dataSet: DataSet): Promise<void> {
+  private async _storeDataSetToDdb(dataSet: DataSetMetadata): Promise<void> {
     const validatedDataSetMetadata = DataSetMetadataParser.safeParse({ ...dataSet, resourceType: 'dataset' });
 
     if (!validatedDataSetMetadata.success) {

@@ -53,3 +53,10 @@ export const ExternalEndpointMetadataParser = z.object({
    */
   resourceType: z.literal('endpoint')
 });
+
+export type ExternalEndpointMetadata = Omit<z.infer<typeof ExternalEndpointMetadataParser>, 'resourceType'>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const ExternalEndpointMetadataArrayParser = z.array(ExternalEndpointMetadataParser);
+
+export type CreateExternalEndpointMetadata = Omit<ExternalEndpointMetadata, 'id' | 'createdAt'>;

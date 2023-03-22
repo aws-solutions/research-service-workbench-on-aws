@@ -4,8 +4,8 @@
  */
 
 import { PaginatedResponse } from '@aws/workbench-core-base';
-import { CreateDataSet, DataSet } from './models/dataSet';
-import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { CreateDataSetMetadata, DataSetMetadata } from './models/dataSetMetadata';
+import { CreateExternalEndpointMetadata, ExternalEndpointMetadata } from './models/externalEndpointMetadata';
 import { StorageLocation } from './models/storageLocation';
 
 export interface DataSetMetadataPlugin {
@@ -22,7 +22,10 @@ export interface DataSetMetadataPlugin {
    *
    * @returns an array of DataSets.
    */
-  listDataSets(pageSize: number, paginationToken: string | undefined): Promise<PaginatedResponse<DataSet>>;
+  listDataSets(
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<DataSetMetadata>>;
 
   /**
    * Gets the metadata associated with an overall dataset. This differs from
@@ -34,7 +37,7 @@ export interface DataSetMetadataPlugin {
    *
    * @throws {@link DataSetNotFoundError} - the dataset doesnt exist
    */
-  getDataSetMetadata(id: string): Promise<DataSet>;
+  getDataSetMetadata(id: string): Promise<DataSetMetadata>;
 
   /**
    * Get a list of objects in the DataSet as stored in the backend.
@@ -61,7 +64,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the DataSet object added to the database.
    */
-  addDataSet(dataSet: CreateDataSet): Promise<DataSet>;
+  addDataSet(dataSet: CreateDataSetMetadata): Promise<DataSetMetadata>;
 
   /**
    * Update a DataSet
@@ -69,7 +72,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the updated DataSet object.
    */
-  updateDataSet(dataSet: DataSet): Promise<DataSet>;
+  updateDataSet(dataSet: DataSetMetadata): Promise<DataSetMetadata>;
 
   /**
    * Remove a DataSet
@@ -85,7 +88,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns details about the specified endpoint.
    */
-  getDataSetEndPointDetails(dataSetId: string, endPointId: string): Promise<ExternalEndpoint>;
+  getDataSetEndPointDetails(dataSetId: string, endPointId: string): Promise<ExternalEndpointMetadata>;
 
   /**
    * Add an external endpoint to a DataSet.
@@ -95,7 +98,7 @@ export interface DataSetMetadataPlugin {
    *
    * @throws {@link EndpointExistsError} - the endpoint already exists
    */
-  addExternalEndpoint(endPoint: CreateExternalEndpoint): Promise<ExternalEndpoint>;
+  addExternalEndpoint(endPoint: CreateExternalEndpointMetadata): Promise<ExternalEndpointMetadata>;
 
   /**
    * Get the endpoint details for a given DataSet.
@@ -104,7 +107,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns an array of ExternalEndpoint objects.
    */
-  listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpoint[]>;
+  listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpointMetadata[]>;
 
   /**
    * Update an external endpoint with the given data.
@@ -113,7 +116,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the updated details of the Endpoint.
    */
-  updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+  updateExternalEndpoint(endPoint: ExternalEndpointMetadata): Promise<ExternalEndpointMetadata>;
 
   /**
    * Lists the {@link StorageLocation}s being used by existing datasets.
