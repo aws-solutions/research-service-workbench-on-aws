@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Removed AuthenticatedUser from Datasets DDB entries.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

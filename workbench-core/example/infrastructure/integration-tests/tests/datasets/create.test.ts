@@ -6,6 +6,7 @@
 import { AddDataSetExternalEndpointResponse, DataSetPermission } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
+import { DatasetHelper } from '../../support/complex/datasetHelper';
 import Dataset from '../../support/resources/datasets/dataset';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -82,6 +83,13 @@ describe('datasets create integration test', () => {
         }
       ]);
     });
+    it('doesnt store the authenticated user in ddb', async () => {
+      const { data } = await adminSession.resources.datasets.create();
+
+      const metadata = await new DatasetHelper().getddbRecords(data.id);
+
+      expect(metadata.authenticatedUser).toBeUndefined();
+    });
   });
 
   describe('AddExternalEndpointForUser', () => {
@@ -124,6 +132,13 @@ describe('datasets create integration test', () => {
           }
         }
       });
+
+      // confirm authenticated user isnt present in ddb
+      const metadata = await new DatasetHelper().getddbRecords(
+        dataset.id,
+        response.data.mountObject.endpointId
+      );
+      expect(metadata.authenticatedUser).toBeUndefined();
     });
 
     it('throws when adding an endpoint to a dataset which does not exist', async () => {
@@ -190,6 +205,13 @@ describe('datasets create integration test', () => {
           }
         }
       });
+
+      // confirm authenticated user isnt present in ddb
+      const metadata = await new DatasetHelper().getddbRecords(
+        dataset.id,
+        response.data.mountObject.endpointId
+      );
+      expect(metadata.authenticatedUser).toBeUndefined();
     });
 
     it('throws when adding an endpoint to a dataset which does not exist', async () => {

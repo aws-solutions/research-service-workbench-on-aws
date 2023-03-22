@@ -75,4 +75,13 @@ export class DatasetHelper {
       })
     );
   }
+
+  public async getddbRecords(dataSetId: string, endpointId?: string): Promise<Record<string, JSONValue>> {
+    return this._awsSdk.helpers.ddb.getItem({
+      key: {
+        pk: buildDynamoDbKey(dataSetId, dataSetPrefix),
+        sk: buildDynamoDbKey(endpointId ?? dataSetId, endpointId ? endpointPrefix : dataSetPrefix)
+      }
+    });
+  }
 }
