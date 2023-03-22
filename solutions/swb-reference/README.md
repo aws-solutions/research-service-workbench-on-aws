@@ -46,8 +46,8 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
 1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<stage>/rootUser/email`.
 1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserEmailParamStorePath` and the value as the main account user's email address.
-1. (Optional) Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
-1. Uncomment `cognitoDomain` and provide a unique string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
+1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
+1. Uncomment `cognitoDomain` and provide a **globally unique** string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. If your SWB instance is going to use a custom network, uncomment `vpcId` and `albSubnetIds` and provide their respective values from your network.
 1. Uncomment `albInternetFacing` and set it's value true if you want an internet-facing AWB instance, otherwize set to false.
@@ -531,7 +531,7 @@ In order to create new Admins:
 1. You must go to the Cognito console in your AWS Console.
 1. Under **User pools**, look for and click on `swb-userpool-<stage>-<abbreviation>`.
 1. Under the **Users tab**, choose **Create user**.
-1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the Admin group.
+1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the ITAdmin group.
 
 ## Create Users
 In **SWBv2 Official** Postman Collection under **users** folder choose **Create User** API.
@@ -550,7 +550,7 @@ POST `{{API_URL}}/users`
 In the response take note of the `id` that was returned. We'll refer to this value as `USER_ID`.
 
 ## Assign Project to User
-Note: By default `ITAdmin` users have access permissions to all projects, only `Researchers` and `ProjectAdmin` require project association.
+Note: Only `Researchers` and `ProjectAdmin` require project association.
 
 In **SWBv2 Official** Postman Collection under **projects** folder choose **Add User To Project** API.
 
@@ -566,7 +566,7 @@ POST `{{API_URL}}/projects/:projectId/users/:userId/relationships`
 
 ```json
 {
-    "roles": ["Researcher"]
+    "role": ["Researcher"]
 }
 ```
 
