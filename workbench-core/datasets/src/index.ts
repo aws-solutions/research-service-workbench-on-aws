@@ -52,8 +52,8 @@ export { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './mod
 export {
   ExternalEndpoint,
   ExternalEndpointParser,
-  ExternalEndpointArrayParser,
-  CreateExternalEndpoint
+  CreateExternalEndpoint,
+  ExternalEndpointArrayParser
 } from './models/externalEndpoint';
 export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { StorageLocation } from './models/storageLocation';

@@ -47,13 +47,11 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockDataSetType = 'Sample-DataSet-Type';
   const mockDataSetOwner = 'Sample-DataSet-Owner';
   const mockDataSetRegion = 'Sample-DataSet-Region';
-  const mockDataSetResourceType = 'dataset';
   const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
   const mockEndpointName = `${endpointKeyTypeId}-Sample-Access-Point`;
   const mockEndpointRole = 'Sample-Role';
   const mockEndpointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndpointName}/${mockDataSetPath}/`;
   const mockEndpointAlias = `${mockEndpointName}-s3alias`;
-  const mockEndpointResourceType = 'endpoint';
   const mockCreatedAt = 'Sample-Created-At-ISO-String';
   const mockAccessLevel: DataSetsAccessLevel = 'read-only';
 
@@ -87,8 +85,7 @@ describe('DdbDataSetMetadataPlugin', () => {
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
-            storageName: { S: mockDataSetStorageName },
-            resourceType: { S: mockDataSetResourceType }
+            storageName: { S: mockDataSetStorageName }
           }
         ]
       });
@@ -130,8 +127,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName },
-          resourceType: { S: mockDataSetResourceType }
+          storageName: { S: mockDataSetStorageName }
         }
       });
       const response = await plugin.getDataSetMetadata(mockDataSetId);
@@ -218,8 +214,7 @@ describe('DdbDataSetMetadataPlugin', () => {
             path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
-            storageName: { S: mockDataSetStorageName },
-            resourceType: { S: mockDataSetResourceType }
+            storageName: { S: mockDataSetStorageName }
           }
         ]
       });
@@ -284,8 +279,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           path: { S: mockDataSetPath },
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName },
-          resourceType: { S: mockDataSetResourceType }
+          storageName: { S: mockDataSetStorageName }
         }
       });
       mockDdb.on(UpdateItemCommand).resolves({});
@@ -325,7 +319,6 @@ describe('DdbDataSetMetadataPlugin', () => {
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
           storageName: { S: mockDataSetStorageName },
-          resourceType: { S: mockDataSetResourceType },
           externalEndpoints: { L: [{ S: mockEndpointName }] },
           createdAt: { S: mockCreatedAt },
           accessLevel: { S: mockAccessLevel }
@@ -341,7 +334,6 @@ describe('DdbDataSetMetadataPlugin', () => {
             endPointUrl: { S: mockEndpointUrl },
             endPointAlias: { S: mockEndpointAlias },
             allowedRoles: { L: [{ S: mockEndpointRole }] },
-            resourceType: { S: mockEndpointResourceType },
             id: { S: mockEndpointName },
             createdAt: { S: mockCreatedAt },
             accessLevel: { S: mockAccessLevel }
@@ -393,8 +385,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           endPointAlias: { S: mockEndpointAlias },
           allowedRoles: { L: [{ S: mockEndpointRole }] },
           createdAt: { S: mockCreatedAt },
-          accessLevel: { S: mockAccessLevel },
-          resourceType: { S: mockEndpointResourceType }
+          accessLevel: { S: mockAccessLevel }
         }
       });
       await expect(
@@ -425,7 +416,6 @@ describe('DdbDataSetMetadataPlugin', () => {
             awsAccountId: { S: mockAwsAccountId },
             storageType: { S: mockDataSetStorageType },
             storageName: { S: mockDataSetStorageName },
-            resourceType: { S: mockDataSetResourceType },
             region: { S: mockAwsBucketRegion },
             createdAt: { S: mockCreatedAt }
           }

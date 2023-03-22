@@ -27,8 +27,7 @@ import { DataSet } from './models/dataSet';
 import { DataSetMountObject } from './models/dataSetMountObject';
 import { DataSetPermission } from './models/dataSetPermission';
 import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
-import { ExternalEndpoint } from './models/externalEndpoint';
-import { CreateExternalEndpointMetadata } from './models/externalEndpointMetadata';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { GetDataSetMountPointRequest, GetDataSetMountPointResponse } from './models/getDataSetMountPoint';
 import { PermissionsResponse } from './models/permissionsResponse';
@@ -831,7 +830,7 @@ export class DataSetService {
       vpcId
     });
 
-    const endpointParam: CreateExternalEndpointMetadata = {
+    const endpointParam: CreateExternalEndpoint = {
       name: externalEndpointName,
       dataSetId: targetDS.id,
       dataSetName: targetDS.name,
