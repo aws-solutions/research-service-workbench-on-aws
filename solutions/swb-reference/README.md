@@ -78,14 +78,8 @@ CDKToolkit: creating CloudFormation changeset...
  ✅  Environment aws://123456789012/ap-northeast-3 bootstrapped.
 ```
 
-<<<<<<< HEAD
 ### Deploy the code
 In `swb-reference` root directory run the following code
-=======
-Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
-
-## Running Code Locally
->>>>>>> 6a6ec651 (fix: solutions resource collision (#943))
 
 ```bash
 STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
