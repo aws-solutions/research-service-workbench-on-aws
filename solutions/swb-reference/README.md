@@ -54,7 +54,6 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone. If you dont have a domain configured, follow instructions to [create a Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
-Note: For Solutions Implementations deployment, the `awsRegionShortName` value will be pre-assigned to `test`.
 
 ### Setup CDK
 We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onboard CDK onto your AWS `Main Account`.
@@ -411,7 +410,7 @@ Send **Associate project with EnvTypeConfig** request.
 PUT `{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships`
 
 
-## Create new DataSet
+## Create new DataSets
 In **SWBv2 Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
