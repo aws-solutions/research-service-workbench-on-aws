@@ -11,7 +11,7 @@ on:
 # PR from being merged into stage.
 jobs:
   stage-protection:
-    name: Only create PR against develop branch, not stage branch
+    name: Only create PR against develop/release branch, not stage branch
     runs-on: ubuntu-20.04
     steps:
       - name: Get branch name

@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import {
   AdminCreateUserCommand,
   CognitoIdentityProviderClient,
@@ -15,8 +16,39 @@ describe('CognitoSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     ROOT_USER_EMAIL: 'user@example.com',
-    USER_POOL_NAME: 'swb-userpool-test-va'
+    USER_POOL_NAME: 'swb-userpool-test-va',
+    STACK_NAME: 'swb-test-va'
   };
+  const poolNameParts = constants.USER_POOL_NAME.split('-');
+  const stackName = `${poolNameParts[0]}-${poolNameParts[2]}-${poolNameParts[3]}`;
+  const userPoolId = 'us-east-1_random';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
+    cfMock.on(DescribeStacksCommand).resolves({
+      Stacks: [
+        {
+          StackName: stackName,
+          StackStatus: 'CREATE_COMPLETE',
+          CreationTime: new Date(),
+          Outputs: [
+            {
+              OutputKey: 'cognitoUserPoolId',
+              OutputValue: userPoolId
+            }
+          ]
+        }
+      ]
+    });
+  }
+
+  const cfMock = mockClient(CloudFormationClient);
+  beforeAll(() => {
+    mockCloudformationOutputs(cfMock);
+  });
+
+  afterAll(() => {
+    cfMock.reset();
+  });
 
   describe('execute private methods', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,6 +96,14 @@ describe('CognitoSetup', () => {
       const returnVal = await cognitoSetup.run();
       expect(returnVal).toBeUndefined();
       expect(cognitoSetup.adminCreateUser).toBeCalledTimes(1);
+    });
+
+    test('run: getUserPoolId returns user pool ID', async () => {
+      const cognitoSetup = new CognitoSetup(constants);
+      jest.spyOn(cognitoSetup, 'getUserPoolId');
+
+      const returnVal = await cognitoSetup.getUserPoolId();
+      expect(returnVal).toEqual(userPoolId);
     });
   });
 });
