@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Add zod generic pagination",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}
