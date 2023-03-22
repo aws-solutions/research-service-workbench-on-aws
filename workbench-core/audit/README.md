@@ -1,11 +1,11 @@
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 # Workbench Core Audit
 ## `main branch coverage`
 [![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=workbench-core-audit)](https://codecov.io/gh/aws-solutions/solution-spark-on-aws/tree/main)
 
 ## `develop branch coverage`
 [![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-audit)](https://codecov.io/gh/aws-solutions/solution-spark-on-aws/tree/develop)
-
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 ## Description
 The audit component is a flexible and extensible auditing library. It is designed with the plugin-architecture to allow developers to decide and implement their own process of storing audit logs.
