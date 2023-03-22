@@ -1,6 +1,6 @@
 import { AccessPoint } from '@aws-sdk/client-s3-control';
-import { AwsService } from '@aws/workbench-core-base';
-import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
+import { AwsService, buildDynamoDbKey, JSONValue } from '@aws/workbench-core-base';
+import { dataSetPrefix, endpointPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import _ from 'lodash';
 import Setup from '../setup';
 
@@ -70,5 +70,14 @@ export class DatasetHelper {
         await this._awsSdk.helpers.ddb.delete({ pk: endpoint.pk, sk: endpoint.sk }).execute();
       })
     );
+  }
+
+  public async getddbRecords(dataSetId: string, endpointId?: string): Promise<Record<string, JSONValue>> {
+    return this._awsSdk.helpers.ddb.getItem({
+      key: {
+        pk: buildDynamoDbKey(dataSetId, dataSetPrefix),
+        sk: buildDynamoDbKey(endpointId ?? dataSetId, endpointId ? endpointPrefix : dataSetPrefix)
+      }
+    });
   }
 }
