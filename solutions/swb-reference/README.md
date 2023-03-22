@@ -12,7 +12,7 @@ The 0.1.0 beta release is available for customers to test the newly re-architect
 This release includes:
 
 * Sagemaker Notebook as a compute environment (connect, start, stop, terminate)
-* Data set attachment to Sagemaker Notebooks
+* Dataset attachment to Sagemaker Notebooks
 * Research user creation
 * Workspaces include search/filter/sort functions
 * Customers able to add custom environments
@@ -48,7 +48,7 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Uncomment `cognitoDomain` and provide a **globally unique** string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. If your SWB instance is going to use a custom network, uncomment `vpcId` and `albSubnetIds` and provide their respective values from your network.
-1. Uncomment `albInternetFacing` and set it's value true if you want an internet-facing AWB instance, otherwize set to false.
+1. Uncomment `albInternetFacing` and set it's value true if you want an internet-facing ALB instance, otherwize set to false.
 1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone. If you dont have a domain configured, follow instructions to [create a Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
@@ -105,7 +105,7 @@ After post deployment is complete a temporary password will be sent to the main 
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. 
-1. Upload the corresponding .yaml file from [templates](./src/templates) depending on your installation type. Default installation uses [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml), for BYON or TGW see [Hosting Account Templates](./src/templates/README.md)
+1. Upload the corresponding .yaml file from [templates](./src/templates) depending on your installation type. Default installation uses [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml), for more customizable network options, refer to [Hosting Account Templates](./src/templates/README.md)
 1. For the stack name, use the following value: `swb-<stage>-<awsRegionShortName>-hosting-account`, for example `swb-dev-va-hosting-account`
 1. For the parameters provide the following values
 ```yaml
