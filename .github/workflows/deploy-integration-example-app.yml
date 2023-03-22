@@ -13,6 +13,12 @@ on:
         required: true
       aws-test-account-region:
         required: true
+      aws-test-hosting-account-id:
+        required: true
+      aws-test-hosting-account-region:
+        required: true
+      external_id:
+        required: true
       slack_webhook_url:
         required: true
 
@@ -42,7 +48,16 @@ jobs:
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-test-account-region }} -v
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+
+      - name: Deploy example package to Hosting environment
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+          HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
+          EXTERNAL_ID: ${{ secrets.external_id }}
 
       - name: Example package integration test
         run: |

@@ -140,6 +140,9 @@ export default class Dataset extends Resource {
       vpcId?: string;
       groupId?: string;
       userId?: string;
+      region?: string;
+      roleToAssume?: string;
+      externalId?: string;
     } = {}
   ): Promise<AxiosResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
@@ -153,7 +156,10 @@ export default class Dataset extends Resource {
       kmsKeyArn: requestBody.kmsKeyArn,
       vpcId: requestBody.vpcId,
       groupId: requestBody.groupId,
-      userId: requestBody.userId
+      userId: requestBody.userId,
+      region: requestBody.region,
+      roleToAssume: requestBody.roleToAssume,
+      externalId: requestBody.externalId
     });
 
     const endPointParams: EndpointCreateRequest = {
@@ -170,18 +176,33 @@ export default class Dataset extends Resource {
     return response;
   }
 
-  public async generateSinglePartFileUploadUrl(body: { fileName: string }): Promise<AxiosResponse> {
+  public async generateSinglePartFileUploadUrl(body: {
+    fileName: string;
+    region?: string;
+    roleToAssume?: string;
+    externalId?: string;
+  }): Promise<AxiosResponse> {
     return await this._axiosInstance.post(`${this._api}/presignedUpload`, body);
   }
 
   public async cleanup(): Promise<void> {
+    const mainAwsService = this._setup.getMainAwsClient('ExampleDataSetDDBTableName');
+
     try {
-      // Delete DDB entries, and path folder from bucket (to prevent test resources polluting a prod env)
-      const datasetHelper = new DatasetHelper();
-      await datasetHelper.deleteS3Resources(this.storageName, this.storagePath);
-      await datasetHelper.deleteDdbRecords(this.id);
+      // Delete path folder from bucket
+      const hostAwsService = await this._setup.getHostAwsClient('Main-Account-Cleanup-DataSet');
+      const awsService =
+        this._awsAccountId === this._settings.get('HostingAccountId') ? hostAwsService : mainAwsService;
+      await DatasetHelper.deleteS3Resources(awsService, this.storageName, this.storagePath);
     } catch (error) {
-      console.warn(`Error caught in cleanup of dataset '${this.id}': ${error}.`);
+      console.warn(`Error caught in cleanup of S3 bucket for dataset '${this.id}': ${error}.`);
+    }
+
+    try {
+      // Delete DDB entries
+      await DatasetHelper.deleteDdbRecords(mainAwsService, this.id);
+    } catch (error) {
+      console.warn(`Error caught in cleanup of DDB recored for dataset '${this.id}': ${error}.`);
     }
   }
 }
