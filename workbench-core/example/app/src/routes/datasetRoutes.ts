@@ -56,14 +56,12 @@ const timeToLiveSeconds: number = 60 * 1; // 1 minute
 
 async function getHostingAccountStoragePlugin(
   roleToAssume: string,
-  externalId: string,
   region: string
 ): Promise<DataSetsStoragePlugin> {
   try {
     const { Credentials } = await aws.clients.sts.assumeRole({
       RoleArn: roleToAssume,
-      RoleSessionName: 'Main-Account-Create-DataSet',
-      ExternalId: externalId
+      RoleSessionName: 'Main-Account-Create-DataSet'
     });
 
     if (!Credentials) {
@@ -98,12 +96,11 @@ export function setUpDSRoutes(
       const validatedRequest = validateAndParse<CreateImportDataSet>(CreateImportDataSetParser, req.body);
       const authenticatedUser = validateAndParse<AuthenticatedUser>(AuthenticatedUserParser, res.locals.user);
 
-      const { roleToAssume, externalId, ...createDataSetParams } = validatedRequest;
+      const { roleToAssume, ...createDataSetParams } = validatedRequest;
 
-      const storageProvider =
-        roleToAssume && externalId
-          ? await getHostingAccountStoragePlugin(roleToAssume, externalId, createDataSetParams.region)
-          : dataSetsStoragePlugin;
+      const storageProvider = roleToAssume
+        ? await getHostingAccountStoragePlugin(roleToAssume, createDataSetParams.region)
+        : dataSetsStoragePlugin;
 
       const dataSet = await dataSetService.provisionDataSet({
         ...createDataSetParams,
@@ -144,8 +141,7 @@ export function setUpDSRoutes(
           res.locals.user
         );
 
-        const { userId, groupId, roleToAssume, externalId, region, ...addExternalEndpointRequest } =
-          validatedRequest;
+        const { userId, groupId, roleToAssume, region, ...addExternalEndpointRequest } = validatedRequest;
 
         if (!userId && !groupId) {
           throw Boom.badRequest('Request body must have either "userId" or "groupId" defined.');
@@ -156,8 +152,8 @@ export function setUpDSRoutes(
         }
 
         const storageProvider =
-          roleToAssume && externalId && region
-            ? await getHostingAccountStoragePlugin(roleToAssume, externalId, region)
+          roleToAssume && region
+            ? await getHostingAccountStoragePlugin(roleToAssume, region)
             : dataSetsStoragePlugin;
 
         if (groupId) {
@@ -261,11 +257,11 @@ export function setUpDSRoutes(
           res.locals.user
         );
 
-        const { fileName, roleToAssume, externalId, region } = validatedRequest;
+        const { fileName, roleToAssume, region } = validatedRequest;
 
         const storageProvider =
-          roleToAssume && externalId && region
-            ? await getHostingAccountStoragePlugin(roleToAssume, externalId, region)
+          roleToAssume && region
+            ? await getHostingAccountStoragePlugin(roleToAssume, region)
             : dataSetsStoragePlugin;
 
         const url = await dataSetService.getPresignedSinglePartUploadUrl(

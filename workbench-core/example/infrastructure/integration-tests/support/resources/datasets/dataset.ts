@@ -142,7 +142,6 @@ export default class Dataset extends Resource {
       userId?: string;
       region?: string;
       roleToAssume?: string;
-      externalId?: string;
     } = {}
   ): Promise<AxiosResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
@@ -158,8 +157,7 @@ export default class Dataset extends Resource {
       groupId: requestBody.groupId,
       userId: requestBody.userId,
       region: requestBody.region,
-      roleToAssume: requestBody.roleToAssume,
-      externalId: requestBody.externalId
+      roleToAssume: requestBody.roleToAssume
     });
 
     const endPointParams: EndpointCreateRequest = {
@@ -180,7 +178,6 @@ export default class Dataset extends Resource {
     fileName: string;
     region?: string;
     roleToAssume?: string;
-    externalId?: string;
   }): Promise<AxiosResponse> {
     return await this._axiosInstance.post(`${this._api}/presignedUpload`, body);
   }

@@ -17,7 +17,6 @@ export const CreateImportDataSetParser = z
     owner: z.string().optional(),
     ownerType: z.string().optional(),
     roleToAssume: z.string().optional(),
-    externalId: z.string().optional(),
     permissions: z
       .array(
         z.object({

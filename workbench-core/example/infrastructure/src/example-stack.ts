@@ -42,7 +42,6 @@ import { addAccessPointDelegationStatement, createAccessLogsBucket } from './hel
 export interface ExampleStackProps extends StackProps {
   hostingAccountId: string;
   crossAccountRoleName: string;
-  externalId: string;
 }
 
 export class ExampleStack extends Stack {
@@ -113,8 +112,7 @@ export class ExampleStack extends Stack {
     const exampleLambda: Function = this._createLambda(
       datasetBucket,
       props.hostingAccountId,
-      props.crossAccountRoleName,
-      props.externalId
+      props.crossAccountRoleName
     );
 
     const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
@@ -484,8 +482,7 @@ export class ExampleStack extends Stack {
   private _createLambda(
     datasetBucket: Bucket,
     hostingAccountId: string,
-    crossAccountRoleName: string,
-    externalId: string
+    crossAccountRoleName: string
   ): Function {
     const exampleLambdaRole = new Role(this, 'ExampleLambdaRole', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com')
@@ -591,10 +588,7 @@ export class ExampleStack extends Stack {
         new PolicyStatement({
           sid: 'crossAccountS3DatasetAccess',
           actions: ['sts:AssumeRole'],
-          resources: [`arn:${Aws.PARTITION}:iam::${hostingAccountId}:role/${crossAccountRoleName}`],
-          conditions: {
-            StringEquals: { 'sts:ExternalId': externalId }
-          }
+          resources: [`arn:${Aws.PARTITION}:iam::${hostingAccountId}:role/${crossAccountRoleName}`]
         })
       ]
     });
