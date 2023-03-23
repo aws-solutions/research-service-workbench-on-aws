@@ -43,13 +43,14 @@ jobs:
           aws-region: ${{ secrets.aws-test-region }}
           role-to-assume: ${{ secrets.test-role-to-assume }}
           role-session-name: TestOIDCSessionName
-          role-external-id: ${{ secrets.external_id }}
 
       - name: Deploy example package to Test environment
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-test-account-region }} -v
           node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
 
       - name: Deploy example package to Hosting environment
         run: |
@@ -58,7 +59,6 @@ jobs:
         env:
           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
           HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
-          EXTERNAL_ID: ${{ secrets.external_id }}
 
       - name: Example package integration test
         run: |

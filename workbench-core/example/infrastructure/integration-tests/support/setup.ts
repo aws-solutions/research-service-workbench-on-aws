@@ -77,8 +77,7 @@ export default class Setup {
     const mainAwsService = this.getMainAwsClient(tableName);
     const { Credentials } = await mainAwsService.clients.sts.assumeRole({
       RoleArn: this._settings.get('ExampleHostDatasetRoleOutput'),
-      RoleSessionName: sessionName,
-      ExternalId: process.env.EXTERNAL_ID
+      RoleSessionName: sessionName
     });
 
     if (!Credentials) {

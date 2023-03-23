@@ -18,21 +18,18 @@ describe('datasets byob integration test', () => {
 
   let hostRegion: string;
   let roleToAssume: string;
-  let externalId: string;
 
   beforeEach(() => {
     expect.hasAssertions();
 
     hostRegion = adminSession.getSettings().get('HostingAccountRegion');
     roleToAssume = adminSession.getSettings().get('ExampleHostDatasetRoleOutput');
-    externalId = process.env.EXTERNAL_ID!;
 
     byobCreateParams = {
       storageName: adminSession.getSettings().get('ExampleHostS3DataSetsBucketName'),
       awsAccountId: adminSession.getSettings().get('HostingAccountId'),
       region: hostRegion,
-      roleToAssume,
-      externalId
+      roleToAssume
     };
   });
 
@@ -48,7 +45,7 @@ describe('datasets byob integration test', () => {
   describe('ProvisionDataSet', () => {
     it('creates an external dataset', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { roleToAssume, externalId, ...expected } = byobCreateParams;
+      const { roleToAssume, ...expected } = byobCreateParams;
 
       const { data } = await adminSession.resources.datasets.create(byobCreateParams);
 
@@ -79,8 +76,7 @@ describe('datasets byob integration test', () => {
       const response = await dataset.share({
         userId: userData.id,
         region: hostRegion,
-        roleToAssume,
-        externalId
+        roleToAssume
       });
 
       expect(response).toMatchObject<AddDataSetExternalEndpointResponse>({
@@ -105,8 +101,7 @@ describe('datasets byob integration test', () => {
       const { data } = await dataset.generateSinglePartFileUploadUrl({
         fileName,
         region: hostRegion,
-        roleToAssume,
-        externalId
+        roleToAssume
       });
 
       await adminSession.getAxiosInstance().put(data.url, { fake: 'data' });
