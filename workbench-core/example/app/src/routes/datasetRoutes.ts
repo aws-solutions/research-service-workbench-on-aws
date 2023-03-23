@@ -65,7 +65,7 @@ async function getHostingAccountStoragePlugin(
     });
 
     if (!Credentials) {
-      throw Boom.badRequest('Invalid roleToAssume param.');
+      throw new Error('Invalid roleToAssume param.');
     }
 
     const awsService = new AwsService({
@@ -80,6 +80,7 @@ async function getHostingAccountStoragePlugin(
 
     return new S3DataSetStoragePlugin(awsService);
   } catch (e) {
+    console.error(e.message);
     throw Boom.badRequest(e.message);
   }
 }

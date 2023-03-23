@@ -52,10 +52,8 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
-          console.error(error.response.data);
           return Promise.reject(new HttpError(error.response.status, error.response.data));
         }
-        console.error(error);
         return Promise.reject(error);
       }
     );
