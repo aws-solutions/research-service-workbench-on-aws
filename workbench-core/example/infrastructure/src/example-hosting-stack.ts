@@ -9,7 +9,7 @@ import {
   WorkbenchSecureS3Bucket
 } from '@aws/workbench-core-infrastructure';
 import { Aws, CfnOutput, CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { AccountPrincipal, PolicyStatement, PrincipalWithConditions, Role } from 'aws-cdk-lib/aws-iam';
+import { AccountPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -20,7 +20,6 @@ import { addAccessPointDelegationStatement, createAccessLogsBucket } from './hel
 export interface ExampleHostingStackProps extends StackProps {
   mainAccountId: string;
   crossAccountRoleName: string;
-  externalId: string;
 }
 
 export class ExampleHostingStack extends Stack {
@@ -70,9 +69,7 @@ export class ExampleHostingStack extends Stack {
 
     const exampleCrossAccountRole = new Role(this, props.crossAccountRoleName, {
       roleName: props.crossAccountRoleName,
-      assumedBy: new PrincipalWithConditions(new AccountPrincipal(props.mainAccountId), {
-        StringEquals: { 'sts:ExternalId': props.externalId }
-      })
+      assumedBy: new AccountPrincipal(props.mainAccountId)
     });
 
     exampleCrossAccountRole.addToPolicy(

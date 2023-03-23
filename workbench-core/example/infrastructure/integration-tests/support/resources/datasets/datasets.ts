@@ -85,7 +85,6 @@ export default class Datasets extends CollectionResource {
       owner: resource.owner,
       ownerType: resource.ownerType,
       roleToAssume: resource.roleToAssume,
-      externalId: resource.externalId,
       permissions: resource.permissions ?? []
     };
   }
@@ -100,6 +99,5 @@ interface DataSetCreateRequest {
   owner?: string;
   ownerType?: string;
   roleToAssume?: string;
-  externalId?: string;
   permissions?: DataSetPermission[];
 }

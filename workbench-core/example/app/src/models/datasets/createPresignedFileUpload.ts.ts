@@ -10,8 +10,7 @@ export const CreatePresignedSinglePartFileUploadUrlParser = z
   .object({
     fileName: z.string(),
     region: z.string().optional(),
-    roleToAssume: z.string().optional(),
-    externalId: z.string().optional()
+    roleToAssume: z.string().optional()
   })
   .strict();
 
