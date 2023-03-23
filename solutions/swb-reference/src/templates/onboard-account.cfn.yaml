@@ -268,6 +268,8 @@ Resources:
         rules_to_suppress:
           - id: W11
             reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -450,6 +452,11 @@ Resources:
       ManagedPolicyArns:
         - !Ref PolicyHostingAccountHandler
       PermissionsBoundary: !Ref PolicyHostingAccountHandler
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   VPC:
     Type: AWS::EC2::VPC
@@ -500,6 +507,11 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public subnet 1
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W33
+            reason: 'TODO:EC2 Subnet should not have MapPublicIpOnLaunch set to true'
 
   FlowLogPublicSubnet:
     Type: AWS::EC2::FlowLog
