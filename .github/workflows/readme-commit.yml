@@ -10,7 +10,7 @@ on:
       branch:
         required: true
         type: string
-    secrets: 
+    secrets:
       gpg-private-key:
         required: true
       passphrase:
@@ -23,7 +23,7 @@ on:
         required: true
       slack_webhook_url:
         required: true
-      
+
     outputs:
       commit_hash:
         description: 'README update commit hash'
@@ -33,13 +33,13 @@ on:
         value: "${{ jobs.readme-commit.outputs.changes_detected }}"
 
 jobs:
-  readme-commit:  
+  readme-commit:
     runs-on: ubuntu-20.04
     outputs:
         commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
         changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
 
-    steps:        
+    steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.merge-token }}
@@ -48,12 +48,6 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: Rush test and update the README file in each package with the coverage badge
-        run: node common/scripts/install-run-rush.js test --verbose
-
-      - name: Update root README file with common coverage badge
-        run: node common/scripts/install-run-rush.js common-coverage-make-badge
-      
       - name: Update package info in root README file
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
@@ -75,13 +69,13 @@ jobs:
 
         # There's no way for github actions to push to a protected branch. This is a workaround
         # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on ${{ inputs.branch }}
+      - name: Temporarily disable branch protection on  ${{ inputs.branch }}
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
           repo: solution-spark-on-aws
-          branch: ${{ inputs.branch }}
+          branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
@@ -93,17 +87,17 @@ jobs:
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.bot-user }} # defaults to "github-actions[bot]"
           commit_user_email: ${{ secrets.bot-user-email }}
-          file_pattern: "README.md **/README.md"
+          file_pattern: "README.md"
           branch: ${{ inputs.branch }}
 
-      - name: Enable branch protection on ${{ inputs.branch }}
+      - name: Enable branch protection on  ${{ inputs.branch }}
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
           repo: solution-spark-on-aws
-          branch: ${{ inputs.branch }}
+          branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 

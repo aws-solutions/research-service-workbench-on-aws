@@ -37,6 +37,9 @@ jobs:
   deploy-swb-reference:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    with:
+      stage: testEnv
+      environment: dev
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -50,6 +53,9 @@ jobs:
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
+    with:
+      stage: swbv2-private
+      environment: dev
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION_BYON }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -71,6 +77,8 @@ jobs:
   deploy-swb-demo:
     needs: [deploy-swb-reference]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    with:
+      environment: dev    
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
@@ -80,10 +88,12 @@ jobs:
   deploy-example-app:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
+    with:
+      environment: test
     secrets:
-      aws-test-region: ${{ secrets.AWS_TEST_REGION }}
-      test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
-      aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
+      aws-region: ${{ secrets.AWS_TEST_REGION }}
+      role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
+      aws-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
       aws-test-hosting-account-id: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_ID }}
       aws-test-hosting-account-region: ${{ secrets.AWS_TEST_HOSTING_ACCOUNT_REGION }}
       external_id: ${{ secrets.EXTERNAL_ID }}

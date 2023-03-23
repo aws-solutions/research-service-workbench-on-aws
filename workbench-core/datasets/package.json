@@ -17,16 +17,14 @@
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "heft build --clean && rushx pkg-json-lint",
-    "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
+    "build:test": "heft test --clean && rushx pkg-json-lint",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only && rushx make-badges",
-    "test:only": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -71,7 +69,6 @@
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "fast-check": "^2.24.0",
-    "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "jest-fast-check": "^1.0.2",
     "license-check-and-add": "^4.0.5",

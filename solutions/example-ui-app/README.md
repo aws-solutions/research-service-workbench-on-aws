@@ -1,14 +1,13 @@
-# MA Foundation Starter App - POC
-
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
+# MA Foundation Starter App - POC
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
+
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
+
 This is a prototype app and you should expect to modify the source code to reflect your project needs.
-
-## Code Coverage
-
-| Statements | Branches | Functions | Lines |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-Unknown%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-Unknown%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-Unknown%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-Unknown%25-brightgreen.svg?style=flat) |
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

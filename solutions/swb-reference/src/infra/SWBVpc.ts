@@ -15,7 +15,7 @@ import {
   Vpc
 } from 'aws-cdk-lib/aws-ec2';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
 export interface SWBVpcProps {
@@ -35,7 +35,7 @@ export class SWBVpc extends Construct {
 
     this.vpc = vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
 
-    const logGroup = new LogGroup(this, 'VpcFlowLogGroup');
+    const logGroup = new LogGroup(this, 'VpcFlowLogGroup', { retention: RetentionDays.TEN_YEARS });
 
     const role = new Role(this, 'VpcFlowLogRole', {
       assumedBy: new ServicePrincipal('vpc-flow-logs.amazonaws.com')

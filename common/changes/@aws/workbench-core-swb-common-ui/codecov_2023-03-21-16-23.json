@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "codecov update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

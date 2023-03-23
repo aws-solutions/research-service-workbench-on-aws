@@ -152,18 +152,10 @@
     },
     {
       "name": "@aws/workbench-core-environments",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@aws/workbench-core-environments-ui",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws/workbench-core-example-app",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@aws/workbench-core-example-express",
       "allowedCategories": [ "prototypes" ]
     },
     {
@@ -179,68 +171,44 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws/workbench-core-swb-datasets-ui",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws/workbench-core-user-management",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/collection-hooks",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/components-react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/design-tokens",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/global-styles",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/test-utils-core",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/core",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@babel/plugin-syntax-dynamic-import",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@babel/plugin-syntax-flow",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@babel/plugin-transform-react-jsx",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-env",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@babel/preset-next",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-typescript",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@babel/runtime",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@casl/ability",
@@ -252,14 +220,6 @@
     },
     {
       "name": "@cloudscape-design/components",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@cloudscape-design/design-tokens",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@cloudscape-design/global-styles",
       "allowedCategories": [ "production" ]
     },
     {
@@ -291,14 +251,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@rushstack/heft-web-rig",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@rushstack/heft-webpack5-plugin",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@rushstack/node-core-library",
       "allowedCategories": [ "production" ]
     },
@@ -308,19 +260,19 @@
     },
     {
       "name": "@testing-library/dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/jest-dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/user-event",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@typescript-eslint/parser",
@@ -356,23 +308,11 @@
     },
     {
       "name": "babel-jest",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "babel-loader",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "babel-preset-next",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "cdk-ssm-document",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "concurrently",
@@ -396,10 +336,6 @@
     },
     {
       "name": "csurf",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "cypress",
       "allowedCategories": [ "production" ]
     },
     {
@@ -427,16 +363,12 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "eslint-config-next",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "eslint-import-resolver-typescript",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-import",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-react",
@@ -452,7 +384,7 @@
     },
     {
       "name": "eslint-plugin-testing-library",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "express",
@@ -469,10 +401,6 @@
     {
       "name": "generate-password",
       "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "istanbul-badges-readme",
-      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jest",
@@ -515,12 +443,8 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "next-compose-plugins",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "next-global-css",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next-i18next",
@@ -528,7 +452,7 @@
     },
     {
       "name": "next-transpile-modules",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "nodemon",
@@ -563,16 +487,12 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "react-scripts",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "sass",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "sharp",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "sort-package-json",
@@ -580,7 +500,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "swr",
@@ -599,24 +519,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "tslib",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "typescript",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "uuid",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "web-vitals",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "webpack",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "winston",

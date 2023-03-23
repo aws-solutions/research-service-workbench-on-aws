@@ -4,36 +4,13 @@
  */
 
 import { z } from 'zod';
+import { getPaginationParser } from '../validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListEnvironmentTypeConfigsRequestParser = z
   .object({
     envTypeId: z.string(),
-    pageSize: z
-      .string()
-      .transform((pageSizeString, ctx) => {
-        const pageSize = parseInt(pageSizeString);
-        if (isNaN(pageSize)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Must be a number'
-          });
-
-          return z.NEVER;
-        }
-        if (pageSize < 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Must be 0 or larger'
-          });
-
-          return z.NEVER;
-        }
-
-        return parseInt(pageSizeString);
-      })
-      .optional(),
-    paginationToken: z.string().optional()
+    ...getPaginationParser()
   })
   .strict();
 
