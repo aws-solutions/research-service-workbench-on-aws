@@ -18,6 +18,7 @@ interface PaabResources {
   rs1Session: ClientSession;
   project1Id: string;
   project2Id: string;
+  project3Id: string;
 }
 
 export class PaabHelper {
@@ -43,7 +44,7 @@ export class PaabHelper {
     });
 
     // create two projects
-    const projectNames: string[] = ['Project1', 'Project2'];
+    const projectNames: string[] = ['Project1', 'Project2', 'Project3'];
     const projectIds: string[] = [];
 
     for (const projectName of projectNames) {
@@ -55,7 +56,7 @@ export class PaabHelper {
       });
       projectIds.push(projectResponse.data.id);
     }
-    const [project1Id, project2Id] = projectIds;
+    const [project1Id, project2Id, project3Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
     let pa1Session: ClientSession = await this._setup.getSessionForUserType(
@@ -73,10 +74,16 @@ export class PaabHelper {
       .project(project1Id)
       .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
     await adminSession.resources.projects
+      .project(project3Id)
+      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+    await adminSession.resources.projects
       .project(project2Id)
       .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
     await adminSession.resources.projects
       .project(project1Id)
+      .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
+    await adminSession.resources.projects
+      .project(project3Id)
       .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
 
     pa1Session = await this._setup.getSessionForUserType('projectAdmin1', this._outputError);
@@ -89,7 +96,8 @@ export class PaabHelper {
       pa2Session,
       rs1Session,
       project1Id,
-      project2Id
+      project2Id,
+      project3Id
     };
   }
 
