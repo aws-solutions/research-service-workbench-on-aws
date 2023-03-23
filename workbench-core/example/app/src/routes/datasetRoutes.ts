@@ -80,7 +80,6 @@ async function getHostingAccountStoragePlugin(
 
     return new S3DataSetStoragePlugin(awsService);
   } catch (e) {
-    console.error(e.message);
     throw Boom.badRequest(e.message);
   }
 }
