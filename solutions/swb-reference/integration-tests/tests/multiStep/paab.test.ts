@@ -13,7 +13,8 @@ import { ListProjectsResponse } from '../../support/models/projects';
 import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
-  ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+  ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
+  ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
 import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
@@ -537,7 +538,7 @@ describe('multiStep environment test', () => {
       env1.id,
       'TERMINATING',
       'TERMINATED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     );
     await _waitForEnvironmentToReachState(
       adminSession,
@@ -545,7 +546,7 @@ describe('multiStep environment test', () => {
       env2.id,
       'TERMINATING',
       'TERMINATED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     );
     await _waitForEnvironmentToReachState(
       adminSession,
@@ -553,7 +554,7 @@ describe('multiStep environment test', () => {
       env3.id,
       'TERMINATING',
       'TERMINATED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     );
 
     console.log('Disassociating Environment Type Configs from Projects...');
