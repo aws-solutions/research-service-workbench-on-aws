@@ -43,7 +43,6 @@ jobs:
           aws-region: ${{ secrets.aws-test-region }}
           role-to-assume: ${{ secrets.test-role-to-assume }}
           role-session-name: TestOIDCSessionName
-          role-external-id: ${{ secrets.external_id }}
 
       - name: Deploy example package to Test environment
         run: |
