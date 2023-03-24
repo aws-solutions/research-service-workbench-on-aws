@@ -75,6 +75,11 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref AccessFromCIDRBlock
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W5
+            reason: 'TODO:Security Groups found with cidr open to world on egress'
 
   InstanceRolePermissionBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -171,6 +176,8 @@ Resources:
         rules_to_suppress:
           - id: W13
             reason: 'We allow the wildcard resource for sagemaker permissions since we do not know the sagemaker notebook instance identifier at the time of creation of this permisison boundary'
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   IAMRole:
     Type: 'AWS::IAM::Role'
@@ -240,6 +247,11 @@ Resources:
               Resource:
                 - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
       PermissionsBoundary: !Ref InstanceRolePermissionBoundary
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   # This policy is attached to the role after the instance is created
   # so that the instance can be referenced in the resource section
