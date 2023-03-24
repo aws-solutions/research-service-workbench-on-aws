@@ -27,4 +27,4 @@ As is, these templates depend on a subscription to an EC2 firewall appliance. We
 1. On the onboarding account, accept the resource share
     1. Resource Access Manager -> Shared with me -> Accept the invite
 1. Launch the onboarding stack (`onboard-account-tgw.cfn.yaml`) in the hosting account with the relevant outputs from the network account onboarding
-1. Use the outputs from the onboarding stack to onboard the account with the main account per the instructions in the [setup instructions](../../SETUP_v2p1.md).
+1. Use the outputs from the onboarding stack to onboard the account with the main account per the instructions in the [setup instructions](../../README.md#setup-instructions-for-swbv2p1).
