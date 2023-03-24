@@ -52,7 +52,6 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Uncomment `hostedZoneId` and `domainName` and provide their respective values from your Hosted Zone. If you dont have a domain configured, follow instructions to [create a Hosted Zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
-
 ### Setup CDK
 We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onboard CDK onto your AWS `Main Account`.
 
