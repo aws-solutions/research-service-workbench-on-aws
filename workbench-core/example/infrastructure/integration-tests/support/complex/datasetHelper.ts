@@ -1,6 +1,6 @@
 import { AccessPoint } from '@aws-sdk/client-s3-control';
-import { AwsService } from '@aws/workbench-core-base';
-import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
+import { AwsService, buildDynamoDbKey, JSONValue } from '@aws/workbench-core-base';
+import { dataSetPrefix, endpointPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 
 export class DatasetHelper {
   public static async listAccessPoints(
@@ -76,7 +76,11 @@ export class DatasetHelper {
     );
   }
 
-  public static async getddbRecords(awsService: AwsService, dataSetId: string, endpointId?: string): Promise<Record<string, JSONValue>> {
+  public static async getddbRecords(
+    awsService: AwsService,
+    dataSetId: string,
+    endpointId?: string
+  ): Promise<Record<string, JSONValue>> {
     return awsService.helpers.ddb.getItem({
       key: {
         pk: buildDynamoDbKey(dataSetId, dataSetPrefix),
