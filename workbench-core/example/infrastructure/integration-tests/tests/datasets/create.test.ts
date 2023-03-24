@@ -135,13 +135,9 @@ describe('datasets create integration test', () => {
       });
 
       // confirm authenticated user isnt present in ddb
-<<<<<<< HEAD
       const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
       const metadata = await DatasetHelper.getddbRecords(
         mainAwsService,
-=======
-      const metadata = await new DatasetHelper().getddbRecords(
->>>>>>> 3fed8c75 (fix: remove AuthenticatedUser from datasets DDB entries (#949))
         dataset.id,
         response.data.mountObject.endpointId
       );
@@ -214,13 +210,9 @@ describe('datasets create integration test', () => {
       });
 
       // confirm authenticated user isnt present in ddb
-<<<<<<< HEAD
       const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
       const metadata = await DatasetHelper.getddbRecords(
         mainAwsService,
-=======
-      const metadata = await new DatasetHelper().getddbRecords(
->>>>>>> 3fed8c75 (fix: remove AuthenticatedUser from datasets DDB entries (#949))
         dataset.id,
         response.data.mountObject.endpointId
       );
