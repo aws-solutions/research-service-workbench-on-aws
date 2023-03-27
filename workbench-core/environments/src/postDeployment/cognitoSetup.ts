@@ -3,11 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ListUserPoolsCommandInput,
-  UserPoolDescriptionType,
-  UsernameExistsException
-} from '@aws-sdk/client-cognito-identity-provider';
+import { Output } from '@aws-sdk/client-cloudformation';
+import { UsernameExistsException } from '@aws-sdk/client-cognito-identity-provider';
 import { AwsService } from '@aws/workbench-core-base';
 import passwordGenerator from 'generate-password';
 
@@ -17,9 +14,15 @@ export default class CognitoSetup {
     AWS_REGION: string;
     ROOT_USER_EMAIL: string;
     USER_POOL_NAME: string;
+    STACK_NAME: string;
   };
 
-  public constructor(constants: { AWS_REGION: string; ROOT_USER_EMAIL: string; USER_POOL_NAME: string }) {
+  public constructor(constants: {
+    AWS_REGION: string;
+    ROOT_USER_EMAIL: string;
+    USER_POOL_NAME: string;
+    STACK_NAME: string;
+  }) {
     this._constants = constants;
 
     const { AWS_REGION } = constants;
@@ -108,31 +111,19 @@ export default class CognitoSetup {
    * @returns user pool id
    */
   public async getUserPoolId(): Promise<string | undefined> {
-    // Get list of user pools
-    let userPools: UserPoolDescriptionType[] = [];
-    let nextToken: string | undefined = undefined;
+    const { STACK_NAME } = this._constants;
+    const describeStackParam = {
+      StackName: STACK_NAME
+    };
 
-    do {
-      // Add all pages of ListUserPoolsOutput to the userPools array until there are no more pages
-      const listUserPoolsInput: ListUserPoolsCommandInput = {
-        MaxResults: 20,
-        NextToken: nextToken
-      };
+    const stackDetails = await this._aws.clients.cloudformation.describeStacks(describeStackParam);
 
-      const listUserPoolsOutput = await this._aws.clients.cognito.listUserPools(listUserPoolsInput);
-      nextToken = listUserPoolsOutput.NextToken;
-      if (listUserPoolsOutput.UserPools) {
-        userPools = userPools.concat(listUserPoolsOutput.UserPools);
-      }
-    } while (nextToken);
-
-    // Find user pool in output with given user pool name
-    const userPool = userPools.find(
-      (userPool: UserPoolDescriptionType) => userPool.Name === this._constants.USER_POOL_NAME
-    );
+    const cognitoUserPoolId = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
+      return output.OutputKey && output.OutputKey === 'cognitoUserPoolId';
+    })?.OutputValue;
 
     // Return user pool id of given user pool
-    return userPool?.Id;
+    return cognitoUserPoolId;
   }
 
   /**

@@ -42,7 +42,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
@@ -142,19 +142,18 @@ export class SWBStack extends Stack {
       new CfnParameter(this, 'RequiredStackName', {
         type: 'String',
         default: STACK_NAME,
-        allowedValues: [STACK_NAME],
         description:
-          'Please use this value as the CloudFormation stack name above. Using any other stack name will result in failures later on.'
+          'Please copy the following value into the "Stack name" field at the top of this page. Warning: Do not change this value.'
       });
     }
 
     const cognitoDomainToUse = this._isSolutionsBuild
       ? new CfnParameter(this, 'CognitoDomainPrefix', {
           type: 'String',
-          default: COGNITO_DOMAIN,
-          minLength: 5,
+          minLength: 1,
+          maxLength: 63,
           description:
-            'Please provide a value to be used for your Cognito domain name prefix. Cognito domain names must be globally unique.'
+            'Please provide a string for your Cognito domain name prefix. Cognito domain names must be globally unique, so be creative.'
         }).valueAsString
       : COGNITO_DOMAIN;
 
@@ -673,7 +672,6 @@ export class SWBStack extends Stack {
 
     const iamRole = new Role(this, 'LaunchConstraint', {
       assumedBy: new ServicePrincipal('servicecatalog.amazonaws.com'),
-      roleName: `${this.stackName}-LaunchConstraint`,
       description: 'Launch constraint role for Service Catalog products',
       inlinePolicies: {
         sagemakerNotebookLaunchPermissions: sagemakerNotebookPolicy,
@@ -1256,7 +1254,7 @@ export class SWBStack extends Stack {
 
   // API Gateway
   private _createRestApi(apiLambda: Function): string {
-    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
+    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs', { retention: RetentionDays.TEN_YEARS });
     const metadatanode = logGroup.node.defaultChild as CfnResource;
     metadatanode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention

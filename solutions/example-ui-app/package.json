@@ -23,13 +23,11 @@
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
     "start": "next start",
-    "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
-    "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
+    "test": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "dependencies": {
     "next": "^12.1.5",
@@ -67,7 +65,6 @@
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-testing-library": "5.0.1",
-    "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "license-check-and-add": "^4.0.5",
     "license-checker": "^25.0.1",

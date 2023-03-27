@@ -6,6 +6,10 @@
 name: Deploy-swb-reference-demo
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
     secrets:
       role-to-assume:
         required: true
@@ -20,7 +24,7 @@ jobs:
   # deploy only when files specific to swb package changed
   deploy-swb-ref-demo:
     runs-on: ubuntu-20.04
-    environment: dev
+    environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read

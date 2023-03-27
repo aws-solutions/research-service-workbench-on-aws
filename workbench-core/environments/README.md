@@ -1,12 +1,11 @@
-# Workbench Core Environments
-
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
-# Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-85.98%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-83.01%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-84.46%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-86.07%25-yellow.svg?style=flat) |
+# Workbench Core Environments
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=workbench-core-environments)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-environments)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 This project provides the library and utilities function for setting up and managing environments. For an example of how this project can be used, please refer to [swb-reference](../../solutions/swb-reference).
 

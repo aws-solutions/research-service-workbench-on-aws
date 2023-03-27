@@ -16,10 +16,13 @@ import {
 } from '@aws/workbench-core-base';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetExistsError } from './errors/dataSetExistsError';
+import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { DataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
+import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { CreateDataSet, DataSet, DataSetArrayParser, DataSetParser } from './models/dataSet';
+import { DataSetMetadataParser, ExternalEndpointMetadataParser } from './models/ddbMetadata';
 import {
   CreateExternalEndpoint,
   ExternalEndpoint,
@@ -208,23 +211,32 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
       sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)
     };
-    const endpointItem: ExternalEndpoint & { resourceType: string } = {
+
+    const validatedEndpointMetadata = ExternalEndpointMetadataParser.safeParse({
       ...endpoint,
       resourceType: 'endpoint'
-    };
+    });
 
-    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endpointKey, params: { item: endpointItem } });
+    if (!validatedEndpointMetadata.success) {
+      throw new InvalidEndpointError(validatedEndpointMetadata.error.message);
+    }
+
+    await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: endpointKey,
+      params: { item: validatedEndpointMetadata.data }
+    });
   }
 
   private async _storeDataSetToDdb(dataSet: DataSet): Promise<void> {
-    const dataSetItem: DataSet & { resourceType: string } = {
-      ...dataSet,
-      resourceType: 'dataset'
-    };
+    const validatedDataSetMetadata = DataSetMetadataParser.safeParse({ ...dataSet, resourceType: 'dataset' });
+
+    if (!validatedDataSetMetadata.success) {
+      throw new DataSetInvalidParameterError(validatedDataSetMetadata.error.message);
+    }
 
     await this._aws.helpers.ddb.updateExecuteAndFormat({
       key: buildDynamoDBPkSk(dataSet.id, this._dataSetKeyType),
-      params: { item: dataSetItem }
+      params: { item: validatedDataSetMetadata.data }
     });
   }
 
