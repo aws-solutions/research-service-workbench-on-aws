@@ -9,7 +9,8 @@ ignores: [
     '@types/node',
     '@next/eslint-plugin-next',
     'eslint-plugin-react',
-    'eslint-plugin-react-hooks'
+    'eslint-plugin-react-hooks',
+    '@types/react-dom'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored
