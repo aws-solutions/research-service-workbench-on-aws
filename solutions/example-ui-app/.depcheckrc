@@ -3,7 +3,16 @@ ignores: [
     'eslint-plugin-import',
     'eslint-plugin-security',
     'npm-package-json-lint-config-default',
-    '@types/node'
+    '@types/node',
+    '@rushstack/heft',
+    '@rushstack/heft-jest-plugin',
+    '@awsui/components-react',
+    '@babel/preset-typescript',
+    '@awsui/design-tokens',
+    '@next/eslint-plugin-next',
+    'eslint-plugin-react',
+    'eslint-plugin-react-hooks',
+    'eslint-plugin-testing-library'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored
