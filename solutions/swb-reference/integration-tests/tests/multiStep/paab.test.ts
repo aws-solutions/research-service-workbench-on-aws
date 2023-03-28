@@ -13,7 +13,8 @@ import { ListProjectsResponse } from '../../support/models/projects';
 import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
-  ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+  ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
+  ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
 import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
@@ -26,17 +27,41 @@ describe('multiStep environment test', () => {
   const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-  const etId: string = setup.getSettings().get('envTypeId');
+  const etId: string = settings.get('envTypeId');
+  const type: string = settings.get('envType');
   const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
+  const defaultSageMakerETCBody = {
+    type,
+    params: [
+      {
+        key: 'IamPolicyDocument',
+        value: '${iamPolicyDocument}'
+      },
+      {
+        key: 'InstanceType',
+        value: 'ml.t3.medium'
+      },
+      {
+        key: 'AutoStopIdleTimeInMinutes',
+        value: '0'
+      },
+      {
+        key: 'CIDR',
+        value: '0.0.0.0/0'
+      }
+    ]
+  };
+
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let project1Id: string;
   let project2Id: string;
+  let project3Id: string;
   let rs1Session: ClientSession;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, rs1Session } =
+    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session } =
       await paabHelper.createResources());
   });
 
@@ -49,11 +74,15 @@ describe('multiStep environment test', () => {
     const { data: etc1 } = await adminSession.resources.environmentTypes
       .environmentType(etId)
       .configurations()
-      .create();
+      .create(defaultSageMakerETCBody);
     const { data: etc2 } = await adminSession.resources.environmentTypes
       .environmentType(etId)
       .configurations()
-      .create();
+      .create(defaultSageMakerETCBody);
+    const { data: etc3 } = await adminSession.resources.environmentTypes
+      .environmentType(etId)
+      .configurations()
+      .create(defaultSageMakerETCBody);
 
     console.log('Associating Environment Type Configs to Projects...');
     await adminSession.resources.projects
@@ -70,12 +99,19 @@ describe('multiStep environment test', () => {
       .configurations()
       .environmentTypeConfig(etc2.id)
       .associate();
+    await adminSession.resources.projects
+      .project(project3Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc3.id)
+      .associate();
 
     console.log('Creating Environment1 for Project1...');
     const env1Body = {
-      envTypeId: settings.get('envTypeId'),
-      envTypeConfigId: settings.get('envTypeConfigId'),
-      envType: settings.get('envType'),
+      envTypeId: etId,
+      envTypeConfigId: etc1.id,
+      envType: type,
       datasetIds: [],
       name: randomTextGenerator.getFakeText('paab-test-env1'),
       description: 'Environment1 for paab.test'
@@ -87,9 +123,9 @@ describe('multiStep environment test', () => {
 
     console.log('Creating Environment2 for Project2...');
     const env2Body = {
-      envTypeId: settings.get('envTypeId'),
-      envTypeConfigId: settings.get('envTypeConfigId'),
-      envType: settings.get('envType'),
+      envTypeId: etId,
+      envTypeConfigId: etc2.id,
+      envType: type,
       datasetIds: [],
       name: randomTextGenerator.getFakeText('paab-test-env2'),
       description: 'Environment2 for paab.test'
@@ -98,6 +134,20 @@ describe('multiStep environment test', () => {
       .project(project2Id)
       .environments()
       .create(env2Body, false);
+
+    console.log('Creating Environment3 for Project3...');
+    const env3Body = {
+      envTypeId: etId,
+      envTypeConfigId: etc3.id,
+      envType: type,
+      datasetIds: [],
+      name: randomTextGenerator.getFakeText('paab-test-env3'),
+      description: 'Environment3 for paab.test'
+    };
+    const { data: env3 } = await pa1Session.resources.projects
+      .project(project3Id)
+      .environments()
+      .create(env3Body, false);
 
     console.log('Creating Dataset1 for Project1...');
     const datasetName = randomTextGenerator.getFakeText('paab-test');
@@ -171,6 +221,17 @@ describe('multiStep environment test', () => {
     // Get Projects
     try {
       await pa2Session.resources.projects.project(project1Id).get();
+    } catch (err) {
+      checkHttpError(err, unauthorizedHttpError);
+    }
+
+    console.log('Verifying PA2 CANNOT see Project3...');
+    // List Projects
+    const { data: listProjects3 }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(listProjects3.data.filter((proj) => proj.id === project3Id).length).toEqual(0);
+    // Get Projects
+    try {
+      await pa2Session.resources.projects.project(project3Id).get();
     } catch (err) {
       checkHttpError(err, unauthorizedHttpError);
     }
@@ -252,13 +313,23 @@ describe('multiStep environment test', () => {
       checkHttpError(err, unauthorizedHttpError);
     }
 
-    console.log('Verifying Researcher1 CAN see Environment1');
+    console.log('Verifying Researcher1 CAN ONLY see Environment1 on project1 Request');
     // List Environments for Project
     const { data: researcherProj1Environments }: ListEnvironmentResponse = await rs1Session.resources.projects
       .project(project1Id)
       .environments()
       .listProjectEnvironments();
     expect(researcherProj1Environments.data.filter((env) => env.id === env1.id).length).toEqual(1);
+    expect(researcherProj1Environments.data.filter((env) => env.id === env3.id).length).toEqual(0);
+
+    console.log('Verifying Researcher1 CAN ONLY see Environment3 on project3 Request');
+    // List Environments for Project
+    const { data: researcherProj3Environments }: ListEnvironmentResponse = await rs1Session.resources.projects
+      .project(project3Id)
+      .environments()
+      .listProjectEnvironments();
+    expect(researcherProj3Environments.data.filter((env) => env.id === env3.id).length).toEqual(1);
+    expect(researcherProj3Environments.data.filter((env) => env.id === env1.id).length).toEqual(0);
 
     console.log('Verifying Researcher1 CANNOT see Environment2...');
     // List Environments for Project
@@ -387,6 +458,20 @@ describe('multiStep environment test', () => {
     // Stop
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).stop();
 
+    console.log('Verifying Researcher1 CAN call all Environment APIs against Environment3...');
+    await _waitForEnvironmentToReachState(
+      rs1Session,
+      project3Id,
+      env3.id,
+      'PENDING',
+      'COMPLETED',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    );
+    // Connect
+    await rs1Session.resources.projects.project(project3Id).environments().environment(env3.id).connect();
+    // Stop
+    await rs1Session.resources.projects.project(project3Id).environments().environment(env3.id).stop();
+
     console.log('Verifying ITAdmin can call all other Environment APIs against Environment1...');
     // Start (expecting this to fail since the state is not STOPPED, but not due to unauthorized access)
     try {
@@ -435,6 +520,43 @@ describe('multiStep environment test', () => {
     );
     await adminSession.resources.projects.project(project2Id).environments().environment(env2.id).terminate();
 
+    console.log('Verifying ITAdmin can terminate environment3...');
+    await _waitForEnvironmentToReachState(
+      adminSession,
+      project3Id,
+      env3.id,
+      'STOPPING',
+      'STOPPED',
+      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+    );
+    await adminSession.resources.projects.project(project3Id).environments().environment(env3.id).terminate();
+
+    console.log('Verifying Env1, Env2 and Env3 are terminated...');
+    await _waitForEnvironmentToReachState(
+      adminSession,
+      project1Id,
+      env1.id,
+      'TERMINATING',
+      'TERMINATED',
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+    );
+    await _waitForEnvironmentToReachState(
+      adminSession,
+      project2Id,
+      env2.id,
+      'TERMINATING',
+      'TERMINATED',
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+    );
+    await _waitForEnvironmentToReachState(
+      adminSession,
+      project3Id,
+      env3.id,
+      'TERMINATING',
+      'TERMINATED',
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+    );
+
     console.log('Disassociating Environment Type Configs from Projects...');
     await adminSession.resources.projects
       .project(project1Id)
@@ -449,6 +571,13 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .environmentTypeConfig(etc2.id)
+      .disassociate();
+    await adminSession.resources.projects
+      .project(project3Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc3.id)
       .disassociate();
   });
 });
