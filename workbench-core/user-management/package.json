@@ -27,9 +27,7 @@
     "test": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-base": "workspace:*",
-    "jsonschema": "^1.4.1",
-    "zod": "^3.19.1"
+    "@aws/workbench-core-base": "workspace:*"
   },
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
