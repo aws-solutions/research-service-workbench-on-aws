@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "fix dependencies",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}
