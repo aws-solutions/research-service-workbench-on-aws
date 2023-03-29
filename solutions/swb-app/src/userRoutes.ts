@@ -16,11 +16,9 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import _ from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { CreateRoleRequest, CreateRoleRequestParser } from './users/createRoleRequest';
 import { CreateUserRequest, CreateUserRequestParser } from './users/createUserRequest';
 import { DeleteUserRequest, DeleteUserRequestParser } from './users/deleteUserRequest';
 import { GetUserRequest, GetUserRequestParser } from './users/getUserRequest';
-import { UpdateRoleRequest, UpdateRoleRequestParser } from './users/updateRoleRequest';
 import { UpdateUserRequest, UpdateUserRequestParser } from './users/updateUserRequest';
 
 export function setUpUserRoutes(router: Router, userService: UserManagementService): void {
@@ -155,31 +153,6 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         if (Boom.isBoom(err)) throw err;
         throw Boom.badImplementation(`Could not update user ${userId}`);
       }
-    })
-  );
-
-  router.post(
-    '/roles',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<CreateRoleRequest>(CreateRoleRequestParser, req.body);
-      const response = await userService.createRole(validatedRequest.roleName);
-      res.status(201).send(response);
-    })
-  );
-
-  router.put(
-    '/roles/:roleName',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<UpdateRoleRequest>(UpdateRoleRequestParser, {
-        ...req.body,
-        roleName: req.params.roleName
-      });
-
-      if (!_.isString(validatedRequest.roleName)) {
-        throw Boom.badRequest('roleName must be a string.');
-      }
-      const response = await userService.addUserToRole(validatedRequest.username, validatedRequest.roleName);
-      res.send(response);
     })
   );
 }
