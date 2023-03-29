@@ -496,7 +496,19 @@
             "url": {
               "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/permissions",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "datasets", ":datasetId", "permissions"]
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "permissions"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
