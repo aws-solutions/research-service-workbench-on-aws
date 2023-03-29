@@ -5,7 +5,8 @@ ignores: [
     '@types/heft-jest',
     'eslint-plugin-import',
     'eslint-plugin-security',
-    'npm-package-json-lint-config-default'
+    'npm-package-json-lint-config-default',
+    '@types/node'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored

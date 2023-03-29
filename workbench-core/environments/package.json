@@ -38,14 +38,9 @@
     }
   },
   "dependencies": {
-    "@aws-cdk/aws-iam": "^1.159.0",
     "@aws-sdk/client-cloudformation": "^3.212.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
     "@aws-sdk/client-dynamodb": "^3.212.0",
-    "@aws-sdk/client-ec2": "^3.212.0",
-    "@aws-sdk/client-eventbridge": "^3.212.0",
-    "@aws-sdk/client-iam": "^3.212.0",
-    "@aws-sdk/client-lambda": "^3.212.0",
     "@aws-sdk/client-s3": "^3.212.0",
     "@aws-sdk/client-service-catalog": "^3.212.0",
     "@aws-sdk/client-ssm": "^3.212.0",
@@ -62,7 +57,6 @@
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "md5-file": "^5.0.0",
-    "uuid": "^8.3.2",
     "zod": "^3.19.1"
   },
   "devDependencies": {
@@ -76,7 +70,6 @@
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
-    "@types/uuid": "^8.3.4",
     "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
