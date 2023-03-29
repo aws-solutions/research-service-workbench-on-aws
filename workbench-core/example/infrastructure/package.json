@@ -57,6 +57,7 @@
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws/workbench-core-example-app": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
