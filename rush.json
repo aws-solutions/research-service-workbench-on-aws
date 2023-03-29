@@ -142,7 +142,13 @@
     {
       "packageName": "@aws/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
-      "reviewCategory": "production",
+      "reviewCategory": "tools",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@aws/workbench-core-github-oidc",
+      "projectFolder": "workbench-core/repo-scripts/github-oidc",
+      "reviewCategory": "tools",
       "shouldPublish": false
     },
     {

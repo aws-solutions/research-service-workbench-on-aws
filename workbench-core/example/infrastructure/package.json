@@ -18,7 +18,7 @@
     "build:test": "rushx compile && heft test -u --clean && rushx pkg-json-lint",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
-    "cdk:bootstrap:hosting": "cdk bootstrap aws://$HOSTING_ACCOUNT_ID/$HOSTING_ACCOUNT_REGION --trust $MAIN_ACCOUNT_ID --trust-for-lookup $MAIN_ACCOUNT_ID --cloudformation-execution-policies 'arn:aws:iam::aws:policy/AdministratorAccess'",
+    "cdk:bootstrap:hosting": "cdk bootstrap aws://$HOSTING_ACCOUNT_ID/$HOSTING_ACCOUNT_REGION --trust $MAIN_ACCOUNT_ID --trust-for-lookup $MAIN_ACCOUNT_ID --cloudformation-execution-policies \"arn:aws:iam::$HOSTING_ACCOUNT_ID:policy/maf-hosting-cdk-bootstrap-policy-us-east-1\" --toolkitStackName SSOA-CDKToolkit --qualifier ssoa",
     "cdk:bootstrap:main": "cdk bootstrap aws://$MAIN_ACCOUNT_ID/$MAIN_ACCOUNT_REGION",
     "cdk:deploy:hosting": "rush build -f @aws/workbench-core-example-infrastructure && rushx cdk deploy ExampleHostingStack --require-approval never --outputs-file src/config/hostingEnv.json",
     "cdk:deploy:hosting-noBuild": "rushx cdk deploy ExampleHostingStack --require-approval never --outputs-file src/config/hostingEnv.json",

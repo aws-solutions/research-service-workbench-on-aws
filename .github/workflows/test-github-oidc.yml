@@ -1,0 +1,19 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-develop-to-stage
+on: ['pull_request']
+
+jobs:
+  deploy-example-app:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@github-oidc-lp
+    with:
+      environment: prTest
+    secrets:
+      aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
+      role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
+      aws-test-hosting-account-id: ${{ secrets.PR_TEST_HOSTING_ACCOUNT_ID }}
+      aws-test-hosting-account-region: ${{ secrets.PR_TEST_HOSTING_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
