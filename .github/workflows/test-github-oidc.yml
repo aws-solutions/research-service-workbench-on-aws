@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Merge-develop-to-stage
+name: test-github-oidc
 on: ['pull_request']
 
 jobs:
