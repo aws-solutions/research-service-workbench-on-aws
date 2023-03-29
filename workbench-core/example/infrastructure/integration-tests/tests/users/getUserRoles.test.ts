@@ -36,9 +36,14 @@ describe('userManagement get user roles integration test', () => {
   });
 
   it('returns a list containing the users roles', async () => {
+    const roleName = `example-role-name-${uuidv4()}`; // TODO use roles.create() response once the route returns the created role name
     const { data: userData } = await adminSession.resources.users.create(user);
+    await adminSession.resources.roles.create({ roleName });
+    await adminSession.resources.roles.role(roleName).addUser({ userId: userData.id });
+
     const { data } = await adminSession.resources.users.user(userData.id).getRoles();
-    expect(data).toMatchObject([]);
+
+    expect(data).toMatchObject([roleName]);
   });
 
   it('throws a 404 error when the user doesnt exist', async () => {
