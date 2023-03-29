@@ -16,11 +16,9 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import _ from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { CreateRoleRequest, CreateRoleRequestParser } from './users/createRoleRequest';
 import { CreateUserRequest, CreateUserRequestParser } from './users/createUserRequest';
 import { DeleteUserRequest, DeleteUserRequestParser } from './users/deleteUserRequest';
 import { GetUserRequest, GetUserRequestParser } from './users/getUserRequest';
-import { UpdateRoleRequest, UpdateRoleRequestParser } from './users/updateRoleRequest';
 import { UpdateUserRequest, UpdateUserRequestParser } from './users/updateUserRequest';
 
 export function setUpUserRoutes(router: Router, userService: UserManagementService): void {
