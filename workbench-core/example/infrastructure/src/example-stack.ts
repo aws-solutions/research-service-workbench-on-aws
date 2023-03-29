@@ -48,8 +48,9 @@ export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
     COGNITO_DOMAIN: string;
     USER_POOL_ID: string;
-    CLIENT_ID: string;
-    CLIENT_SECRET: string;
+    WEB_UI_CLIENT_ID: string;
+    WEB_UI_CLIENT_SECRET: string;
+    PROGRAMMATIC_ACCESS_CLIENT_ID: string;
     STACK_NAME: string;
   };
 
@@ -70,8 +71,9 @@ export class ExampleStack extends Stack {
     this._exampleLambdaEnvVars = {
       COGNITO_DOMAIN: exampleCognito.cognitoDomain,
       USER_POOL_ID: exampleCognito.userPoolId,
-      CLIENT_ID: exampleCognito.userPoolClientId,
-      CLIENT_SECRET: exampleCognito.userPoolClientSecret.unsafeUnwrap(),
+      WEB_UI_CLIENT_ID: exampleCognito.webUiUserPoolClientId,
+      WEB_UI_CLIENT_SECRET: exampleCognito.webUiUserPoolClientSecret.unsafeUnwrap(),
+      PROGRAMMATIC_ACCESS_CLIENT_ID: exampleCognito.programmaticAccessUserPoolClientId,
       STACK_NAME: Aws.STACK_NAME
     };
 
@@ -677,9 +679,16 @@ export class ExampleStack extends Stack {
       domainPrefix: domainPrefix,
       websiteUrls: websiteUrls,
       userPoolName: userPoolName,
-      userPoolClientName: userPoolClientName,
+      webUiUserPoolClientName: `${userPoolClientName}-webUi`,
+      programmaticAccessUserPoolName: `${userPoolClientName}-iTest`,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      webUiUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(60)
+      },
+      programmaticAccessUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(60)
+      },
       removalPolicy: RemovalPolicy.DESTROY
     };
 
@@ -695,9 +704,14 @@ export class ExampleStack extends Stack {
       exportName: 'ExampleUserPoolId'
     });
 
-    new CfnOutput(this, 'ExampleCognitoUserPoolClientId', {
-      value: workbenchCognito.userPoolClientId,
-      exportName: 'ExampleCognitoUserPoolClientId'
+    new CfnOutput(this, 'ExampleCognitoWebUiUserPoolClientId', {
+      value: workbenchCognito.webUiUserPoolClientId,
+      exportName: 'ExampleCognitoWebUiUserPoolClientId'
+    });
+
+    new CfnOutput(this, 'ExampleCognitoIntegrationTestUserPoolClientId', {
+      value: workbenchCognito.programmaticAccessUserPoolClientId,
+      exportName: 'ExampleCognitoIntegrationTestUserPoolClientId'
     });
 
     new CfnOutput(this, 'ExampleCognitoDomainName', {

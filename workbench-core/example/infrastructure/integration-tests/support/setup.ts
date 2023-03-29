@@ -29,9 +29,11 @@ export default class Setup {
     return session;
   }
 
-  public async createAdminSession(): Promise<ClientSession> {
-    const userPoolId = this._settings.get('ExampleCognitoUserPoolId');
-    const clientId = this._settings.get('ExampleCognitoUserPoolClientId');
+  public async createRootUserSession(
+    userPoolId: string,
+    clientId: string,
+    accountType?: 'USER' | 'ADMIN'
+  ): Promise<ClientSession> {
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
     const awsRegion = this._settings.get('MainAccountRegion');
@@ -42,7 +44,8 @@ export default class Setup {
       userPoolId,
       clientId,
       rootUserNameParamStorePath,
-      rootPasswordParamStorePath
+      rootPasswordParamStorePath,
+      accountType
     });
 
     const decodedToken: { sub: string } = jwt_decode(accessToken);
@@ -52,6 +55,13 @@ export default class Setup {
     this._sessions.push(session);
 
     return session;
+  }
+
+  public async createAdminSession(): Promise<ClientSession> {
+    return this.createRootUserSession(
+      this._settings.get('ExampleCognitoUserPoolId'),
+      this._settings.get('ExampleCognitoIntegrationTestUserPoolClientId')
+    );
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {

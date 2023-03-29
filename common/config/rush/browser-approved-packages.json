@@ -36,7 +36,7 @@
     },
     {
       "name": "@aws-sdk/client-cognito-identity-provider",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-dynamodb",

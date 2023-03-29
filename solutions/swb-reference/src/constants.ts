@@ -33,8 +33,9 @@ interface Constants {
   COGNITO_DOMAIN: string;
   WEBSITE_URLS: string[];
   USER_POOL_ID: string;
-  CLIENT_ID: string;
-  CLIENT_SECRET: string;
+  WEB_UI_CLIENT_ID: string;
+  WEB_UI_CLIENT_SECRET: string;
+  PROGRAMMATIC_ACCESS_CLIENT_ID: string;
   VPC_ID: string;
   S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
@@ -108,8 +109,9 @@ function getConstants(region?: string): Constants {
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URLS = allowedOrigins;
   const USER_POOL_ID = config.userPoolId || '';
-  const CLIENT_ID = config.clientId || '';
-  const CLIENT_SECRET = config.clientSecret || '';
+  const WEB_UI_CLIENT_ID = config.webUiClientId || '';
+  const WEB_UI_CLIENT_SECRET = config.webUiClientSecret || '';
+  const PROGRAMMATIC_ACCESS_CLIENT_ID = config.programmaticAccessClientId || '';
   const VPC_ID = config.vpcId || '';
   const ALB_SUBNET_IDS = config.albSubnetIds || [];
   const ECS_SUBNET_IDS = config.ecsSubnetIds || [];
@@ -165,8 +167,9 @@ function getConstants(region?: string): Constants {
     COGNITO_DOMAIN,
     WEBSITE_URLS,
     USER_POOL_ID,
-    CLIENT_ID,
-    CLIENT_SECRET,
+    WEB_UI_CLIENT_ID,
+    WEB_UI_CLIENT_SECRET,
+    PROGRAMMATIC_ACCESS_CLIENT_ID,
     VPC_ID,
     S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
@@ -211,8 +214,9 @@ interface Config {
   allowedOrigins: string[];
   cognitoDomain: string;
   userPoolId?: string;
-  clientId?: string;
-  clientSecret?: string;
+  webUiClientId?: string;
+  webUiClientSecret?: string;
+  programmaticAccessClientId?: string;
   vpcId?: string;
   albSubnetIds?: string[];
   ecsSubnetIds?: string[];

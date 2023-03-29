@@ -52,7 +52,7 @@ export default class Setup {
       }
     }
     const userPoolId = this._settings.get('cognitoUserPoolId');
-    const clientId = this._settings.get('cognitoUserPoolClientId');
+    const clientId = this._settings.get('cognitoProgrammaticAccessUserPoolClientId');
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
     const awsRegion = this._settings.get('awsRegion');
@@ -101,7 +101,7 @@ export default class Setup {
 
   private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
     const userPoolId = this._settings.get('cognitoUserPoolId');
-    const clientId = this._settings.get('cognitoUserPoolClientId');
+    const clientId = this._settings.get('cognitoProgrammaticAccessUserPoolClientId');
     const awsRegion = this._settings.get('awsRegion');
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
