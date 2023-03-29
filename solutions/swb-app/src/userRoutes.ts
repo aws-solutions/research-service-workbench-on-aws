@@ -157,29 +157,4 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
       }
     })
   );
-
-  router.post(
-    '/roles',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<CreateRoleRequest>(CreateRoleRequestParser, req.body);
-      const response = await userService.createRole(validatedRequest.roleName);
-      res.status(201).send(response);
-    })
-  );
-
-  router.put(
-    '/roles/:roleName',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<UpdateRoleRequest>(UpdateRoleRequestParser, {
-        ...req.body,
-        roleName: req.params.roleName
-      });
-
-      if (!_.isString(validatedRequest.roleName)) {
-        throw Boom.badRequest('roleName must be a string.');
-      }
-      const response = await userService.addUserToRole(validatedRequest.username, validatedRequest.roleName);
-      res.send(response);
-    })
-  );
 }
