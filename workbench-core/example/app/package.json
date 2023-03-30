@@ -22,12 +22,10 @@
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
-    "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "start": "node lib/index.js",
-    "test": "rushx test:only",
-    "test:only": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build"
   },
   "dependencies": {
     "@aws/workbench-core-audit": "workspace:*",
@@ -43,7 +41,6 @@
     "express-rate-limit": "^6.6.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2",
     "zod": "^3.19.1"
   },
   "devDependencies": {
@@ -58,7 +55,6 @@
     "@types/heft-jest": "1.0.2",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
-    "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "eslint-plugin-security": "^1.4.0",

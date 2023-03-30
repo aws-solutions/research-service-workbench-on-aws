@@ -96,9 +96,13 @@ solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/integration-tests/config/testEnv.yaml
+!solutions/swb-reference/integration-tests/config/release-candidate.yaml
+!solutions/swb-reference/integration-tests/config/release-candidate-private.yaml
 !solutions/swb-reference/integration-tests/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
+!solutions/swb-reference/src/config/release-candidate.yaml
+!solutions/swb-reference/src/config/release-candidate-private.yaml
 !solutions/swb-reference/src/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/demo.yaml
 solutions/swb-reference/src/config/*.json
@@ -115,6 +119,7 @@ solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.
 # example package
 workbench-core/example/infrastructure/build
 workbench-core/example/infrastructure/src/config/testEnv.json
+workbench-core/example/infrastructure/src/config/hostingEnv.json
 
 #next static export
 solutions/swb-ui/ui/out

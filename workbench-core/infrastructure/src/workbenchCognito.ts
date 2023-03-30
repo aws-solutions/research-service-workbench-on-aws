@@ -6,6 +6,7 @@
 import { Duration, RemovalPolicy, SecretValue } from 'aws-cdk-lib';
 import {
   AccountRecovery,
+  AdvancedSecurityMode,
   Mfa,
   OAuthScope,
   UserPool,
@@ -44,7 +45,8 @@ const userPoolDefaults: UserPoolProps = {
   mfaSecondFactor: {
     sms: false,
     otp: true
-  }
+  },
+  advancedSecurityMode: AdvancedSecurityMode.ENFORCED
 };
 
 const userPoolClientDefaults: UserPoolClientOptions = {
@@ -83,6 +85,7 @@ export interface WorkbenchCognitoProps {
   programmaticAccessUserPoolTokenValidity?: UserPoolTokenValidity;
   mfa?: Mfa;
   removalPolicy?: RemovalPolicy;
+  advancedSecurityMode?: AdvancedSecurityMode;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -115,7 +118,8 @@ export class WorkbenchCognito extends Construct {
     const tempUserPoolProps: UserPoolProps = {
       mfa: props.mfa,
       userPoolName: props.userPoolName,
-      removalPolicy: props.removalPolicy
+      removalPolicy: props.removalPolicy,
+      advancedSecurityMode: props.advancedSecurityMode
     };
 
     const userPoolProps = merge({}, userPoolDefaults, tempUserPoolProps);

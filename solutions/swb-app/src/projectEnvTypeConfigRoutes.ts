@@ -101,7 +101,7 @@ export function setUpProjectEnvTypeConfigRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const request = validateAndParse<ListProjectEnvTypeConfigsRequest>(
         ListProjectEnvTypeConfigsRequestParser,
-        { envTypeId: req.params.envTypeId, projectId: req.params.projectId, ...req.body }
+        { envTypeId: req.params.envTypeId, projectId: req.params.projectId, ...req.query }
       );
       try {
         const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
@@ -136,7 +136,7 @@ export function setUpProjectEnvTypeConfigRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const request = validateAndParse<ListEnvTypeConfigProjectsRequest>(
         ListEnvTypeConfigProjectsRequestParser,
-        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.body }
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.query }
       );
       const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
       res.status(201).send(relationships);

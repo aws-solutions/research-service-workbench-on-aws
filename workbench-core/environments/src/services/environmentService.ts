@@ -252,8 +252,9 @@ export class EnvironmentService {
         queryParams.index = 'getResourceByCreatedAt';
       }
     } else {
-      // if nonadmin, use GSI getResourceByOwner
-      const addFilter = this._setFilter('getResourceByOwner', 'owner', user.id);
+      if (!filter?.project) throw Boom.unauthorized('User is not authorized.'); //researchers or PA trying to get environemnts with no project filter
+      // forcing nonadmins to filter by project
+      const addFilter = this._setFilter('getResourceByDependency', 'dependency', filter.project);
       queryParams = { ...queryParams, ...addFilter };
     }
 

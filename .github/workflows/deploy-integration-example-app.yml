@@ -6,12 +6,22 @@
 name: Deploy-and-integration-test-example-app
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
     secrets:
-      aws-test-region:
+      aws-region:
         required: true
-      test-role-to-assume:
+      role-to-assume:
         required: true
-      aws-test-account-region:
+      aws-account-region:
+        required: true
+      aws-test-hosting-account-id:
+        required: true
+      aws-test-hosting-account-region:
+        required: true
+      external_id:
         required: true
       slack_webhook_url:
         required: true
@@ -19,7 +29,7 @@ on:
 jobs:
   deploy-and-integration-test-example:
     runs-on: ubuntu-20.04
-    environment: test
+    environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read
@@ -34,15 +44,25 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ secrets.aws-test-region }}
-          role-to-assume: ${{ secrets.test-role-to-assume }}
+          aws-region: ${{ secrets.aws-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: TestOIDCSessionName
 
       - name: Deploy example package to Test environment
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-test-account-region }} -v
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-account-region }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+
+      - name: Deploy example package to Hosting environment
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+          HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
 
       - name: Example package integration test
         run: |

@@ -35,6 +35,7 @@ export {
 } from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 export { DataSet, DataSetParser, DataSetArrayParser, CreateDataSet } from './models/dataSet';
+export { DataSetMetadataParser, ExternalEndpointMetadataParser } from './models/ddbMetadata';
 export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';

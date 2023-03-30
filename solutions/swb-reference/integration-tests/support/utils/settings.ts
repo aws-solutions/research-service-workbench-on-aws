@@ -26,7 +26,8 @@ interface Setting {
   // Main CFN template outputs
   cognitoWebUiUserPoolClientId: string;
   cognitoProgrammaticAccessUserPoolClientId: string;
-  MainAccountEncryptionKeyOutput: string;
+  MainAccountS3ArtifactEncryptionKeyOutput: string;
+  MainAccountS3DatasetsEncryptionKeyOutput: string;
   SagemakerNotebookTerminateSSMDocOutput: string;
   awsRegion: string;
   DataSetsBucketName: string;
