@@ -92,12 +92,6 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/example-ui-app",
-      "projectFolder": "solutions/example-ui-app",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
       "packageName": "@aws/workbench-core-datasets",
       "projectFolder": "workbench-core/datasets",
       "reviewCategory": "production",

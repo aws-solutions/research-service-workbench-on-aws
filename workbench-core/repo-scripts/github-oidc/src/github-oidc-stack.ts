@@ -46,10 +46,22 @@ export class GitHubOIDCStack extends Stack {
       new ManagedPolicy(this, `${props.gitHubOrg}-${gitHubRepo}-GitHubOIDCCustomManagedPolicy`, {
         statements: [
           new PolicyStatement({
-            sid: 'StsAssumeRole',
+            sid: 'stsAccess',
             effect: Effect.ALLOW,
             actions: ['sts:AssumeRole'],
             resources: [`arn:${Aws.PARTITION}:iam::*:role/cdk-ssoa*`]
+          }),
+          new PolicyStatement({
+            sid: 'ssmAccess',
+            effect: Effect.ALLOW,
+            actions: ['ssm:GetParameter'],
+            resources: ['*']
+          }),
+          new PolicyStatement({
+            sid: 'cognitoAccess',
+            effect: Effect.ALLOW,
+            actions: ['cognito-idp:DescribeUserPoolClient'],
+            resources: ['*']
           })
         ],
         roles: [githubOIDCRole]
