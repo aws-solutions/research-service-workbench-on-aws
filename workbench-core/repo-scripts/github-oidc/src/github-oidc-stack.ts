@@ -16,9 +16,11 @@ import {
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import {
-  mafSsmPath,
+  mafSsmBasePath,
   mafCrossAccountRoleName,
+  swbBase,
   swbStage,
+  swbRegionShortName,
   mafMaxSessionDuration,
   swbMaxSessionDuration
 } from './configs/config';
@@ -53,7 +55,7 @@ export class GitHubOIDCStack extends Stack {
       });
 
       if (props.application === 'MAF') {
-        if (!mafSsmPath && !mafMaxSessionDuration) {
+        if (!mafSsmBasePath || !mafMaxSessionDuration) {
           throw new Error('SsmPath and MaxSessionDuration are required !');
         }
 
@@ -76,7 +78,7 @@ export class GitHubOIDCStack extends Stack {
               effect: Effect.ALLOW,
               actions: ['ssm:GetParameter'],
               resources: [
-                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${mafSsmPath}/*`
+                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${mafSsmBasePath}/*`
               ]
             }),
             new PolicyStatement({
@@ -129,7 +131,7 @@ export class GitHubOIDCStack extends Stack {
           roles: [githubOIDCRole]
         });
       } else if (props.application === 'SWB') {
-        if (!swbStage && !swbMaxSessionDuration) {
+        if (!swbStage || !swbBase || !swbRegionShortName || !swbMaxSessionDuration) {
           throw new Error('Stage and MaxSessionDuration are required !');
         }
         const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
@@ -144,11 +146,19 @@ export class GitHubOIDCStack extends Stack {
               resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-ssoa*`]
             }),
             new PolicyStatement({
+              sid: 'cloudformationAccess',
+              effect: Effect.ALLOW,
+              actions: ['cloudformation:DescribeStacks'],
+              resources: [
+                `arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/${swbBase}-${swbStage}-${swbRegionShortName}/*`
+              ]
+            }),
+            new PolicyStatement({
               sid: 'ssmAccess',
               effect: Effect.ALLOW,
               actions: ['ssm:GetParameter'],
               resources: [
-                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/swb/${swbStage}/*`
+                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${swbBase}/${swbStage}/*`
               ]
             }),
             new PolicyStatement({
