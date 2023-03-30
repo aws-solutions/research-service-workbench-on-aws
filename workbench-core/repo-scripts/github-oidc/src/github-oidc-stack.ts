@@ -3,18 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Aws, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Effect,
   FederatedPrincipal,
   OpenIdConnectProvider,
   ManagedPolicy,
   PolicyStatement,
-  Role
+  Role,
+  CfnRole
 } from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { mafSsmPath, mafCrossAccountRoleName, swbStage } from './configs/config';
+import {
+  mafSsmPath,
+  mafCrossAccountRoleName,
+  swbStage,
+  mafMaxSessionDuration,
+  swbMaxSessionDuration
+} from './configs/config';
 
 export interface GitHubOIDCStackProps extends StackProps {
   gitHubOrg: string;
@@ -41,10 +48,17 @@ export class GitHubOIDCStack extends Stack {
             }
           },
           'sts:AssumeRoleWithWebIdentity'
-        )
+        ),
+        maxSessionDuration: Duration.hours(2)
       });
 
       if (props.application === 'MAF') {
+        if (!mafSsmPath && !mafMaxSessionDuration) {
+          throw new Error('SsmPath and MaxSessionDuration are required !');
+        }
+
+        const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
+        githubCfnRole.maxSessionDuration = mafMaxSessionDuration;
         // eslint-disable-next-line no-new
         new ManagedPolicy(this, `${props.gitHubOrg}-${gitHubRepo}-GitHubOIDCCustomManagedPolicy`, {
           statements: [
@@ -115,6 +129,11 @@ export class GitHubOIDCStack extends Stack {
           roles: [githubOIDCRole]
         });
       } else if (props.application === 'SWB') {
+        if (!swbStage && !swbMaxSessionDuration) {
+          throw new Error('Stage and MaxSessionDuration are required !');
+        }
+        const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
+        githubCfnRole.maxSessionDuration = swbMaxSessionDuration;
         // eslint-disable-next-line no-new
         new ManagedPolicy(this, `${props.gitHubOrg}-${gitHubRepo}-GitHubOIDCCustomManagedPolicy`, {
           statements: [

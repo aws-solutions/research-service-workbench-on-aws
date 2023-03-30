@@ -1,0 +1,35 @@
+## Note:
+## Please deploy the swb-reference package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
+
+## Default Env Config for launching a new environment
+envTypeId: 'et-prod-uqwi7qg7fateq,pa-7t3glphqr2wrq'
+envTypeConfigId: 'etc-c18fe21a-8fd1-4d21-a572-febe65a7f20f'
+projectId: 'proj-05b5d543-a2c4-48f2-892f-bb68f65050fa' #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
+envType: 'sagemakerNotebook'
+
+## Negative Testing
+terminatedEnvId: 'env-94c32cee-ff6f-4430-8429-d80ff84e1817' # id of an environment that has already been terminated
+
+## Cognito Integ Test Client
+rootUserNameParamStorePath: '/swb/sam/rootUser/email'
+rootPasswordParamStorePath: '/swb/sam/rootUser/password'
+
+projectAdmin1UserNameParamStorePath: '/swb/sam/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/sam/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/sam/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/sam/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/sam/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/sam/researcher1/password'
+
+## Default Hosting Account
+defaultHostingAccountId: 'acc-affbdb7c-bd47-4f2d-af0a-e0c188df4e60' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+
+## Pre-requisite for running aws-accounts integration test
+## Create the onboard_account stack in an external AWS account, and populate the following values below:
+hostAwsAccountIdParamStorePath: '/swb/sam/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/sam/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/sam/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/sam/accountsTest/encryptionKeyArn'

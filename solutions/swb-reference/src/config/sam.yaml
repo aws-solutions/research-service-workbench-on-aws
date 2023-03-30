@@ -1,0 +1,18 @@
+stage: sam # Stage Name
+awsRegion: us-east-2
+awsRegionShortName: oh #two or three letter abbreviation for the region. You can choose your own abbreviation
+rootUserEmailParamStorePath: '/swb/sam/rootUser/email' # Log into your AWS account and store root user email in SSM Param store
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+cognitoDomain: 'sam-dev-test-domain'
+
+# Please provide the following values if you have a custom network for SWB to use
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+
+# internet-facing ALB
+# If you want internet-facing put value `true` else `false`
+albInternetFacing: true
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']

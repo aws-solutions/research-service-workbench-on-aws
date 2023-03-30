@@ -62,7 +62,6 @@ jobs:
       - name: Deploy SWB-Reference
         run: |
           cd solutions/swb-reference
-          node ../../common/scripts/install-run-rushx.js compile
           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
