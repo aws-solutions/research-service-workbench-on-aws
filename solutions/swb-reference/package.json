@@ -17,7 +17,7 @@
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint",
     "cdk": "cdk",
-    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
+    "cdk-deploy": "rush build -t @aws/swb-reference && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "cdk-synth": "rush build && rushx compile && cdk synth",
     "cdk-synth:noBuild": "rushx compile && cdk synth",
@@ -30,7 +30,7 @@
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
-    "run-postDeployment": "rush build && node lib/src/postDeployment.js",
+    "run-postDeployment": "rush build -t @aws/swb-reference && node lib/src/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "heft test --clean --no-build"
   },

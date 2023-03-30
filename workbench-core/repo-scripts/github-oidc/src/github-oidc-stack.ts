@@ -154,6 +154,18 @@ export class GitHubOIDCStack extends Stack {
               ]
             }),
             new PolicyStatement({
+              sid: 'serviceCatalogPortfolioAccess',
+              effect: Effect.ALLOW,
+              actions: ['servicecatalog:ListPortfolios'],
+              resources: [`arn:${Aws.PARTITION}:servicecatalog:${Aws.REGION}:${Aws.ACCOUNT_ID}:*/*`]
+            }),
+            new PolicyStatement({
+              sid: 'serviceCatalogProductAccess',
+              effect: Effect.ALLOW,
+              actions: ['servicecatalog:SearchProductsAsAdmin'],
+              resources: [`arn:${Aws.PARTITION}:servicecatalog:${Aws.REGION}:${Aws.ACCOUNT_ID}:portfolio/*`]
+            }),
+            new PolicyStatement({
               sid: 'ssmAccess',
               effect: Effect.ALLOW,
               actions: ['ssm:GetParameter'],
@@ -225,15 +237,16 @@ export class GitHubOIDCStack extends Stack {
         [
           {
             id: 'AwsSolutions-IAM5',
-            reason: 'I am ok to use wildcard permission here',
-            appliesTo: [
-              'Resource::arn:<AWS::Partition>:iam::<AWS::AccountId>:role/cdk-ssoa*',
-              'Resource::arn:<AWS::Partition>:ssm:<AWS::Region>:<AWS::AccountId>:parameter/swb/sam/*',
-              'Resource::arn:<AWS::Partition>:cognito-idp:<AWS::Region>:<AWS::AccountId>:userpool/*',
-              'Resource::arn:<AWS::Partition>:dynamodb:<AWS::Region>:<AWS::AccountId>:table/*',
-              'Resource::arn:<AWS::Partition>:kms:<AWS::Region>:<AWS::AccountId>:key/*',
-              'Resource::*'
-            ]
+            reason: 'I am ok to use wildcard permission here'
+            // appliesTo: [
+            //   'Resource::arn:<AWS::Partition>:iam::<AWS::AccountId>:role/cdk-ssoa*',
+            //   'Resource::arn:<AWS::Partition>:ssm:<AWS::Region>:<AWS::AccountId>:parameter/swb/sam/*',
+            //   'Resource::arn:<AWS::Partition>:cognito-idp:<AWS::Region>:<AWS::AccountId>:userpool/*',
+            //   'Resource::arn:<AWS::Partition>:dynamodb:<AWS::Region>:<AWS::AccountId>:table/*',
+            //   'Resource::arn:<AWS::Partition>:kms:<AWS::Region>:<AWS::AccountId>:key/*',
+            //   'Resource::*',
+            //   'Resource::arn:<AWS::Partition>:cloudformation:<AWS::Region>:<AWS::AccountId>:stack/swb-sam-oh/*'
+            // ]
           }
         ]
       );
