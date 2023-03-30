@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Stack, StackProps } from 'aws-cdk-lib';
-import { CfnRole, OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
+import { CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnRole, IOpenIdConnectProvider, OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export class OIDCProviderStack extends Stack {
-  public idp: OpenIdConnectProvider;
+  public idp: IOpenIdConnectProvider;
 
   public constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
@@ -18,6 +18,9 @@ export class OIDCProviderStack extends Stack {
       url: 'https://token.actions.githubusercontent.com',
       clientIds: ['sts.amazonaws.com']
     });
+
+    const oidcCfnResource = this.idp.node.findChild('Resource') as CfnResource;
+    oidcCfnResource.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
     // CFN NAG Suppression
     const customResourceProviderRoleMetaDataNode = this.node

@@ -18,7 +18,8 @@
         "cloudwatch:*",
         "acm:*",
         "servicecatalog:*",
-        "applicationinsights:*"
+        "applicationinsights:*",
+        "cloudformation:*"
       ],
       "Resource": "*",
       "Condition": {

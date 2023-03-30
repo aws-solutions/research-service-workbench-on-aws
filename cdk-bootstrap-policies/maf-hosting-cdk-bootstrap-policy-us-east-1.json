@@ -3,7 +3,16 @@
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": ["lambda:*", "kms:*", "s3:*", "servicecatalog:*", "applicationinsights:*", "ssm:*"],
+      "Action": [
+        "lambda:*",
+        "kms:*",
+        "s3:*",
+        "servicecatalog:*",
+        "applicationinsights:*",
+        "ssm:*",
+        "cloudformation:*",
+        "logs:*"
+      ],
       "Resource": "*",
       "Condition": {
         "StringEquals": {
