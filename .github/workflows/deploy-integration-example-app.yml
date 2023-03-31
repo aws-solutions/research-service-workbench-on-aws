@@ -103,8 +103,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Base Action
-        uses: ./.github/actions/baseAction
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.13.0
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -128,19 +160,17 @@ jobs:
           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
           HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
 
-      - name: Cache Main cdk output json
-        uses: actions/cache@v3
+      - name: Upload Artifact testEnv.json
+        uses: actions/upload-artifact@v3
         with:
-          path: |
-            workbench-core/example/infrastructure/src/config/testEnv.json
-          key: testEnv
+          name: testEnv
+          path: workbench-core/example/infrastructure/src/config/testEnv.json
 
-      - name: Cache Hosting cdk output json
-        uses: actions/cache@v3
+      - name: Upload Artifact hostingEnv.json
+        uses: actions/upload-artifact@v3
         with:
-          path: |
-            workbench-core/example/infrastructure/src/config/hostingEnv.json
-          key: hostingEnv
+          name: hostingEnv
+          path: workbench-core/example/infrastructure/src/config/hostingEnv.json
 
       - name: Set Chunks
         id: set-test-chunks
@@ -169,22 +199,55 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Base Action
-        uses: ./.github/actions/baseAction
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
 
-      - name: Restore Cache Main cdk output json
-        uses: actions/cache@v2
+      - name: Cache Rush
+        uses: actions/cache@v3
         with:
           path: |
-            workbench-core/example/infrastructure/src/config/testEnv.json
-          key: testEnv
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
 
-      - name: Restore Cache Hosting cdk output json
-        uses: actions/cache@v2
+      - name: Cache pnpm
+        uses: actions/cache@v3
         with:
           path: |
-            workbench-core/example/infrastructure/src/config/hostingEnv.json
-          key: hostingEnv
+            common/temp/pnpm-store
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.13.0
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build -f @aws/workbench-core-example-infrastructure
+
+      - name: Dowload Artifact testEnv.json
+        uses: actions/download-artifact@v3
+        with:
+          name: testEnv
+          path: workbench-core/example/infrastructure/src/config/testEnv.json
+
+      - name: Download Artifact hostingEnv.json
+        uses: actions/download-artifact@v3
+        with:
+          name: hostingEnv
+          path: workbench-core/example/infrastructure/src/config/hostingEnv.json
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -199,3 +262,10 @@ jobs:
           echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../../common/scripts/install-run-rushx.js -q jest
         env:
           CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
+
+      - name: Delete Artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            testEnv
+            hostingEnv
