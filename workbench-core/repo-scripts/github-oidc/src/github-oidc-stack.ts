@@ -217,7 +217,7 @@ export class GitHubOIDCStack extends Stack {
               sid: 'eventRuleAccess',
               effect: Effect.ALLOW,
               actions: ['events:DescribeRule'],
-              resources: [`arn:${Aws.PARTITION}:events:${Aws.REGION}:${Aws.ACCOUNT_ID}:ule/RouteHostEvents`]
+              resources: [`arn:${Aws.PARTITION}:events:${Aws.REGION}:${Aws.ACCOUNT_ID}:rule/RouteHostEvents`]
             }),
             new PolicyStatement({
               sid: 'kmsAccess',

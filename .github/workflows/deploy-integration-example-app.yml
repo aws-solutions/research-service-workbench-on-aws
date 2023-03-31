@@ -243,11 +243,17 @@ jobs:
           name: testEnv
           path: workbench-core/example/infrastructure/src/config/testEnv.json
 
+      - name: echo testEnv.json
+        run: cat workbench-core/example/infrastructure/src/config/testEnv.json
+
       - name: Download Artifact hostingEnv.json
         uses: actions/download-artifact@v3
         with:
           name: hostingEnv
           path: workbench-core/example/infrastructure/src/config/hostingEnv.json
+
+      - name: echo hostingEnv.json
+        run: cat workbench-core/example/infrastructure/src/config/hostingEnv.json
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
