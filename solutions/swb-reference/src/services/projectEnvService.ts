@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProjectEnvPlugin, ProjectDeletedError } from '@aws/swb-app';
+import { ProjectEnvPlugin, ProjectDeletedError, EnvironmentItem } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import {
@@ -93,12 +93,11 @@ export class ProjectEnvService implements ProjectEnvPlugin {
 
   public async listProjectEnvs(
     projectId: string,
-    user: AuthenticatedUser,
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
+  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }> {
     await this._projectService.getProject({ projectId: projectId });
-    return this._envService.listEnvironments(user, { project: projectId }, pageSize, paginationToken);
+    return this._envService.listEnvironmentsByProject({ projectId: projectId, pageSize, paginationToken });
   }
 
   public async updateEnvironment(

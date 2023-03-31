@@ -14,6 +14,7 @@ import {
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { EnvironmentPlugin } from './environments/environmentPlugin';
 import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
 import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
@@ -24,6 +25,7 @@ export interface ApiRouteConfig {
   environments: { [key: string]: EnvironmentUtilityServices };
   account: HostingAccountService;
   environmentService: EnvironmentService;
+  environmentPlugin: EnvironmentPlugin;
   dataSetService: DataSetPlugin;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;

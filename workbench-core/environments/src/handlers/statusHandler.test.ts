@@ -6,8 +6,9 @@
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
+import { Environment } from '../models/environments/environment';
 import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
-import { EnvironmentService, Environment } from '../services/environmentService';
+import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
 

@@ -218,7 +218,6 @@ export function setUpProjectEnvRoutes(
       } else {
         const response = await projectEnvironmentService.listProjectEnvs(
           req.params.projectId,
-          res.locals.user,
           pageSize ? Number(pageSize) : undefined,
           paginationToken
         );

@@ -185,17 +185,14 @@ describe('ProjectEnvService', () => {
 
   describe('listProjectEnvs', () => {
     test('should call projectService and environmentService, and return list of environments', async () => {
-      mockWorkbenchEnvironmentService.listEnvironments = jest.fn().mockReturnValueOnce([mockEnv]);
+      mockWorkbenchEnvironmentService.listEnvironmentsByProject = jest.fn().mockReturnValueOnce([mockEnv]);
 
-      const envs = await projectEnvService.listProjectEnvs(fakeProjectId, mockUser);
+      const envs = await projectEnvService.listProjectEnvs(fakeProjectId);
 
       expect(mockWorkbenchProjectService.getProject).toHaveBeenCalledWith({ projectId: fakeProjectId });
-      expect(mockWorkbenchEnvironmentService.listEnvironments).toHaveBeenLastCalledWith(
-        mockUser,
-        { project: fakeProjectId },
-        undefined,
-        undefined
-      );
+      expect(mockWorkbenchEnvironmentService.listEnvironmentsByProject).toHaveBeenLastCalledWith({
+        projectId: fakeProjectId
+      });
       expect(envs).toEqual([mockEnv]);
     });
   });

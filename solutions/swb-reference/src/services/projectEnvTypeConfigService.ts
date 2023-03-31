@@ -12,7 +12,8 @@ import {
   GetProjectEnvTypeConfigRequest,
   ListEnvTypeConfigProjectsRequest,
   Project,
-  ProjectDeletedError
+  ProjectDeletedError,
+  EnvironmentItem
 } from '@aws/swb-app';
 import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
 import {
@@ -32,8 +33,7 @@ import {
   EnvironmentTypeConfigService,
   EnvironmentTypeService,
   EnvironmentTypeConfig,
-  EnvironmentService,
-  Environment
+  EnvironmentService
 } from '@aws/workbench-core-environments';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
@@ -242,8 +242,12 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     let paginationToken: string | undefined = undefined;
 
     do {
-      const dependencies: { data: Environment[]; paginationToken: string | undefined } =
-        await this._environmentService.listEnvironments(user, { type: typeId }, 200, paginationToken);
+      const dependencies: { data: EnvironmentItem[]; paginationToken: string | undefined } =
+        await this._environmentService.listEnvironments({
+          filter: { type: { eq: typeId } },
+          pageSize: 200,
+          paginationToken
+        });
       if (dependencies?.data) {
         const activeEnvironments = dependencies.data.filter(
           (e) => e.status !== 'FAILED' && e.projectId === projectId

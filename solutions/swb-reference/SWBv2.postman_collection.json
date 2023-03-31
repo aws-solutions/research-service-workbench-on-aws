@@ -732,6 +732,11 @@
                   "key": "pageSize",
                   "value": "",
                   "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "desc",
+                  "disabled": true
                 }
               ]
             }
@@ -760,57 +765,67 @@
               "path": ["environments"],
               "query": [
                 {
-                  "key": "status",
-                  "value": "COMPLETED",
-                  "disabled": true
-                },
-                {
-                  "key": "name",
+                  "key": "filter[name][begins]",
                   "value": "testEnv",
                   "disabled": true
                 },
                 {
-                  "key": "createdAtFrom",
-                  "value": "2022-05-13T20:03:54.055Z",
+                  "key": "filter[status][eq]",
+                  "value": "COMPLETED",
                   "disabled": true
                 },
                 {
-                  "key": "createdAtTo",
-                  "value": "2022-05-13T20:03:54.055Z",
-                  "disabled": true
-                },
-                {
-                  "key": "owner",
-                  "value": "user-123",
-                  "disabled": true
-                },
-                {
-                  "key": "type",
-                  "value": "envType-123",
-                  "disabled": true
-                },
-                {
-                  "key": "project",
+                  "key": "filter[projectId][eq]",
                   "value": "project-123",
                   "disabled": true
                 },
                 {
-                  "key": "ascending",
-                  "value": "name",
+                  "key": "filter[owner][eq]",
+                  "value": "user-123",
                   "disabled": true
                 },
                 {
-                  "key": "descending",
-                  "value": "name",
+                  "key": "filter[createdAt][between][value1]",
+                  "value": "2022-05-13T20:03:54.055Z",
                   "disabled": true
                 },
                 {
-                  "key": "paginationToken",
-                  "value": "",
+                  "key": "filter[createdAt][between][value2]",
+                  "value": "2026-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[status]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[projectId]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[owner]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[createdAt]",
+                  "value": "desc",
                   "disabled": true
                 },
                 {
                   "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
                   "value": "",
                   "disabled": true
                 }

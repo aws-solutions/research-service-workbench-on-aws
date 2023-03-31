@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { Environment, EnvironmentStatus } from '@aws/workbench-core-environments';
+import { EnvironmentItem } from '../environments/environmentItem';
 
 export interface ProjectEnvPlugin {
   /**
@@ -48,10 +49,9 @@ export interface ProjectEnvPlugin {
    */
   listProjectEnvs(
     projectId: string,
-    user: AuthenticatedUser,
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ data: Environment[]; paginationToken: string | undefined }>;
+  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }>;
 
   /**
    * Update Environment associated with Project
