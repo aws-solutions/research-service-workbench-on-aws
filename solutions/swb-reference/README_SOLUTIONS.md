@@ -8,9 +8,9 @@
 - You have now deployed SWBv2 successfully in your main account.
 
 ### Breaking down your stack name
-While following along steps you encounter further, please note that since you're working with a pre-formed template the region short name is a random string. For example if your stack name is `swb-dev-bb5823` then:
+While following along steps you encounter further, please note that since you're working with a pre-formed template the region short name is a random string. For example if your stack name is `swb-dev-test` then:
 - `dev` is the stage name
-- `bb5823` is the region short name
+- `test` is the region short name
 ----
 
 ## Link Hosting Account
