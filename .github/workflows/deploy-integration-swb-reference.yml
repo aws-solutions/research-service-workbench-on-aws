@@ -41,8 +41,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Base Action
-        uses: ./.github/actions/baseAction
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.13.0
+
+      - name: Install dependecies
+        shell: bash
+        run: node common/scripts/install-run-rush.js install
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
