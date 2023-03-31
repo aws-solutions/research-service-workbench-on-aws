@@ -164,13 +164,16 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: testEnv
-          path: workbench-core/example/infrastructure/src/config/testEnv.json
+          path: workbench-core/example/infrastructure/src/config/
 
       - name: Upload Artifact hostingEnv.json
         uses: actions/upload-artifact@v3
         with:
           name: hostingEnv
-          path: workbench-core/example/infrastructure/src/config/hostingEnv.json
+          path: workbench-core/example/infrastructure/src/config/
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Set Chunks
         id: set-test-chunks
