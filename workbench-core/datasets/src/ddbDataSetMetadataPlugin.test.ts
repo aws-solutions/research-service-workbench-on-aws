@@ -35,6 +35,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
   const datasetKeyTypeId = 'DS';
   const endpointKeyTypeId = 'EP';
+  const storageLocationKeyTypeId = 'SL';
 
   const mockDataSetId = `${datasetKeyTypeId.toLowerCase()}-sampleId`;
   const mockDataSetName = 'Sample-DataSet';
@@ -65,7 +66,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
-    plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId);
+    plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId, storageLocationKeyTypeId);
     mockDdb = mockClient(DynamoDBClient);
     jest.spyOn(Date.prototype, 'toISOString').mockImplementation(() => mockCreatedAt);
   });

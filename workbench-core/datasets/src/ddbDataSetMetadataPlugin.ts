@@ -22,24 +22,35 @@ import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidEndpointError } from './errors/invalidEndpointError';
 import { CreateDataSet, DataSet, DataSetArrayParser, DataSetParser } from './models/dataSet';
-import { DataSetMetadataParser, ExternalEndpointMetadataParser } from './models/ddbMetadata';
+import {
+  DataSetMetadataParser,
+  ExternalEndpointMetadataParser,
+  StorageLocationMetadataParser
+} from './models/ddbMetadata';
 import {
   CreateExternalEndpoint,
   ExternalEndpoint,
   ExternalEndpointArrayParser,
   ExternalEndpointParser
 } from './models/externalEndpoint';
-import { StorageLocation } from './models/storageLocation';
+import { StorageLocation, StorageLocationArrayParser } from './models/storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
   private _dataSetKeyType: string;
   private _endpointKeyType: string;
+  private _storageLocationKeyType: string;
 
-  public constructor(aws: AwsService, dataSetKeyTypeId: string, endpointKeyTypeId: string) {
+  public constructor(
+    aws: AwsService,
+    dataSetKeyTypeId: string,
+    endpointKeyTypeId: string,
+    storageLocationKeyType: string
+  ) {
     this._aws = aws;
     this._dataSetKeyType = dataSetKeyTypeId;
     this._endpointKeyType = endpointKeyTypeId;
+    this._storageLocationKeyType = storageLocationKeyType;
   }
 
   public async getDataSetEndPointDetails(dataSetId: string, endpointId: string): Promise<ExternalEndpoint> {
@@ -109,6 +120,16 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     await this._storeDataSetToDdb(createdDataSet);
 
+    await this._storeStorageLocationToDdb(
+      {
+        name: dataSet.storageName,
+        type: dataSet.storageType,
+        awsAccountId: dataSet.awsAccountId,
+        region: dataSet.region
+      },
+      'increment'
+    );
+
     return createdDataSet;
   }
 
@@ -122,7 +143,29 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
    * @param dataSetId - the ID of the Dataset to remove.
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
-    await this._aws.helpers.ddb.delete(buildDynamoDBPkSk(dataSetId, this._dataSetKeyType)).execute();
+    const data = await this._aws.helpers.ddb.deleteItem({
+      key: buildDynamoDBPkSk(dataSetId, this._dataSetKeyType),
+      params: { return: 'ALL_OLD' }
+    });
+
+    const remainingDatasets = await this._storeStorageLocationToDdb(
+      {
+        name: data.storageName as string,
+        type: data.storageType as string,
+        awsAccountId: data.awsAccountId as string,
+        region: data.region as string
+      },
+      'decrement'
+    );
+
+    if (remainingDatasets < 1) {
+      await this._aws.helpers.ddb
+        .delete({
+          pk: this._dataSetKeyType,
+          sk: buildDynamoDbKey(data.storageName as string, this._storageLocationKeyType)
+        })
+        .execute();
+    }
   }
 
   public async addExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<ExternalEndpoint> {
@@ -163,19 +206,18 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     pageSize: number,
     paginationToken: string | undefined
   ): Promise<PaginatedResponse<StorageLocation>> {
-    const response = await this.listDataSets(pageSize, paginationToken);
+    const query: QueryParams = addPaginationToken(paginationToken, {
+      key: { name: 'resourceType', value: 'datasetStorageLocation' },
+      index: 'getResourceByCreatedAt',
+      limit: pageSize
+    });
 
-    const map = new Map<string, StorageLocation>();
-    response.data.forEach((dataset) =>
-      map.set(dataset.storageName, {
-        name: dataset.storageName,
-        awsAccountId: dataset.awsAccountId,
-        type: dataset.storageType,
-        region: dataset.region
-      })
-    );
+    const response = await this._aws.helpers.ddb.getPaginatedItems(query);
+
+    const storageLocations = StorageLocationArrayParser.parse(response.data) || [];
+
     return {
-      data: Array.from(map.values()),
+      data: storageLocations,
       paginationToken: response.paginationToken
     };
   }
@@ -207,11 +249,6 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   private async _storeEndpointToDdb(endpoint: ExternalEndpoint): Promise<void> {
-    const endpointKey = {
-      pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
-      sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)
-    };
-
     const validatedEndpointMetadata = ExternalEndpointMetadataParser.safeParse({
       ...endpoint,
       resourceType: 'endpoint'
@@ -220,6 +257,11 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!validatedEndpointMetadata.success) {
       throw new InvalidEndpointError(validatedEndpointMetadata.error.message);
     }
+
+    const endpointKey = {
+      pk: buildDynamoDbKey(endpoint.dataSetId, this._dataSetKeyType),
+      sk: buildDynamoDbKey(endpoint.id, this._endpointKeyType)
+    };
 
     await this._aws.helpers.ddb.updateExecuteAndFormat({
       key: endpointKey,
@@ -238,6 +280,40 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       key: buildDynamoDBPkSk(dataSet.id, this._dataSetKeyType),
       params: { item: validatedDataSetMetadata.data }
     });
+  }
+
+  // Returns the current number of datasets for the storage location
+  private async _storeStorageLocationToDdb(
+    storageLocation: StorageLocation,
+    increment: 'increment' | 'decrement'
+  ): Promise<number> {
+    const validatedStorageLocationMetadata = StorageLocationMetadataParser.safeParse({
+      ...storageLocation,
+      resourceType: 'datasetStorageLocation'
+    });
+
+    if (!validatedStorageLocationMetadata.success) {
+      throw new DataSetInvalidParameterError(validatedStorageLocationMetadata.error.message);
+    }
+
+    const storageLocationKey = {
+      pk: this._dataSetKeyType,
+      sk: buildDynamoDbKey(storageLocation.name, this._storageLocationKeyType)
+    };
+
+    const { Attributes } = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: storageLocationKey,
+      params: {
+        item: validatedStorageLocationMetadata.data,
+        set: '#datasetCount = if_not_exists(#datasetCount, :zero) + :counter',
+        names: { '#datasetCount': 'datasetCount' },
+        values: { ':counter': increment === 'increment' ? 1 : -1, ':zero': 0 }
+      }
+    });
+
+    const count = Attributes?.datasetCount;
+
+    return Number.isInteger(count) ? Number(count) : 0;
   }
 
   public getPaginationToken(dataSetId: string): string {

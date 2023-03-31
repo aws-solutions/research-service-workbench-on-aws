@@ -164,7 +164,7 @@ describe('DataSetService', () => {
     });
     authzPlugin = new WbcDataSetsAuthorizationPlugin(authzService);
     log = new LoggingService();
-    metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
+    metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP', 'SL');
 
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
