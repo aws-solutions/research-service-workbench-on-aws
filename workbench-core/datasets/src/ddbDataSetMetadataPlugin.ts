@@ -148,7 +148,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       params: { return: 'ALL_OLD' }
     });
 
-    const remainingDatasets = await this._storeStorageLocationToDdb(
+    await this._storeStorageLocationToDdb(
       {
         name: data.storageName as string,
         type: data.storageType as string,
@@ -157,15 +157,6 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       },
       'decrement'
     );
-
-    if (remainingDatasets < 1) {
-      await this._aws.helpers.ddb
-        .delete({
-          pk: this._dataSetKeyType,
-          sk: buildDynamoDbKey(data.storageName as string, this._storageLocationKeyType)
-        })
-        .execute();
-    }
   }
 
   public async addExternalEndpoint(endpoint: CreateExternalEndpoint): Promise<ExternalEndpoint> {
@@ -282,11 +273,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     });
   }
 
-  // Returns the current number of datasets for the storage location
   private async _storeStorageLocationToDdb(
     storageLocation: StorageLocation,
-    increment: 'increment' | 'decrement'
-  ): Promise<number> {
+    operator: 'increment' | 'decrement'
+  ): Promise<void> {
     const validatedStorageLocationMetadata = StorageLocationMetadataParser.safeParse({
       ...storageLocation,
       resourceType: 'datasetStorageLocation'
@@ -297,7 +287,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
 
     const storageLocationKey = {
-      pk: this._dataSetKeyType,
+      pk: buildDynamoDbKey(this._storageLocationKeyType, this._dataSetKeyType),
       sk: buildDynamoDbKey(storageLocation.name, this._storageLocationKeyType)
     };
 
@@ -307,13 +297,13 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         item: validatedStorageLocationMetadata.data,
         set: '#datasetCount = if_not_exists(#datasetCount, :zero) + :counter',
         names: { '#datasetCount': 'datasetCount' },
-        values: { ':counter': increment === 'increment' ? 1 : -1, ':zero': 0 }
+        values: { ':counter': operator === 'increment' ? 1 : -1, ':zero': 0 }
       }
     });
 
-    const count = Attributes?.datasetCount;
-
-    return Number.isInteger(count) ? Number(count) : 0;
+    if (Number.isInteger(Attributes?.datasetCount) && Number(Attributes?.datasetCount) < 1) {
+      await this._aws.helpers.ddb.delete(storageLocationKey).execute();
+    }
   }
 
   public getPaginationToken(dataSetId: string): string {
