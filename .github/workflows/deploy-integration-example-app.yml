@@ -195,6 +195,7 @@ jobs:
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.deploy-example-app.outputs['test-chunk-ids']) }}
+      fail-fast: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -248,12 +249,6 @@ jobs:
         with:
           name: hostingEnv
           path: workbench-core/example/infrastructure/src/config/
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
-      - name: Display structure of downloaded files
-        run: ls -R workbench-core/example/infrastructure/src/config/
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
