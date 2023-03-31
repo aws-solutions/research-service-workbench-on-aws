@@ -1,5 +1,5 @@
 /*
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  Copyright Amazon.com, Inc. or its affiliateshore. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,6 +29,7 @@ export class SWBApplicationLoadBalancer extends Construct {
       vpcSubnets: subnets,
       internetFacing
     });
+    // logAccessLogs() depends on region being specified on the stack, which is only possible during non-Solutions deployment
     if (!isSolutionsBuild()) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
     if (isSolutionsBuild()) {
       const albMetadataNode = this.applicationLoadBalancer.node.defaultChild as CfnResource;
@@ -37,7 +38,7 @@ export class SWBApplicationLoadBalancer extends Construct {
         rules_to_suppress: [
           {
             id: 'W52',
-            reason: 'TODO: Enable access logging for Solutions Implementation'
+            reason: 'Enabling ALB access logging for Solutions Implementation is documented as a manual step'
           }
         ]
       });
