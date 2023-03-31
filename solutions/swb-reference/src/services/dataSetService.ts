@@ -105,6 +105,13 @@ export class DataSetService implements DataSetPlugin {
       [researcher],
       ['READ']
     );
+    await this._removeAuthZPermissionsForDataset(
+      authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_UPLOAD,
+      dataSetId,
+      [projectAdmin, researcher],
+      ['READ']
+    );
   }
 
   private async _associatedProjects(dataset: DataSet): Promise<string[]> {
@@ -161,11 +168,8 @@ export class DataSetService implements DataSetPlugin {
       };
     }
 
-    let page = 0;
     let lastPaginationToken = paginationToken;
     do {
-      console.log(`page ${page}`);
-      page += 1;
       const dataSetsOnPageResponse = await this._workbenchDataSetService.listDataSets(
         user,
         pageSize,
@@ -196,7 +200,8 @@ export class DataSetService implements DataSetPlugin {
     const response = await this._workbenchDataSetService.getAllDataSetAccessPermissions(
       request.dataSetId,
       request.authenticatedUser,
-      request.paginationToken
+      request.paginationToken,
+      request.pageSize
     );
 
     return PermissionsResponseParser.parse(response);
@@ -246,6 +251,14 @@ export class DataSetService implements DataSetPlugin {
       `${dataset.id!}`,
       [projectAdmin],
       ['READ', 'UPDATE', 'DELETE']
+    );
+
+    await this._addAuthZPermissionsForDataset(
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_UPLOAD,
+      dataset.id!,
+      [projectAdmin, projectResearcher],
+      ['READ']
     );
 
     return dataset;
@@ -318,6 +331,16 @@ export class DataSetService implements DataSetPlugin {
     };
 
     const response = await this.addAccessPermission(permissionRequest);
+
+    if (request.accessLevel === 'read-write') {
+      await this._addAuthZPermissionsForDataset(
+        request.authenticatedUser,
+        SwbAuthZSubject.SWB_DATASET_UPLOAD,
+        request.dataSetId,
+        [projectAdmin, projectResearcher],
+        ['READ']
+      );
+    }
 
     const dataset: Associable = {
       type: SwbAuthZSubject.SWB_DATASET,

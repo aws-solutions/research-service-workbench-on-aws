@@ -1301,8 +1301,7 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W59',
-          reason:
-            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+          reason: 'AuthN with Congnito + JWT and AuthZ with CASL is implemented.'
         }
       ]
     });
