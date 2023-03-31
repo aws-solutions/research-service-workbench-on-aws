@@ -163,7 +163,16 @@ export class GitHubOIDCStack extends Stack {
               sid: 'serviceCatalogProductAccess',
               effect: Effect.ALLOW,
               actions: ['servicecatalog:SearchProductsAsAdmin'],
-              resources: [`arn:${Aws.PARTITION}:servicecatalog:${Aws.REGION}:${Aws.ACCOUNT_ID}:portfolio/*`]
+              resources: [`arn:${Aws.PARTITION}:catalog:${Aws.REGION}:${Aws.ACCOUNT_ID}:portfolio/*`]
+            }),
+            new PolicyStatement({
+              sid: 'serviceCatalogArtifactAccess',
+              effect: Effect.ALLOW,
+              actions: [
+                'servicecatalog:ListProvisioningArtifacts',
+                'servicecatalog:DescribeProvisioningArtifact'
+              ],
+              resources: [`arn:${Aws.PARTITION}:catalog:${Aws.REGION}:${Aws.ACCOUNT_ID}:product/*`]
             }),
             new PolicyStatement({
               sid: 'ssmAccess',
@@ -180,20 +189,40 @@ export class GitHubOIDCStack extends Stack {
                 'cognito-idp:DescribeUserPoolClient',
                 'cognito-idp:AdminInitiateAuth',
                 'cognito-idp:DeleteGroup',
-                'cognito-idp:AdminDeleteUser'
+                'cognito-idp:AdminDeleteUser',
+                'cognito-idp:AdminCreateUser',
+                'cognito-idp:AdminAddUserToGroup'
               ],
               resources: [`arn:${Aws.PARTITION}:cognito-idp:${Aws.REGION}:${Aws.ACCOUNT_ID}:userpool/*`]
             }),
             new PolicyStatement({
               sid: 'dynamodbAccess',
               effect: Effect.ALLOW,
-              actions: ['dynamodb:DeleteItem', 'dynamodb:GetItem', 'dynamodb:Query'],
+              actions: [
+                'dynamodb:DeleteItem',
+                'dynamodb:GetItem',
+                'dynamodb:Query',
+                'dynamodb:PutItem',
+                'dynamodb:UpdateItem'
+              ],
               resources: [`arn:${Aws.PARTITION}:dynamodb:${Aws.REGION}:${Aws.ACCOUNT_ID}:table/*`]
+            }),
+            new PolicyStatement({
+              sid: 'eventAccess',
+              effect: Effect.ALLOW,
+              actions: ['events:RemovePermission'],
+              resources: [`arn:${Aws.PARTITION}:events:${Aws.REGION}:${Aws.ACCOUNT_ID}:event-bus/default`]
+            }),
+            new PolicyStatement({
+              sid: 'eventRuleAccess',
+              effect: Effect.ALLOW,
+              actions: ['events:DescribeRule'],
+              resources: [`arn:${Aws.PARTITION}:events:${Aws.REGION}:${Aws.ACCOUNT_ID}:ule/RouteHostEvents`]
             }),
             new PolicyStatement({
               sid: 'kmsAccess',
               effect: Effect.ALLOW,
-              actions: ['kms:Decrypt', 'kms:DescribeKey'],
+              actions: ['kms:Decrypt', 'kms:DescribeKey', 'kms:GenerateDataKey'],
               resources: [`arn:${Aws.PARTITION}:kms:${Aws.REGION}:${Aws.ACCOUNT_ID}:key/*`]
             }),
             new PolicyStatement({

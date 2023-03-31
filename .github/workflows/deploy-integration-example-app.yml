@@ -3,6 +3,73 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
+# name: Deploy-and-integration-test-example-app
+# on:
+#   workflow_call:
+#     inputs:
+#       environment:
+#         required: true
+#         type: string
+#     secrets:
+#       aws-region:
+#         required: true
+#       role-to-assume:
+#         required: true
+#       aws-test-hosting-account-id:
+#         required: true
+#       aws-test-hosting-account-region:
+#         required: true
+#       slack_webhook_url:
+#         required: true
+
+# jobs:
+#   deploy-and-integration-test-example:
+#     runs-on: ubuntu-20.04
+#     environment: ${{ inputs.environment }}
+#     permissions:
+#       id-token: write
+#       contents: read
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Base Action
+#         uses: ./.github/actions/baseAction
+
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-region: ${{ secrets.aws-region }}
+#           role-to-assume: ${{ secrets.role-to-assume }}
+#           role-session-name: TestOIDCSessionName
+
+#       - name: Deploy example package to Test environment
+#         run: |
+#           cd workbench-core/example/infrastructure
+#           node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+#         env:
+#           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+
+#       - name: Deploy example package to Hosting environment
+#         run: |
+#           cd workbench-core/example/infrastructure
+#           node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting
+#         env:
+#           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+#           HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
+
+#       - name: Example package integration test
+#         run: |
+#           cd workbench-core/example/infrastructure
+#           node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
+
+      # - name: Slack Failure Notification
+      #   if: failure()
+      #   uses: ./.github/actions/notification
+      #   with:
+      #     slack_webhook_url: ${{ secrets.slack_webhook_url }}
+
 name: Deploy-and-integration-test-example-app
 on:
   workflow_call:
@@ -23,13 +90,15 @@ on:
         required: true
 
 jobs:
-  deploy-and-integration-test-example:
+  deploy-example-app:
     runs-on: ubuntu-20.04
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read
-
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -59,13 +128,72 @@ jobs:
           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
           HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
 
+      - name: Cache Main cdk output json
+        uses: actions/cache@v3
+        with:
+          path: |
+            solutions/swb-reference/src/config/testEnv.json
+          key: testEnv
+
+      - name: Cache Hosting cdk output json
+        uses: actions/cache@v3
+        with:
+          path: |
+            solutions/swb-reference/src/config/hostingEnv.json
+          key: hostingEnv
+
+      - name: Set Chunks
+        id: set-test-chunks
+        run: echo "::set-output name=test-chunks::$(rushx -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
+
+      - name: Set Chunk IDs
+        id: set-test-chunk-ids
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
+  integration-test-example-app:
+    name: integration test (chunk ${{ matrix.chunk }})
+    runs-on: ubuntu-20.04
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    needs: [deploy-example-app]
+    strategy:
+      matrix:
+        chunk: ${{ fromJson(needs.deploy-example-app.outputs['test-chunk-ids']) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Restore Cache Main cdk output json
+        uses: actions/cache@v2
+        with:
+          path: |
+            solutions/swb-reference/src/config/testEnv.json
+          key: testEnv
+
+      - name: Restore Cache Hosting cdk output json
+        uses: actions/cache@v2
+        with:
+          path: |
+            solutions/swb-reference/src/config/hostingEnv.json
+          key: hostingEnv
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: TestOIDCSessionName
+
       - name: Example package integration test
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
-
-      # - name: Slack Failure Notification
-      #   if: failure()
-      #   uses: ./.github/actions/notification
-      #   with:
-      #     slack_webhook_url: ${{ secrets.slack_webhook_url }}
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs rushx -q jest
+        env:
+          CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
