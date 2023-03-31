@@ -132,19 +132,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            solutions/swb-reference/src/config/testEnv.json
+            workbench-core/example/infrastructure/src/config/testEnv.json
           key: testEnv
 
       - name: Cache Hosting cdk output json
         uses: actions/cache@v3
         with:
           path: |
-            solutions/swb-reference/src/config/hostingEnv.json
+            workbench-core/example/infrastructure/src/config/hostingEnv.json
           key: hostingEnv
 
       - name: Set Chunks
         id: set-test-chunks
-        run: echo "::set-output name=test-chunks::$(rushx -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
+        run: |
+          cd workbench-core/example/infrastructure
+          echo "::set-output name=test-chunks::$(node ../../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
 
       - name: Set Chunk IDs
         id: set-test-chunk-ids
@@ -174,14 +176,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            solutions/swb-reference/src/config/testEnv.json
+            workbench-core/example/infrastructure/src/config/testEnv.json
           key: testEnv
 
       - name: Restore Cache Hosting cdk output json
         uses: actions/cache@v2
         with:
           path: |
-            solutions/swb-reference/src/config/hostingEnv.json
+            workbench-core/example/infrastructure/src/config/hostingEnv.json
           key: hostingEnv
 
       - name: Configure AWS Credentials
@@ -194,6 +196,6 @@ jobs:
       - name: Example package integration test
         run: |
           cd workbench-core/example/infrastructure
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs rushx -q jest
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../../common/scripts/install-run-rushx.js -q jest
         env:
           CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
