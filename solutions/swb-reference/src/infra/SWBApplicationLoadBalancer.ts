@@ -30,8 +30,9 @@ export class SWBApplicationLoadBalancer extends Construct {
       internetFacing
     });
     // logAccessLogs() depends on region being specified on the stack, which is only possible during non-Solutions deployment
-    if (!isSolutionsBuild()) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
-    if (isSolutionsBuild()) {
+    if (!isSolutionsBuild()) {
+      this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
+    } else {
       const albMetadataNode = this.applicationLoadBalancer.node.defaultChild as CfnResource;
       albMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
