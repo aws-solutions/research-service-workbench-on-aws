@@ -3,114 +3,6 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-# name: Deploy-and-integration-test-swb-reference
-# on:
-#   workflow_call:
-#     inputs:
-#       environment:
-#         required: true
-#         type: string
-#       stage:
-#         required: true
-#         type: string
-#     secrets:
-#       aws-dev-region:
-#         required: true
-#       role-to-assume:
-#         required: true
-#       slack_webhook_url:
-#         required: true
-#       CYPRESS_ADMIN_PASSWORD:
-#         required: true
-#       CYPRESS_ADMIN_USER:
-#         required: true
-#       HOSTED_ZONE_ID:
-#         required: true
-#       DOMAIN_NAME:
-#         required: true
-
-# jobs:
-#   deploy-and-integration-test-swb-reference:
-#     runs-on: ubuntu-20.04
-#     environment: ${{ inputs.environment }}
-#     permissions:
-#       id-token: write
-#       contents: read
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v3
-
-#       - name: Use Node.js 16.x
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: '16.x'
-
-#       - name: Cache Rush
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             common/temp/install-run
-#             ~/.rush
-#           key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
-#           restore-keys: |
-#             ${{ runner.os }}-rush-
-#             ${{ runner.os }}-
-
-#       - name: Cache pnpm
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             common/temp/pnpm-store
-#             ~/.cache/Cypress
-#           key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
-#           restore-keys: |
-#             ${{ runner.os }}-pnpm-
-#             ${{ runner.os }}-
-
-#       - name: install pnpm
-#         uses: pnpm/action-setup@v2.2.2
-#         with:
-#           version: 7.13.0
-
-#       - name: Install dependecies
-#         shell: bash
-#         run: node common/scripts/install-run-rush.js install
-
-#       - name: Configure AWS Credentials
-#         uses: aws-actions/configure-aws-credentials@v1
-#         with:
-#           aws-region: ${{ secrets.aws-dev-region }}
-#           role-to-assume: ${{ secrets.role-to-assume }}
-#           role-session-name: OIDCSessionName
-#           role-duration-seconds: 7200
-
-#       - name: Enter config settings from GH secrets
-#         shell: bash
-#         run: |
-#           echo "
-#           hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}
-#           domainName: ${{ secrets.DOMAIN_NAME }}" >> "solutions/swb-reference/src/config/${{inputs.stage}}.yaml"
-
-#       - name: Deploy SWB-Reference
-#         run: |
-#           cd solutions/swb-reference
-#           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk-deploy
-#           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js run-postDeployment
-
-#       - name: Run Integration tests
-#         env:
-#           NODE_OPTIONS: "--max_old_space_size=4096"
-#         run: |
-#           cd solutions/swb-reference
-#           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js integration-tests
-
-      # - name: Slack Failure Notification
-      #   if: failure()
-      #   uses: ./.github/actions/notification
-      #   with:
-      #     slack_webhook_url: ${{ secrets.slack_webhook_url }}
-
 name: Deploy-and-integration-test-swb-reference
 on:
   workflow_call:
@@ -226,86 +118,86 @@ jobs:
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
-  # integration-test-swb-reference:
-  #   name: integration test (chunk ${{ matrix.chunk }})
-  #   runs-on: ubuntu-20.04
-  #   environment: ${{ inputs.environment }}
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   needs: [deploy-swb-reference]
-  #   strategy:
-  #     matrix:
-  #       chunk: ${{ fromJson(needs.deploy-swb-reference.outputs['test-chunk-ids']) }}
-  #     fail-fast: false
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
+  integration-test-swb-reference:
+    name: integration test (chunk ${{ matrix.chunk }})
+    runs-on: ubuntu-20.04
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    needs: [deploy-swb-reference]
+    strategy:
+      matrix:
+        chunk: ${{ fromJson(needs.deploy-swb-reference.outputs['test-chunk-ids']) }}
+      fail-fast: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  #     - name: Use Node.js 16.x
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16.x'
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
 
-  #     - name: Cache Rush
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           common/temp/install-run
-  #           ~/.rush
-  #         key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-rush-
-  #           ${{ runner.os }}-
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
 
-  #     - name: Cache pnpm
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           common/temp/pnpm-store
-  #           ~/.cache/Cypress
-  #         key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-pnpm-
-  #           ${{ runner.os }}-
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
 
-  #     - name: install pnpm
-  #       uses: pnpm/action-setup@v2.2.2
-  #       with:
-  #         version: 7.13.0
+      - name: install pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.13.0
 
-  #     - name: Install dependecies
-  #       run: node common/scripts/install-run-rush.js install
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
 
-  #     - name: Rush build
-  #       run: node common/scripts/install-run-rush.js build -f @aws/swb-reference
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build -f @aws/swb-reference
 
-  #     - name: Dowload Artifact ${{ inputs.stage }}.json
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: ${{ inputs.stage }}
-  #         path: solutions/swb-reference/src/config/
+      - name: Dowload Artifact ${{ inputs.stage }}.json
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.stage }}
+          path: solutions/swb-reference/src/config/
 
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-region: ${{ secrets.aws-dev-region }}
-  #         role-to-assume: ${{ secrets.role-to-assume }}
-  #         role-session-name: OIDCSessionName
-  #         role-duration-seconds: 7200
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: OIDCSessionName
+          role-duration-seconds: 7200
 
-  #     - name: swb-reference integration test (chunk ${{ matrix.chunk }})
-  #       env:
-  #         NODE_OPTIONS: "--max_old_space_size=4096"
-  #         CHUNKS: ${{ needs.deploy-swb-reference.outputs['test-chunks'] }}
-  #       run: |
-  #         cd solutions/swb-reference
-  #         echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../common/scripts/install-run-rushx.js -q jest
+      - name: swb-reference integration test (chunk ${{ matrix.chunk }})
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          CHUNKS: ${{ needs.deploy-swb-reference.outputs['test-chunks'] }}
+        run: |
+          cd solutions/swb-reference
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../common/scripts/install-run-rushx.js -q jest
 
   delete-artifacts:
     if: always()
     runs-on: ubuntu-20.04
-    needs: [deploy-swb-reference]
+    needs: [integration-test-swb-reference]
     steps:
       - name: Delete Artifacts
         uses: geekyeggo/delete-artifact@v2
