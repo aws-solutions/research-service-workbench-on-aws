@@ -265,7 +265,7 @@ jobs:
       - name: Example App integration test (chunk ${{ matrix.chunk }})
         run: |
           cd workbench-core/example/infrastructure
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../../common/scripts/install-run-rushx.js -q jest --testPathIgnorePatterns lib/integration-tests/tests/datasets/list.test.js
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | grep -v 'datasets/list.test.js' | xargs node ../../../common/scripts/install-run-rushx.js -q jest
         env:
           CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
 

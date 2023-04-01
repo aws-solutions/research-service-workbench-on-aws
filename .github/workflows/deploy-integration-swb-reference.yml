@@ -137,6 +137,8 @@ on:
       DOMAIN_NAME:
         required: true
 
+env:
+  STAGE: ${{ inputs.stage }}
 jobs:
   deploy-swb-reference:
     runs-on: ubuntu-20.04
@@ -201,8 +203,6 @@ jobs:
           domainName: ${{ secrets.DOMAIN_NAME }}" >> "solutions/swb-reference/src/config/${{ inputs.stage }}.yaml"
 
       - name: Deploy SWB-Reference
-        env:
-          STAGE: ${{ inputs.stage }}
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js cdk-deploy
@@ -297,7 +297,6 @@ jobs:
       - name: swb-reference integration test (chunk ${{ matrix.chunk }})
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
-          STAGE: ${{ inputs.stage }}
           CHUNKS: ${{ needs.ddeploy-swb-reference.outputs['test-chunks'] }}
         run: |
           cd solutions/swb-reference
