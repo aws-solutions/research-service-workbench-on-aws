@@ -144,7 +144,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -212,8 +214,20 @@ jobs:
           name: ${{ inputs.stage }}
           path: solutions/swb-reference/src/config/${{ inputs.stage }}.json
 
+      - name: Set Chunks
+        id: set-test-chunks
+        run: |
+          cd solutions/swb-reference
+          echo "::set-output name=test-chunks::$(node ../../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
+
+      - name: Set Chunk IDs
+        id: set-test-chunk-ids
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
   integration-test-swb-reference:
-    name: integration test ${{ matrix.shard }}
+    name: integration test (chunk ${{ matrix.chunk }})
     runs-on: ubuntu-20.04
     environment: ${{ inputs.environment }}
     permissions:
@@ -222,7 +236,7 @@ jobs:
     needs: [deploy-swb-reference]
     strategy:
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        chunk: ${{ fromJson(needs.deploy-swb-reference.outputs['test-chunk-ids']) }}
       fail-fast: false
     steps:
       - name: Checkout repository
@@ -284,9 +298,10 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
           STAGE: ${{ inputs.stage }}
+          CHUNKS: ${{ needs.ddeploy-swb-reference.outputs['test-chunks'] }}
         run: |
           cd solutions/swb-reference
-          node ../../common/scripts/install-run-rushx.js jest lib/integration-tests --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs rushx -q jest
 
   delete-artifacts:
     if: always()

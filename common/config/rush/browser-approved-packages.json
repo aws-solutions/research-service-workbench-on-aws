@@ -415,6 +415,10 @@
       "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
+      "name": "jest-environment-jsdom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "jest-fast-check",
       "allowedCategories": [ "production", "prototypes" ]
     },

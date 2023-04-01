@@ -96,6 +96,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -169,25 +172,25 @@ jobs:
           name: hostingEnv
           path: workbench-core/example/infrastructure/src/config/hostingEnv.json
 
+      - name: Set Chunks
+        id: set-test-chunks
+        run: |
+          cd workbench-core/example/infrastructure
+          echo "::set-output name=test-chunks::$(node ../../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
+
+      - name: Set Chunk IDs
+        id: set-test-chunk-ids
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
       - name: Example package integration test
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js jest lib/integration-tests/tests/datasets/list.test.js -i
 
-  #     - name: Set Chunks
-  #       id: set-test-chunks
-  #       run: |
-  #         cd workbench-core/example/infrastructure
-  #         echo "::set-output name=test-chunks::$(node ../../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 5 | floor)]')"
-
-  #     - name: Set Chunk IDs
-  #       id: set-test-chunk-ids
-  #       run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-  #       env:
-  #         CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-
   integration-test-example-app:
-    name: integration test ${{ matrix.shard }}
+    name: integration test (chunk ${{ matrix.chunk }})
     runs-on: ubuntu-20.04
     environment: ${{ inputs.environment }}
     permissions:
@@ -196,7 +199,7 @@ jobs:
     needs: [deploy-example-app]
     strategy:
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        chunk: ${{ fromJson(needs.deploy-example-app.outputs['test-chunk-ids']) }}
       fail-fast: false
     steps:
       - name: Checkout repository
@@ -262,7 +265,9 @@ jobs:
       - name: Example package integration test
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js jest --shard=${{ matrix.shard }}/${{ strategy.job-total }} --testPathIgnorePatterns lib/integration-tests/tests/datasets/list.test.js
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs rushx -q jest --testPathIgnorePatterns lib/integration-tests/tests/datasets/list.test.js
+        env:
+          CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
 
   delete-artifacts:
     if: always()
