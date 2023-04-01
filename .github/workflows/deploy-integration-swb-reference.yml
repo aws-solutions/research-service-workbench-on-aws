@@ -218,7 +218,7 @@ jobs:
         id: set-test-chunks
         run: |
           cd solutions/swb-reference
-          echo "::set-output name=test-chunks::$(node ../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/**/*.js | jq -cM '[_nwise(length / 10 | floor)]')"
+          echo "::set-output name=test-chunks::$(node ../../common/scripts/install-run-rushx.js -q jest --listTests --json --findRelatedTests lib/integration-tests/tests/**/*.js | jq -cM '[_nwise(length / 10 | floor)]')"
 
       - name: Set Chunk IDs
         id: set-test-chunk-ids
