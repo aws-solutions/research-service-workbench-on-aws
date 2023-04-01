@@ -262,10 +262,10 @@ jobs:
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: TestOIDCSessionName
 
-      - name: Example package integration test
+      - name: Example App integration test (chunk ${{ matrix.chunk }})
         run: |
           cd workbench-core/example/infrastructure
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs rushx -q jest --testPathIgnorePatterns lib/integration-tests/tests/datasets/list.test.js
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs node ../../../common/scripts/install-run-rushx.js -q jest --testPathIgnorePatterns lib/integration-tests/tests/datasets/list.test.js
         env:
           CHUNKS: ${{ needs.deploy-example-app.outputs['test-chunks'] }}
 
