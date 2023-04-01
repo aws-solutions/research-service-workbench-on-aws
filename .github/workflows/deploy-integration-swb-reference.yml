@@ -305,7 +305,7 @@ jobs:
   delete-artifacts:
     if: always()
     runs-on: ubuntu-20.04
-    needs: [integration-test-swb-reference]
+    needs: [deploy-swb-reference]
     steps:
       - name: Delete Artifacts
         uses: geekyeggo/delete-artifact@v2
