@@ -40,7 +40,7 @@ const getEnvironmentVariables = async (stage: string) => {
   const cognitoDomainName = settings['ExampleCognitoDomainName'];
   const userPoolId = settings['ExampleCognitoUserPoolId'];
   const clientId = settings['ExampleCognitoWebUiUserPoolClientId'];
-  const region = settings['AwsRegion'];
+  const region = settings['MainAccountRegion'];
   const rootUserNameParamStorePath = settings['rootUserNameParamStorePath'];
   const rootPasswordParamStorePath = settings['rootPasswordParamStorePath'];
   const restApiEndpoint = settings['ExampleRestApiEndpoint9C6D55BB'];

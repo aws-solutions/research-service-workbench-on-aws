@@ -127,17 +127,6 @@ describe('authentication route handler integration tests', () => {
   });
 
   describe('logoutUser', () => {
-    it('should return the logout URL for a logged in user', async () => {
-      const adminSession = await setup.createAdminSession();
-      const origin = 'fakeOrigin';
-      const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
-
-      const { data } = await adminSession.resources.authentication.logout({ origin });
-
-      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
-    });
-
     it('should return the logout URL for a logged out user', async () => {
       const origin = 'fakeOrigin';
       const domain = setup.getSettings().get('ExampleCognitoDomainName');

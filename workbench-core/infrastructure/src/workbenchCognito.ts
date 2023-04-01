@@ -166,7 +166,8 @@ export class WorkbenchCognito extends Construct {
 
     const tempProgrammaticAccessUserPoolClientProps: UserPoolClientOptions = {
       authFlows: {
-        adminUserPassword: true
+        adminUserPassword: true,
+        userPassword: true
       }
     };
     const programmaticAccessUserPoolClientProps = merge(
