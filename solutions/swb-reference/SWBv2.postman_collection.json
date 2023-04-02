@@ -732,11 +732,6 @@
                   "key": "pageSize",
                   "value": "",
                   "disabled": true
-                },
-                {
-                  "key": "sort",
-                  "value": "desc",
-                  "disabled": true
                 }
               ]
             }

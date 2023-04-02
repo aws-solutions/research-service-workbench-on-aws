@@ -10,33 +10,14 @@ export const EnvironmentParser = z.object({
   instanceId: z.string().optional(),
   cidr: z.string(),
   description: z.string(),
-  error: z
-    .object({
-      type: z.string(),
-      value: z.string()
-    })
-    .optional(),
   name: z.string(),
-  outputs: z
-    .array(
-      z.object({
-        id: z.string(),
-        value: z.string(),
-        description: z.string()
-      })
-    )
-    .default([]),
   projectId: z.string(),
   status: z.string(),
   provisionedProductId: z.string(),
   envTypeConfigId: z.string(),
   updatedAt: z.string(),
-  updatedBy: z.string(),
   createdAt: z.string(),
-  createdBy: z.string(),
   owner: z.string(),
-  type: z.string(),
-  dependency: z.string(),
   ETC: z.any().optional(),
   PROJ: z.any().optional(),
   DATASETS: z.array(z.any()).optional(),

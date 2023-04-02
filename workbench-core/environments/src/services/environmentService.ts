@@ -34,20 +34,14 @@ const defaultEnv: Environment = {
   instanceId: '',
   cidr: '',
   description: '',
-  error: undefined,
   name: '',
-  outputs: [],
   projectId: '',
   status: 'PENDING',
   envTypeConfigId: '',
   updatedAt: '',
-  updatedBy: '',
   createdAt: '',
-  createdBy: '',
   provisionedProductId: '',
-  owner: '',
-  type: '',
-  dependency: ''
+  owner: ''
 };
 
 export class EnvironmentService {
@@ -72,7 +66,7 @@ export class EnvironmentService {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
 
-      return EnvironmentParser.parse(data.Item!);
+      return this._mapDDBItemToEnvironment(data.Item!);
     }
 
     const data = await this._dynamoDBService
@@ -84,7 +78,7 @@ export class EnvironmentService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let envWithMetadata: Environment = EnvironmentParser.parse({ ...defaultEnv });
+    let envWithMetadata: Environment = { ...defaultEnv };
     envWithMetadata.DATASETS = [];
     envWithMetadata.ENDPOINTS = [];
     for (const item of items) {
@@ -105,7 +99,7 @@ export class EnvironmentService {
         }
       }
     }
-    return envWithMetadata;
+    return this._mapDDBItemToEnvironment(envWithMetadata);
   }
 
   /**
@@ -200,7 +194,7 @@ export class EnvironmentService {
       params: { item: updatedValues }
     });
 
-    return EnvironmentParser.parse(updateResponse.Attributes!);
+    return this._mapDDBItemToEnvironment(updateResponse.Attributes!);
   }
 
   /**
@@ -249,7 +243,7 @@ export class EnvironmentService {
       .execute()) as BatchGetItemCommandOutput;
 
     const createdAt = new Date(Date.now()).toISOString();
-    const newEnv: Environment = {
+    const newEnv = {
       id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
       cidr: params.cidr,
@@ -436,7 +430,7 @@ export class EnvironmentService {
   /**
    * This method formats a DDB item containing environment data as a EnvironmentItem object
    *
-   * @param item - the DDB item to conver to a Project object
+   * @param item - the DDB item to conver to a EnvironmentItem object
    * @returns a EnvironmentItem object containing only environment data from DDB attributes
    */
   private _mapDDBItemToEnvironmentItem(item: Record<string, unknown>): EnvironmentItem {
@@ -444,5 +438,18 @@ export class EnvironmentService {
 
     // parse will remove pk and sk from the DDB item
     return EnvironmentItemParser.parse(environment);
+  }
+
+  /**
+   * This method formats a DDB item containing environment data as a Environment object
+   *
+   * @param item - the DDB item to conver to a Environment object
+   * @returns a Environment object containing only environment data from DDB attributes
+   */
+  private _mapDDBItemToEnvironment(item: Record<string, unknown>): Environment {
+    const environment: Record<string, unknown> = { ...item, projectId: item.dependency };
+
+    // parse will remove pk and sk from the DDB item
+    return EnvironmentParser.parse(environment);
   }
 }

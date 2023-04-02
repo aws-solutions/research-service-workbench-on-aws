@@ -222,7 +222,7 @@ describe('EnvironmentService', () => {
         ENDPOINTS: [endpointItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...ddbEnv,
+        ...envAPIResponse,
         provisionedProductId: '',
         error: undefined
       });
@@ -948,18 +948,12 @@ describe('EnvironmentService', () => {
         description: 'test 123',
         envTypeConfigId: 'envTypeConfig-123',
         name: 'testEnv',
-        outputs: [],
         owner: 'owner-123',
         projectId: projectId,
         status: 'TERMINATED',
-        type: envTypeConfigItem.sk,
         updatedAt: '2022-05-13T20:03:54.055Z',
         instanceId: 'instance-123',
-        provisionedProductId: '',
-        dependency: projectId,
-        updatedBy: 'user-123',
-        createdBy: 'user-123',
-        error: undefined
+        provisionedProductId: ''
       };
       const mockGetEnv = jest.spyOn(envService, 'getEnvironment');
       mockGetEnv.mockImplementation(() => {
@@ -1043,7 +1037,7 @@ describe('EnvironmentService', () => {
           ENDPOINTS: [],
           ETC: envTypeConfigItem,
           PROJ: projItem,
-          ...ddbEnv,
+          ...envAPIResponse,
           provisionedProductId: '',
           error: undefined
         });

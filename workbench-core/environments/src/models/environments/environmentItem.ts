@@ -7,7 +7,7 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentItemParser = z.object({
   id: z.string(),
-  instanceId: z.string().optional(),
+  instanceId: z.string().default(''),
   projectId: z.string(),
   name: z.string(),
   description: z.string(),

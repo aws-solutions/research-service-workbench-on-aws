@@ -54,18 +54,12 @@ describe('StatusHandler', () => {
       cidr: '1.1.1.1/32',
       description: 'blah',
       instanceId: '123',
-      error: undefined,
       name: 'sagemaker',
-      outputs: [],
       projectId: '123',
       PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
-      owner: 'blah',
-      type: 'testEnvType',
-      dependency: '123',
-      updatedBy: 'blah',
-      createdBy: 'blah'
+      owner: 'blah'
     };
 
     const dynamoDBService = new DynamoDBService({

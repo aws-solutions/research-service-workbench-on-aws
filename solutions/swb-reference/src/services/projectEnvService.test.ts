@@ -52,21 +52,15 @@ describe('ProjectEnvService', () => {
       id: fakeEnvId,
       cidr: '0.0.0.0/0',
       createdAt: '2022-05-13T20:03:54.055Z',
-      updatedBy: 'user-123',
-      createdBy: 'user-123',
       description: 'test 123',
       envTypeConfigId: 'envTypeConfig-123',
-      error: undefined,
       name: 'testEnv',
-      outputs: [],
       owner: 'user-123',
       projectId: fakeProjectId,
       status: 'PENDING',
-      type: 'ETC#etc-123',
       updatedAt: '2022-05-13T20:03:54.055Z',
       instanceId: 'instance-123',
-      provisionedProductId: '',
-      dependency: fakeProjectId
+      provisionedProductId: ''
     };
 
     mockProject = {
