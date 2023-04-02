@@ -24,7 +24,7 @@ import {
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
-import { Environment } from '../models/environments/environment';
+import { Environment, EnvironmentParser } from '../models/environments/environment';
 import { EnvironmentItem, EnvironmentItemParser } from '../models/environments/environmentItem';
 import { ListEnvironmentsByProjectRequest } from '../models/environments/listEnvironmentsByProjectRequest';
 import { ListEnvironmentsServiceRequest } from '../models/environments/listEnvironmentsServiceRequest';
@@ -72,7 +72,7 @@ export class EnvironmentService {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
 
-      return data.Item! as unknown as Environment;
+      return EnvironmentParser.parse(data.Item!);
     }
 
     const data = await this._dynamoDBService
@@ -84,7 +84,7 @@ export class EnvironmentService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let envWithMetadata: Environment = { ...defaultEnv };
+    let envWithMetadata: Environment = EnvironmentParser.parse({ ...defaultEnv });
     envWithMetadata.DATASETS = [];
     envWithMetadata.ENDPOINTS = [];
     for (const item of items) {
@@ -200,7 +200,7 @@ export class EnvironmentService {
       params: { item: updatedValues }
     });
 
-    return updateResponse.Attributes! as unknown as Environment;
+    return EnvironmentParser.parse(updateResponse.Attributes!);
   }
 
   /**

@@ -21,7 +21,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
-import { Environment } from '../models/environments/environment';
+import { Environment, EnvironmentParser } from '../models/environments/environment';
 import { EnvironmentService } from './environmentService';
 
 describe('EnvironmentService', () => {
@@ -82,8 +82,12 @@ describe('EnvironmentService', () => {
     resourceType: 'environment',
     instanceId: 'instance-123',
     provisionedProductId: '',
-    dependency: projectId
+    dependency: projectId,
+    updatedBy: 'owner-123',
+    createdBy: 'owner-123'
   };
+
+  const envAPIResponse = EnvironmentParser.parse(ddbEnv);
 
   const ddbEnvItem = {
     id: envId,
@@ -181,7 +185,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironment(envId, false);
 
       // CHECK
-      expect(actualResponse).toEqual(getItemResponse.Item);
+      expect(actualResponse).toEqual(envAPIResponse);
     });
 
     test('includeMetadata = true', async () => {
@@ -220,9 +224,7 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...ddbEnv,
         provisionedProductId: '',
-        error: undefined,
-        createdBy: '',
-        updatedBy: ''
+        error: undefined
       });
     });
 
@@ -935,7 +937,7 @@ describe('EnvironmentService', () => {
           'SET #status = :status, #createdAt = if_not_exists(#createdAt, :createdAt), #updatedAt = :updatedAt'
       });
 
-      expect(actualResponse).toEqual({ ...ddbEnv, status: 'COMPLETED' });
+      expect(actualResponse).toEqual({ ...envAPIResponse, status: 'COMPLETED' });
     });
 
     test('update environment fails when given a TERMINATED environment', async () => {
@@ -1043,9 +1045,7 @@ describe('EnvironmentService', () => {
           PROJ: projItem,
           ...ddbEnv,
           provisionedProductId: '',
-          error: undefined,
-          createdBy: '',
-          updatedBy: ''
+          error: undefined
         });
       });
 

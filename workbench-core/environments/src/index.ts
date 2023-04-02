@@ -49,7 +49,6 @@ import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import EnvironmentTypeSetup from './postDeployment/environmentTypeSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
-import CreateEnvironmentSchema from './schemas/createEnvironment';
 import { EnvironmentService } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
@@ -75,7 +74,6 @@ export {
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
-  CreateEnvironmentSchema,
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeSetup,
   ListEnvironmentTypesRequest,

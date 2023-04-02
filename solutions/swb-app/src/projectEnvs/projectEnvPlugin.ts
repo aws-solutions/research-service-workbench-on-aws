@@ -4,7 +4,7 @@
  */
 
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { Environment, EnvironmentStatus } from '@aws/workbench-core-environments';
+import { Environment } from '@aws/workbench-core-environments';
 import { EnvironmentItem } from '../environments/environmentItem';
 
 export interface ProjectEnvPlugin {
@@ -15,17 +15,12 @@ export interface ProjectEnvPlugin {
    */
   createEnvironment(
     params: {
-      instanceId?: string;
-      cidr: string;
       description: string;
-      error?: { type: string; value: string };
       name: string;
-      outputs: { id: string; value: string; description: string }[];
       projectId: string;
       datasetIds: string[];
       envTypeId: string;
       envTypeConfigId: string;
-      status?: EnvironmentStatus;
     },
     user: AuthenticatedUser
   ): Promise<Environment>;

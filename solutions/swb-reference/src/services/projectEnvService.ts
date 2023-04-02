@@ -14,7 +14,7 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
-import { Environment, EnvironmentService, EnvironmentStatus } from '@aws/workbench-core-environments';
+import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 
@@ -35,17 +35,12 @@ export class ProjectEnvService implements ProjectEnvPlugin {
 
   public async createEnvironment(
     params: {
-      instanceId?: string;
-      cidr: string;
       description: string;
-      error?: { type: string; value: string };
       name: string;
-      outputs: { id: string; value: string; description: string }[];
       projectId: string;
       datasetIds: string[];
       envTypeId: string;
       envTypeConfigId: string;
-      status?: EnvironmentStatus;
     },
     authenticatedUser: AuthenticatedUser
   ): Promise<Environment> {
@@ -56,7 +51,10 @@ export class ProjectEnvService implements ProjectEnvPlugin {
       throw new ProjectDeletedError(`Project ${projectId} was deleted`);
     }
 
-    const env: Environment = await this._envService.createEnvironment(params, authenticatedUser);
+    const env: Environment = await this._envService.createEnvironment(
+      { ...params, cidr: '', outputs: [] },
+      authenticatedUser
+    );
 
     const projectAdmin = getProjectAdminRole(projectId);
     const projectResearcher = getResearcherRole(projectId);
