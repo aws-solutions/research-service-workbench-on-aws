@@ -26,6 +26,7 @@ import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/
 import {
   ApplicationTargetGroup,
   ListenerCondition,
+  SslPolicy,
   TargetType
 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
@@ -472,18 +473,8 @@ export class SWBStack extends Stack {
     });
     const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
       port: 443,
-      certificates: [certificate]
-    });
-
-    const listenerMetadataNode = httpsListener.node.defaultChild as CfnResource;
-    listenerMetadataNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        {
-          id: 'W55',
-          reason: 'TODO: Elastic Load Balancer V2 Listener SslPolicy should use TLS 1.2'
-        }
-      ]
+      certificates: [certificate],
+      sslPolicy: SslPolicy.RECOMMENDED_TLS
     });
 
     const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
@@ -1301,8 +1292,7 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W59',
-          reason:
-            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+          reason: 'AuthN with Congnito + JWT and AuthZ with CASL is implemented.'
         }
       ]
     });
