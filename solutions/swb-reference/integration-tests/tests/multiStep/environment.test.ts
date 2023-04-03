@@ -161,7 +161,7 @@ describe('multiStep environment test', () => {
     console.log('Searching for Environment A: filtering by "name"');
     const { data: environmentsNameFilter }: ListEnvironmentResponse =
       await adminSession.resources.environments.get({
-        name: environmentAStopped.name
+        filter: { name: { eq: environmentAStopped.name } }
       });
     expect(
       environmentsNameFilter.data.filter((env) => env.id === environmentAStopped.id).length
@@ -171,7 +171,7 @@ describe('multiStep environment test', () => {
     console.log('Searching for Environment A: filtering by "status"');
     const { data: environmentsStatusFilter }: ListEnvironmentResponse =
       await adminSession.resources.environments.get({
-        status: environmentAStopped.status
+        filter: { status: { eq: environmentAStopped.status } }
       });
     expect(
       environmentsStatusFilter.data.filter((env) => env.id === environmentAStopped.id).length
@@ -181,8 +181,11 @@ describe('multiStep environment test', () => {
     console.log('Searching for Environment A: filtering by "createdAt"');
     const { data: environmentsCreatedAtFilter }: ListEnvironmentResponse =
       await adminSession.resources.environments.get({
-        createdAtFrom: environmentAStopped.createdAt,
-        createdAtTo: environmentAStopped.createdAt
+        filter: {
+          createdAt: {
+            between: { value1: environmentAStopped.createdAt, value2: environmentAStopped.createdAt }
+          }
+        }
       });
     expect(
       environmentsCreatedAtFilter.data.filter((env) => env.id === environmentAStopped.id).length
@@ -192,7 +195,7 @@ describe('multiStep environment test', () => {
     console.log('Searching for Environment A: filtering by "owner"');
     const { data: environmentsOwnerFilter }: ListEnvironmentResponse =
       await adminSession.resources.environments.get({
-        owner: environmentAStopped.owner
+        filter: { owner: { eq: environmentAStopped.owner } }
       });
     expect(
       environmentsOwnerFilter.data.filter((env) => env.id === environmentAStopped.id).length
