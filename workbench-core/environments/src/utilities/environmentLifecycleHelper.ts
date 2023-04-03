@@ -66,7 +66,7 @@ export default class EnvironmentLifecycleHelper {
     this.dataSetService = new DataSetService(
       auditService,
       logger,
-      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
+      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT', 'STORAGELOCATION'),
       new WbcDataSetsAuthorizationPlugin(authzService)
     );
     this.environmentService = new EnvironmentService(this.aws.helpers.ddb);

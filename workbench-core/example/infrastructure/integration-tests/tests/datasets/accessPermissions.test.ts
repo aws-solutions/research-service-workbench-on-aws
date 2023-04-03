@@ -12,7 +12,7 @@ import Dataset from '../../support/resources/datasets/dataset';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 
-describe('DataSets access permissions integration tests', () => {
+describe('datasets access permissions integration tests', () => {
   const setup: Setup = new Setup();
   const mockBadValue: string = 'fake-data';
   let adminSession: ClientSession;

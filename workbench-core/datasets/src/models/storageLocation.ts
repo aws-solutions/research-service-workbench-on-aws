@@ -3,24 +3,32 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface StorageLocation {
+import { z } from 'zod';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const StorageLocationParser = z.object({
   /**
    * a string which identifies the storage specific location such the URL to an S3 bucket.
    */
-  name: string;
+  name: z.string(),
 
   /**
    * storage type of the StorageLocation
    */
-  type: string;
+  type: z.string(),
 
   /**
    * AWS Account ID of the StorageLocation
    */
-  awsAccountId?: string;
+  awsAccountId: z.string().optional(),
 
   /**
    * AWS region of the StorageLocation
    */
-  region?: string;
-}
+  region: z.string().optional()
+});
+
+export type StorageLocation = z.infer<typeof StorageLocationParser>;
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const StorageLocationArrayParser = z.array(StorageLocationParser);
