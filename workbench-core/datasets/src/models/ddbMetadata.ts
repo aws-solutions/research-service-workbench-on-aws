@@ -113,3 +113,30 @@ export const ExternalEndpointMetadataParser = z.object({
    */
   resourceType: z.literal('endpoint')
 });
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const StorageLocationMetadataParser = z.object({
+  /**
+   * a unique string which identifies the storage specific location such the URL to an S3 bucket.
+   */
+  name: z.string(),
+
+  /**
+   * storage type of the StorageLocation
+   */
+  type: z.string(),
+
+  /**
+   * AWS Account ID of the StorageLocation
+   */
+  awsAccountId: z.string(),
+
+  /**
+   * AWS region of the StorageLocation
+   */
+  region: z.string(),
+  /**
+   * Resource type of the StorageLocation
+   */
+  resourceType: z.literal('datasetStorageLocation')
+});

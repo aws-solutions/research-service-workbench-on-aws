@@ -9,7 +9,7 @@ import Dataset from '../../support/resources/datasets/dataset';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 
-describe('datasets list integration test', () => {
+describe('datasets file upload integration test', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
 

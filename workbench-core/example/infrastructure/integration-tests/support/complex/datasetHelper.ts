@@ -1,7 +1,10 @@
 import { AccessPoint } from '@aws-sdk/client-s3-control';
-import { AwsService, buildDynamoDbKey, JSONValue } from '@aws/workbench-core-base';
-import { dataSetPrefix, endpointPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
-import _ from 'lodash';
+import { AwsService, buildDynamoDbKey, buildDynamoDBPkSk, JSONValue } from '@aws/workbench-core-base';
+import {
+  dataSetPrefix,
+  endpointPrefix,
+  storageLocationPrefix
+} from '@aws/workbench-core-example-app/lib/configs/constants';
 import Setup from '../setup';
 
 export class DatasetHelper {
@@ -50,14 +53,26 @@ export class DatasetHelper {
   }
 
   public async deleteDdbRecords(dataSetId: string): Promise<void> {
-    await this._awsSdk.helpers.ddb
-      .delete({ pk: `${dataSetPrefix}#${dataSetId}`, sk: `${dataSetPrefix}#${dataSetId}` })
-      .execute();
+    // delete dataset entry
+    const deletedDataSet = await this._awsSdk.helpers.ddb.deleteItem({
+      key: buildDynamoDBPkSk(dataSetId, dataSetPrefix),
+      params: { return: 'ALL_OLD' }
+    });
+
+    // delete storage location entry
+    await this._awsSdk.helpers.ddb.deleteItem({
+      key: {
+        pk: dataSetPrefix,
+        sk: buildDynamoDbKey(deletedDataSet.storageName as string, storageLocationPrefix)
+      }
+    });
+
+    // delete endpoint entries
     const data = await this._awsSdk.helpers.ddb
       .query({
         key: {
           name: 'pk',
-          value: `${dataSetPrefix}#${dataSetId}`
+          value: buildDynamoDbKey(dataSetId, dataSetPrefix)
         }
       })
       .execute();
@@ -66,7 +81,7 @@ export class DatasetHelper {
     const endpoints = data.Items!;
     // Tests are not expected to create more than a couple of endpoints per DS max, so no support needed for pagintated query results
     await Promise.all(
-      _.map(endpoints, async (endpoint) => {
+      endpoints.map(async (endpoint) => {
         await this._awsSdk.helpers.ddb.delete({ pk: endpoint.pk, sk: endpoint.sk }).execute();
       })
     );

@@ -46,7 +46,7 @@ export default class Resource {
 
   public async delete(): Promise<AxiosResponse> {
     const response = await this._axiosInstance.delete(this._api);
-    this._clientSession.removeCleanupTask(`group-${this.id}`);
+    this._clientSession.removeCleanupTask(`${this._type}-${this.id}`);
 
     return response;
   }
