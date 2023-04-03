@@ -4,6 +4,7 @@
  */
 
 import { EnvironmentPlugin, ListEnvironmentsRequest, EnvironmentItem } from '@aws/swb-app';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { EnvironmentService, ListEnvironmentsServiceRequestParser } from '@aws/workbench-core-environments';
 
 export class SWBEnvironmentService implements EnvironmentPlugin {
@@ -15,7 +16,7 @@ export class SWBEnvironmentService implements EnvironmentPlugin {
 
   public async listEnvironments(
     request: ListEnvironmentsRequest
-  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }> {
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
     const parsedRequest = ListEnvironmentsServiceRequestParser.parse(request); //removing project properties
     //Replacing project prop for dependency
     if (request.filter?.projectId && parsedRequest.filter)

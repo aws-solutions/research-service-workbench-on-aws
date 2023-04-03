@@ -14,6 +14,7 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
@@ -93,7 +94,7 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     projectId: string,
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }> {
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
     await this._projectService.getProject({ projectId: projectId });
     return this._envService.listEnvironmentsByProject({ projectId: projectId, pageSize, paginationToken });
   }

@@ -27,7 +27,8 @@ import {
   MetadataService,
   resourceTypeToKey,
   RelationshipDDBItem,
-  RelationshipDDBItemParser
+  RelationshipDDBItemParser,
+  PaginatedResponse
 } from '@aws/workbench-core-base';
 import {
   EnvironmentTypeConfigService,
@@ -242,7 +243,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     let paginationToken: string | undefined = undefined;
 
     do {
-      const dependencies: { data: EnvironmentItem[]; paginationToken: string | undefined } =
+      const dependencies: PaginatedResponse<EnvironmentItem> =
         await this._environmentService.listEnvironments({
           filter: { type: { eq: typeId } },
           pageSize: 200,

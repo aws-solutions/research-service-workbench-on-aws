@@ -19,7 +19,8 @@ import {
   JSONValue,
   validateSingleSortAndFilter,
   getSortQueryParams,
-  getFilterQueryParams
+  getFilterQueryParams,
+  PaginatedResponse
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -111,7 +112,7 @@ export class EnvironmentService {
    */
   public async listEnvironments(
     request: ListEnvironmentsServiceRequest
-  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }> {
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
     const { filter, pageSize, paginationToken, sort } = request;
     validateSingleSortAndFilter(filter, sort);
     const gsiNames = [
@@ -149,7 +150,7 @@ export class EnvironmentService {
    */
   public async listEnvironmentsByProject(
     request: ListEnvironmentsByProjectRequest
-  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }> {
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
     const { projectId, pageSize, paginationToken, sort } = request;
     return this.listEnvironments({
       filter: { dependency: { eq: projectId } },

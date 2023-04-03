@@ -4,6 +4,7 @@
  */
 
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { Environment } from '@aws/workbench-core-environments';
 import { EnvironmentItem } from '../environments/environmentItem';
 
@@ -46,7 +47,7 @@ export interface ProjectEnvPlugin {
     projectId: string,
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ data: EnvironmentItem[]; paginationToken: string | undefined }>;
+  ): Promise<PaginatedResponse<EnvironmentItem>>;
 
   /**
    * Update Environment associated with Project
