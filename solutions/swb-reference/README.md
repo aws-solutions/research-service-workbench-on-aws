@@ -31,8 +31,8 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
   * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/rush.json#L9)
-  * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN is not needed if you already have a preferred API client.
-* The requirements below are for running the lambda locally
+  * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN is not needed if you already have a preferred API client. 
+* The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
    * Install Docker ([link](https://docs.docker.com/get-docker/))
 

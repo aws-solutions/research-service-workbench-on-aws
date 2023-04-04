@@ -73,7 +73,7 @@ export class GitHubOIDCStack extends Stack {
                 effect: Effect.ALLOW,
                 actions: ['sts:AssumeRole'],
                 resources: [
-                  `arn:${Aws.PARTITION}:iam::*:role/cdk-ssoa*`,
+                  `arn:${Aws.PARTITION}:iam::*:role/cdk-*`,
                   `arn:${Aws.PARTITION}:iam::*:role/${maf.mafCrossAccountRoleName}`
                 ]
               }),
@@ -151,7 +151,7 @@ export class GitHubOIDCStack extends Stack {
                 sid: 'stsAccess',
                 effect: Effect.ALLOW,
                 actions: ['sts:AssumeRole'],
-                resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-ssoa*`]
+                resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-*`]
               }),
               new PolicyStatement({
                 sid: 'cloudformationAccess',

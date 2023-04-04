@@ -37,8 +37,7 @@ async function init() {
     testEnvOutputs = apiStackOutputs[apiStackName];
   } catch (e) {
     throw new Error(
-      'There was a problem reading the main stage file. Please run cdk-deploy prior to running the integration test suite' +
-        join(__dirname, `src/config/${testEnvStage}.json`)
+      'There was a problem reading the main stage file. Please run cdk-deploy prior to running the integration test suite'
     );
   }
 
@@ -51,8 +50,7 @@ async function init() {
     hostEnvOutputs = apiStackOutputs[apiStackName];
   } catch (e) {
     throw new Error(
-      'There was a problem reading the hosting stage file. Please run cdk-deploy prior to running the integration test suite' +
-        join(__dirname, `src/config/${hostingEnvStage}.json`)
+      'There was a problem reading the hosting stage file. Please run cdk-deploy prior to running the integration test suite'
     );
   }
   settings = {

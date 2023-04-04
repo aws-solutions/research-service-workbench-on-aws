@@ -30,7 +30,7 @@
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
-    "run-postDeployment": "rush build -t @aws/swb-reference && node lib/src/postDeployment.js",
+    "run-postDeployment": "rush build -f @aws/swb-reference && node lib/src/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "heft test --clean --no-build"
   },
