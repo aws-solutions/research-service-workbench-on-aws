@@ -4,12 +4,12 @@
 
 ## Default Env Config for launching a new environment
 envTypeId: 'et-prod-uqwi7qg7fateq,pa-7t3glphqr2wrq'
-envTypeConfigId: 'etc-c18fe21a-8fd1-4d21-a572-febe65a7f20f'
-projectId: 'proj-05b5d543-a2c4-48f2-892f-bb68f65050fa' #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
+envTypeConfigId: 'etc-bb8899ae-25cb-4306-b3e5-a221afe6750e'
+projectId: 'proj-4b408b0a-d27b-4cca-981a-8eba3a6f5592' #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
 envType: 'sagemakerNotebook'
 
 ## Negative Testing
-terminatedEnvId: 'env-94c32cee-ff6f-4430-8429-d80ff84e1817' # id of an environment that has already been terminated
+terminatedEnvId: 'env-401926f9-c37a-48b9-ac05-a2d3f1cd2740' # id of an environment that has already been terminated
 
 ## Cognito Integ Test Client
 rootUserNameParamStorePath: '/swb/sam/rootUser/email'
@@ -25,7 +25,7 @@ researcher1UserNameParamStorePath: '/swb/sam/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/sam/researcher1/password'
 
 ## Default Hosting Account
-defaultHostingAccountId: 'acc-affbdb7c-bd47-4f2d-af0a-e0c188df4e60' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+defaultHostingAccountId: 'acc-431eca61-32a0-45a4-98e2-c5812ceb2364' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 
 ## Pre-requisite for running aws-accounts integration test
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:

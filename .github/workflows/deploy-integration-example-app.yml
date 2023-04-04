@@ -81,14 +81,14 @@ jobs:
       - name: Deploy example package to Test environment
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:main --no-previous-parameters
         env:
           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
 
       - name: Deploy example package to Hosting environment
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting --no-previous-parameters
         env:
           HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
           HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
