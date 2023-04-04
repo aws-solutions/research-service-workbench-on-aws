@@ -23,7 +23,7 @@ This policy assumes that the services are being deployed to `us-east-1` region. 
     --policy-document file://src/cdk-bootstrap-policies/maf/maf-main-cdk-bootstrap-policy-us-east-1.json
 
     # Boostrap using the new policy you created above
-    rushx cdk bootstrap aws://<MAIN_ACCOUNT_ID>/<MAIN_ACCOUNT_REGION> --toolkitStackName SSOA-CDKToolkit --qualifier ssoa --cloudformation-execution-policies "arn:aws:iam::<MAIN_ACCOUNT_ID>:policy/maf-main-cdk-bootstrap-policy-us-east-1" -c "application=MAF"
+    rushx cdk bootstrap aws://<MAIN_ACCOUNT_ID>/<MAIN_ACCOUNT_REGION> --cloudformation-execution-policies "arn:aws:iam::<MAIN_ACCOUNT_ID>:policy/maf-main-cdk-bootstrap-policy-us-east-1" -c "application=MAF"
     ```
 1. Update [config](./src/configs/config.json) file for `maf` params:
     ```bash
@@ -66,7 +66,7 @@ This policy assumes that the services are being deployed to `us-east-1` region. 
     --policy-document file://src/cdk-bootstrap-policies/maf/maf-hosting-cdk-bootstrap-policy-us-east-1.json
 
     # Boostrap using the new policy you created above
-    rushx cdk bootstrap aws://<HOSTING_ACCOUNT_ID>/<HOSTING_ACCOUNT_REGION> --trust <MAIN_ACCOUNT_ID> --trust-for-lookup <MAIN_ACCOUNT_ID> --cloudformation-execution-policies "arn:aws:iam::<HOSTING_ACCOUNT_ID>:policy/maf-hosting-cdk-bootstrap-policy-us-east-1" --toolkitStackName SSOA-CDKToolkit --qualifier ssoa -c "application=MAF"
+    rushx cdk bootstrap aws://<HOSTING_ACCOUNT_ID>/<HOSTING_ACCOUNT_REGION> --trust <MAIN_ACCOUNT_ID> --trust-for-lookup <MAIN_ACCOUNT_ID> --cloudformation-execution-policies "arn:aws:iam::<HOSTING_ACCOUNT_ID>:policy/maf-hosting-cdk-bootstrap-policy-us-east-1" -c "application=MAF"
     ```
 
 ### SWB Reference Package Instructions
@@ -85,7 +85,7 @@ These policies assume that the services are being deployed to `us-east-1` region
     --policy-document file://src/cdk-bootstrap-policies/swb/swb-main-cdk-bootstrap-policy-us-east-1.json
 
     # Boostrap using the new policy you created above
-    rushx cdk bootstrap aws://<MAIN_ACCOUNT_ID>/<MAIN_ACCOUNT_REGION> --toolkitStackName SSOA-CDKToolkit --qualifier ssoa --cloudformation-execution-policies "arn:aws:iam::<MAIN_ACCOUNT_ID>:policy/swb-main-cdk-bootstrap-policy-us-east-1" -c "application=SWB"
+    rushx cdk bootstrap aws://<MAIN_ACCOUNT_ID>/<MAIN_ACCOUNT_REGION> --cloudformation-execution-policies "arn:aws:iam::<MAIN_ACCOUNT_ID>:policy/swb-main-cdk-bootstrap-policy-us-east-1" -c "application=SWB"
     ```
 1. Update [config](./src/configs/config.json) file for `swb` params:
     ```bash
@@ -128,6 +128,6 @@ Received response status [FAILED] from custom resource. Message returned: Entity
 This error states that you can have only one Identity Provider in an AWS account and it was already created by one of the previous deployment. To solve this, please use these commands instead:
 
 ```bash
-cdk:deploy:existingoidc:maf
-cdk:deploy:existingoidc:swb
+rushx cdk:deploy:existingoidc:maf
+rushx cdk:deploy:existingoidc:swb
 ```
