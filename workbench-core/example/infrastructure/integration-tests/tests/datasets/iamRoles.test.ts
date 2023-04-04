@@ -45,7 +45,7 @@ describe('datasets IAM tests', () => {
       const expected =
         '{"Type":"AWS::IAM::Role","Properties":{"RoleName":"roleName","AssumeRolePolicyDocument":{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"assumingAwsAccountId"},"Action":["sts:AssumeRole"],"Condition":{"StringEquals":{"sts:ExternalId":"externalId"}}}]},"Description":"A role that allows the datasets package to perform basic actions","Policies":[{"PolicyName":"dataset-base-permissions","PolicyDocument":{"Version":"2012-10-17","Statement":[{"Sid":"AccessPointCreationDeletion","Effect":"Allow","Action":["s3:CreateAccessPoint","s3:DeleteAccessPoint","s3:GetAccessPointPolicy","s3:PutAccessPointPolicy"],"Resource":["arn:aws:s3:awsBucketRegion:awsAccountId:accesspoint/*"]},{"Sid":"CreateRemoveAccessPointDelegation","Effect":"Allow","Action":["s3:GetBucketPolicy","s3:PutBucketPolicy"],"Resource":["s3BucketArn"]},{"Sid":"ListTopLevelFolders","Effect":"Allow","Action":"s3:ListBucket","Resource":["s3BucketArn"],"Condition":{"StringEquals":{"s3:prefix":[""],"s3:delimiter":["/"]}}}]}}]}}';
       const response = await adminSession.resources.datasets.createRole(validRequest);
-      expect(JSON.parse(response.data.iamRoleString)).toMatchObject(JSON.parse(expected));
+      expect(JSON.parse(response.data.iamRoleString)).toStrictEqual(JSON.parse(expected));
     });
 
     it('returns an IAM role with KMS permissions when the KMS key ARN is provided', async () => {
@@ -55,7 +55,7 @@ describe('datasets IAM tests', () => {
         ...validRequest,
         kmsKeyArn: 'kmsKeyArn'
       });
-      expect(JSON.parse(response.data.iamRoleString)).toMatchObject(JSON.parse(expected));
+      expect(JSON.parse(response.data.iamRoleString)).toStrictEqual(JSON.parse(expected));
     });
 
     it('throws when the roleName parameter in the request body is missing', async () => {
@@ -205,7 +205,7 @@ describe('datasets IAM tests', () => {
       const expected =
         '{"Type":"AWS::IAM::Role","Properties":{"RoleName":"roleName","AssumeRolePolicyDocument":{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"assumingAwsAccountId"},"Action":["sts:AssumeRole"],"Condition":{"StringEquals":{"sts:ExternalId":"externalId"}}}]},"Description":"A role that allows the datasets package to perform basic actions","Policies":[{"PolicyName":"dataset-base-permissions","PolicyDocument":{"Version":"2012-10-17","Statement":[{"Sid":"AccessPointCreationDeletion","Effect":"Allow","Action":["s3:CreateAccessPoint","s3:DeleteAccessPoint","s3:GetAccessPointPolicy","s3:PutAccessPointPolicy"],"Resource":["arn:aws:s3:awsBucketRegion:awsAccountId:accesspoint/*"]},{"Sid":"CreateRemoveAccessPointDelegation","Effect":"Allow","Action":["s3:GetBucketPolicy","s3:PutBucketPolicy"],"Resource":["s3BucketArn"]},{"Sid":"ListTopLevelFolders","Effect":"Allow","Action":"s3:ListBucket","Resource":["s3BucketArn"],"Condition":{"StringEquals":{"s3:prefix":[""],"s3:delimiter":["/"]}}}]}},{"PolicyName":"datasetPrefix-permissions","PolicyDocument":{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"s3:ListBucket","Resource":["accessPointArn"],"Condition":{"StringLike":{"s3:prefix":"datasetPrefix/*"}}},{"Effect":"Allow","Action":["s3:GetObject","s3:PutObject"],"Resource":"accessPointArn/object/datasetPrefix/*"}]}}]}}';
       const response = await adminSession.resources.datasets.updateRole(validRequest);
-      expect(JSON.parse(response.data.iamRoleString)).toMatchObject(JSON.parse(expected));
+      expect(JSON.parse(response.data.iamRoleString)).toStrictEqual(JSON.parse(expected));
     });
 
     it('throws when the roleString doesnt represent a valid IAM role', async () => {

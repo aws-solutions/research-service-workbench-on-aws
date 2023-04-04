@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddDataSetExternalEndpointResponse } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import { DatasetHelper } from '../../support/complex/datasetHelper';
@@ -49,7 +48,15 @@ describe('datasets byob integration test', () => {
 
       const { data } = await adminSession.resources.datasets.create(byobCreateParams);
 
-      expect(data).toMatchObject(expected);
+      expect(data).toStrictEqual({
+        ...expected,
+        createdAt: expect.any(String),
+        id: expect.any(String),
+        name: expect.any(String),
+        path: expect.any(String),
+        storageType: expect.any(String),
+        permissions: expect.any(Array)
+      });
     });
   });
 
@@ -73,20 +80,18 @@ describe('datasets byob integration test', () => {
       });
       const dataset = adminSession.resources.datasets.children.get(datasetData.id) as Dataset;
 
-      const response = await dataset.share({
+      const { data } = await dataset.share({
         userId: userData.id,
         region: hostRegion,
         roleToAssume
       });
 
-      expect(response).toMatchObject<AddDataSetExternalEndpointResponse>({
-        data: {
-          mountObject: {
-            name: dataset.storagePath,
-            bucket: expect.stringMatching(accessPointS3AliasRegExp),
-            prefix: dataset.storagePath,
-            endpointId: expect.stringMatching(endpointIdRegExp)
-          }
+      expect(data).toStrictEqual({
+        mountObject: {
+          name: dataset.storagePath,
+          bucket: expect.stringMatching(accessPointS3AliasRegExp),
+          prefix: dataset.storagePath,
+          endpointId: expect.stringMatching(endpointIdRegExp)
         }
       });
     });
