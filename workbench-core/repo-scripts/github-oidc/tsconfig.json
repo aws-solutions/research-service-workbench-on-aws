@@ -4,7 +4,8 @@
   "compilerOptions": {
     "types": ["heft-jest", "node"],
     "lib": ["es2017", "dom"],
-    "rootDir": "src"
+    "rootDir": "src",
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "lib", "cdk.out"]

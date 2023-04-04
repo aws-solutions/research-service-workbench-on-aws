@@ -1,0 +1,16 @@
+{
+  "gitHubOrgToRepos": {
+    "aws-solutions": ["solution-spark-on-aws"]
+  },
+  "maf": {
+    "mafSsmBasePath": "maf/exampleApp/rootUser",
+    "mafCrossAccountRoleName": "ExampleCrossAccountRole",
+    "mafMaxSessionDuration": 3600
+  },
+  "swb": {
+    "swbBase": "swb",
+    "swbStage": "sam",
+    "swbRegionShortName": "oh",
+    "swbMaxSessionDuration": 7200
+  }
+}

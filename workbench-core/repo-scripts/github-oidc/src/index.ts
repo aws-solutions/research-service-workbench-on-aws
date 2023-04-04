@@ -10,13 +10,14 @@ import * as cdk from 'aws-cdk-lib';
 import { App, Aspects, Environment } from 'aws-cdk-lib';
 import { OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
 import { AwsSolutionsChecks } from 'cdk-nag';
-import { gitHubOrgToRepos } from './configs/config';
+import { gitHubOrgToRepos } from './configs/config.json';
 import { GitHubOIDCStack } from './github-oidc-stack';
 import { OIDCProviderStack } from './oidc-provider-stack';
 
 const app: App = new cdk.App();
 
 const application: string = app.node.tryGetContext('application');
+const existingOIDC: string = app.node.tryGetContext('existingOIDC');
 
 if (!application || (application !== 'SWB' && application !== 'MAF')) {
   throw new Error('CDK Context "application" is required. Valid values: "SWB or MAF"');
@@ -27,19 +28,26 @@ const env: Environment = {
   region: process.env.CDK_DEFAULT_REGION!
 };
 
-const oidcProviderStack: OIDCProviderStack = new OIDCProviderStack(app, 'OIDCProviderStack', {
-  env: env
-});
+let oidcProvider: OpenIdConnectProvider | undefined;
 
-Object.keys(gitHubOrgToRepos).forEach((gitHubOrg) => {
+let oidcProviderStack: OIDCProviderStack;
+
+if (!existingOIDC) {
+  oidcProviderStack = new OIDCProviderStack(app, 'OIDCProviderStack', {
+    env: env
+  });
+  oidcProvider = oidcProviderStack.idp;
+}
+
+for (const [key, values] of Object.entries(gitHubOrgToRepos)) {
   // eslint-disable-next-line no-new
-  new GitHubOIDCStack(app, `${gitHubOrg}-GitHubOIDCStack`, {
+  new GitHubOIDCStack(app, `${key}-GitHubOIDCStack`, {
     env: env,
-    gitHubOrg: gitHubOrg,
-    gitHubRepos: gitHubOrgToRepos[`${gitHubOrg}`],
-    idp: oidcProviderStack.idp as OpenIdConnectProvider,
+    gitHubOrg: key,
+    gitHubRepos: values,
+    idp: oidcProvider,
     application: application
   });
-});
+}
 
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

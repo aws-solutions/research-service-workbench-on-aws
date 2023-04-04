@@ -77,7 +77,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
-    "@types/uuid": "^9.0.1",
+    "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "jest": "^27.5.1",

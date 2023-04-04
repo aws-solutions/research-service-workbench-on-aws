@@ -4,12 +4,12 @@
  */
 
 import { CfnResource, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { CfnRole, IOpenIdConnectProvider, OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
+import { CfnRole, OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
 import { CfnFunction } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export class OIDCProviderStack extends Stack {
-  public idp: IOpenIdConnectProvider;
+  public idp: OpenIdConnectProvider;
 
   public constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);

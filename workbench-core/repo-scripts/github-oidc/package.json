@@ -17,6 +17,8 @@
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test -u --clean && rushx pkg-json-lint",
     "cdk": "cdk",
+    "cdk:deploy:existingoidc:maf": "cdk deploy --all -c 'application=MAF' -c 'existingOIDC=true' --require-approval never --outputs-file src/configs/cdk-outputs.json",
+    "cdk:deploy:existingoidc:swb": "cdk deploy --all -c 'application=SWB' -c 'existingOIDC=true' --require-approval never --outputs-file src/configs/cdk-outputs.json",
     "cdk:deploy:maf": "cdk deploy --all -c 'application=MAF' --require-approval never --outputs-file src/configs/cdk-outputs.json",
     "cdk:deploy:swb": "cdk deploy --all -c 'application=SWB' --require-approval never --outputs-file src/configs/cdk-outputs.json",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
