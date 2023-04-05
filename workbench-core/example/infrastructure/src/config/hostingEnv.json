@@ -1,0 +1,13 @@
+{
+  "ExampleHostingStack": {
+    "ExampleHostingDataSetBucketEncryptionKey747140AC": "arn:aws:kms:us-east-1:052488004497:key/77cf5b43-7ff6-4a2c-9526-cdf4232b25bf",
+    "HostingAccountRegion": "us-east-1",
+    "ExampleHostDatasetRoleOutput": "arn:aws:iam::052488004497:role/ExampleCrossAccountRole",
+    "ExampleHostingAccessLogsNameOutput": "examplehostingstack-examplehostings3accesslogsbuc-1of4c21vya9p5",
+    "ExampleHostingDataSetBucketExampleHostingDataSetBucketOutputDBBC3CEC": "arn:aws:s3:::examplehostingstack-examplehostingdatasetbucketex-1pyx71lzq4k0v",
+    "ExampleHostS3DataSetsBucketName": "examplehostingstack-examplehostingdatasetbucketex-1pyx71lzq4k0v",
+    "HostingAccountId": "052488004497",
+    "ExampleHostingStackExampleHostingStackAppRegistryApplicationArn0C8D0DEC": "arn:aws:servicecatalog:us-east-1:052488004497:/applications/05y7ie1m64aa72qz2unnboo0f4",
+    "ExampleHostingStackApplicationApplicationManagerUrlAD7E2B70": "https://us-east-1.console.aws.amazon.com/systems-manager/appmanager/application/AWS_AppRegistry_Application-ExampleApp-us-east-1-052488004497"
+  }
+}
