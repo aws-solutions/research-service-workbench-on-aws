@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CfnOutput, CfnResource, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
 import { FederatedPrincipal, OpenIdConnectProvider, ManagedPolicy, Role, CfnRole } from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
@@ -43,8 +43,7 @@ export class GitHubOIDCStack extends Stack {
             }
           },
           'sts:AssumeRoleWithWebIdentity'
-        ),
-        maxSessionDuration: Duration.hours(2)
+        )
       });
 
       let githubCustomManagedPolicy!: ManagedPolicy;
