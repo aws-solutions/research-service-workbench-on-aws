@@ -3,28 +3,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
   "packages": [
     {
-      "name": "@aws-cdk/assert",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@aws-cdk/aws-apigatewayv2-alpha",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@aws-cdk/aws-dynamodb",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws-cdk/aws-iam",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-cdk/aws-servicecatalogappregistry-alpha",
@@ -32,7 +12,7 @@
     },
     {
       "name": "@aws-sdk/client-cloudformation",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-cognito-identity-provider",
@@ -68,7 +48,7 @@
     },
     {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
@@ -76,11 +56,11 @@
     },
     {
       "name": "@aws-sdk/client-sagemaker",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-service-catalog",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-service-catalog-appregistry",
@@ -92,11 +72,11 @@
     },
     {
       "name": "@aws-sdk/client-ssm",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-sts",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/s3-request-presigner",
@@ -104,7 +84,7 @@
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -175,42 +155,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@awsui/collection-hooks",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@awsui/components-react",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@awsui/design-tokens",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@awsui/global-styles",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@awsui/test-utils-core",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@babel/core",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@babel/preset-env",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@babel/preset-react",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@babel/preset-typescript",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "@casl/ability",
       "allowedCategories": [ "production" ]
     },
@@ -228,11 +172,11 @@
     },
     {
       "name": "@microsoft/rush-lib",
-      "allowedCategories": [ "production", "tools" ]
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "@next/eslint-plugin-next",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/eslint-config",
@@ -252,27 +196,11 @@
     },
     {
       "name": "@rushstack/node-core-library",
-      "allowedCategories": [ "production", "tools" ]
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "@rushstack/ts-command-line",
-      "allowedCategories": [ "production", "tools" ]
-    },
-    {
-      "name": "@testing-library/dom",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@testing-library/jest-dom",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@testing-library/react",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@testing-library/user-event",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "@typescript-eslint/parser",
@@ -292,10 +220,6 @@
     },
     {
       "name": "aws-jwt-verify",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "aws-lambda",
       "allowedCategories": [ "production" ]
     },
     {
@@ -307,16 +231,8 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "babel-jest",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "cdk-nag",
       "allowedCategories": [ "prototypes", "tools" ]
-    },
-    {
-      "name": "concurrently",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "constructs",
@@ -348,7 +264,7 @@
     },
     {
       "name": "diff",
-      "allowedCategories": [ "production", "tools" ]
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "dotenv",
@@ -372,19 +288,15 @@
     },
     {
       "name": "eslint-plugin-react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-react-hooks",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-security",
       "allowedCategories": [ "production", "prototypes", "tools" ]
-    },
-    {
-      "name": "eslint-plugin-testing-library",
-      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "express",
@@ -403,20 +315,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "glob",
-      "allowedCategories": [ "tools" ]
-    },
-    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "tools" ]
     },
     {
       "name": "jest",
-      "allowedCategories": [ "production", "prototypes", "tools" ]
-    },
-    {
-      "name": "jest-environment-jsdom",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jest-fast-check",
@@ -444,7 +348,7 @@
     },
     {
       "name": "lodash",
-      "allowedCategories": [ "production", "prototypes", "tools" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "md5-file",
@@ -452,19 +356,7 @@
     },
     {
       "name": "next",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "next-global-css",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "next-i18next",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "next-transpile-modules",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "nodemon",
@@ -492,19 +384,15 @@
     },
     {
       "name": "react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "react-dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "sharp",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sort-package-json",
@@ -524,7 +412,7 @@
     },
     {
       "name": "ts-jest",
-      "allowedCategories": [ "production", "prototypes", "tools" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "ts-node",
@@ -536,7 +424,7 @@
     },
     {
       "name": "uuid",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "winston",
