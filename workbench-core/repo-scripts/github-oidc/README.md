@@ -7,6 +7,13 @@ This package creates the roles in an AWS account that can be assumed from a gith
 1. `OIDCProviderStack`: This stack deploys the identity provider for GitHub
 2. `<GitHub-Org>-GitHubOIDCStack`: This stack deploys the role-to-assume which will be used in our github workflows to deploy and perform integration/e2e tests
 
+## Constructs
+This package defines 2 constructs:
+1. [MafGithubOidcRolePolicy](./src/constructs/maf-github-oidc-role-policy.ts)
+2. [SwbGithubOidcRolePolicy](./src/constructs/swb-github-oidc-role-policy.ts)
+
+Use these constructs to update the permissions according to the requirement.
+
 ### MAF Example Package Instructions
 #### MAF Main Account
 1. CDK boostrap by default uses `AdministratorAccess` permission which is not secure. In order to overcome this problem, we will first create our own bootstrap policy with permissions to allow only the creation of services required by `Example package`. This package provides 1 pre-configured bootstrap policy document for MAF `main` account:
@@ -14,6 +21,7 @@ This package creates the roles in an AWS account that can be assumed from a gith
 This policy assumes that the services are being deployed to `us-east-1` region. If you want to deploy to another region then create a new policy using the existing policy document and update the region accordingly.
 
     *Create Policy:*
+
     ```bash
     cd <ROOT_DIR>/workbench-core/repo-scripts/github-oidc
 
@@ -57,6 +65,7 @@ This policy assumes that the services are being deployed to `us-east-1` region. 
 This policy assumes that the services are being deployed to `us-east-1` region. If you want to deploy to a another region then create a new policy using the existing policy document and update the region accordingly.
 
     *Create Policy:*
+
     ```bash
     cd <ROOT_DIR>/workbench-core/repo-scripts/github-oidc
 
@@ -94,10 +103,10 @@ These policies assume that the services are being deployed to `us-east-1` region
         "swbBase": "swb",
 
         # Stage name that you plan to deploy
-        "swbStage": "sam",
+        "swbStage": "testEnv",
 
         # RegionShortName used in the STAGE.yaml file in swb-reference
-        "swbRegionShortName": "oh",
+        "swbRegionShortName": "va",
 
         # Update if you want to increase the session duration for the github-oidc role
         "swbMaxSessionDuration": 7200

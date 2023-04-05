@@ -9,8 +9,8 @@
   },
   "swb": {
     "swbBase": "swb",
-    "swbStage": "sam",
-    "swbRegionShortName": "oh",
+    "swbStage": "testEnv",
+    "swbRegionShortName": "va",
     "swbMaxSessionDuration": 7200
   }
 }
