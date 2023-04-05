@@ -32,9 +32,8 @@ Metadata:
           - EnableFlowLogs
           - VpcCidr
           - PublicSubnetCidr #PublicSubnet1CIDR
-          - PrivateSubnet1CIDR
+          - PrivateSubnetCIDR
           - GLBSubnet1CIDR
-
 
 Parameters:
   EnableFlowLogs:
@@ -75,7 +74,7 @@ Parameters:
     Type: String
     AllowedValues: [true, false]
     Default: true
-    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
+    Description: Set to true if this is a Public VPC. This will be the type of GWLB and LB subnets
 
   GLBEndpointServiceName:
     Type: String
@@ -104,7 +103,7 @@ Parameters:
     Type: String
     Default: 10.0.0.0/19
 
-  PrivateSubnet1CIDR:
+  PrivateSubnetCIDR:
     Default: 10.0.32.0/21
     Description: CIDR block for private subnet 1 located in Availability Zone 1
     Type: String
@@ -128,7 +127,10 @@ Parameters:
 
 Conditions:
   enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
-  PublicVPC: !Equals [!Ref IsPublicVPC, true]
+  enableFlowLogsPublic: !And [!Equals [!Ref EnableFlowLogs, true], !Equals [!Ref IsPublicVPC, true]]
+  enableFlowLogsPrivate: !And [!Equals [!Ref EnableFlowLogs, true], !Equals [!Ref IsPublicVPC, false]]
+  isPublicVPC: !Equals [!Ref IsPublicVPC, true]
+  isPrivateVPC: !Equals [!Ref IsPublicVPC, false]
 
 Mappings:
   Solution:
@@ -323,8 +325,6 @@ Resources:
         rules_to_suppress:
           - id: W11
             reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
-          - id: W28
-            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -378,7 +378,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}*'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}'
               - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*presigned-url-sagemaker-notebook-role'
           - Effect: Allow
             Action:
@@ -389,7 +389,7 @@ Resources:
               - iam:DeletePolicy
               - iam:DeletePolicyVersion
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}*'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}'
           - Effect: Allow
             Action:
               - iam:GetGroup
@@ -460,7 +460,7 @@ Resources:
               - iam:UpdateRoleDescription
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
-            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint*'
+            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
           - Effect: Allow
             Action:
               - iam:GetRole
@@ -506,11 +506,6 @@ Resources:
       ManagedPolicyArns:
         - !Ref PolicyHostingAccountHandler
       PermissionsBoundary: !Ref PolicyHostingAccountHandler
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W28
-            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   VPC:
     Type: AWS::EC2::VPC
@@ -539,7 +534,7 @@ Resources:
           Value: AcceptTraffic
 
   InternetGateway:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
@@ -547,14 +542,14 @@ Resources:
           Value: !Sub ${Namespace} igw
 
   VPCGatewayAttachment:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
 
   InternetGatewayRouteTable:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     DependsOn: VPCGatewayAttachment
     Type: AWS::EC2::RouteTable
     Properties:
@@ -564,14 +559,14 @@ Resources:
           Value: !Sub "${Namespace}-${VPCName}-routetable-internet-gateway"
 
   InternetGatewayRTAssociation:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::GatewayRouteTableAssociation
     Properties:
       GatewayId: !Ref "InternetGateway"
       RouteTableId: !Ref "InternetGatewayRouteTable"
 
   InternetGatewayRoute1:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref "InternetGatewayRouteTable"
@@ -580,6 +575,7 @@ Resources:
 
   PublicSubnet:
     Type: AWS::EC2::Subnet
+    Condition: isPublicVPC
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone: !Select ["0", !Ref "AvailabilityZones"]
@@ -588,14 +584,9 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public subnet 1
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W33
-            reason: 'TODO:EC2 Subnet should not have MapPublicIpOnLaunch set to true'
 
   PublicSubnet1RouteTable:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref "VPC"
@@ -604,7 +595,7 @@ Resources:
           Value: !Sub "${Namespace}-${VPCName}-routetable-public-az1"
 
   PublicSubnet1Route:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref "PublicSubnet1RouteTable"
@@ -612,13 +603,14 @@ Resources:
       VpcEndpointId: !Ref "GLBEndpoint1" ##### outbound traffic from public subnet goes to GLB endpoint in the AZ
 
   PublicSubnet1RouteTableAssociation:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref "PublicSubnet"
       RouteTableId: !Ref "PublicSubnet1RouteTable"
 
-  PrivateSubnetRouteTable:
+  PrivateRouteTable:
+    Condition: isPrivateVPC
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref "VPC"
@@ -626,11 +618,12 @@ Resources:
         - Key: Name
           Value: !Sub "${Namespace}-${VPCName}-routetable-private"
 
-  PrivateSubnet1:
+  PrivateSubnet:
     Type: AWS::EC2::Subnet
+    Condition: isPrivateVPC
     Properties:
       VpcId: !Ref "VPC"
-      CidrBlock: !Ref "PrivateSubnet1CIDR"
+      CidrBlock: !Ref "PrivateSubnetCIDR"
       AvailabilityZone: !Select ["0", !Ref "AvailabilityZones"]
       Tags:
         - Key: Name
@@ -640,29 +633,48 @@ Resources:
 
   TransitGatewayAttachment1:
     Type: AWS::EC2::TransitGatewayAttachment
+    Condition: isPrivateVPC
     Properties:
       SubnetIds:
-        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet
       TransitGatewayId: !Ref TransitGatewayID
       VpcId: !Ref "VPC"
 
   PrivateSubnetRoute:
     Type: AWS::EC2::Route
+    Condition: isPrivateVPC
     DependsOn: TransitGatewayAttachment1
     Properties:
-      RouteTableId: !Ref "PrivateSubnetRouteTable"
+      RouteTableId: !Ref "PrivateRouteTable"
       DestinationCidrBlock: 0.0.0.0/0
       TransitGatewayId: !Ref "TransitGatewayID"
   
-  PrivateSubnet1RouteTableAssociation:
+  PrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: isPrivateVPC
     Properties:
-      SubnetId: !Ref "PrivateSubnet1"
-      RouteTableId: !Ref "PrivateSubnetRouteTable"
+      SubnetId: !Ref "PrivateSubnet"
+      RouteTableId: !Ref "PrivateRouteTable"
+
+  FlowLogPrivateSubnet:
+    Type: AWS::EC2::FlowLog
+    Condition: enableFlowLogsPrivate
+    Properties:
+      ResourceId: !Ref PrivateSubnet
+      ResourceType: Subnet
+      TrafficType: ACCEPT
+      DeliverLogsPermissionArn: !GetAtt EnvManagementRole.Arn
+      LogGroupName: PrivateSubnetLogGroup
+      LogFormat: '${version} ${vpc-id} ${subnet-id} ${instance-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${tcp-flags} ${type} ${pkt-srcaddr} ${pkt-dstaddr}'
+      Tags:
+        - Key: Name
+          Value: FlowLogForPrivateSubnet
+        - Key: Purpose
+          Value: AcceptTraffic
 
   FlowLogPublicSubnet:
     Type: AWS::EC2::FlowLog
-    Condition: enableFlowLogs
+    Condition: enableFlowLogsPublic
     Properties:
       ResourceId: !Ref PublicSubnet
       ResourceType: Subnet
@@ -678,6 +690,7 @@ Resources:
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
+    Condition: isPublicVPC
     Properties:
       VpcId: !Ref VPC
       Tags:
@@ -686,7 +699,7 @@ Resources:
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
-    Condition: PublicVPC
+    Condition: isPublicVPC
     DependsOn: VPCGatewayAttachment
     Properties:
       RouteTableId: !Ref PublicRouteTable
@@ -695,6 +708,7 @@ Resources:
 
   PublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: isPublicVPC
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet
@@ -795,7 +809,7 @@ Resources:
 
 
   GatewayLoadBalancerSubnet1:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref "VPC"
@@ -806,7 +820,7 @@ Resources:
           Value: !Sub "${Namespace}-${VPCName}-GLB-subnet-az1"
 
   GLBEndpoint1:
-    Condition: PublicVPC
+    Condition: isPublicVPC
     Type: AWS::EC2::VPCEndpoint
     Properties:
       ServiceName: !Ref GLBEndpointServiceName
@@ -872,16 +886,22 @@ Outputs:
     Value: !Ref VPC
 
   VpcSubnet:
-    Description: A reference to the public subnet in the 1st Availability Zone
-    Value: !Ref PublicSubnet
+    Description: Subnet to be used for workspace provisioning
+    Value: !If
+          - isPublicVPC
+          - !Ref PublicSubnet
+          - !Ref PrivateSubnet
 
   EncryptionKeyArn:
     Description: KMS Encryption Key Arn
     Value: !GetAtt [EncryptionKey, Arn]
 
-  PublicRouteTableId:
-    Description: The public route table assigned to the workspace VPC
-    Value: !Ref PublicRouteTable
+  RouteTableId:
+    Description: The route table assigned to the workspace VPC
+    Value: !If
+          - isPublicVPC
+          - !Ref PublicRouteTable
+          - !Ref PrivateRouteTable
   
   AppRegistryApplicationARN:
     Description: App Registry Application ARN
