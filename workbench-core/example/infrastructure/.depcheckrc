@@ -8,8 +8,7 @@ ignores: [
     'npm-package-json-lint-config-default',
     '@types/aws-lambda',
     '@types/node',
-    'fast-check',
-    'ts-jest'
+    'fast-check'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored
