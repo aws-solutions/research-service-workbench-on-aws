@@ -865,7 +865,6 @@ importers:
       eslint: ^8.7.0
       generate-password: ^1.7.0
       jest: ^27.5.1
-      jsonschema: ^1.4.1
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
@@ -893,7 +892,6 @@ importers:
       '@aws/workbench-core-user-management': link:../user-management
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
-      jsonschema: 1.4.1
       lodash: 4.17.21
       md5-file: 5.0.0
       zod: 3.19.1
@@ -8903,7 +8901,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001470
+      caniuse-lite: 1.0.30001473
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -9019,8 +9017,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001470:
-    resolution: {integrity: sha512-065uNwY6QtHCBOExzbV6m236DDhYCCtPmQUCoQtwkVqzud8v5QPidoMr6CoMkC2nfp6nksjttqWQRRh75LqUmA==}
+  /caniuse-lite/1.0.30001473:
+    resolution: {integrity: sha512-ewDad7+D2vlyy+E4UJuVfiBsU69IL+8oVmTuZnH5Q6CIUbxNfI50uVpRHbUPDD6SUaN2o0Lh4DhTrvLG/Tn1yg==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -13085,7 +13083,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001470
+      caniuse-lite: 1.0.30001473
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -13128,7 +13126,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001470
+      caniuse-lite: 1.0.30001473
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2

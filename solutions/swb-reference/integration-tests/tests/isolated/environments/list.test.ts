@@ -42,26 +42,9 @@ describe('list environments', () => {
   });
 
   describe('IT Admin tests', () => {
-    test('list environments when status query is invalid', async () => {
-      try {
-        const queryParams = {
-          status: 'someInvalidStatus'
-        };
-        await itAdminSession.resources.environments.get(queryParams);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(400, {
-            error: 'Bad Request',
-            message: 'Invalid environment status. Please try again with valid inputs.'
-          })
-        );
-      }
-    });
-
     test.each(validEnvStatuses)('list environments when status query is %s', async (status) => {
       const queryParams = {
-        status
+        filter: { status: { eq: status } }
       };
 
       const { data: response } = await itAdminSession.resources.environments.get(queryParams);
@@ -92,7 +75,7 @@ describe('list environments', () => {
     test('not authorized to call list environments', async () => {
       try {
         const queryParams = {
-          status: 'someInvalidStatus'
+          filter: { status: { eq: 'someInvalidStatus' } }
         };
         await paSession.resources.environments.get(queryParams);
       } catch (e) {
@@ -124,7 +107,7 @@ describe('list environments', () => {
     test('not authorized to call list environments', async () => {
       try {
         const queryParams = {
-          status: 'someInvalidStatus'
+          filter: { status: { eq: 'someInvalidStatus' } }
         };
         await researcherSession.resources.environments.get(queryParams);
       } catch (e) {

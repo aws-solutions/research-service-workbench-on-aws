@@ -21,7 +21,8 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import _ from 'lodash';
-import { Environment, EnvironmentService } from '../services/environmentService';
+import { Environment } from '../models/environments/environment';
+import { EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
 

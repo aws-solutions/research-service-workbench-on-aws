@@ -45,6 +45,7 @@ import { EnvTypeConfigService } from './services/envTypeConfigService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 import SshKeyService from './services/sshKeyService';
+import { SWBEnvironmentService } from './services/swbEnvironmentService';
 import { SWBProjectService } from './services/swbProjectService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
@@ -126,6 +127,7 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentService,
+  environmentPlugin: new SWBEnvironmentService(environmentService),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
   userManagementService: new UserManagementService(

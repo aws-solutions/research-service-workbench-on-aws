@@ -6,8 +6,9 @@
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
+import { Environment } from '../models/environments/environment';
 import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
-import { EnvironmentService, Environment } from '../services/environmentService';
+import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
 
@@ -53,18 +54,12 @@ describe('StatusHandler', () => {
       cidr: '1.1.1.1/32',
       description: 'blah',
       instanceId: '123',
-      error: undefined,
       name: 'sagemaker',
-      outputs: [],
       projectId: '123',
       PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
-      owner: 'blah',
-      type: 'testEnvType',
-      dependency: '123',
-      updatedBy: 'blah',
-      createdBy: 'blah'
+      owner: 'blah'
     };
 
     const dynamoDBService = new DynamoDBService({
