@@ -4,7 +4,7 @@
  */
 
 import { Environment } from '@aws/workbench-core-environments';
-import { badImplementation, badRequest, conflict, isBoom } from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
@@ -52,26 +52,28 @@ export function setUpProjectEnvRoutes(
       const { envType } = environmentRequest;
 
       if (!supportedEnvs.includes(envType)) {
-        throw badRequest(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
       if (req.body.id) {
-        throw badRequest('id cannot be passed in the request body when trying to launch a new environment');
+        throw Boom.badRequest(
+          'id cannot be passed in the request body when trying to launch a new environment'
+        );
       }
 
       let env: Environment;
       try {
         env = await projectEnvironmentService.createEnvironment(environmentRequest, res.locals.user);
       } catch (e) {
-        if (isBoom(e)) {
+        if (Boom.isBoom(e)) {
           throw e;
         }
         if (isProjectDeletedError(e)) {
-          throw badRequest(e.message);
+          throw Boom.badRequest(e.message);
         }
 
-        throw badImplementation(
+        throw Boom.badImplementation(
           `There was a problem creating environment type ${envType} for project ${req.body.projectId}`
         );
       }
@@ -111,11 +113,11 @@ export function setUpProjectEnvRoutes(
       if (['TERMINATING', 'TERMINATED'].includes(envStatus)) {
         res.status(204).send();
       } else if (envStatus === 'TERMINATING_FAILED') {
-        throw conflict(
+        throw Boom.conflict(
           'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
         );
       } else if (envStatus !== 'STOPPED') {
-        throw badRequest(
+        throw Boom.badRequest(
           `Environment must be STOPPED before beginning termination. ${environment.id} currently in state ${environment.status}.`
         );
       } else if (supportedEnvs.includes(envType)) {
@@ -123,7 +125,7 @@ export function setUpProjectEnvRoutes(
         await environments[`${envType}`].lifecycle.terminate(environmentId);
         res.status(204).send();
       } else {
-        throw badRequest(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -143,7 +145,7 @@ export function setUpProjectEnvRoutes(
       const environment = await projectEnvironmentService.getEnvironment(projectId, environmentId, true);
       const envType = environment.ETC.type;
       if (environment.status === 'STOPPING') {
-        throw conflict('Cannot start environment while environment is currently being stopped');
+        throw Boom.conflict('Cannot start environment while environment is currently being stopped');
       } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
@@ -151,7 +153,7 @@ export function setUpProjectEnvRoutes(
         await environments[`${envType}`].lifecycle.start(environmentId);
         res.status(204).send();
       } else {
-        throw badRequest(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -171,7 +173,7 @@ export function setUpProjectEnvRoutes(
       const envType = environment.ETC.type;
 
       if (['PENDING', 'STARTING'].includes(environment.status)) {
-        throw conflict('Cannot stop environment while environment is currently being started');
+        throw Boom.conflict('Cannot stop environment while environment is currently being started');
       } else if (['STOPPING', 'STOPPED'].includes(environment.status)) {
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
@@ -179,7 +181,7 @@ export function setUpProjectEnvRoutes(
         await environments[`${envType}`].lifecycle.stop(environmentId);
         res.status(204).send();
       } else {
-        throw badRequest(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -208,7 +210,7 @@ export function setUpProjectEnvRoutes(
       };
 
       if (environment.status !== 'COMPLETED') {
-        throw conflict(
+        throw Boom.conflict(
           `Environment is in ${environment.status} status. Please wait until environment is in 'COMPLETED' status before trying to connect to the environment.`
         );
       }
@@ -226,7 +228,7 @@ export function setUpProjectEnvRoutes(
         };
         res.send(response);
       } else {
-        throw badRequest(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -246,6 +248,11 @@ export function setUpProjectEnvRoutes(
         validatedRequest.environmentId,
         true
       );
+      if (env.projectId !== validatedRequest.projectId) {
+        throw Boom.notFound(
+          `Couldnt find environment ${validatedRequest.environmentId} with project ${validatedRequest.projectId}`
+        );
+      }
       res.send(env);
     })
   );
@@ -261,7 +268,9 @@ export function setUpProjectEnvRoutes(
       const { paginationToken, pageSize, projectId } = validatedRequest;
       // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        throw badRequest('Invalid pagination token and/or page size. Please try again with valid inputs.');
+        throw Boom.badRequest(
+          'Invalid pagination token and/or page size. Please try again with valid inputs.'
+        );
       } else {
         const response = await projectEnvironmentService.listProjectEnvs(
           projectId,
