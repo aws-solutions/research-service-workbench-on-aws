@@ -89,7 +89,7 @@ describe('Audit service integration tests', () => {
     };
     const response = await newAdminSession.resources.auditEntry.isAuditEntryComplete(auditEntry);
     expect(response.status).toBe(200);
-    expect(response.data).toMatchObject({
+    expect(response.data).toStrictEqual({
       isComplete: false
     });
   });
@@ -102,7 +102,7 @@ describe('Audit service integration tests', () => {
     };
     const response = await newAdminSession.resources.auditEntry.isAuditEntryComplete(auditEntry);
     expect(response.status).toBe(200);
-    expect(response.data).toMatchObject({
+    expect(response.data).toStrictEqual({
       isComplete: true
     });
   });
@@ -113,7 +113,7 @@ describe('Audit service integration tests', () => {
     async (randomObject) => {
       const response = await newAdminSession.resources.auditEntry.isAuditEntryComplete(randomObject);
       expect(response.status).toBe(200);
-      expect(response.data).toMatchObject({
+      expect(response.data).toStrictEqual({
         isComplete: false
       });
     }

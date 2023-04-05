@@ -147,7 +147,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       const decoded = await plugin.validateToken('validToken');
 
-      expect(decoded).toMatchObject(baseDecodedAccessToken);
+      expect(decoded).toStrictEqual(baseDecodedAccessToken);
     });
 
     it('should throw InvalidJWTError when an invalid token is passed in', async () => {
@@ -292,13 +292,13 @@ describe('CognitoAuthenticationPlugin tests', () => {
         'cognito:groups': ['Admin']
       });
 
-      expect(roles).toMatchObject(['Admin']);
+      expect(roles).toStrictEqual(['Admin']);
     });
 
     it('should return an empty array when the decoded token doesnt have the cognito:groups claim', () => {
       const roles = plugin.getUserRolesFromToken(baseDecodedAccessToken);
 
-      expect(roles).toMatchObject([]);
+      expect(roles).toStrictEqual([]);
     });
   });
 
@@ -336,7 +336,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
           }
         }
       );
-      expect(tokens).toMatchObject({
+      expect(tokens).toStrictEqual({
         idToken: {
           token: 'id token',
           expiresIn: 1
@@ -554,7 +554,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
           }
         }
       );
-      expect(tokens).toMatchObject({
+      expect(tokens).toStrictEqual({
         idToken: {
           token: 'id token',
           expiresIn: 1
@@ -692,7 +692,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       const tokens = await plugin['_getTokensExpirationinMS']();
 
-      expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
+      expect(tokens).toStrictEqual({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
     it('should return a TokensExpiration object when user pool token expiration is undefined', async () => {
@@ -704,7 +704,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       const tokens = await plugin['_getTokensExpirationinMS']();
 
-      expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
+      expect(tokens).toStrictEqual({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
