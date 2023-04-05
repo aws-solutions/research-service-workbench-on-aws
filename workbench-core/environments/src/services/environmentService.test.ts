@@ -975,7 +975,7 @@ describe('EnvironmentService', () => {
 
       // CHECK
       const updateCall = ddbMock.commandCalls(UpdateItemCommand)[0];
-      expect(updateCall.args[0].input).toMatchObject({
+      expect(updateCall.args[0].input).toStrictEqual({
         TableName: tableName,
         Key: {
           pk: {

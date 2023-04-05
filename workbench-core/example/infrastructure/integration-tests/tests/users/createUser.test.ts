@@ -35,8 +35,9 @@ describe('userManagement create user integration test', () => {
   it('should return a created user', async () => {
     const response = await adminSession.resources.users.create(user);
 
-    expect(response.data).toMatchObject({
+    expect(response.data).toStrictEqual({
       ...user,
+      id: expect.any(String),
       status: Status.ACTIVE,
       roles: []
     });

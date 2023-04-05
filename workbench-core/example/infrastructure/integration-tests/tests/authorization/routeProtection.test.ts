@@ -148,7 +148,7 @@ describe('Static authorization integration tests', () => {
         method
       });
       expect(status).toBe(200);
-      expect(data).toMatchObject({
+      expect(data).toStrictEqual({
         ignored: true
       });
     });
@@ -161,7 +161,7 @@ describe('Static authorization integration tests', () => {
         method
       });
       expect(status).toBe(200);
-      expect(data).toMatchObject({
+      expect(data).toStrictEqual({
         ignored: false
       });
     });
