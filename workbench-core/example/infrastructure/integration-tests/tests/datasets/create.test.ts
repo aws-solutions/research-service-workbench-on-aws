@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AddDataSetExternalEndpointResponse, DataSetPermission } from '@aws/workbench-core-datasets';
+import { DataSetPermission } from '@aws/workbench-core-datasets';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import { DatasetHelper } from '../../support/complex/datasetHelper';
@@ -60,7 +60,7 @@ describe('datasets create integration test', () => {
       });
 
       expect(response.data.id).toBeDefined();
-      expect(response.data.permissions).toMatchObject<DataSetPermission[]>([
+      expect(response.data.permissions).toStrictEqual<DataSetPermission[]>([
         {
           identity: groupId,
           identityType: 'GROUP',
@@ -75,7 +75,7 @@ describe('datasets create integration test', () => {
         owner: groupId,
         ownerType: 'GROUP'
       });
-      expect(response.data.permissions).toMatchObject<DataSetPermission[]>([
+      expect(response.data.permissions).toStrictEqual<DataSetPermission[]>([
         {
           identity: groupId,
           identityType: 'GROUP',
@@ -121,16 +121,14 @@ describe('datasets create integration test', () => {
           accessLevel: 'read-only'
         }
       });
-      const response = await dataset.share({ userId });
+      const { data } = await dataset.share({ userId });
 
-      expect(response).toMatchObject<AddDataSetExternalEndpointResponse>({
-        data: {
-          mountObject: {
-            name: dataset.storagePath,
-            bucket: expect.stringMatching(accessPointS3AliasRegExp),
-            prefix: dataset.storagePath,
-            endpointId: expect.stringMatching(endpointIdRegExp)
-          }
+      expect(data).toStrictEqual({
+        mountObject: {
+          name: dataset.storagePath,
+          bucket: expect.stringMatching(accessPointS3AliasRegExp),
+          prefix: dataset.storagePath,
+          endpointId: expect.stringMatching(endpointIdRegExp)
         }
       });
 
@@ -139,7 +137,7 @@ describe('datasets create integration test', () => {
       const metadata = await DatasetHelper.getddbRecords(
         mainAwsService,
         dataset.id,
-        response.data.mountObject.endpointId
+        data.mountObject.endpointId
       );
       expect(metadata.authenticatedUser).toBeUndefined();
     });
@@ -196,16 +194,14 @@ describe('datasets create integration test', () => {
           accessLevel: 'read-only'
         }
       });
-      const response = await dataset.share({ groupId });
+      const { data } = await dataset.share({ groupId });
 
-      expect(response).toMatchObject<AddDataSetExternalEndpointResponse>({
-        data: {
-          mountObject: {
-            name: dataset.storagePath,
-            bucket: expect.stringMatching(accessPointS3AliasRegExp),
-            prefix: dataset.storagePath,
-            endpointId: expect.stringMatching(endpointIdRegExp)
-          }
+      expect(data).toStrictEqual({
+        mountObject: {
+          name: dataset.storagePath,
+          bucket: expect.stringMatching(accessPointS3AliasRegExp),
+          prefix: dataset.storagePath,
+          endpointId: expect.stringMatching(endpointIdRegExp)
         }
       });
 
@@ -214,7 +210,7 @@ describe('datasets create integration test', () => {
       const metadata = await DatasetHelper.getddbRecords(
         mainAwsService,
         dataset.id,
-        response.data.mountObject.endpointId
+        data.mountObject.endpointId
       );
       expect(metadata.authenticatedUser).toBeUndefined();
     });
