@@ -31,7 +31,6 @@
     "compile": "node scripts/buildLambda.js",
     "depcheck": "depcheck",
     "integration-tests": "rushx build && jest lib/integration-tests -i --verbose",
-    "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
