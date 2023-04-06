@@ -80,7 +80,7 @@ export class GitHubOIDCStack extends Stack {
         );
       } else if (props.application === 'SWB') {
         if (!swb.swbStage || !swb.swbBase || !swb.swbRegionShortName || !swb.swbMaxSessionDuration) {
-          throw new Error('Stage and MaxSessionDuration are required !');
+          throw new Error('Stage, Base, RegionShortName and MaxSessionDuration are required !');
         }
         const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
         githubCfnRole.maxSessionDuration = swb.swbMaxSessionDuration;

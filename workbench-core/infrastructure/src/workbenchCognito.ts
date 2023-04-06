@@ -59,7 +59,6 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   },
   authFlows: {
     userSrp: true,
-    userPassword: true,
     custom: true
   },
   preventUserExistenceErrors: true,
@@ -167,7 +166,8 @@ export class WorkbenchCognito extends Construct {
 
     const tempProgrammaticAccessUserPoolClientProps: UserPoolClientOptions = {
       authFlows: {
-        adminUserPassword: true
+        adminUserPassword: true,
+        userPassword: true
       }
     };
     const programmaticAccessUserPoolClientProps = merge(

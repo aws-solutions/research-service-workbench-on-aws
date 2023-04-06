@@ -223,6 +223,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "aws-sdk",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "aws-sdk-client-mock",
       "allowedCategories": [ "production" ]
     },
@@ -253,6 +257,10 @@
     {
       "name": "csurf",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cypress",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "date-fns",
@@ -312,7 +320,7 @@
     },
     {
       "name": "generate-password",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "istanbul-badges-readme",
@@ -353,6 +361,10 @@
     {
       "name": "md5-file",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "minimist",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next",
