@@ -72,7 +72,7 @@ jobs:
       - name: Example package end to end test
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cypress run --verbose
+          node ../../../common/scripts/install-run-rushx.js cypress run
 
       - name: Slack Failure Notification
         if: failure()
