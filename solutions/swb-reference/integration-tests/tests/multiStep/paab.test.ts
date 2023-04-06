@@ -322,10 +322,10 @@ describe('multiStep environment test', () => {
     expect(researcherProj1Environments.data.filter((env) => env.id === env1.id).length).toEqual(1);
     expect(researcherProj1Environments.data.filter((env) => env.id === env3.id).length).toEqual(0);
 
-    console.log('Verifying Researcher1 CANNOT see Environment1 on single get REQUEST using project3 Request');
+    console.log('Verifying Researcher1 CANNOT see Environment1 on single get REQUEST using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).get()
-    ).toThrow(
+    ).rejects.toThrowError(
       new HttpError(404, { error: `Couldnt find environment ${env1.id} with project ${project3Id}` })
     );
 
@@ -464,12 +464,12 @@ describe('multiStep environment test', () => {
     console.log('Verifying Researcher1 CANNOT stop Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).stop()
-    ).toThrow(unauthorizedHttpError);
+    ).rejects.toThrowError(unauthorizedHttpError);
 
     console.log('Verifying Researcher1 CANNOT connect Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).connect()
-    ).toThrow(unauthorizedHttpError);
+    ).rejects.toThrowError(unauthorizedHttpError);
     // Connect
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).connect();
     // Stop
@@ -528,12 +528,12 @@ describe('multiStep environment test', () => {
     console.log('Verifying Researcher1 CANNOT start Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).start()
-    ).toThrow(unauthorizedHttpError);
+    ).rejects.toThrowError(unauthorizedHttpError);
 
     console.log('Verifying Researcher1 CANNOT terminate Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).terminate()
-    ).toThrow(unauthorizedHttpError);
+    ).rejects.toThrowError(unauthorizedHttpError);
 
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).terminate();
 
