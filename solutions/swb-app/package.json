@@ -70,7 +70,7 @@
     "@types/heft-jest": "1.0.2",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.181",
-    "@types/node": "^14",
+    "@types/node": "^18.15.11",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "jest": "^27.5.1",
