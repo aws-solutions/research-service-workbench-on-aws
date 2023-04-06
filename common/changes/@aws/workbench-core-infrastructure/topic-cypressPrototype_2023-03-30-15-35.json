@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "Adding Cypress integration test",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}
