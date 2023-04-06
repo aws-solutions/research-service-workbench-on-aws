@@ -85,7 +85,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
-  setUpEnvRoutes(router, apiRouteConfig.environmentService);
+  setUpEnvRoutes(router, apiRouteConfig.environmentPlugin);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(

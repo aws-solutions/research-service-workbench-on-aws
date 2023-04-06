@@ -73,7 +73,7 @@ describe('environments launch negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'name'"
+              message: 'name: Required'
             })
           );
         }
@@ -89,7 +89,7 @@ describe('environments launch negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'envTypeId'"
+              message: 'envTypeId: Required'
             })
           );
         }
@@ -103,7 +103,7 @@ describe('environments launch negative tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message:
-                "requires property 'name'. requires property 'description'. requires property 'envTypeId'. requires property 'envTypeConfigId'. requires property 'envType'. requires property 'datasetIds'"
+                'name: Required. description: Required. envTypeId: Required. envTypeConfigId: Required. envType: Required'
             })
           );
         }
@@ -138,7 +138,7 @@ describe('environments launch negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'name'"
+              message: 'name: Required'
             })
           );
         }
@@ -157,7 +157,7 @@ describe('environments launch negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: "requires property 'envTypeId'"
+              message: 'envTypeId: Required'
             })
           );
         }
@@ -171,7 +171,7 @@ describe('environments launch negative tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message:
-                "requires property 'name'. requires property 'description'. requires property 'envTypeId'. requires property 'envTypeConfigId'. requires property 'envType'. requires property 'datasetIds'"
+                'name: Required. description: Required. envTypeId: Required. envTypeConfigId: Required. envType: Required'
             })
           );
         }

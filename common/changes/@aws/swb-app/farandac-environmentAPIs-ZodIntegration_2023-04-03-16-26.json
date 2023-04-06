@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Add zod to Environments API",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

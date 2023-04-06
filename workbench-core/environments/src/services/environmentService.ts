@@ -15,69 +15,39 @@ import {
   buildDynamoDbKey,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
-  getPaginationToken,
   DynamoDBService,
-  JSONValue
+  JSONValue,
+  validateSingleSortAndFilter,
+  getSortQueryParams,
+  getFilterQueryParams,
+  PaginatedResponse
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
-
-export interface Environment {
-  id: string;
-  instanceId: string | undefined;
-  cidr: string;
-  description: string;
-  error: { type: string; value: string } | undefined;
-  name: string;
-  outputs: { id: string; value: string; description: string }[];
-  projectId: string;
-  status: EnvironmentStatus;
-  provisionedProductId: string;
-  envTypeConfigId: string;
-  updatedAt: string;
-  updatedBy: string;
-  createdAt: string;
-  createdBy: string;
-  owner: string;
-  type: string;
-  dependency: string;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ETC?: any;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PROJ?: any;
-  // TODO: Replace any[] with <type>[]
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DATASETS?: any[];
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ENDPOINTS?: any[];
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  INID?: any;
-}
+import { Environment, EnvironmentParser } from '../models/environments/environment';
+import { EnvironmentItem, EnvironmentItemParser } from '../models/environments/environmentItem';
+import { ListEnvironmentsByProjectRequest } from '../models/environments/listEnvironmentsByProjectRequest';
+import { ListEnvironmentsServiceRequest } from '../models/environments/listEnvironmentsServiceRequest';
 
 const defaultEnv: Environment = {
   id: '',
   instanceId: '',
   cidr: '',
   description: '',
-  error: undefined,
   name: '',
-  outputs: [],
   projectId: '',
   status: 'PENDING',
   envTypeConfigId: '',
   updatedAt: '',
-  updatedBy: '',
   createdAt: '',
-  createdBy: '',
   provisionedProductId: '',
-  owner: '',
-  type: '',
-  dependency: ''
+  owner: ''
 };
 
 export class EnvironmentService {
   private _dynamoDBService: DynamoDBService;
+  private _resourceType: string = 'environment';
 
   public constructor(dynamoDBService: DynamoDBService) {
     this._dynamoDBService = dynamoDBService;
@@ -97,7 +67,7 @@ export class EnvironmentService {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
 
-      return data.Item! as unknown as Environment;
+      return this._mapDDBItemToEnvironment(data.Item!);
     }
 
     const data = await this._dynamoDBService
@@ -130,184 +100,64 @@ export class EnvironmentService {
         }
       }
     }
-    return envWithMetadata;
+    return this._mapDDBItemToEnvironment(envWithMetadata);
   }
 
   /**
    * List all environments with options for filtering, pagination, and sort
-   * @param user - User information
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
   public async listEnvironments(
-    user: AuthenticatedUser,
-    filter?: {
-      status?: EnvironmentStatus;
-      name?: string;
-      createdAtFrom?: string;
-      createdAtTo?: string;
-      project?: string;
-      owner?: string;
-      type?: string;
-    },
-    pageSize?: number,
-    paginationToken?: string,
-    sort?: {
-      status?: boolean;
-      name?: boolean;
-      createdAt?: boolean;
-      project?: boolean;
-      owner?: boolean;
-      type?: boolean;
-    }
-  ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
-    // Check that filter and sort are not both defined
-    if (filter && sort) {
-      throw Boom.badRequest('Cannot apply a filter and sort at the same time');
-    }
-    const filterAttributesLength = filter ? Object.keys(filter).length : 0;
-    // Check that at most one filter is defined because we not support more than one filter
-    if (
-      filterAttributesLength > 1 &&
-      !(filterAttributesLength === 2 && filter?.createdAtFrom && filter?.createdAtTo)
-    ) {
-      //catch case for range
-      throw Boom.badRequest('Cannot apply more than one filter.');
-    }
-
-    // Check that at most one sort attribute is defined because we not support sorting by more than one attribute
-    if (sort && Object.keys(sort).length > 1) {
-      throw Boom.badRequest('Cannot sort by more than one attribute.');
-    }
-
-    let environments: Environment[] = [];
-
+    request: ListEnvironmentsServiceRequest
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
+    const { filter, pageSize, paginationToken, sort } = request;
+    validateSingleSortAndFilter(filter, sort);
+    const gsiNames = [
+      'getResourceByName',
+      'getResourceByStatus',
+      'getResourceByCreatedAt',
+      'getResourceByDependency',
+      'getResourceByOwner',
+      'getResourceByType',
+      'getResourceByStatus'
+    ];
     let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: 'environment' },
+      key: { name: 'resourceType', value: this._resourceType },
+      index: 'getResourceByCreatedAt',
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
-
-    if (user.roles.includes('ITAdmin')) {
-      if (filter) {
-        if (filter.status) {
-          // if admin and status is selected in the filter, use GSI getResourceByStatus
-          const addFilter = this._setFilter('getResourceByStatus', 'status', filter.status);
-          queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.name) {
-          // if admin and name is selected in the filter, use GSI getResourceByName
-          const addFilter = this._setFilter('getResourceByName', 'name', filter.name);
-          queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.createdAtFrom && filter.createdAtTo) {
-          // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
-          const addFilter = this._setRangeFilter(
-            'getResourceByCreatedAt',
-            'createdAt',
-            filter.createdAtFrom,
-            filter.createdAtTo
-          );
-          queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.project) {
-          // if admin and project is selected in the filter, use GSI getResourceByProject
-          const addFilter = this._setFilter('getResourceByDependency', 'dependency', filter.project);
-          queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.owner) {
-          // if admin and owner is selected in the filter, use GSI getResourceByOwner
-          const addFilter = this._setFilter('getResourceByOwner', 'owner', filter.owner);
-          queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.type) {
-          // if admin and type is selected in the filter, use GSI getResourceByType
-          const addFilter = this._setFilter('getResourceByType', 'type', filter.type);
-          queryParams = { ...queryParams, ...addFilter };
-        }
-      } else if (sort) {
-        if (sort.status !== undefined) {
-          // if admin and status is selected in the sort param, use GSI getResourceByStatus
-          const addSort = this._setSort('getResourceByStatus', 'status', sort.status);
-          queryParams = { ...queryParams, ...addSort };
-        } else if (sort.name !== undefined) {
-          // if admin and name is selected in the sort param, use GSI getResourceByName
-          const addSort = this._setSort('getResourceByName', 'name', sort.name);
-          queryParams = { ...queryParams, ...addSort };
-        } else if (sort.createdAt !== undefined) {
-          // if admin and createdAt is selected in the sort param, use GSI getResourceByCreatedAt
-          const addSort = this._setSort('getResourceByCreatedAt', 'createdAt', sort.createdAt);
-          queryParams = { ...queryParams, ...addSort };
-        } else if (sort.project !== undefined) {
-          // if admin and project is selected in the sort param, use GSI getResourceByProject
-          const addSort = this._setSort('getResourceByDependency', 'dependency', sort.project);
-          queryParams = { ...queryParams, ...addSort };
-        } else if (sort.owner !== undefined) {
-          // if admin and owner is selected in the sort param, use GSI getResourceByOwner
-          const addSort = this._setSort('getResourceByOwner', 'owner', sort.owner);
-          queryParams = { ...queryParams, ...addSort };
-        } else if (sort.type !== undefined) {
-          // if admin and type is selected in the sort param, use GSI getResourceByType
-          const addSort = this._setSort('getResourceByType', 'type', sort.type);
-          queryParams = { ...queryParams, ...addSort };
-        }
-      } else {
-        // if admin, use GSI getResourceByCreatedAt by default
-        queryParams.index = 'getResourceByCreatedAt';
-      }
-    } else {
-      if (!filter?.project) throw Boom.unauthorized('User is not authorized.'); //researchers or PA trying to get environemnts with no project filter
-      // forcing nonadmins to filter by project
-      const addFilter = this._setFilter('getResourceByDependency', 'dependency', filter.project);
-      queryParams = { ...queryParams, ...addFilter };
-    }
+    const filterQuery = getFilterQueryParams(filter, gsiNames);
+    const sortQuery = getSortQueryParams(sort, gsiNames);
+    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
-
-    try {
-      const data = await this._dynamoDBService.query(queryParams).execute();
-
-      // check that Items is defined
-      if (data && data.Items) {
-        environments = data.Items.map((item) => {
-          return item as unknown as Environment;
-        });
-
-        // Always sort by CreatedAt values for environments if not sorting by other attribute. Newest environment appear first
-        if (!sort) {
-          environments = environments.sort((envA, envB) => {
-            return new Date(envB.createdAt).getTime() - new Date(envA.createdAt).getTime();
-          });
-        }
-      }
-      const token = getPaginationToken(data);
-      return { data: environments, paginationToken: token };
-    } catch (error) {
-      throw Boom.badRequest(error);
-    }
+    const environments = await this._dynamoDBService.getPaginatedItems(queryParams);
+    return {
+      data: environments.data.map((item) => this._mapDDBItemToEnvironmentItem(item)),
+      paginationToken: environments.paginationToken
+    };
   }
 
-  private _setFilter(gsi: string, sortKey: string, eq: string): QueryParams {
-    const queryParams: QueryParams = {
-      index: gsi,
-      sortKey: sortKey,
-      eq: { S: eq }
-    };
-    return queryParams;
-  }
-
-  private _setRangeFilter(gsi: string, sortKey: string, from: string, to: string): QueryParams {
-    const queryParams: QueryParams = {
-      index: gsi,
-      sortKey: sortKey,
-      between: { value1: { S: from }, value2: { S: to } }
-    };
-    return queryParams;
-  }
-
-  private _setSort(gsi: string, sortKey: string, forward: boolean): QueryParams {
-    const queryParams: QueryParams = {
-      index: gsi,
-      sortKey: sortKey,
-      forward: forward
-    };
-    return queryParams;
+  /**
+   * List all environments filtered by projectId with pagination, and sort
+   * @param projectId - Filtering project for environments.
+   * @param pageSize - Number of results per page
+   * @param paginationToken - Token used for getting specific page of results
+   * @param sort - Sorting type for request, asc or desc
+   */
+  public async listEnvironmentsByProject(
+    request: ListEnvironmentsByProjectRequest
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
+    const { projectId, pageSize, paginationToken, sort } = request;
+    return this.listEnvironments({
+      filter: { dependency: { eq: projectId } },
+      sort: { dependency: sort },
+      pageSize,
+      paginationToken
+    });
   }
 
   /**
@@ -345,7 +195,7 @@ export class EnvironmentService {
       params: { item: updatedValues }
     });
 
-    return updateResponse.Attributes! as unknown as Environment;
+    return this._mapDDBItemToEnvironment(updateResponse.Attributes!);
   }
 
   /**
@@ -394,7 +244,7 @@ export class EnvironmentService {
       .execute()) as BatchGetItemCommandOutput;
 
     const createdAt = new Date(Date.now()).toISOString();
-    const newEnv: Environment = {
+    const newEnv = {
       id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
       cidr: params.cidr,
@@ -576,5 +426,31 @@ export class EnvironmentService {
     const response = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     return response.data.length > 0;
+  }
+
+  /**
+   * This method formats a DDB item containing environment data as a EnvironmentItem object
+   *
+   * @param item - the DDB item to conver to a EnvironmentItem object
+   * @returns a EnvironmentItem object containing only environment data from DDB attributes
+   */
+  private _mapDDBItemToEnvironmentItem(item: Record<string, unknown>): EnvironmentItem {
+    const environment: Record<string, unknown> = { ...item, projectId: item.dependency };
+
+    // parse will remove pk and sk from the DDB item
+    return EnvironmentItemParser.parse(environment);
+  }
+
+  /**
+   * This method formats a DDB item containing environment data as a Environment object
+   *
+   * @param item - the DDB item to conver to a Environment object
+   * @returns a Environment object containing only environment data from DDB attributes
+   */
+  private _mapDDBItemToEnvironment(item: Record<string, unknown>): Environment {
+    const environment: Record<string, unknown> = { ...item, projectId: item.dependency };
+
+    // parse will remove pk and sk from the DDB item
+    return EnvironmentParser.parse(environment);
   }
 }

@@ -399,9 +399,9 @@ In **SWBv2 Official** Postman Collection under **project** folder choose **Assoc
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
-In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
+In the params tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
-In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from [Create Environment Type Config step](#create-environment-type-config).
+In the params tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from [Create Environment Type Config step](#create-environment-type-config).
 
 Send **Associate project with EnvTypeConfig** request.
 

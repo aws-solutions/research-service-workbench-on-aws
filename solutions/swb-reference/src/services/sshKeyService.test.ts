@@ -534,20 +534,14 @@ describe('SshKeyService', () => {
           instanceId: 'i-123',
           cidr: '',
           description: '',
-          error: undefined,
           name: '',
-          outputs: [],
           projectId: projectId,
           status: 'COMPLETED',
           provisionedProductId: '',
           envTypeConfigId: '',
           updatedAt: '',
-          updatedBy: '',
           createdAt: '',
-          createdBy: '',
-          owner: sendPublicKeyRequest.userId,
-          type: '',
-          dependency: ''
+          owner: sendPublicKeyRequest.userId
         };
         environmentService.getEnvironment = jest.fn(() => Promise.resolve(environment));
       });
