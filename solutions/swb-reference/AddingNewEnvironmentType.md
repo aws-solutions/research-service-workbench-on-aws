@@ -238,30 +238,30 @@ Follow instructions in [Get access token Step](../swb-reference/README.md#get-ac
 
 1. Follow these steps to launch an environment using the new environment type created.
 
-  In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
+    - In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
-  In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](../swb-reference/README.md#setup-project).
+    - In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](../swb-reference/README.md#setup-project).
 
-  In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from step 1.
+    - In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from step 1.
 
-  In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from step 1.
+    - In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from step 1.
 
-  Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assig Project to User](../swb-reference/README.md#assign-project-to-user) , [Associate Project to Environment Type Configuration](../swb-reference/README.md#associate-project-to-environment-type-configuration).
+    - Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project      assigned in the request, for more information see [Assig Project to User](../swb-reference/README.md#assign-project-to-user) , [Associate Project to Environment Type Configuration](../swb-reference/README.md#associate-project-to-environment-type-configuration).
 
-  Send **Launch Environment** request.
+    - Send **Launch Environment** request.
 
-  POST `{{API_URL}}/projects/:projectId/environments`
+    POST `{{API_URL}}/projects/:projectId/environments`
 
-  ```json
-  {
-      "description": "<description>",
-      "name": "<environment name>",
-      "envTypeId": "<ENV_TYPE_ID>",
-      "envTypeConfigId": "<ENV_TYPE_CONFIG_ID>",
-      "datasetIds": [],
-      "envType": "sagemakerNotebook"
-  }
-  ```
+    ```json
+    {
+        "description": "<description>",
+        "name": "<environment name>",
+        "envTypeId": "<ENV_TYPE_ID>",
+        "envTypeConfigId": "<ENV_TYPE_CONFIG_ID>",
+        "datasetIds": [],
+        "envType": "sagemakerNotebook"
+    }
+    ```
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
