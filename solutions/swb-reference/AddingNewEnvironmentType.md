@@ -224,6 +224,7 @@ Run the following command in `solutions/swb-reference` directory to deploy the u
 STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
 STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 ```
+Note: Executing `run-postDeployment` command will create an Environment Type whenever there is a new product and provisioning Artifact in Service Catalog, the name of the Environment Type will be <productName>-<provisioningArtifactName> e.g. `sagemakerNotebook-v1`.
 
 ## Step 6 (Optional): Update hosting account resources
 * If the [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml) template was updated, the hosting account CloudFormation stack will need to be updated.
@@ -231,111 +232,36 @@ STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 ## Step 7 (Optional): Test Launch new Environment
 Do the following steps if you would like to launch your new environment type, and assuming your new envType is named `sagemakerExample`
 
-To access the APIs you'll need to get an `accessToken`. To get the `accessToken` use the UI to log into SWBv2. Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!! 
+Follow instructions in [Get access token Step](../swb-reference/README.md#get-access-token) and [POSTMAN Setup Step](../swb-reference/README.md#postman-setup) to make API requests to SWBv2 using postman.
 
-1. Create a new `envType` for your environment, by making the following API request.
+1. Follow instructions in [Setup EnvironmentTypeConfig Step](../swb-reference/README.md#setup-environmenttypeconfig) to create an Environment Type Config and take note of the `ENV_TYPE_ID` and `ENV_TYPE_CONFIG_ID` values.
 
-**POST {{API_URL}}/environmentTypes**
-   ```json
-   {
-  "productId": "",  // Grab new product id from Service Catalog Portfolio
-  "provisioningArtifactId": "", // Grab new provisionArtifact id from Service Catalog Portfolio 
-  "description": "An Amazon SageMaker Jupyter Notebook",
-  "name": "Sagemaker Example",
-  "type": "sagemakerExample",
-  "allowedRoleIds": [],
-  "params": [
-    {
-      "DefaultValue": "ml.t3.xlarge",
-      "Description": "EC2 instance type to launch",
-      "IsNoEcho": false,
-      "ParameterConstraints": {
-        "AllowedValues": []
-      },
-      "ParameterKey": "InstanceType",
-      "ParameterType": "String"
-    },
-    {
-      "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-      "IsNoEcho": false,
-      "ParameterConstraints": {
-        "AllowedValues": []
-      },
-      "ParameterKey": "AutoStopIdleTimeInMinutes",
-      "ParameterType": "Number"
-    },
-    {
-      "Description": "The IAM policy to be associated with the launched workstation",
-      "IsNoEcho": false,
-      "ParameterConstraints": {
-        "AllowedValues": []
-      },
-      "ParameterKey": "IamPolicyDocument",
-      "ParameterType": "String"
-    },
-    {
-      "DefaultValue": "1.1.1.1/1",
-      "Description": "CIDR to restrict IPs that can access the environment",
-      "IsNoEcho": false,
-      "ParameterConstraints": {
-        "AllowedValues": []
-      },
-      "ParameterKey": "CIDR",
-      "ParameterType": "String"
-    }
-  ],
-  "status": "APPROVED"
-}
-   ```
-Record the `id` that is returned. We'll refer to this `id` as `envTypeId`
+1. Follow these steps to launch an environment using the new environment type created.
 
-2. Create a new `envTypeConfig` for your environment, by making the following API request
+In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
-**POST {{API_URL}}/environmentTypes/:envTypeId/configurations**
+In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](../swb-reference/README.md#setup-project).
+
+In the body tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from step 1.
+
+In the body tab set `envTypeConfigId` parameter to the `ENV_TYPE_CONFIG_ID` value from step 1.
+
+Note: Only Researchers and Project Admins can access this API, the user calling this API and the environment type config in the request need to have access permissions to the project assigned in the request, for more information see [Assig Project to User](../swb-reference/README.md#assign-project-to-user) , [Associate Project to Environment Type Configuration](../swb-reference/README.md#associate-project-to-environment-type-configuration).
+
+Send **Launch Environment** request.
+
+POST `{{API_URL}}/projects/:projectId/environments`
 
 ```json
 {
-  "allowedRoleIds": [],
-  "type": "sagemakerExample",
-  "description": "Example config 1",
-  "name": "sagemakerExample",
-  "params": [
-    {
-      "key": "IamPolicyDocument",
-      "value": "${iamPolicyDocument}"
-    },
-    {
-      "key": "InstanceType",
-      "value": "ml.t3.medium"
-    },
-    {
-      "key": "AutoStopIdleTimeInMinutes",
-      "value": "0"
-    },
-    {
-      "key": "CIDR",
-      "value": "0.0.0.0/0"
-    }
-  ]
-}
-```
-Record the `id` that is returned. We'll refer to this `id` as `envTypeConfigId`
-
-3. Launch environment. Make the following API request
-
-**POST `{{API_URL}}/environments`**
-```json
-{
-    "description": "test-sagemakerExample AWS",
-    "name": "test",
-    "envTypeId": <envTypeId>,
-    "envTypeConfigId": <envTypeConfigId>,
-    "projectId": <projectId>,
+    "description": "<description>",
+    "name": "<environment name>",
+    "envTypeId": "<ENV_TYPE_ID>",
+    "envTypeConfigId": "<ENV_TYPE_CONFIG_ID>",
     "datasetIds": [],
-    "envType": "sagemakerExample"
+    "envType": "sagemakerNotebook"
 }
 ```
-The `envTypeId` and `envTypeConfigId` value are references to the `id` that you created in step 1 and step 2.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 

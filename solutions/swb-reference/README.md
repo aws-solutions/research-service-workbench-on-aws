@@ -265,82 +265,87 @@ In the response take note of the `id` that was returned. We'll refer to this val
 In **SWBv2 Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
 If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
 
-Once the account handler finishes, running the **List envTypes** request in postman should return a json with the following format
+Running the **List envTypes** request in postman should return a json with the following format
 ```json
 {
-    "id": "et-<productId>,<provisioningArtifactId>",
-    "productId": "<productId>",
-    "provisioningArtifactId": "<provisioningArtifactId>",
-    "description": "description",
-    "name": "name",
-    "type": "sagemakerNotebook",
-    "status": "NOT_APPROVED",
-    "createdAt": "2022-07-21T21:24:57.171Z",
-    "updatedAt": "2022-07-21T21:24:57.171Z",
-    "params": 
-        {
-            "DatasetsBucketArn": {
-                    "Description": "Name of the datasets bucket in the main account",
-                    "Type": "String"
-                },
-                "EncryptionKeyArn": {
-                    "Description": "The ARN of the KMS encryption Key used to encrypt data in the notebook",
-                    "Type": "String"
-                },
-                "AccessFromCIDRBlock": {
-                    "Default": "10.0.0.0/19",
-                    "Description": "The CIDR used to access sagemaker notebook",
-                    "Type": "String"
-                },
-                "VPC": {
-                    "Description": "VPC for Sagemaker Notebook",
-                    "Type": "AWS::EC2::VPC::Id"
-                },
-                "S3Mounts": {
-                    "Description": "A JSON array of objects with name, bucket and prefix properties used to mount data",
-                    "Type": "String"
-                },
-                "Namespace": {
-                    "Description": "An environment name that will be prefixed to resource names",
-                    "Type": "String"
-                },
-                "MainAccountId": {
-                    "Description": "The Main Account ID where application is deployed",
-                    "Type": "String"
-                },
-                "MainAccountKeyArn": {
-                    "Description": "The ARN of main account bucket encryption key",
-                    "Type": "String"
-                },
-                "IamPolicyDocument": {
-                    "Description": "The IAM policy to be associated with the launched workstation",
-                    "Type": "String"
-                },
-                "EnvironmentInstanceFiles": {
-                    "Description": "An S3 URI (starting with \"s3://\") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts",
-                    "Type": "String"
-                },
-                "MainAccountRegion": {
-                    "Description": "The region of application deployment in main account",
-                    "Type": "String"
-                },
-                "InstanceType": {
-                    "Default": "ml.t3.xlarge",
-                    "Description": "EC2 instance type to launch",
-                    "Type": "String"
-                },
-                "Subnet": {
-                    "Description": "Subnet for Sagemaker Notebook, from the VPC selected above",
-                    "Type": "AWS::EC2::Subnet::Id"
-                },
-                "AutoStopIdleTimeInMinutes": {
-                    "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-                    "Type": "Number"
-                }
-        }
+    "data": [
+    {
+        "id": "et-<productId>,<provisioningArtifactId>",
+        "productId": "<productId>",
+        "provisioningArtifactId": "<provisioningArtifactId>",
+        "description": "description",
+        "name": "name",
+        "type": "sagemakerNotebook",
+        "status": "NOT_APPROVED",
+        "createdAt": "2022-07-21T21:24:57.171Z",
+        "updatedAt": "2022-07-21T21:24:57.171Z",
+        "params": 
+            {
+                "DatasetsBucketArn": {
+                        "Description": "Name of the datasets bucket in the main account",
+                        "Type": "String"
+                    },
+                    "EncryptionKeyArn": {
+                        "Description": "The ARN of the KMS encryption Key used to encrypt data in the notebook",
+                        "Type": "String"
+                    },
+                    "AccessFromCIDRBlock": {
+                        "Default": "10.0.0.0/19",
+                        "Description": "The CIDR used to access sagemaker notebook",
+                        "Type": "String"
+                    },
+                    "VPC": {
+                        "Description": "VPC for Sagemaker Notebook",
+                        "Type": "AWS::EC2::VPC::Id"
+                    },
+                    "S3Mounts": {
+                        "Description": "A JSON array of objects with name, bucket and prefix properties used to mount data",
+                        "Type": "String"
+                    },
+                    "Namespace": {
+                        "Description": "An environment name that will be prefixed to resource names",
+                        "Type": "String"
+                    },
+                    "MainAccountId": {
+                        "Description": "The Main Account ID where application is deployed",
+                        "Type": "String"
+                    },
+                    "MainAccountKeyArn": {
+                        "Description": "The ARN of main account bucket encryption key",
+                        "Type": "String"
+                    },
+                    "IamPolicyDocument": {
+                        "Description": "The IAM policy to be associated with the launched workstation",
+                        "Type": "String"
+                    },
+                    "EnvironmentInstanceFiles": {
+                        "Description": "An S3 URI (starting with \"s3://\") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts",
+                        "Type": "String"
+                    },
+                    "MainAccountRegion": {
+                        "Description": "The region of application deployment in main account",
+                        "Type": "String"
+                    },
+                    "InstanceType": {
+                        "Default": "ml.t3.xlarge",
+                        "Description": "EC2 instance type to launch",
+                        "Type": "String"
+                    },
+                    "Subnet": {
+                        "Description": "Subnet for Sagemaker Notebook, from the VPC selected above",
+                        "Type": "AWS::EC2::Subnet::Id"
+                    },
+                    "AutoStopIdleTimeInMinutes": {
+                        "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+                        "Type": "Number"
+                    }
+            }
+    }
+    ]
+    
 }
 ```
-In the response take note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
+In the response take note of the `id` of the environment type you are looking for, the `name` will have the format `<product name>-<provisioning artifact name>`, e.g. `sageMakerNotebook-v1`. We'll need it for the next step. We'll refer to this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
 In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environemnt type.
@@ -455,7 +460,6 @@ POST `{{API_URL}}/projects/:projectId/environments`
     "name": "<environment name>",
     "envTypeId": "<ENV_TYPE_ID>",
     "envTypeConfigId": "<ENV_TYPE_CONFIG_ID>",
-    "projectId": "<PROJECT_ID>",
     "datasetIds": [],
     "envType": "sagemakerNotebook"
 }
