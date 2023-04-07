@@ -55,7 +55,8 @@ describe('EnvironmentService', () => {
     sk: 'ETC#envTypeConfig-123',
     pk: `ENV#${envId}`,
     id: 'envTypeConfig-123',
-    productId: 'prod-t5q2vqlgvd76o'
+    productId: 'prod-t5q2vqlgvd76o',
+    type: 'sagemakerNotebook'
   };
 
   const projectId = 'proj-123';
@@ -217,15 +218,17 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironment(envId, true);
 
       // CHECK
-      expect(actualResponse).toEqual({
-        DATASETS: [datasetItem],
-        ENDPOINTS: [endpointItem],
-        ETC: envTypeConfigItem,
-        PROJ: projItem,
-        ...envAPIResponse,
-        provisionedProductId: '',
-        error: undefined
-      });
+      expect(actualResponse).toEqual(
+        EnvironmentParser.parse({
+          DATASETS: [datasetItem],
+          ENDPOINTS: [endpointItem],
+          ETC: envTypeConfigItem,
+          PROJ: projItem,
+          ...envAPIResponse,
+          provisionedProductId: '',
+          error: undefined
+        })
+      );
     });
 
     test('env not found w/ includeMetadata', async () => {
@@ -1032,15 +1035,17 @@ describe('EnvironmentService', () => {
         const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
 
         // CHECK
-        expect(actualResponse).toEqual({
-          DATASETS: [datasetItem],
-          ENDPOINTS: [],
-          ETC: envTypeConfigItem,
-          PROJ: projItem,
-          ...envAPIResponse,
-          provisionedProductId: '',
-          error: undefined
-        });
+        expect(actualResponse).toEqual(
+          EnvironmentParser.parse({
+            DATASETS: [datasetItem],
+            ENDPOINTS: [],
+            ETC: envTypeConfigItem,
+            PROJ: projItem,
+            ...envAPIResponse,
+            provisionedProductId: '',
+            error: undefined
+          })
+        );
       });
 
       test('creates association objects for the mounted datasets', async () => {

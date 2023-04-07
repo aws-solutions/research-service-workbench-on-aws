@@ -14,6 +14,29 @@ import EnvironmentLifecycleHelper, { Operation } from './environmentLifecycleHel
 
 describe('EnvironmentLifecycleHelper', () => {
   const ORIGINAL_ENV = process.env;
+  const defaultProject = {
+    id: '',
+    name: '',
+    subnetId: '',
+    awsAccountId: '',
+    environmentInstanceFiles: '',
+    vpcId: '',
+    envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+    encryptionKeyArn: '',
+    externalId: 'workbench',
+    createdAt: '',
+    updatedAt: '',
+    hostingAccountHandlerRoleArn: ''
+  };
+  const defaultETC = {
+    id: 'id',
+    type: 'type',
+    productId: 'sampleProductId',
+    createdAt: '',
+    updatedAt: '',
+    provisioningArtifactId: 'sampleProvisioningArtifactId',
+    params: []
+  };
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
@@ -55,13 +78,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const datasetIds: string[] = [];
     const envMetadata = {
       id: 'sampleEnvId',
-      PROJ: {
-        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-        externalId: 'workbench'
-      },
-      ETC: {
-        productId: 'sampleProductId'
-      },
+      PROJ: defaultProject,
+      ETC: defaultETC,
       instanceId: '',
       cidr: '',
       description: '',
@@ -97,13 +115,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const datasetIds = ['exampleDatasetId'];
     const envMetadata = {
       id: 'sampleEnvId',
-      PROJ: {
-        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-        externalId: 'workbench'
-      },
-      ETC: {
-        productId: 'sampleProductId'
-      },
+      PROJ: defaultProject,
+      ETC: defaultETC,
       instanceId: '',
       cidr: '',
       description: '',

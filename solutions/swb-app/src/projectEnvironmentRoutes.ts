@@ -108,7 +108,7 @@ export function setUpProjectEnvRoutes(
         environmentId,
         true
       );
-      const envType = environment.ETC.type;
+      const envType = environment.ETC!.type;
       const envStatus = environment.status;
       if (['TERMINATING', 'TERMINATED'].includes(envStatus)) {
         res.status(204).send();
@@ -143,7 +143,7 @@ export function setUpProjectEnvRoutes(
       const { environmentId, projectId } = validatedRequest;
 
       const environment = await projectEnvironmentService.getEnvironment(projectId, environmentId, true);
-      const envType = environment.ETC.type;
+      const envType = environment.ETC!.type;
       if (environment.status === 'STOPPING') {
         throw Boom.conflict('Cannot start environment while environment is currently being stopped');
       } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
@@ -170,7 +170,7 @@ export function setUpProjectEnvRoutes(
       });
       const { environmentId, projectId } = validatedRequest;
       const environment = await projectEnvironmentService.getEnvironment(projectId, environmentId, true);
-      const envType = environment.ETC.type;
+      const envType = environment.ETC!.type;
 
       if (['PENDING', 'STARTING'].includes(environment.status)) {
         throw Boom.conflict('Cannot stop environment while environment is currently being started');
@@ -202,11 +202,11 @@ export function setUpProjectEnvRoutes(
         true
       );
       const instanceName = environment.instanceId!;
-      const envType = environment.ETC.type;
+      const envType = environment.ETC!.type;
 
       const context = {
-        roleArn: environment.PROJ.envMgmtRoleArn,
-        externalId: environment.PROJ.externalId
+        roleArn: environment.PROJ!.envMgmtRoleArn,
+        externalId: environment.PROJ!.externalId
       };
 
       if (environment.status !== 'COMPLETED') {

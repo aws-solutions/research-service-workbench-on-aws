@@ -97,8 +97,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       ssmParameters,
       operation: 'Terminate',
       envType: this._envType,
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId
     });
 
     // Delete access point(s) for this workspace
@@ -117,8 +117,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
       operation: 'Start',
       envType: this._envType
     });
@@ -138,8 +138,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
       operation: 'Stop',
       envType: this._envType
     });
