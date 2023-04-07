@@ -84,7 +84,7 @@ export class EnvironmentService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let envWithMetadata = { ...defaultEnv };
+    let envWithMetadata: Environment = { ...defaultEnv };
     envWithMetadata.DATASETS = [];
     envWithMetadata.ENDPOINTS = [];
     for (const item of items) {
