@@ -277,7 +277,7 @@ export default class EnvironmentLifecycleHelper {
     // Call IAM policy generator here, and return both strings
     const iamPolicyDocument = this.generateIamPolicy(
       endpointsCreated,
-      envMetadata.PROJ.encryptionKeyArn,
+      envMetadata.PROJ!.encryptionKeyArn,
       mainAcctEncryptionArnList
     );
     const s3Mounts = JSON.stringify(datasetsToMount);

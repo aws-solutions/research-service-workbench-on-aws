@@ -25,7 +25,12 @@ import {
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
-import { Environment, EnvironmentParser } from '../models/environments/environment';
+import {
+  DatasetDependencyParser,
+  EndpointsDependecyParser,
+  Environment,
+  EnvironmentParser
+} from '../models/environments/environment';
 import { EnvironmentItem, EnvironmentItemParser } from '../models/environments/environmentItem';
 import { ListEnvironmentsByProjectRequest } from '../models/environments/listEnvironmentsByProjectRequest';
 import { ListEnvironmentsServiceRequest } from '../models/environments/listEnvironmentsServiceRequest';
@@ -79,7 +84,7 @@ export class EnvironmentService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let envWithMetadata: Environment = { ...defaultEnv };
+    let envWithMetadata = { ...defaultEnv };
     envWithMetadata.DATASETS = [];
     envWithMetadata.ENDPOINTS = [];
     for (const item of items) {
@@ -90,9 +95,9 @@ export class EnvironmentService {
       } else {
         const envKey = sk.split('#')[0];
         if (envKey === 'DATASET') {
-          envWithMetadata.DATASETS!.push(item);
+          envWithMetadata.DATASETS!.push(DatasetDependencyParser.parse(item));
         } else if (envKey === 'ENDPOINT') {
-          envWithMetadata.ENDPOINTS!.push(item);
+          envWithMetadata.ENDPOINTS!.push(EndpointsDependecyParser.parse(item));
         } else {
           // metadata of environment item
           // @ts-ignore

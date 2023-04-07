@@ -56,7 +56,20 @@ describe('StatusHandler', () => {
       instanceId: '123',
       name: 'sagemaker',
       projectId: '123',
-      PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
+      PROJ: {
+        subnetId: 'subnet-07f475d83291a3603',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
+        awsAccountId: '123456789012',
+        environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
+        createdAt: '2022-05-18T20:33:42.608Z',
+        vpcId: 'vpc-0b0bc7ae01d82e7b3',
+        name: 'Example project',
+        encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
+        externalId: 'workbench',
+        updatedAt: '2022-05-18T20:33:42.608Z',
+        id: 'id',
+        envMgmtRoleArn: 'sampleEnvMgmtRoleArn'
+      },
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah'
