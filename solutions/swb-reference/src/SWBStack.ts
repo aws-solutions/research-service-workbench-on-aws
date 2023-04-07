@@ -434,7 +434,7 @@ export class SWBStack extends Stack {
     const proxyLambda = new Function(this, 'LambdaProxy', {
       handler: 'proxyHandlerLambda.handler',
       code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -841,7 +841,7 @@ export class SWBStack extends Stack {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -929,7 +929,7 @@ export class SWBStack extends Stack {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: this.lambdaEnvVars,
       memorySize: 256,
       timeout: Duration.minutes(4)
@@ -1079,7 +1079,7 @@ export class SWBStack extends Stack {
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: {
         ...this.lambdaEnvVars,
         FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
