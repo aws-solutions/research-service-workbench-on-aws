@@ -31,12 +31,12 @@ jobs:
       - name: rebase-with-release
         run: |
           git checkout test-rebase-release-4debe38e-develop
-          git merge test-release/4debe38e-5796-47b6-96ec-881a87e0df21 --no-ff --no-edit
+          git merge origin/test-release/4debe38e-5796-47b6-96ec-881a87e0df21 --no-ff --no-edit
           git push origin test-rebase-release-4debe38e-develop
       - name: rebase-with-develop
         run: |
           git checkout test-rebase-release-4debe38e-develop
-          git merge test-develop --no-ff --no-edit
+          git merge origin/test-develop --no-ff --no-edit
           git push origin test-rebase-release-4debe38e-develop
 
       - name: disable merge commits
