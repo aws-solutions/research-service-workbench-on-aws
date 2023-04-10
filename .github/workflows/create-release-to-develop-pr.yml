@@ -1,0 +1,36 @@
+name: create-release-to-develop-pr
+on:
+  push:
+    branches:
+      - 'test-release/4debe38e-5796-47b6-96ec-881a87e0df21'
+
+jobs:
+  rebase-release:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+      - name: create-pr-if-merge-fails
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: test-rebase-release-4debe38e-develop
+          base: test-develop
+          token: ${{ secrets.MERGE_TOKEN }}
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: merge
+      - name: rebase-with-release
+        run: |
+          git checkout test-rebase-release-4debe38e-develop
+          git merge test-release/4debe38e-5796-47b6-96ec-881a87e0df21 --no-ff --no-edit
+      - name: rebase-with-develop
+        run: |
+          git checkout test-rebase-release-4debe38e-develop
+          git merge test-develop --no-ff --no-edit
