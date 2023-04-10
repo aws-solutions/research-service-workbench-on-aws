@@ -97,5 +97,7 @@ module.exports = defineConfig({
       return merge(config, { env: await getEnvironmentVariables(config.env.stage ?? 'testEnv') });
     }
   },
+  video: false,
+  screenshotOnRunFailure: false,
   chromeWebSecurity: false // Required to allow switching origins from Cognito (HTTPS) to localhost (HTTP)
 });
