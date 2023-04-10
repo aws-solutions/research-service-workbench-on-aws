@@ -19,8 +19,8 @@ const app: App = new cdk.App();
 const application: string = app.node.tryGetContext('application');
 const existingOIDC: string = app.node.tryGetContext('existingOIDC');
 
-if (!application || (application !== 'SWB' && application !== 'MAF')) {
-  throw new Error('CDK Context "application" is required. Valid values: "SWB or MAF"');
+if (!application || (application !== 'SWBStack' && application !== 'ExampleStack')) {
+  throw new Error('CDK Context "application" is required. Valid values: "SWBStack or ExampleStack"');
 }
 
 const env: Environment = {

@@ -6,23 +6,23 @@
 import { Aws } from 'aws-cdk-lib';
 import { Effect, IRole, ManagedPolicy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import { maf } from '../configs/config.json';
+import { exampleStack } from '../configs/config.json';
 
-export interface MafGithubOidcRolePolicyProps {
+export interface ExampleStackGithubOidcRolePolicyProps {
   gitHubOrg: string;
   gitHubRepo: string;
   githubOIDCRole: IRole;
 }
 
-export class MafGithubOidcRolePolicy extends Construct {
+export class ExampleStackGithubOidcRolePolicy extends Construct {
   public policy: ManagedPolicy;
 
-  public constructor(scope: Construct, id: string, props: MafGithubOidcRolePolicyProps) {
+  public constructor(scope: Construct, id: string, props: ExampleStackGithubOidcRolePolicyProps) {
     super(scope, id);
 
     this.policy = new ManagedPolicy(
       this,
-      `${props.gitHubOrg}-${props.gitHubRepo}-GitHubOIDCCustomManagedPolicy`,
+      `${props.gitHubOrg}-${props.gitHubRepo}-ExampleStackGitHubOIDCCustomManagedPolicy`,
       {
         statements: [
           new PolicyStatement({
@@ -31,7 +31,7 @@ export class MafGithubOidcRolePolicy extends Construct {
             actions: ['sts:AssumeRole'],
             resources: [
               `arn:${Aws.PARTITION}:iam::*:role/cdk-*`,
-              `arn:${Aws.PARTITION}:iam::*:role/${maf.mafCrossAccountRoleName}`
+              `arn:${Aws.PARTITION}:iam::*:role/${exampleStack.crossAccountRoleName}`
             ]
           }),
           new PolicyStatement({
@@ -39,7 +39,7 @@ export class MafGithubOidcRolePolicy extends Construct {
             effect: Effect.ALLOW,
             actions: ['ssm:GetParameter'],
             resources: [
-              `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${maf.mafSsmBasePath}/*`
+              `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${exampleStack.ssmBasePath}/*`
             ]
           }),
           new PolicyStatement({

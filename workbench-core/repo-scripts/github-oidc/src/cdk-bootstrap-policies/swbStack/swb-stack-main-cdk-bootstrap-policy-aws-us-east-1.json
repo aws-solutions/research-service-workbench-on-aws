@@ -7,14 +7,18 @@
         "cognito-idp:*",
         "lambda:*",
         "kms:*",
+        "events:*",
         "dynamodb:*",
         "logs:*",
         "apigateway:*",
+        "ssm:*",
+        "ec2:*",
+        "elasticloadbalancing:*",
         "s3:*",
         "cloudwatch:*",
+        "acm:*",
         "servicecatalog:*",
         "applicationinsights:*",
-        "ssm:*",
         "cloudformation:*"
       ],
       "Resource": "*",
@@ -40,7 +44,7 @@
       ],
       "NotResource": [
         "arn:aws:iam::*:role/cdk-*",
-        "arn:aws:iam::*:policy/maf-main-cdk-bootstrap-policy-us-east-1"
+        "arn:aws:iam::*:policy/swb-stack-main-cdk-bootstrap-policy-us-east-1"
       ]
     }
   ]

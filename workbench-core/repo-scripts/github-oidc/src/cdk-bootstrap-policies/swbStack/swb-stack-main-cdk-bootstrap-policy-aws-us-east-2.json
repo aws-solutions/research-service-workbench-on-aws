@@ -24,7 +24,7 @@
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:RequestedRegion": "us-east-1"
+          "aws:RequestedRegion": "us-east-2"
         }
       }
     },
@@ -44,7 +44,7 @@
       ],
       "NotResource": [
         "arn:aws:iam::*:role/cdk-*",
-        "arn:aws:iam::*:policy/swb-main-cdk-bootstrap-policy-us-east-1"
+        "arn:aws:iam::*:policy/swb-stack-main-cdk-bootstrap-policy-us-east-2"
       ]
     }
   ]

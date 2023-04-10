@@ -1,0 +1,31 @@
+## Note:
+## Please deploy the swb-reference package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
+
+# Default Env Config for launching a new environment
+envTypeId: 'et-prod-uqwi7qg7fateq,pa-36nhdwjufruty'
+envTypeConfigId: 'etc-be224d3d-1a3c-44d3-b11a-dc539339d48c'
+projectId: 'proj-c7621911-ae9a-45d6-a557-47b77c170754'
+envType: 'sagemakerNotebook'
+
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '/swb/sam/rootUser/email'
+rootPasswordParamStorePath: '/swb/sam/rootUser/password'
+
+projectAdmin1UserNameParamStorePath: '/swb/sam/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/sam/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/sam/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/sam/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/sam/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/sam/researcher1/password'
+
+## Default Hosting Account
+defaultHostingAccountId: 'acc-08228bd8-840f-4318-9083-944eca887410'
+
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '/swb/sam/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/sam/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/sam/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/sam/accountsTest/encryptionKeyArn'

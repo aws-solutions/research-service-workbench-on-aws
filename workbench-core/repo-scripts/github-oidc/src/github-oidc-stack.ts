@@ -7,9 +7,9 @@ import { CfnOutput, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
 import { FederatedPrincipal, OpenIdConnectProvider, ManagedPolicy, Role, CfnRole } from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { maf, swb } from './configs/config.json';
-import { MafGithubOidcRolePolicy } from './constructs/maf-github-oidc-role-policy';
-import { SwbGithubOidcRolePolicy } from './constructs/swb-github-oidc-role-policy';
+import { exampleStack, swbStack } from './configs/config.json';
+import { ExampleStackGithubOidcRolePolicy } from './constructs/example-stack-github-oidc-role-policy';
+import { SWBStackGithubOidcRolePolicy } from './constructs/swb-stack-github-oidc-role-policy';
 
 export interface GitHubOIDCStackProps extends StackProps {
   gitHubOrg: string;
@@ -48,18 +48,22 @@ export class GitHubOIDCStack extends Stack {
 
       let githubCustomManagedPolicy!: ManagedPolicy;
 
-      if (props.application === 'MAF') {
-        if (!maf.mafSsmBasePath || !maf.mafMaxSessionDuration) {
-          throw new Error('SsmPath and MaxSessionDuration are required !');
+      if (props.application === 'ExampleStack') {
+        if (
+          !exampleStack.ssmBasePath ||
+          !exampleStack.maxSessionDuration ||
+          !exampleStack.crossAccountRoleName
+        ) {
+          throw new Error('ssmBasePath, maxSessionDuration and crossAccountRoleName are required !');
         }
 
         const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
-        githubCfnRole.maxSessionDuration = maf.mafMaxSessionDuration;
+        githubCfnRole.maxSessionDuration = exampleStack.maxSessionDuration;
 
         // eslint-disable-next-line no-new
-        githubCustomManagedPolicy = new MafGithubOidcRolePolicy(
+        githubCustomManagedPolicy = new ExampleStackGithubOidcRolePolicy(
           this,
-          `${props.gitHubOrg}-${gitHubRepo}-MafGithubOidcRolePolicy`,
+          `${props.gitHubOrg}-${gitHubRepo}-ExampleStackGithubOidcRolePolicy`,
           {
             gitHubOrg: props.gitHubOrg,
             gitHubRepo: gitHubRepo,
@@ -70,7 +74,7 @@ export class GitHubOIDCStack extends Stack {
         // Suppress: AwsSolutions-IAM5: The IAM entity contains wildcard permissions
         NagSuppressions.addResourceSuppressionsByPath(
           this,
-          '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-MafGithubOidcRolePolicy/aws-solutions-solution-spark-on-aws-GitHubOIDCCustomManagedPolicy/Resource',
+          '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-ExampleStackGithubOidcRolePolicy/aws-solutions-solution-spark-on-aws-ExampleStackGitHubOIDCCustomManagedPolicy/Resource',
           [
             {
               id: 'AwsSolutions-IAM5',
@@ -78,16 +82,21 @@ export class GitHubOIDCStack extends Stack {
             }
           ]
         );
-      } else if (props.application === 'SWB') {
-        if (!swb.swbStage || !swb.swbBase || !swb.swbRegionShortName || !swb.swbMaxSessionDuration) {
-          throw new Error('Stage, Base, RegionShortName and MaxSessionDuration are required !');
+      } else if (props.application === 'SWBStack') {
+        if (
+          !swbStack.stage ||
+          !swbStack.ssmBase ||
+          !swbStack.regionShortName ||
+          !swbStack.maxSessionDuration
+        ) {
+          throw new Error('stage, ssmBase, regionShortName and MaxSessionDuration are required !');
         }
         const githubCfnRole = githubOIDCRole.node.defaultChild as CfnRole;
-        githubCfnRole.maxSessionDuration = swb.swbMaxSessionDuration;
+        githubCfnRole.maxSessionDuration = swbStack.maxSessionDuration;
 
-        githubCustomManagedPolicy = new SwbGithubOidcRolePolicy(
+        githubCustomManagedPolicy = new SWBStackGithubOidcRolePolicy(
           this,
-          `${props.gitHubOrg}-${gitHubRepo}-SwbGithubOidcRolePolicy`,
+          `${props.gitHubOrg}-${gitHubRepo}-SWBStackGithubOidcRolePolicy`,
           {
             gitHubOrg: props.gitHubOrg,
             gitHubRepo: gitHubRepo,
@@ -98,7 +107,7 @@ export class GitHubOIDCStack extends Stack {
         // Suppress: AwsSolutions-IAM5: The IAM entity contains wildcard permissions
         NagSuppressions.addResourceSuppressionsByPath(
           this,
-          '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-SwbGithubOidcRolePolicy/aws-solutions-solution-spark-on-aws-GitHubOIDCCustomManagedPolicy/Resource',
+          '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-SWBStackGithubOidcRolePolicy/aws-solutions-solution-spark-on-aws-SWBStackGitHubOIDCCustomManagedPolicy/Resource',
           [
             {
               id: 'AwsSolutions-IAM5',

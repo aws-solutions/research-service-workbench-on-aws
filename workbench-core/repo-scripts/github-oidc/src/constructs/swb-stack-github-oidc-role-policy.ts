@@ -6,23 +6,23 @@
 import { Aws } from 'aws-cdk-lib';
 import { Effect, IRole, ManagedPolicy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import { swb } from '../configs/config.json';
+import { swbStack } from '../configs/config.json';
 
-export interface SwbGithubOidcRolePolicyProps {
+export interface SWBStackGithubOidcRolePolicyProps {
   gitHubOrg: string;
   gitHubRepo: string;
   githubOIDCRole: IRole;
 }
 
-export class SwbGithubOidcRolePolicy extends Construct {
+export class SWBStackGithubOidcRolePolicy extends Construct {
   public policy: ManagedPolicy;
 
-  public constructor(scope: Construct, id: string, props: SwbGithubOidcRolePolicyProps) {
+  public constructor(scope: Construct, id: string, props: SWBStackGithubOidcRolePolicyProps) {
     super(scope, id);
 
     this.policy = new ManagedPolicy(
       this,
-      `${props.gitHubOrg}-${props.gitHubRepo}-GitHubOIDCCustomManagedPolicy`,
+      `${props.gitHubOrg}-${props.gitHubRepo}-SWBStackGitHubOIDCCustomManagedPolicy`,
       {
         statements: [
           new PolicyStatement({
@@ -36,7 +36,7 @@ export class SwbGithubOidcRolePolicy extends Construct {
             effect: Effect.ALLOW,
             actions: ['cloudformation:DescribeStacks'],
             resources: [
-              `arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/${swb.swbBase}-${swb.swbStage}-${swb.swbRegionShortName}/*`
+              `arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/${swbStack.ssmBase}-${swbStack.stage}-${swbStack.regionShortName}/*`
             ]
           }),
           new PolicyStatement({
@@ -65,7 +65,7 @@ export class SwbGithubOidcRolePolicy extends Construct {
             effect: Effect.ALLOW,
             actions: ['ssm:GetParameter'],
             resources: [
-              `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${swb.swbBase}/${swb.swbStage}/*`
+              `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/${swbStack.ssmBase}/${swbStack.stage}/*`
             ]
           }),
           new PolicyStatement({

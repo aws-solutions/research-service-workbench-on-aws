@@ -4,14 +4,18 @@
     {
       "Effect": "Allow",
       "Action": [
+        "cognito-idp:*",
         "lambda:*",
         "kms:*",
+        "dynamodb:*",
+        "logs:*",
+        "apigateway:*",
         "s3:*",
+        "cloudwatch:*",
         "servicecatalog:*",
         "applicationinsights:*",
         "ssm:*",
-        "cloudformation:*",
-        "logs:*"
+        "cloudformation:*"
       ],
       "Resource": "*",
       "Condition": {
@@ -19,6 +23,11 @@
           "aws:RequestedRegion": "us-east-1"
         }
       }
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["route53:*"],
+      "Resource": "*"
     },
     {
       "Effect": "Allow",
@@ -31,7 +40,7 @@
       ],
       "NotResource": [
         "arn:aws:iam::*:role/cdk-*",
-        "arn:aws:iam::*:policy/maf-hosting-cdk-bootstrap-policy-us-east-1"
+        "arn:aws:iam::*:policy/example-stack-main-cdk-bootstrap-policy-us-east-1"
       ]
     }
   ]
