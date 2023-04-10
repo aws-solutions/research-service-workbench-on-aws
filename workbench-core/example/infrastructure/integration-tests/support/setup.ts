@@ -29,12 +29,14 @@ export default class Setup {
     return session;
   }
 
-  public async createAdminSession(): Promise<ClientSession> {
-    const userPoolId = this._settings.get('ExampleCognitoUserPoolId');
-    const clientId = this._settings.get('ExampleCognitoUserPoolClientId');
+  public async createRootUserSession(
+    userPoolId: string,
+    clientId: string,
+    accountType?: 'USER' | 'ADMIN'
+  ): Promise<ClientSession> {
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
-    const awsRegion = this._settings.get('AwsRegion');
+    const awsRegion = this._settings.get('MainAccountRegion');
 
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
     const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
@@ -42,7 +44,8 @@ export default class Setup {
       userPoolId,
       clientId,
       rootUserNameParamStorePath,
-      rootPasswordParamStorePath
+      rootPasswordParamStorePath,
+      accountType
     });
 
     const decodedToken: { sub: string } = jwt_decode(accessToken);
@@ -52,6 +55,13 @@ export default class Setup {
     this._sessions.push(session);
 
     return session;
+  }
+
+  public async createAdminSession(): Promise<ClientSession> {
+    return this.createRootUserSession(
+      this._settings.get('ExampleCognitoUserPoolId'),
+      this._settings.get('ExampleCognitoIntegrationTestUserPoolClientId')
+    );
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {
@@ -66,10 +76,32 @@ export default class Setup {
     return `ExampleStack`;
   }
 
-  public getMainAwsClient(tableName: keyof Setting): AwsService {
+  public getMainAwsClient(tableName?: keyof Setting): AwsService {
     return new AwsService({
-      region: this._settings.get('AwsRegion'),
-      ddbTableName: this._settings.get(tableName)
+      region: this._settings.get('MainAccountRegion'),
+      ddbTableName: tableName ? this._settings.get(tableName) : undefined
+    });
+  }
+
+  public async getHostAwsClient(sessionName: string, tableName?: keyof Setting): Promise<AwsService> {
+    const mainAwsService = this.getMainAwsClient(tableName);
+    const { Credentials } = await mainAwsService.clients.sts.assumeRole({
+      RoleArn: this._settings.get('ExampleHostDatasetRoleOutput'),
+      RoleSessionName: sessionName
+    });
+
+    if (!Credentials) {
+      throw new Error('Invalid assumed role');
+    }
+
+    return new AwsService({
+      region: this._settings.get('HostingAccountRegion'),
+      credentials: {
+        accessKeyId: Credentials.AccessKeyId!,
+        secretAccessKey: Credentials.SecretAccessKey!,
+        sessionToken: Credentials.SessionToken,
+        expiration: Credentials.Expiration
+      }
     });
   }
 

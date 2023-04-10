@@ -43,7 +43,7 @@ describe('authentication route handler integration tests', () => {
       });
 
       const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
 
       expect(data.signInUrl).toBe(
         `${domain}/oauth2/authorize?client_id=${clientId}&response_type=code&scope=openid&redirect_uri=${origin}&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`
@@ -110,7 +110,13 @@ describe('authentication route handler integration tests', () => {
 
   describe('refreshAccessToken', () => {
     it('should return the id token if the access token is successfully refreshed', async () => {
-      const adminSession = await setup.createAdminSession();
+      // Log in using ALLOW_USER_PASSWORD_AUTH flow because ALLOW_ADMIN_USER_PASSWORD_AUTH is disabled for WebUI appClient
+      const adminSession = await setup.createRootUserSession(
+        setup.getSettings().get('ExampleCognitoUserPoolId'),
+        setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId'),
+        'USER'
+      );
+
       const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
 
       expect(data.idToken).toBeDefined();
@@ -138,7 +144,7 @@ describe('authentication route handler integration tests', () => {
       const adminSession = await setup.createAdminSession();
       const origin = 'fakeOrigin';
       const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
 
       const { data } = await adminSession.resources.authentication.logout({ origin });
 
@@ -148,7 +154,7 @@ describe('authentication route handler integration tests', () => {
     it('should return the logout URL for a logged out user', async () => {
       const origin = 'fakeOrigin';
       const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
 
       const { data } = await anonymousSession.resources.authentication.logout({ origin });
 

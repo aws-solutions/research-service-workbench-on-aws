@@ -47,8 +47,8 @@ describe('datasets file upload integration test', () => {
 
       await adminSession.getAxiosInstance().put(response.data.url, { fake: 'data' });
 
-      const dsHelper = new DatasetHelper();
-      const files = await dsHelper.listDatasetFileNames(dataset.storageName, dataset.storagePath);
+      const aws = setup.getMainAwsClient();
+      const files = await DatasetHelper.listDatasetFileNames(aws, dataset.storageName, dataset.storagePath);
       expect(files.length > 0).toBe(true);
       expect(files).toContain(`${dataset.storagePath}/${fileName}`);
     });

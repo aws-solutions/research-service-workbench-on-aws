@@ -86,7 +86,8 @@ describe('datasets create integration test', () => {
     it('doesnt store the authenticated user in ddb', async () => {
       const { data } = await adminSession.resources.datasets.create();
 
-      const metadata = await new DatasetHelper().getddbRecords(data.id);
+      const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const metadata = await DatasetHelper.getddbRecords(mainAwsService, data.id);
 
       expect(metadata.authenticatedUser).toBeUndefined();
     });
@@ -134,7 +135,9 @@ describe('datasets create integration test', () => {
       });
 
       // confirm authenticated user isnt present in ddb
-      const metadata = await new DatasetHelper().getddbRecords(
+      const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const metadata = await DatasetHelper.getddbRecords(
+        mainAwsService,
         dataset.id,
         response.data.mountObject.endpointId
       );
@@ -207,7 +210,9 @@ describe('datasets create integration test', () => {
       });
 
       // confirm authenticated user isnt present in ddb
-      const metadata = await new DatasetHelper().getddbRecords(
+      const mainAwsService = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+      const metadata = await DatasetHelper.getddbRecords(
+        mainAwsService,
         dataset.id,
         response.data.mountObject.endpointId
       );

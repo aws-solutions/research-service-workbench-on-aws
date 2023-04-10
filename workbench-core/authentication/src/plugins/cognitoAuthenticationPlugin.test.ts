@@ -32,8 +32,10 @@ import {
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
-  clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret'
+  webUiClient: {
+    clientId: 'fake-client-id',
+    clientSecret: 'fake-client-secret'
+  }
 } as const;
 
 const baseUrl = cognitoPluginOptions.cognitoDomain;
@@ -43,7 +45,7 @@ const validToken = 'validToken';
 const invalidToken = 'invalidToken';
 
 const encodedClientId = Buffer.from(
-  `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
+  `${cognitoPluginOptions.webUiClient.clientId}:${cognitoPluginOptions.webUiClient.clientSecret}`
 ).toString('base64');
 
 const baseDecodedAccessToken: CognitoAccessTokenPayload = {
@@ -508,7 +510,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getAuthorizationCodeUrl(state, codeChallenge, websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.webUiClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
       );
     });
   });
@@ -518,7 +520,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getLogoutUrl(websiteUrl);
 
       expect(url).toBe(
-        `${baseUrl}/logout?client_id=${cognitoPluginOptions.clientId}&logout_uri=${websiteUrl}`
+        `${baseUrl}/logout?client_id=${cognitoPluginOptions.webUiClient.clientId}&logout_uri=${websiteUrl}`
       );
     });
   });

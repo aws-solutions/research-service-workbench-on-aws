@@ -31,8 +31,11 @@ import { ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
 // Create an OidcProvider if including a SSO component
 const myWorkbenchUserPoolOidcIdentityProvider: WorkbenchUserPoolOidcIdentityProvider = {
   name: 'publicNameForProvider',
-  clientId: 'providerClientId',
-  clientSecret: 'providerClientSecret',
+  webUiClient: {
+    clientId: 'webUiProviderClientId',
+    clientSecret: 'webUiProviderClientSecret',
+  },
+  allowedClientIds: ['programmaticAccessProviderClientId'],
   issuerUrl: 'providerIssuerUrl',
   attributeMapping: {
     // These attributes are used by workbench-core-authentication package
@@ -48,13 +51,23 @@ const cognitoProps: WorkbenchCognitoProps = {
   domainPrefix: 'myDomainPrefix',
   websiteUrls: ['https://mysite.mydomain.com'],
   // Include your created OidcProvider if including a SSO component
-  oidcIdentityProviders = [ myWorkbenchUserPoolOidcIdentityProvider ]
-  // If an access token validity of 15 minutes is insufficient, you may change it here
-  accessTokenValidity: Duration.minutes(60) // 1 hour
-  // If an id token validity of 15 minutes is insufficient, you may change it here
-  idTokenValidity: Duration.minutes(60) // 1 hour
-  // If a refresh token validity of 7 days is insufficient, you may change it here
-  refreshTokenValidity: Duration.days(30) // 30 days
+  oidcIdentityProviders = [ myWorkbenchUserPoolOidcIdentityProvider ],
+  webUiUserPoolTokenValidity: {
+    // If an access token validity of 15 minutes for WebUI app client is insufficient, you may change it here
+    accessTokenValidity: Duration.minutes(60), // 1 hour
+    // If an id token validity of 15 minutes for WebUI app client is insufficient, you may change it here
+    idTokenValidity: Duration.minutes(60), // 1 hour
+    // If a refresh token validity of 7 days for WebUI app client is insufficient, you may change it here
+    refreshTokenValidity: Duration.days(30) // 30 days
+  },
+  programmaticAccessUserPoolTokenValidity: {
+    // If an access token validity of 15 minutes for programmatic access app client is insufficient, you may change it here
+    accessTokenValidity: Duration.minutes(60), // 1 hour
+    // If an id token validity of 15 minutes for programmatic access app client is insufficient, you may change it here
+    idTokenValidity: Duration.minutes(60), // 1 hour
+    // If a refresh token validity of 7 days for programmatic access app client is insufficient, you may change it here
+    refreshTokenValidity: Duration.days(30) // 30 days
+  },  
   // If you could like to change the MFA requirements from OPTIONAL, you may change it here
   mfa: Mfa.REQUIRED
 };

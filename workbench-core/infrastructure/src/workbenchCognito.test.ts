@@ -71,7 +71,32 @@ describe('WorkbenchCognito tests', () => {
     });
 
     // User Pool Client
-    template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
+    template.resourceCountIs('AWS::Cognito::UserPoolClient', 2);
+    template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
+      AllowedOAuthFlows: ['code'],
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthScopes: ['openid'],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
+      EnableTokenRevocation: true,
+      GenerateSecret: true,
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
+      RefreshTokenValidity: 10080,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
+    });
+
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
       AllowedOAuthFlows: ['code'],
       AllowedOAuthFlowsUserPoolClient: true,
@@ -104,10 +129,18 @@ describe('WorkbenchCognito tests', () => {
       domainPrefix: 'test-domain',
       websiteUrls: ['https://www.example.com'],
       userPoolName: 'Sample-User-Pool-Name',
-      userPoolClientName: 'Sample-User-Pool-Client-Name',
-      accessTokenValidity: Duration.minutes(5),
-      idTokenValidity: Duration.hours(1),
-      refreshTokenValidity: Duration.hours(24),
+      webUiUserPoolClientName: 'Sample-User-Pool-Client-Name-webUi',
+      programmaticAccessUserPoolName: 'Sample-User-Pool-Client-Name-iTest',
+      webUiUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(5),
+        idTokenValidity: Duration.hours(1),
+        refreshTokenValidity: Duration.hours(24)
+      },
+      programmaticAccessUserPoolTokenValidity: {
+        accessTokenValidity: Duration.minutes(10),
+        idTokenValidity: Duration.hours(2),
+        refreshTokenValidity: Duration.hours(48)
+      },
       mfa: Mfa.REQUIRED,
       removalPolicy: RemovalPolicy.DESTROY,
       advancedSecurityMode: AdvancedSecurityMode.AUDIT
@@ -172,7 +205,8 @@ describe('WorkbenchCognito tests', () => {
     });
 
     // User Pool Client
-    template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
+    template.resourceCountIs('AWS::Cognito::UserPoolClient', 2);
+
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
       AllowedOAuthFlows: ['code'],
       AllowedOAuthFlowsUserPoolClient: true,
@@ -192,12 +226,38 @@ describe('WorkbenchCognito tests', () => {
       },
       ExplicitAuthFlows: [
         'ALLOW_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ],
+      ClientName: workbenchCognitoProps.webUiUserPoolClientName
+    });
+
+    template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
+      AllowedOAuthFlows: ['code'],
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthScopes: ['openid'],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
+      EnableTokenRevocation: true,
+      GenerateSecret: true,
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 120,
+      AccessTokenValidity: 10,
+      RefreshTokenValidity: 2880,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_USER_PASSWORD_AUTH',
         'ALLOW_ADMIN_USER_PASSWORD_AUTH',
         'ALLOW_CUSTOM_AUTH',
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
       ],
-      ClientName: workbenchCognitoProps.userPoolClientName
+      ClientName: workbenchCognitoProps.programmaticAccessUserPoolName
     });
   });
 

@@ -85,12 +85,7 @@
     "<rootDir>/src/users/deleteUserRequest.ts",
     "<rootDir>/src/users/getUserRequest.ts",
     "<rootDir>/src/users/updateRoleRequest.ts",
-    "<rootDir>/src/users/updateUserRequest.ts",
-
-    "<rootDir>/src/environments/environment.ts",
-    "<rootDir>/src/environments/environmentItem.ts",
-    "<rootDir>/src/environments/environmentPlugin.ts",
-    "<rootDir>/src/environments/listEnvironmentsRequest.ts"
+    "<rootDir>/src/users/updateUserRequest.ts"
   ],
   "coverageThreshold": {
     "global": {

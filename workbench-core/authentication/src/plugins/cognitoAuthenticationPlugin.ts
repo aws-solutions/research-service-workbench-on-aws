@@ -29,6 +29,18 @@ interface TokensExpiration {
   refreshToken: number; // ms
 }
 
+export interface CognitoWebUiClient {
+  /**
+   * The Cognito app client ID.
+   */
+  clientId: string;
+
+  /**
+   * The Cognito app client secret.
+   */
+  clientSecret: string;
+}
+
 export interface CognitoAuthenticationPluginOptions {
   /**
    * The Cognito domain. Follows the format: "https://\<domain prefix\>.auth.\<region\>.amazoncognito.com"
@@ -41,14 +53,14 @@ export interface CognitoAuthenticationPluginOptions {
   userPoolId: string;
 
   /**
-   * The Cognito app client ID.
+   * The WebUI client authentication options
    */
-  clientId: string;
+  webUiClient: CognitoWebUiClient;
 
   /**
-   * The Cognito app client secret.
+   * Additional allowed client Ids.
    */
-  clientSecret: string;
+  allowedClientIds?: string[];
 }
 
 /**
@@ -58,14 +70,13 @@ export interface CognitoAuthenticationPluginOptions {
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _region: string;
   private _userPoolId: string;
-  private _clientId: string;
-  private _clientSecret: string;
+  private _webUiClient: CognitoWebUiClient;
 
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
     tokenUse: 'access';
-    clientId: string;
+    clientId: string[];
   }>;
 
   /**
@@ -77,12 +88,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public constructor({
     cognitoDomain,
     userPoolId,
-    clientId,
-    clientSecret
+    webUiClient,
+    allowedClientIds = []
   }: CognitoAuthenticationPluginOptions) {
     this._userPoolId = userPoolId;
-    this._clientId = clientId;
-    this._clientSecret = clientSecret;
+    this._webUiClient = webUiClient;
     this._baseUrl = cognitoDomain;
 
     // eslint-disable-next-line security/detect-unsafe-regex
@@ -96,7 +106,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       this._verifier = CognitoJwtVerifier.create({
         userPoolId,
         tokenUse: 'access',
-        clientId
+        clientId: [...allowedClientIds, webUiClient.clientId]
       });
     } catch (error) {
       throw new PluginConfigurationError(error.message);
@@ -293,7 +303,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
-    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    return `${this._baseUrl}/oauth2/authorize?client_id=${this._webUiClient.clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
   /**
@@ -361,7 +371,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getLogoutUrl(websiteUrl: string): string {
-    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${websiteUrl}`;
+    return `${this._baseUrl}/logout?client_id=${this._webUiClient.clientId}&logout_uri=${websiteUrl}`;
   }
 
   /**
@@ -370,7 +380,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns a string representation of the encoded client id and secret.
    */
   private _getEncodedClientId(): string {
-    return Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
+    return Buffer.from(`${this._webUiClient.clientId}:${this._webUiClient.clientSecret}`).toString('base64');
   }
 
   /**
@@ -383,7 +393,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
 
     const describeInput: DescribeUserPoolClientCommandInput = {
       UserPoolId: this._userPoolId,
-      ClientId: this._clientId
+      ClientId: this._webUiClient.clientId
     };
     const describeCommand = new DescribeUserPoolClientCommand(describeInput);
 
