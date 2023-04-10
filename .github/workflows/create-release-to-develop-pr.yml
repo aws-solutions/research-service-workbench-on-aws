@@ -12,18 +12,18 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: create-pr-if-merge-fails
+      - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           branch: test-rebase-release-4debe38e-develop
           base: test-develop
+          title: 'chore: merge release to develop'
           token: ${{ secrets.MERGE_TOKEN }}
       - name: Enable Pull Request Automerge
         if: steps.cpr.outputs.pull-request-operation == 'created'
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
-          token: ${{ secrets.MERGE_TOKEN }}
           pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
           merge-method: merge
       - name: rebase-with-release
