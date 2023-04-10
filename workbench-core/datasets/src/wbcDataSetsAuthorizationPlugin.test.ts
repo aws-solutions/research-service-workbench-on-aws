@@ -447,7 +447,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -463,7 +463,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -491,7 +491,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             }
           };
         });
-      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).resolves.toMatchObject({
+      await expect(plugin.removeAllAccessPermissions(dataSetId, authenticatedUser)).resolves.toStrictEqual({
         data: {
           dataSetId,
           permissions: []
@@ -564,7 +564,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             subjectType: dataSetSubjectType
           }
         ])
-      ).toMatchObject([
+      ).toStrictEqual([
         {
           data: {
             dataSetId: dataSetId,
@@ -605,7 +605,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             subjectType: dataSetSubjectType
           }
         ])
-      ).toMatchObject([
+      ).toStrictEqual([
         {
           data: {
             dataSetId: dataSetId,
@@ -641,7 +641,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             subjectType: dataSetSubjectType
           }
         ])
-      ).toMatchObject([
+      ).toStrictEqual([
         {
           data: {
             dataSetId: dataSetId,
@@ -671,7 +671,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAccessPermissions(getAccessPermission)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -687,7 +687,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAccessPermissions(getAccessPermission)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -724,7 +724,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             }
           };
         });
-      await expect(plugin.getAccessPermissions(getAccessPermission)).resolves.toMatchObject({
+      await expect(plugin.getAccessPermissions(getAccessPermission)).resolves.toStrictEqual({
         data: {
           dataSetId,
           permissions: []
@@ -741,7 +741,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAllDataSetAccessPermissions(dataSetId)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -758,7 +758,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAllDataSetAccessPermissions(dataSetId, undefined, 1)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -776,7 +776,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAllDataSetAccessPermissions(dataSetId, undefined, 1)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -794,7 +794,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
       await expect(
         plugin.getAllDataSetAccessPermissions(dataSetId)
-      ).resolves.toMatchObject<PermissionsResponse>({
+      ).resolves.toStrictEqual<PermissionsResponse>({
         data: {
           dataSetId: getAccessPermission.dataSetId,
           permissions: [
@@ -822,7 +822,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             }
           };
         });
-      await expect(plugin.getAllDataSetAccessPermissions(dataSetId)).resolves.toMatchObject({
+      await expect(plugin.getAllDataSetAccessPermissions(dataSetId)).resolves.toStrictEqual({
         data: {
           dataSetId,
           permissions: []

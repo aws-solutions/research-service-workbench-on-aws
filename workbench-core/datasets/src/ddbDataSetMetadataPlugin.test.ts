@@ -96,7 +96,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
 
       const response = await plugin.listDataSets(1, undefined);
-      expect(response).toMatchObject<PaginatedResponse<DataSet>>({
+      expect(response).toStrictEqual<PaginatedResponse<DataSet>>({
         data: [
           {
             id: mockDataSetId,
@@ -137,7 +137,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       const response = await plugin.getDataSetMetadata(mockDataSetId);
 
-      expect(response).toMatchObject<DataSet>({
+      expect(response).toStrictEqual<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -201,7 +201,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
-      expect(newDataSet).toMatchObject<DataSet>({
+      expect(newDataSet).toStrictEqual<DataSet>({
         ...exampleDS,
         id: mockDataSetId,
         createdAt: mockCreatedAt
@@ -338,7 +338,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         accessLevel: mockAccessLevel
       };
 
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toMatchObject<ExternalEndpoint>({
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toStrictEqual<ExternalEndpoint>({
         id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
@@ -432,7 +432,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       await expect(
         plugin.getDataSetEndPointDetails(mockDataSetId, mockEndpointName)
-      ).resolves.toMatchObject<ExternalEndpoint>({
+      ).resolves.toStrictEqual<ExternalEndpoint>({
         id: mockEndpointId,
         name: mockEndpointName,
         dataSetId: mockDataSetId,
@@ -463,7 +463,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       const response = await plugin.listStorageLocations(1, undefined);
       expect(response.data).toBeDefined();
       expect(response.data).toHaveLength(1);
-      expect(response.data).toMatchObject<StorageLocation[]>([
+      expect(response.data).toStrictEqual<StorageLocation[]>([
         {
           name: mockDataSetStorageName,
           awsAccountId: mockAwsAccountId,

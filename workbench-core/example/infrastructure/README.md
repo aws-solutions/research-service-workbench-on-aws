@@ -72,6 +72,21 @@ rushx cdk:deploy:hosting
 rushx integration-tests
 ```
 
+### Run Cypress end-to-end test
+
+To run Cypress suite and output the results to command line: 
+
+```bash
+rushx cypress
+```
+
+To run Cypress suite in GUI mode: 
+
+```bash
+rushx cypress open
+```
+
+
 ## Cleanup your environment
 Navigate to `workbench-core/example/infrastructure`
 
