@@ -155,6 +155,34 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@awsui/components-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/design-tokens",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/global-styles",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/core",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-env",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-typescript",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@casl/ability",
       "allowedCategories": [ "production" ]
     },
@@ -176,7 +204,7 @@
     },
     {
       "name": "@next/eslint-plugin-next",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/eslint-config",
@@ -201,6 +229,10 @@
     {
       "name": "@rushstack/ts-command-line",
       "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@testing-library/jest-dom",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@typescript-eslint/parser",
@@ -233,6 +265,10 @@
     {
       "name": "axios",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "babel-jest",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-nag",
@@ -296,15 +332,19 @@
     },
     {
       "name": "eslint-plugin-react",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint-plugin-react-hooks",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint-plugin-security",
       "allowedCategories": [ "production", "prototypes", "tools" ]
+    },
+    {
+      "name": "eslint-plugin-testing-library",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "express",
@@ -368,7 +408,15 @@
     },
     {
       "name": "next",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "next-i18next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-transpile-modules",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "nodemon",
@@ -396,15 +444,15 @@
     },
     {
       "name": "react",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "react-dom",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "sass",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "sort-package-json",
@@ -424,7 +472,7 @@
     },
     {
       "name": "ts-jest",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "ts-node",
