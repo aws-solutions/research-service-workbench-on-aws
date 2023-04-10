@@ -52,6 +52,12 @@ export function csurf(
   });
 }
 
+const getRequestOrigin = (req: Request): string | undefined => {
+  const { origin, referer } = req.headers;
+  // HTTP header Origin is optional and may not be included (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
+  return origin ?? (referer ? new URL(referer.toString()).origin : undefined);
+};
+
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
@@ -79,7 +85,7 @@ export function getTokensFromAuthorizationCode(
     const { loggingService, sameSite } = options || {};
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
-    const websiteUrl = req.headers.origin;
+    const websiteUrl = getRequestOrigin(req);
 
     if (typeof code === 'string' && typeof codeVerifier === 'string' && typeof websiteUrl === 'string') {
       try {
@@ -147,7 +153,7 @@ export function getAuthorizationCodeUrl(
     const { csrf } = options || {};
     const stateVerifier = req.query.stateVerifier;
     const codeChallenge = req.query.codeChallenge;
-    const websiteUrl = req.headers.origin;
+    const websiteUrl = getRequestOrigin(req);
     const includeCsrfToken = csrf ?? true;
 
     if (
@@ -243,7 +249,7 @@ export function logoutUser(
   return async function (req: Request, res: Response) {
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
-    const websiteUrl = req.headers.origin;
+    const websiteUrl = getRequestOrigin(req);
 
     if (!websiteUrl) {
       res.sendStatus(400);
