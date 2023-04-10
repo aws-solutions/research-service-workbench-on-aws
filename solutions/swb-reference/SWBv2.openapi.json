@@ -1,0 +1,2595 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SWBv2 Official",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "{{API_URL}}"
+    }
+  ],
+  "paths": {
+    "/costCenters/": {
+      "post": {
+        "tags": ["costCenters"],
+        "summary": "Create Cost Center",
+        "description": "Create Cost Center",
+        "operationId": "createCostCenter",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "example": "acc-123"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "a description of the cost center"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "cost center name"
+                  }
+                }
+              },
+              "example": {
+                "accountId": "acc-123",
+                "description": "a description of the cost center",
+                "name": "cost center name"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/costCenters/{id}": {
+      "get": {
+        "tags": ["costCenters"],
+        "summary": "Get Cost Center",
+        "description": "Get Cost Center",
+        "operationId": "getCostCenter",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["costCenters"],
+        "summary": "Soft Delete Cost Center",
+        "description": "Soft Delete Cost Center",
+        "operationId": "softDeleteCostCenter",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": ["costCenters"],
+        "summary": "Update Cost Center",
+        "description": "Update Cost Center",
+        "operationId": "updateCostCenter",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": ""
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": ""
+                  }
+                }
+              },
+              "example": {
+                "description": "",
+                "name": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/costCenters": {
+      "get": {
+        "tags": ["costCenters"],
+        "summary": "List Cost Centers",
+        "description": "List Cost Centers",
+        "operationId": "listCostCenters",
+        "parameters": [
+          {
+            "name": "filter[name][begins]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "sort[name]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/datasets/": {
+      "post": {
+        "tags": ["datasets"],
+        "summary": "Create Internal DataSet",
+        "description": "Create Internal DataSet",
+        "operationId": "createInternalDataset",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "awsAccountId": {
+                    "type": "string",
+                    "example": "mainAccountId"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "testDs"
+                  },
+                  "path": {
+                    "type": "string",
+                    "example": "folderName"
+                  },
+                  "region": {
+                    "type": "string",
+                    "example": "us-east-1"
+                  },
+                  "storageName": {
+                    "type": "string",
+                    "example": "datasetBucketNameInMainAccount"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "internal"
+                  }
+                }
+              },
+              "example": {
+                "awsAccountId": "mainAccountId",
+                "name": "testDs",
+                "path": "folderName",
+                "region": "us-east-1",
+                "storageName": "datasetBucketNameInMainAccount",
+                "type": "internal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/datasets/{datasetId}": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "Get Internal DataSet",
+        "description": "Get Internal DataSet",
+        "operationId": "getInternalDataset",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["datasets"],
+        "summary": "Soft Delete Internal DataSet",
+        "description": "Soft Delete Internal DataSet",
+        "operationId": "softDeleteInternalDataset",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/datasets/{datasetId}/upload-requests": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "Upload Files to DataSet",
+        "description": "Upload Files to DataSet",
+        "operationId": "uploadFilesToDataset",
+        "parameters": [
+          {
+            "name": "filenames[]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "file1.txt,file2.txt"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/datasets/{datasetId}": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "Get DataSet",
+        "description": "Get DataSet",
+        "operationId": "getDataset",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/datasets": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "List DataSets for Project",
+        "description": "List DataSets for Project",
+        "operationId": "listDatasetsForProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/datasets/{datasetId}/relationships": {
+      "put": {
+        "tags": ["datasets"],
+        "summary": "Associate DataSet With Project",
+        "description": "Associate DataSet With Project",
+        "operationId": "associateDatasetWithProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accessLevel": {
+                    "type": "string",
+                    "example": "<'read-only' or 'read-write'>"
+                  }
+                }
+              },
+              "example": {
+                "accessLevel": "<'read-only' or 'read-write'>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["datasets"],
+        "summary": "Remove DataSet from Project",
+        "description": "Remove DataSet from Project",
+        "operationId": "removeDatasetFromProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/datasets/{datasetId}/permissions": {
+      "get": {
+        "tags": ["datasets"],
+        "summary": "List Project Permissions for Dataset",
+        "description": "List Project Permissions for Dataset",
+        "operationId": "listProjectPermissionsForDataset",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "datasetId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/environments/{id}/terminate": {
+      "put": {
+        "tags": ["environments"],
+        "summary": "Terminate Environment",
+        "description": "Terminate Environment",
+        "operationId": "terminateEnvironment",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID of environment to terminate"
+        }
+      ]
+    },
+    "/projects/{projectId}/environments": {
+      "get": {
+        "tags": ["environments"],
+        "summary": "List Project Environments",
+        "description": "List Project Environments",
+        "operationId": "listProjectEnvironments",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": ["environments"],
+        "summary": "Launch Environment",
+        "description": "Launch Environment",
+        "operationId": "launchEnvironment",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "datasetIds": {
+                    "type": "array",
+                    "items": {},
+                    "example": []
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "test 123"
+                  },
+                  "envType": {
+                    "type": "string",
+                    "example": "sagemakerNotebook"
+                  },
+                  "envTypeConfigId": {
+                    "type": "string",
+                    "example": "envTypeConfig-123"
+                  },
+                  "envTypeId": {
+                    "type": "string",
+                    "example": "envType-123"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "testEnv1"
+                  }
+                }
+              },
+              "example": {
+                "datasetIds": [],
+                "description": "test 123",
+                "envType": "sagemakerNotebook",
+                "envTypeConfigId": "envTypeConfig-123",
+                "envTypeId": "envType-123",
+                "name": "testEnv1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        }
+      ]
+    },
+    "/projects/{projectId}/environments/{id}/start": {
+      "put": {
+        "tags": ["environments"],
+        "summary": "Start Environment",
+        "description": "Start Environment",
+        "operationId": "startEnvironment",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID of environment to start"
+        }
+      ]
+    },
+    "/projects/{projectId}/environments/{id}/stop": {
+      "put": {
+        "tags": ["environments"],
+        "summary": "Stop Environment",
+        "description": "Stop Environment",
+        "operationId": "stopEnvironment",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID of environment to stop"
+        }
+      ]
+    },
+    "/projects/{projectId}/environments/{id}": {
+      "get": {
+        "tags": ["environments"],
+        "summary": "Get Environment",
+        "description": "Get Environment",
+        "operationId": "getEnvironment",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID of environment to GET metadata"
+        }
+      ]
+    },
+    "/environments": {
+      "get": {
+        "tags": ["environments"],
+        "summary": "List Environments",
+        "description": "List Environments",
+        "operationId": "listEnvironments",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "COMPLETED"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "testEnv"
+            }
+          },
+          {
+            "name": "createdAtFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2022-05-13T20:03:54.055Z"
+            }
+          },
+          {
+            "name": "createdAtTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2022-05-13T20:03:54.055Z"
+            }
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "user-123"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "envType-123"
+            }
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "project-123"
+            }
+          },
+          {
+            "name": "ascending",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "name"
+            }
+          },
+          {
+            "name": "descending",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "name"
+            }
+          },
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/environments/{id}/connections": {
+      "get": {
+        "tags": ["environments"],
+        "summary": "Get Connection",
+        "description": "Get Connection",
+        "operationId": "getConnection",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project the environment belongs to"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID of environment to get connection information"
+        }
+      ]
+    },
+    "/environmentTypes/{id}": {
+      "get": {
+        "tags": ["envType"],
+        "summary": "Get envType",
+        "description": "Get envType",
+        "operationId": "getEnvtype",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": ["envType"],
+        "summary": "Update envType",
+        "description": "Update envType",
+        "operationId": "updateEnvtype",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": "An Amazon SageMaker Jupyter Notebook"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Jupyter Notebook"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "APPROVED"
+                  }
+                }
+              },
+              "example": {
+                "description": "An Amazon SageMaker Jupyter Notebook",
+                "name": "Jupyter Notebook",
+                "status": "APPROVED"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of envType to get metadata"
+        }
+      ]
+    },
+    "/environmentTypes": {
+      "get": {
+        "tags": ["envType"],
+        "summary": "List envTypes",
+        "description": "List envTypes",
+        "operationId": "listEnvtypes",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/environmentTypes/{envTypeId}/configurations": {
+      "get": {
+        "tags": ["envTypeConfig"],
+        "summary": "List envTypeConfigs",
+        "description": "List envTypeConfigs",
+        "operationId": "listEnvtypeconfigs",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": ["envTypeConfig"],
+        "summary": "Create envTypeConfig",
+        "description": "Create envTypeConfig",
+        "operationId": "createEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": "Example config 1"
+                  },
+                  "estimatedCost": {
+                    "type": "string",
+                    "example": "estimated cost"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "config 1"
+                  },
+                  "params": {
+                    "type": "array",
+                    "items": {},
+                    "example": []
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "sagemakerNotebook"
+                  }
+                }
+              },
+              "example": {
+                "description": "Example config 1",
+                "estimatedCost": "estimated cost",
+                "name": "config 1",
+                "params": [],
+                "type": "sagemakerNotebook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with this config"
+        }
+      ]
+    },
+    "/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}": {
+      "get": {
+        "tags": ["envTypeConfig"],
+        "summary": "List projects by envTypeConfig",
+        "description": "List projects by envTypeConfig",
+        "operationId": "listProjectsByEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["envTypeConfig"],
+        "summary": "Soft Delete envTypeConfig",
+        "description": "Soft Delete envTypeConfig",
+        "operationId": "softDeleteEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": ["envTypeConfig"],
+        "summary": "Update envTypeConfig",
+        "description": "Update envTypeConfig",
+        "operationId": "updateEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "example": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with this config"
+        },
+        {
+          "name": "envTypeConfigId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type config to associate"
+        }
+      ]
+    },
+    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations": {
+      "get": {
+        "tags": ["projects"],
+        "summary": "Get EnvTypeConfigs associated with Project",
+        "description": "Get EnvTypeConfigs associated with Project",
+        "operationId": "getEnvtypeconfigsAssociatedWithProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project to associate"
+        },
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with environment Type Configuration"
+        }
+      ]
+    },
+    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}": {
+      "get": {
+        "tags": ["envTypeConfig"],
+        "summary": "Get EnvTypeConfig associated with Project",
+        "description": "Get EnvTypeConfig associated with Project",
+        "operationId": "getEnvtypeconfigAssociatedWithProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project to associate"
+        },
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with environment Type Configuration"
+        },
+        {
+          "name": "envTypeConfigId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type config to associate"
+        }
+      ]
+    },
+    "/projects/{projectId}": {
+      "get": {
+        "tags": ["projects"],
+        "summary": "Get project",
+        "description": "Get project",
+        "operationId": "getProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["projects"],
+        "summary": "Delete project",
+        "description": "Delete project",
+        "operationId": "deleteProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": ["projects"],
+        "summary": "Update Project",
+        "description": "Update Project",
+        "operationId": "updateProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": "New description"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "New name"
+                  }
+                }
+              },
+              "example": {
+                "description": "New description",
+                "name": "New name"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "proj-123"
+          }
+        }
+      ]
+    },
+    "/projects": {
+      "get": {
+        "tags": ["projects"],
+        "summary": "List projects",
+        "description": "List projects",
+        "operationId": "listProjects",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "50"
+            }
+          },
+          {
+            "name": "filter[name][begins]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Project"
+            }
+          },
+          {
+            "name": "filter[createdAt][between][value1]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "date1"
+            }
+          },
+          {
+            "name": "filter[createdAt][between][value2]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "date2"
+            }
+          },
+          {
+            "name": "filter[dependency][eq]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "cc-1"
+            }
+          },
+          {
+            "name": "filter[status][lte]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "AVAILABLE"
+            }
+          },
+          {
+            "name": "sort[createdAt]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "sort[dependency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "desc"
+            }
+          },
+          {
+            "name": "sort[name]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "desc"
+            }
+          },
+          {
+            "name": "sort[status]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": ["projects"],
+        "summary": "Create project",
+        "description": "Create project",
+        "operationId": "createProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "costCenterId": {
+                    "type": "string",
+                    "example": "cc-exampleCostCenterId"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example Project 1"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Example Project 1"
+                  }
+                }
+              },
+              "example": {
+                "costCenterId": "cc-exampleCostCenterId",
+                "description": "Example Project 1",
+                "name": "Example Project 1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}/relationships": {
+      "put": {
+        "tags": ["projects"],
+        "summary": "Associate project with EnvTypeConfig",
+        "description": "Associate project with EnvTypeConfig",
+        "operationId": "associateProjectWithEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["projects"],
+        "summary": "Delete Association between project and EnvTypeConfig",
+        "description": "Delete Association between project and EnvTypeConfig",
+        "operationId": "deleteAssociationBetweenProjectAndEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project to associate"
+        },
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with environment Type Configuration"
+        },
+        {
+          "name": "envTypeConfigId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type config to associate"
+        }
+      ]
+    },
+    "/projects/{projectId}/users": {
+      "get": {
+        "tags": ["projects"],
+        "summary": "List Project Users By Role",
+        "description": "List Project Users By Role",
+        "operationId": "listProjectUsersByRole",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "ProjectAdmin"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/users/{userId}/relationships": {
+      "post": {
+        "tags": ["projects"],
+        "summary": "Add User To Project",
+        "description": "Add User To Project",
+        "operationId": "addUserToProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "example": "Researcher"
+                  }
+                }
+              },
+              "example": {
+                "role": "Researcher"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": ["projects"],
+        "summary": "Remove User From Project",
+        "description": "Remove User From Project",
+        "operationId": "removeUserFromProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        },
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/users": {
+      "get": {
+        "tags": ["users"],
+        "summary": "List Users",
+        "description": "List Users",
+        "operationId": "listUsers",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": ["users"],
+        "summary": "Create User",
+        "description": "Create User",
+        "operationId": "createUser",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doe"
+                  }
+                }
+              },
+              "example": {
+                "email": "john.doe@example.com",
+                "firstName": "John",
+                "lastName": "Doe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Get User",
+        "description": "Get User",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": ["users"],
+        "summary": "Update User",
+        "description": "Update User",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "Admin"
+                    },
+                    "example": ["Admin"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "ACTIVE"
+                  }
+                }
+              },
+              "example": {
+                "email": "john.doe@example.com",
+                "firstName": "John",
+                "lastName": "Doe",
+                "roles": ["Admin"],
+                "status": "ACTIVE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/users/{userId}/purge": {
+      "delete": {
+        "tags": ["users"],
+        "summary": "Delete User",
+        "description": "Delete User",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "costCenters"
+    },
+    {
+      "name": "datasets"
+    },
+    {
+      "name": "environments"
+    },
+    {
+      "name": "envType"
+    },
+    {
+      "name": "envTypeConfig"
+    },
+    {
+      "name": "projects"
+    },
+    {
+      "name": "users"
+    }
+  ]
+}
