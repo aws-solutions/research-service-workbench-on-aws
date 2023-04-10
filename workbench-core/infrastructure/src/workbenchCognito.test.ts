@@ -89,12 +89,7 @@ describe('WorkbenchCognito tests', () => {
         AccessToken: 'minutes',
         RefreshToken: 'minutes'
       },
-      ExplicitAuthFlows: [
-        'ALLOW_USER_PASSWORD_AUTH',
-        'ALLOW_CUSTOM_AUTH',
-        'ALLOW_USER_SRP_AUTH',
-        'ALLOW_REFRESH_TOKEN_AUTH'
-      ]
+      ExplicitAuthFlows: ['ALLOW_CUSTOM_AUTH', 'ALLOW_USER_SRP_AUTH', 'ALLOW_REFRESH_TOKEN_AUTH']
     });
 
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
@@ -224,12 +219,7 @@ describe('WorkbenchCognito tests', () => {
         AccessToken: 'minutes',
         RefreshToken: 'minutes'
       },
-      ExplicitAuthFlows: [
-        'ALLOW_USER_PASSWORD_AUTH',
-        'ALLOW_CUSTOM_AUTH',
-        'ALLOW_USER_SRP_AUTH',
-        'ALLOW_REFRESH_TOKEN_AUTH'
-      ],
+      ExplicitAuthFlows: ['ALLOW_CUSTOM_AUTH', 'ALLOW_USER_SRP_AUTH', 'ALLOW_REFRESH_TOKEN_AUTH'],
       ClientName: workbenchCognitoProps.webUiUserPoolClientName
     });
 

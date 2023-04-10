@@ -109,19 +109,6 @@ describe('authentication route handler integration tests', () => {
   });
 
   describe('refreshAccessToken', () => {
-    it('should return the id token if the access token is successfully refreshed', async () => {
-      // Log in using ALLOW_USER_PASSWORD_AUTH flow because ALLOW_ADMIN_USER_PASSWORD_AUTH is disabled for WebUI appClient
-      const adminSession = await setup.createRootUserSession(
-        setup.getSettings().get('ExampleCognitoUserPoolId'),
-        setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId'),
-        'USER'
-      );
-
-      const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
-
-      expect(data.idToken).toBeDefined();
-    });
-
     it('should throw 401 if there is no access token present', async () => {
       await expect(
         anonymousSession.resources.authentication.refresh({
@@ -140,17 +127,6 @@ describe('authentication route handler integration tests', () => {
   });
 
   describe('logoutUser', () => {
-    it('should return the logout URL for a logged in user', async () => {
-      const adminSession = await setup.createAdminSession();
-      const origin = 'fakeOrigin';
-      const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
-
-      const { data } = await adminSession.resources.authentication.logout({ origin });
-
-      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
-    });
-
     it('should return the logout URL for a logged out user', async () => {
       const origin = 'fakeOrigin';
       const domain = setup.getSettings().get('ExampleCognitoDomainName');

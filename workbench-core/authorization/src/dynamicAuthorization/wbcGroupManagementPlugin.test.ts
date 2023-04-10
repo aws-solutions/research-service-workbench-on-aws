@@ -102,7 +102,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
       const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
+      expect(response).toStrictEqual<CreateGroupResponse>({ data: { groupId } });
     });
 
     it('throws GroupAlreadyExistsError when the group is pending delete', async () => {
@@ -173,7 +173,7 @@ describe('WBCGroupManagemntPlugin', () => {
     it('returns the groupID in the data object when the group was successfully deleted', async () => {
       const response = await wbcGroupManagementPlugin.deleteGroup({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<DeleteGroupResponse>({ data: { groupId } });
+      expect(response).toStrictEqual<DeleteGroupResponse>({ data: { groupId } });
     });
 
     test.each([
@@ -196,7 +196,7 @@ describe('WBCGroupManagemntPlugin', () => {
       mockUserManagementPlugin.getUserRoles = jest.fn().mockResolvedValue([groupId]);
       const response = await wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
+      expect(response).toStrictEqual<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
     });
 
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
@@ -245,7 +245,7 @@ describe('WBCGroupManagemntPlugin', () => {
       mockUserManagementPlugin.listUsersForRole = jest.fn().mockResolvedValue([userId]);
       const response = await wbcGroupManagementPlugin.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds: [userId] } });
+      expect(response).toStrictEqual<GetGroupUsersResponse>({ data: { userIds: [userId] } });
     });
 
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
@@ -347,7 +347,7 @@ describe('WBCGroupManagemntPlugin', () => {
         authenticatedUser: mockUser
       });
 
-      expect(response).toMatchObject<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
+      expect(response).toStrictEqual<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
     });
 
     it('returns false in the data object when the user is not in the group', async () => {
@@ -358,7 +358,7 @@ describe('WBCGroupManagemntPlugin', () => {
         authenticatedUser: mockUser
       });
 
-      expect(response).toMatchObject<IsUserAssignedToGroupResponse>({ data: { isAssigned: false } });
+      expect(response).toStrictEqual<IsUserAssignedToGroupResponse>({ data: { isAssigned: false } });
     });
 
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
@@ -410,7 +410,7 @@ describe('WBCGroupManagemntPlugin', () => {
         authenticatedUser: mockUser
       });
 
-      expect(response).toMatchObject<RemoveUserFromGroupResponse>({ data: { groupId, userId } });
+      expect(response).toStrictEqual<RemoveUserFromGroupResponse>({ data: { groupId, userId } });
     });
 
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
@@ -479,7 +479,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
       const response = await wbcGroupManagementPlugin.getGroupStatus({ groupId });
 
-      expect(response).toMatchObject<GetGroupStatusResponse>({ data: { status } });
+      expect(response).toStrictEqual<GetGroupStatusResponse>({ data: { status } });
     });
 
     it('throws GroupNotFoundError when the group doesnt exist', async () => {
@@ -525,19 +525,19 @@ describe('WBCGroupManagemntPlugin', () => {
     it('returns the status in the data object when the status was successfully set for active', async () => {
       ddbMock.on(UpdateItemCommand).resolves({});
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status });
-      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status } });
+      expect(response).toStrictEqual<SetGroupStatusResponse>({ data: { status } });
     });
 
     it('returns the status in the data object when the status was successfully set for delete_pending', async () => {
       ddbMock.on(UpdateItemCommand).resolves({});
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'delete_pending' });
-      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status: 'delete_pending' } });
+      expect(response).toStrictEqual<SetGroupStatusResponse>({ data: { status: 'delete_pending' } });
     });
 
     it('returns the status in the data object when the status was successfully set for deleted', async () => {
       ddbMock.on(DeleteItemCommand).resolves({});
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status: 'deleted' });
-      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status: 'deleted' } });
+      expect(response).toStrictEqual<SetGroupStatusResponse>({ data: { status: 'deleted' } });
     });
 
     it('throws ForbiddenError when status tried to go from delete_pending to active', async () => {
@@ -590,7 +590,7 @@ describe('WBCGroupManagemntPlugin', () => {
     it('group does exist when status is active', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({ data: { status: 'active' } });
       const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
-      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: true } });
+      expect(response).toStrictEqual<DoesGroupExistResponse>({ data: { exist: true } });
     });
 
     it('group does not exist when status is delete_pending', async () => {
@@ -598,13 +598,13 @@ describe('WBCGroupManagemntPlugin', () => {
         .fn()
         .mockResolvedValue({ data: { status: 'delete_pending' } });
       const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
-      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: false } });
+      expect(response).toStrictEqual<DoesGroupExistResponse>({ data: { exist: false } });
     });
 
     it('group does not exist when status does not exist', async () => {
       wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       const response = await wbcGroupManagementPlugin.doesGroupExist({ groupId });
-      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: false } });
+      expect(response).toStrictEqual<DoesGroupExistResponse>({ data: { exist: false } });
     });
 
     it('throw error if getGroupStatus encounters error', async () => {

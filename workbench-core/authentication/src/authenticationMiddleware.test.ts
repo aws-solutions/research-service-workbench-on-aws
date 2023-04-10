@@ -517,7 +517,7 @@ describe('authenticationMiddleware tests', () => {
 
       await verifyTokenMiddleware(req, res, next);
 
-      expect(res.locals.user).toMatchObject({ id: 'id', roles: ['role'] });
+      expect(res.locals.user).toStrictEqual({ id: 'id', roles: ['role'] });
       expect(next).toHaveBeenCalledTimes(1);
     });
 
@@ -566,7 +566,7 @@ describe('authenticationMiddleware tests', () => {
 
       await verifyTokenMiddleware(req, res, next);
 
-      expect(res.locals.user).toMatchObject({ id: 'id', roles: ['role'] });
+      expect(res.locals.user).toStrictEqual({ id: 'id', roles: ['role'] });
       expect(next).toHaveBeenCalledTimes(1);
     });
 

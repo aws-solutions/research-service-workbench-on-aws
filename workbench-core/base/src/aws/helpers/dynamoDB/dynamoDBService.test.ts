@@ -162,7 +162,7 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toMatchObject(expectedParams);
+      expect(generatedParams).toStrictEqual(expectedParams);
     });
     test('should populate params with optional param: addDeleteRequests', async () => {
       // BUILD
@@ -240,7 +240,7 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toMatchObject(expectedParams);
+      expect(generatedParams).toStrictEqual(expectedParams);
     });
   });
 

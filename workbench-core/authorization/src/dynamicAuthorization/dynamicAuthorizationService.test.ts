@@ -719,7 +719,7 @@ describe('DynamicAuthorizationService', () => {
 
       const response = await dynamicAuthzService.createGroup(params);
 
-      expect(response).toMatchObject<CreateGroupResponse>(mockReturnValue);
+      expect(response).toStrictEqual<CreateGroupResponse>(mockReturnValue);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor: mockUser,
@@ -782,7 +782,7 @@ describe('DynamicAuthorizationService', () => {
 
       const response = await dynamicAuthzService.deleteGroup(params);
 
-      expect(response).toMatchObject<DeleteGroupResponse>(mockReturnValue);
+      expect(response).toStrictEqual<DeleteGroupResponse>(mockReturnValue);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor: mockUser,
@@ -832,7 +832,7 @@ describe('DynamicAuthorizationService', () => {
       const deleteIdentityPermissionsSpy = jest.spyOn(dynamicAuthzService, 'deleteIdentityPermissions');
 
       const response = await dynamicAuthzService.deleteGroup(params);
-      expect(response).toMatchObject<DeleteGroupResponse>(mockReturnValue);
+      expect(response).toStrictEqual<DeleteGroupResponse>(mockReturnValue);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor: mockUser,
@@ -1213,7 +1213,7 @@ describe('DynamicAuthorizationService', () => {
 
       const response = await dynamicAuthzService.removeUserFromGroup(params);
 
-      expect(response).toMatchObject<RemoveUserFromGroupResponse>(mockReturnValue);
+      expect(response).toStrictEqual<RemoveUserFromGroupResponse>(mockReturnValue);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor: mockUser,
@@ -1252,7 +1252,7 @@ describe('DynamicAuthorizationService', () => {
 
       const response = await dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds: [userId] } });
+      expect(response).toStrictEqual<GetGroupUsersResponse>({ data: { userIds: [userId] } });
     });
 
     it('throws when the group cannot be found', async () => {
@@ -1272,7 +1272,7 @@ describe('DynamicAuthorizationService', () => {
 
       const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
+      expect(response).toStrictEqual<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
     });
 
     it('throws when the user cannot be found', async () => {
@@ -1296,7 +1296,7 @@ describe('DynamicAuthorizationService', () => {
         authenticatedUser: mockUser
       });
 
-      expect(response).toMatchObject<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
+      expect(response).toStrictEqual<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
     });
 
     it('throws when the user cannot be found', async () => {
@@ -1318,7 +1318,7 @@ describe('DynamicAuthorizationService', () => {
       const response = await dynamicAuthzService.doesGroupExist({
         groupId
       });
-      expect(response).toMatchObject<DoesGroupExistResponse>({ data: { exist: true } });
+      expect(response).toStrictEqual<DoesGroupExistResponse>({ data: { exist: true } });
     });
   });
 

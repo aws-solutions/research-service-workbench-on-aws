@@ -144,10 +144,12 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
           dataSetId: datasetId,
           permissions: []
         },
-        pageToken: identityResponse.paginationToken
+        ...(identityResponse.paginationToken ? { pageToken: identityResponse.paginationToken } : {})
       };
     }
-    permissionsResponse[0].pageToken = identityResponse.paginationToken;
+    if (identityResponse.paginationToken) {
+      permissionsResponse[0].pageToken = identityResponse.paginationToken;
+    }
     return permissionsResponse[0];
   }
 

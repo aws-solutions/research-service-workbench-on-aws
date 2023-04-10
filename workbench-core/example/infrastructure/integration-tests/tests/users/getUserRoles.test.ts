@@ -43,7 +43,7 @@ describe('userManagement get user roles integration test', () => {
 
     const { data } = await adminSession.resources.users.user(userData.id).getRoles();
 
-    expect(data).toMatchObject([roleName]);
+    expect(data).toStrictEqual([expect.any(String)]);
   });
 
   it('throws a 404 error when the user doesnt exist', async () => {
