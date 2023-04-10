@@ -5,11 +5,6 @@
     "version": "1.0.0",
     "contact": {}
   },
-  "servers": [
-    {
-      "url": "{{API_URL}}"
-    }
-  ],
   "paths": {
     "/costCenters/": {
       "post": {
@@ -94,13 +89,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -130,13 +118,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -263,13 +244,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -385,13 +359,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -478,13 +445,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -534,13 +494,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -1598,13 +1551,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": ""
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
