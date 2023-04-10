@@ -16,11 +16,11 @@ lib
 #SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
 solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:177
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:190
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:237
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:250
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:280
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:293
 # email: 'john@doe.com' is not real email
 workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 # email: 'sample.user@amazon.com' is not real email

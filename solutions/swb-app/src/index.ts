@@ -16,6 +16,10 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { Environment } from './environments/environment';
+import { EnvironmentItem } from './environments/environmentItem';
+import { EnvironmentPlugin } from './environments/environmentPlugin';
+import { ListEnvironmentsRequest } from './environments/listEnvironmentsRequest';
 import { CreateEnvironmentTypeConfigRequest } from './envTypeConfigs/createEnvironmentTypeConfigRequest';
 import { DeleteEnvironmentTypeConfigRequest } from './envTypeConfigs/deleteEnvironmentTypeConfigRequest';
 import { EnvironmentTypeConfig } from './envTypeConfigs/environmentTypeConfig';
@@ -120,5 +124,9 @@ export {
   ConnectionInfoNotDefinedError,
   DuplicateKeyError,
   SendPublicKeyResponseParser,
-  ProjectDeletedError
+  ProjectDeletedError,
+  EnvironmentPlugin,
+  ListEnvironmentsRequest,
+  Environment,
+  EnvironmentItem
 };

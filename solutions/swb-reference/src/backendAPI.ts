@@ -35,7 +35,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
-import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
+import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix, storageLocationPrefix } from './constants';
 import * as DynamicRouteConfig from './dynamicRouteConfig';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
@@ -45,6 +45,7 @@ import { EnvTypeConfigService } from './services/envTypeConfigService';
 import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 import SshKeyService from './services/sshKeyService';
+import { SWBEnvironmentService } from './services/swbEnvironmentService';
 import { SWBProjectService } from './services/swbProjectService';
 
 const requiredAuditValues: string[] = ['actor', 'source'];
@@ -117,7 +118,7 @@ const apiRouteConfig: ApiRouteConfig = {
     new WorkbenchDataSetService(
       new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
       logger,
-      new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
+      new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix, storageLocationPrefix),
       new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
     ),
     new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
@@ -126,6 +127,7 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentService,
+  environmentPlugin: new SWBEnvironmentService(environmentService),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
   userManagementService: new UserManagementService(

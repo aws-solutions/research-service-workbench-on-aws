@@ -296,17 +296,17 @@ describe('datasets list integration test', () => {
 
   describe('ListStorageLocations', () => {
     it('should return StorageLocation entries', async () => {
-      let response = await adminSession.resources.datasets.create();
+      const { data: dataset } = await adminSession.resources.datasets.create();
 
       const location: StorageLocation = {
-        name: response.data.storageName,
-        type: response.data.storageType,
-        region: response.data.region,
-        awsAccountId: response.data.awsAccountId
+        name: dataset.storageName,
+        type: dataset.storageType,
+        region: dataset.region,
+        awsAccountId: dataset.awsAccountId
       };
-      response = await adminSession.resources.datasets.storageLocations();
+      const { data: storageLocationData } = await adminSession.resources.datasets.storageLocations();
 
-      expect(response.data?.data).toContainEqual(location);
+      expect(storageLocationData.data).toStrictEqual([location]);
     });
   });
 });

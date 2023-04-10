@@ -256,6 +256,7 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
 
 const dataSetPrefix: string = 'DATASET';
 const endPointPrefix: string = 'ENDPOINT';
+const storageLocationPrefix: string = 'STORAGELOCATION';
 const authorizationGroupPrefix: string = 'GROUP';
 
 const enum SwbAuthZSubject {
@@ -281,6 +282,7 @@ export {
   getConstantsWithSecrets,
   dataSetPrefix,
   endPointPrefix,
+  storageLocationPrefix,
   authorizationGroupPrefix,
   SwbAuthZSubject,
   SolutionId,
