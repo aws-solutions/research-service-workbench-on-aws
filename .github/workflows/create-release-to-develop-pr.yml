@@ -38,25 +38,13 @@ jobs:
           git checkout test-rebase-release-4debe38e-develop
           git merge origin/test-develop --no-ff --no-edit
           git push origin test-rebase-release-4debe38e-develop
-
-      - name: disable merge commits
-        if: always()
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-
       - name: create-pull-request
         uses: repo-sync/pull-request@v2
         id: pr
         with:
           source_branch: "test-rebase-release-4debe38e-develop"
           destination_branch: "test-develop"
-          pr_title: ${{ inputs.title }}
+          pr_title: 'chore: merge release to develop'
           pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
           pr_label: "auto-release-pr-develop"
           pr_allow_empty: false
@@ -68,3 +56,13 @@ jobs:
           pull-request-number: ${{ steps.pr.outputs.pr_number }}
           merge-method: merge
           token: ${{ secrets.MERGE_TOKEN }}
+      - name: disable merge commits
+        if: always()
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
