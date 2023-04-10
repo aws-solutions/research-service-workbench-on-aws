@@ -40,8 +40,6 @@ function LoginCallback() {
       localStorage.removeItem('codeVerifier');
 
       navigate('/', { replace: true });
-
-      //window.location.href = COGNITO_CALLBACK_URL;
     };
 
     void exchangeAuthorizationCode().catch(setTokenExchangeError);
