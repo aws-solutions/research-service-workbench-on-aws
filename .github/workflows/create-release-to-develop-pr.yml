@@ -12,25 +12,53 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
+      - name: enable merge commits
+        uses: octokit/request-action@v2.x
         with:
-          branch: test-rebase-release-4debe38e-develop
-          base: test-develop
-          title: 'chore: merge release to develop'
-          token: ${{ secrets.MERGE_TOKEN }}
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: merge
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
       - name: rebase-with-release
         run: |
           git checkout test-rebase-release-4debe38e-develop
           git merge test-release/4debe38e-5796-47b6-96ec-881a87e0df21 --no-ff --no-edit
+          git push origin test-rebase-release-4debe38e-develop
       - name: rebase-with-develop
         run: |
           git checkout test-rebase-release-4debe38e-develop
           git merge test-develop --no-ff --no-edit
+          git push origin test-rebase-release-4debe38e-develop
+
+      - name: disable merge commits
+        if: always()
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: create-pull-request
+        uses: repo-sync/pull-request@v2
+        id: pr
+        with:
+          source_branch: "test-rebase-release-4debe38e-develop"
+          destination_branch: "test-develop"
+          pr_title: ${{ inputs.title }}
+          pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
+          pr_label: "auto-release-pr-develop"
+          pr_allow_empty: false
+          github_token: ${{ secrets.MERGE_TOKEN }}
+      - name: Enable Pull Request Automerge
+        if: steps.pr.outputs.pr_created == 'true'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ steps.pr.outputs.pr_number }}
+          merge-method: merge
+          token: ${{ secrets.MERGE_TOKEN }}
