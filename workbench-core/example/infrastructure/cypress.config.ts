@@ -9,7 +9,7 @@ import { SSM } from '@aws-sdk/client-ssm';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import fs from 'fs';
 import yaml from 'js-yaml';
-import path, { join } from 'path';
+import { join } from 'path';
 import { merge } from 'lodash';
 import esbuild from 'esbuild';
 
@@ -70,11 +70,11 @@ const getEnvironmentVariables = async (stage: string) => {
   });
 
   await esbuild.build({
-    entryPoints: [path.join(__dirname, 'cypress/app/index.tsx')],
+    entryPoints: [join(__dirname, 'cypress/app/index.tsx')],
     bundle: true,
     platform: 'browser',
     target: 'node14',
-    outdir: path.join(__dirname, 'build/cypress'),
+    outdir: join(__dirname, 'build/cypress'),
     define: {
       COGNITO_USER_POOL_CLIENT_ID: `"${clientId}"`,
       COGNITO_DOMAIN_NAME: `"${cognitoDomainName}"`,
