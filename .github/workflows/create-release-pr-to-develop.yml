@@ -31,12 +31,7 @@ jobs:
       - name: rebase-with-release
         run: |
           git checkout rebase-$${{ github.ref_name }}
-          git merge origin/$${{ github.ref_name }} --no-ff --no-edit
-          git push origin rebase-$${{ github.ref_name }}
-      - name: rebase-with-develop
-        run: |
-          git checkout rebase-$${{ github.ref_name }}
-          git merge origin/develop --no-ff --no-edit
+          git merge origin/$${{ github.ref_name }} --no-ff --no-edit -X theirs
           git push origin rebase-$${{ github.ref_name }}
       - name: create-pull-request
         uses: repo-sync/pull-request@v2
@@ -56,6 +51,11 @@ jobs:
           pull-request-number: ${{ steps.pr.outputs.pr_number }}
           merge-method: merge
           token: ${{ secrets.MERGE_TOKEN }}
+      - name: rebase-with-develop
+        run: |
+          git checkout rebase-$${{ github.ref_name }}
+          git merge origin/develop --no-ff --no-edit
+          git push origin rebase-$${{ github.ref_name }}
       - name: disable merge commits
         if: always()
         uses: octokit/request-action@v2.x
