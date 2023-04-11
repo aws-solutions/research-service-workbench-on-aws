@@ -96,13 +96,11 @@ solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/integration-tests/config/testEnv.yaml
-!solutions/swb-reference/integration-tests/config/sam.yaml
 !solutions/swb-reference/integration-tests/config/release-candidate.yaml
 !solutions/swb-reference/integration-tests/config/release-candidate-private.yaml
 !solutions/swb-reference/integration-tests/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
-!solutions/swb-reference/src/config/sam.yaml
 !solutions/swb-reference/src/config/release-candidate.yaml
 !solutions/swb-reference/src/config/release-candidate-private.yaml
 !solutions/swb-reference/src/config/swbv2-private.yaml
