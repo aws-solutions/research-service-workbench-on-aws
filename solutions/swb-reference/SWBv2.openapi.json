@@ -59,9 +59,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       }
     },
@@ -90,9 +88,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "delete": {
@@ -119,9 +115,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "patch": {
@@ -171,9 +165,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -245,9 +237,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       }
     },
@@ -319,9 +309,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       },
       "parameters": [
@@ -360,9 +348,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "delete": {
@@ -389,9 +375,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -446,9 +430,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -495,9 +477,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -536,9 +516,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -595,9 +573,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "delete": {
@@ -624,9 +600,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -689,9 +663,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -738,9 +710,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -806,9 +776,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "post": {
@@ -842,7 +810,10 @@
                 "properties": {
                   "datasetIds": {
                     "type": "array",
-                    "items": {},
+                    "items": {
+                      "type": "string",
+                      "example": "dataset-123"
+                    },
                     "example": []
                   },
                   "description": {
@@ -879,9 +850,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       },
       "parameters": [
@@ -922,9 +891,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -974,9 +941,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -1026,9 +991,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -1061,15 +1024,7 @@
         "operationId": "listEnvironments",
         "parameters": [
           {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "COMPLETED"
-            }
-          },
-          {
-            "name": "name",
+            "name": "filter[name][begins]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1077,39 +1032,15 @@
             }
           },
           {
-            "name": "createdAtFrom",
+            "name": "filter[status][eq]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2022-05-13T20:03:54.055Z"
+              "example": "COMPLETED"
             }
           },
           {
-            "name": "createdAtTo",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2022-05-13T20:03:54.055Z"
-            }
-          },
-          {
-            "name": "owner",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "user-123"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "envType-123"
-            }
-          },
-          {
-            "name": "project",
+            "name": "filter[projectId][eq]",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1117,31 +1048,79 @@
             }
           },
           {
-            "name": "ascending",
+            "name": "filter[owner][eq]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "name"
+              "example": "user-123"
             }
           },
           {
-            "name": "descending",
+            "name": "filter[createdAt][between][value1]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "name"
+              "example": "2022-05-13T20:03:54.055Z"
             }
           },
           {
-            "name": "paginationToken",
+            "name": "filter[createdAt][between][value2]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": ""
+              "example": "2026-05-13T20:03:54.055Z"
+            }
+          },
+          {
+            "name": "sort[name]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "sort[status]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "sort[projectId]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "sort[owner]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "asc"
+            }
+          },
+          {
+            "name": "sort[createdAt]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "desc"
             }
           },
           {
             "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "paginationToken",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1166,9 +1145,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       }
     },
@@ -1197,9 +1174,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -1249,9 +1224,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "patch": {
@@ -1306,9 +1279,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -1349,9 +1320,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       }
     },
@@ -1396,9 +1365,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "post": {
@@ -1444,7 +1411,10 @@
                   },
                   "params": {
                     "type": "array",
-                    "items": {},
+                    "items": {
+                      "type": "string",
+                      "example": "param1"
+                    },
                     "example": []
                   },
                   "type": {
@@ -1464,9 +1434,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       },
       "parameters": [
@@ -1483,6 +1451,262 @@
       ]
     },
     "/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}": {
+      "get": {
+        "tags": ["envTypeConfig"],
+        "summary": "Get envTypeConfig",
+        "description": "Get envTypeConfig",
+        "operationId": "getEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "delete": {
+        "tags": ["envTypeConfig"],
+        "summary": "Soft Delete envTypeConfig",
+        "description": "Soft Delete envTypeConfig",
+        "operationId": "softDeleteEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      },
+      "patch": {
+        "tags": ["envTypeConfig"],
+        "summary": "Update envTypeConfig",
+        "description": "Update envTypeConfig",
+        "operationId": "updateEnvtypeconfig",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "example": "Example config 1"
+                  },
+                  "estimatedCost": {
+                    "type": "string",
+                    "example": "estimatedCost"
+                  }
+                }
+              },
+              "example": {
+                "description": "Example config 1",
+                "estimatedCost": "estimatedCost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with this config"
+        },
+        {
+          "name": "envTypeConfigId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type config to associate"
+        }
+      ]
+    },
+    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations": {
+      "get": {
+        "tags": ["projects"],
+        "summary": "List Environment Type Configs for Project",
+        "description": "List Environment Type Configs for Project",
+        "operationId": "listEnvironmentTypeConfigsForProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project to list EnvTypeConfigs for"
+        },
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with environment Type Configuration"
+        }
+      ]
+    },
+    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}": {
+      "get": {
+        "tags": ["envTypeConfig"],
+        "summary": "Get EnvTypeConfig associated with Project",
+        "description": "Get EnvTypeConfig associated with Project",
+        "operationId": "getEnvtypeconfigAssociatedWithProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of project associated with environment Type Configuration"
+        },
+        {
+          "name": "envTypeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type associated with environment Type Configuration"
+        },
+        {
+          "name": "envTypeConfigId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          },
+          "description": "ID of environment type config to associate"
+        }
+      ]
+    },
+    "/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}/projects": {
       "get": {
         "tags": ["envTypeConfig"],
         "summary": "List projects by envTypeConfig",
@@ -1523,74 +1747,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      },
-      "delete": {
-        "tags": ["envTypeConfig"],
-        "summary": "Soft Delete envTypeConfig",
-        "description": "Soft Delete envTypeConfig",
-        "operationId": "softDeleteEnvtypeconfig",
-        "parameters": [
-          {
-            "name": "Cookie",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
-            }
-          },
-          {
-            "name": "csrf-token",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "{{CSRF_TOKEN}}"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      },
-      "patch": {
-        "tags": ["envTypeConfig"],
-        "summary": "Update envTypeConfig",
-        "description": "Update envTypeConfig",
-        "operationId": "updateEnvtypeconfig",
-        "parameters": [
-          {
-            "name": "Cookie",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
-            }
-          },
-          {
-            "name": "csrf-token",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "{{CSRF_TOKEN}}"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "example": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }"
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -1612,123 +1769,7 @@
             "type": "string",
             "example": ""
           },
-          "description": "ID of environment type config to associate"
-        }
-      ]
-    },
-    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations": {
-      "get": {
-        "tags": ["projects"],
-        "summary": "Get EnvTypeConfigs associated with Project",
-        "description": "Get EnvTypeConfigs associated with Project",
-        "operationId": "getEnvtypeconfigsAssociatedWithProject",
-        "parameters": [
-          {
-            "name": "Cookie",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
-            }
-          },
-          {
-            "name": "csrf-token",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "{{CSRF_TOKEN}}"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "projectId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "ID of project to associate"
-        },
-        {
-          "name": "envTypeId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "ID of environment type associated with environment Type Configuration"
-        }
-      ]
-    },
-    "/projects/{projectId}/environmentTypes/{envTypeId}/configurations/{envTypeConfigId}": {
-      "get": {
-        "tags": ["envTypeConfig"],
-        "summary": "Get EnvTypeConfig associated with Project",
-        "description": "Get EnvTypeConfig associated with Project",
-        "operationId": "getEnvtypeconfigAssociatedWithProject",
-        "parameters": [
-          {
-            "name": "Cookie",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
-            }
-          },
-          {
-            "name": "csrf-token",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "example": "{{CSRF_TOKEN}}"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "projectId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "ID of project to associate"
-        },
-        {
-          "name": "envTypeId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "ID of environment type associated with environment Type Configuration"
-        },
-        {
-          "name": "envTypeConfigId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": ""
-          },
-          "description": "ID of environment type config to associate"
+          "description": "ID of environment type config"
         }
       ]
     },
@@ -1757,16 +1798,14 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "delete": {
         "tags": ["projects"],
-        "summary": "Delete project",
-        "description": "Delete project",
-        "operationId": "deleteProject",
+        "summary": "Soft Delete Project",
+        "description": "Soft Delete Project",
+        "operationId": "softDeleteProject",
         "parameters": [
           {
             "name": "Cookie",
@@ -1786,9 +1825,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "patch": {
@@ -1838,9 +1875,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -1968,15 +2003,13 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "post": {
         "tags": ["projects"],
-        "summary": "Create project",
-        "description": "Create project",
+        "summary": "Create Project",
+        "description": "Create Project",
         "operationId": "createProject",
         "parameters": [
           {
@@ -2025,9 +2058,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       }
     },
@@ -2056,9 +2087,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "delete": {
@@ -2085,9 +2114,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -2099,7 +2126,7 @@
             "type": "string",
             "example": ""
           },
-          "description": "ID of project to associate"
+          "description": "ID of project to unassociate"
         },
         {
           "name": "envTypeId",
@@ -2119,7 +2146,7 @@
             "type": "string",
             "example": ""
           },
-          "description": "ID of environment type config to associate"
+          "description": "ID of environment type config to unassociate"
         }
       ]
     },
@@ -2156,9 +2183,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -2216,9 +2241,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "delete": {
@@ -2245,9 +2268,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
@@ -2296,9 +2317,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "post": {
@@ -2353,9 +2372,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "201": {}
         }
       }
     },
@@ -2384,9 +2401,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "patch": {
@@ -2455,9 +2470,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "200": {}
         }
       },
       "parameters": [
@@ -2497,14 +2510,410 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          }
+          "204": {}
         }
       },
       "parameters": [
         {
           "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/awsAccounts": {
+      "get": {
+        "tags": ["hostingAccounts"],
+        "summary": "List Hosting Account",
+        "description": "List Hosting Account",
+        "operationId": "listHostingAccount",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "50"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "post": {
+        "tags": ["hostingAccounts"],
+        "summary": "Create Hosting Account",
+        "description": "Create Hosting Account",
+        "operationId": "createHostingAccount",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "awsAccountId": {
+                    "type": "string",
+                    "example": ""
+                  },
+                  "envMgmtRoleArn": {
+                    "type": "string",
+                    "example": ""
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "example": "workbench"
+                  },
+                  "hostingAccountHandlerRoleArn": {
+                    "type": "string",
+                    "example": ""
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": ""
+                  }
+                }
+              },
+              "example": {
+                "awsAccountId": "",
+                "envMgmtRoleArn": "",
+                "externalId": "workbench",
+                "hostingAccountHandlerRoleArn": "",
+                "name": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {}
+        }
+      }
+    },
+    "/awsAccounts/{accountId}": {
+      "get": {
+        "tags": ["hostingAccounts"],
+        "summary": "Get Hosting Account",
+        "description": "Get Hosting Account",
+        "operationId": "getHostingAccount",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "patch": {
+        "tags": ["hostingAccounts"],
+        "summary": "Update Hosting Account",
+        "description": "Update Hosting Account",
+        "operationId": "updateHostingAccount",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "sampleName"
+                  }
+                }
+              },
+              "example": {
+                "name": "sampleName"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "accountId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/awsAccountTemplateUrls": {
+      "post": {
+        "tags": ["hostingAccounts"],
+        "summary": "Hosting Account Template Urls",
+        "description": "Hosting Account Template Urls",
+        "operationId": "hostingAccountTemplateUrls",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "externalId": {
+                    "type": "string",
+                    "example": "workbench"
+                  }
+                }
+              },
+              "example": {
+                "externalId": "workbench"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {}
+        }
+      }
+    },
+    "/projects/{projectId}/sshKeys": {
+      "get": {
+        "tags": ["sshKeys"],
+        "summary": "List User SSH Keys for Project",
+        "description": "List User SSH Keys for Project",
+        "operationId": "listUserSshKeysForProject",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "post": {
+        "tags": ["sshKeys"],
+        "summary": "Create SSH Key",
+        "description": "Create SSH Key",
+        "operationId": "createSshKey",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "201": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/projects/{projectId}/sshKeys/{sshKeyId}/purge": {
+      "delete": {
+        "tags": ["sshKeys"],
+        "summary": "Delete SSH Key",
+        "description": "Delete SSH Key",
+        "operationId": "deleteSshKey",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        },
+        {
+          "name": "sshKeyId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      ]
+    },
+    "/environments/{environmentId}/sshKeys": {
+      "get": {
+        "tags": ["sshKeys"],
+        "summary": "Send SSH Public Key",
+        "description": "Send SSH Public Key",
+        "operationId": "sendSshPublicKey",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {}
+        }
+      },
+      "parameters": [
+        {
+          "name": "environmentId",
           "in": "path",
           "required": true,
           "schema": {
@@ -2536,6 +2945,12 @@
     },
     {
       "name": "users"
+    },
+    {
+      "name": "hostingAccounts"
+    },
+    {
+      "name": "sshKeys"
     }
   ]
 }
