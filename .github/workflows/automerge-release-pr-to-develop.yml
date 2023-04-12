@@ -8,7 +8,7 @@ on:
 
 jobs:
   automerge-relese-pr-to-develop:
-    runs-on: ubunut-20.04
+    runs-on: ubuntu-20.04
     if: contains(github.event.pull_request.labels.*.name, 'automerge-enabled') && contains(github.event.pull_request.labels.*.name, 'auto-release-pr-develop')
     steps:
       - uses: actions/checkout@v3
