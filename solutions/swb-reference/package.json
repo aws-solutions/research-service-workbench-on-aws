@@ -25,7 +25,7 @@
     "cognito-tokens": "node scripts/generateCognitoTokens.js ${EMAIL} ${PASSWORD}",
     "compile": "node scripts/buildLambda.js",
     "depcheck": "depcheck",
-    "integration-tests": "rushx build && jest lib/integration-tests/tests/isolated/datasets -i",
+    "integration-tests": "rushx build && jest lib/integration-tests -i",
     "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
