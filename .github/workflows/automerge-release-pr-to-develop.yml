@@ -1,0 +1,51 @@
+name: automerge-relese-pr-to-develop
+on:
+  pull_request:
+    types:
+      - labeled
+    branches:
+      - 'test-develop'
+
+jobs:
+  automerge-relese-pr-to-develop:
+    runs-on: ubunut-20.04
+    if: contains(github.event.pull_request.labels.*.name, 'automerge-enabled') && contains(github.event.pull_request.labels.*.name, 'auto-release-pr-develop')
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+      - name: enable merge commits and automerge
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+          allow_auto_merge: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      - name: Enable Pull Request Automerge
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: merge
+          token: ${{ secrets.MERGE_TOKEN }}
+      - name: disable merge commits and automerge
+        if: always()
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+          allow_auto_merge: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      - name: remove automerge label
+        if: failure()
+      - uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: automerge-enabled
+          github_token: ${{ secrets.MERGE_TOKEN }}
+          number: ${{ github.event.pull_request.number }}

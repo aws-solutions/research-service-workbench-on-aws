@@ -35,34 +35,6 @@ jobs:
           pr_label: "auto-release-pr-develop"
           pr_allow_empty: false
           github_token: ${{ secrets.MERGE_TOKEN }}
-      - name: enable merge commits and automerge
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: true
-          allow_auto_merge: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-      - name: Enable Pull Request Automerge
-        if: steps.pr.outputs.pr_created == 'true'
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          pull-request-number: ${{ steps.pr.outputs.pr_number }}
-          merge-method: merge
-          token: ${{ secrets.MERGE_TOKEN }}
-      - name: disable merge commits and automerge
-        if: always()
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: false
-          allow_auto_merge: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       - name: rebase-with-develop
         run: |
           git checkout test-rebase-release-4debe38e-develop
