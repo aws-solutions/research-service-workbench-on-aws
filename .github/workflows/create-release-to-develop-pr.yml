@@ -12,15 +12,6 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: enable merge commits
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -33,11 +24,6 @@ jobs:
           git checkout test-rebase-release-4debe38e-develop
           git merge origin/test-release/4debe38e-5796-47b6-96ec-881a87e0df21 --no-ff --no-edit
           git push origin test-rebase-release-4debe38e-develop
-      - name: rebase-with-develop
-        run: |
-          git checkout test-rebase-release-4debe38e-develop
-          git merge origin/test-develop --no-ff --no-edit
-          git push origin test-rebase-release-4debe38e-develop
       - name: create-pull-request
         uses: repo-sync/pull-request@v2
         id: pr
@@ -49,6 +35,16 @@ jobs:
           pr_label: "auto-release-pr-develop"
           pr_allow_empty: false
           github_token: ${{ secrets.MERGE_TOKEN }}
+      - name: enable merge commits and automerge
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+          allow_auto_merge: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       - name: Enable Pull Request Automerge
         if: steps.pr.outputs.pr_created == 'true'
         uses: peter-evans/enable-pull-request-automerge@v3
@@ -56,7 +52,7 @@ jobs:
           pull-request-number: ${{ steps.pr.outputs.pr_number }}
           merge-method: merge
           token: ${{ secrets.MERGE_TOKEN }}
-      - name: disable merge commits
+      - name: disable merge commits and automerge
         if: always()
         uses: octokit/request-action@v2.x
         with:
@@ -64,5 +60,11 @@ jobs:
           owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: false
+          allow_auto_merge: false
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      - name: rebase-with-develop
+        run: |
+          git checkout test-rebase-release-4debe38e-develop
+          git merge origin/test-develop --no-ff --no-edit
+          git push origin test-rebase-release-4debe38e-develop
