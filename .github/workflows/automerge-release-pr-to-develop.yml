@@ -44,7 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       - name: remove automerge label
         if: failure()
-      - uses: actions-ecosystem/action-remove-labels@v1
+        uses: actions-ecosystem/action-remove-labels@v1
         with:
           labels: automerge-enabled
           github_token: ${{ secrets.MERGE_TOKEN }}
