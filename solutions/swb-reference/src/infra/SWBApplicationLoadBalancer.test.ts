@@ -7,7 +7,7 @@ import { Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { SWBApplicationLoadBalancer, SWBApplicationLoadBalancerProps } from './SWBApplicationLoadBalancer';
 
 describe('SWBApplicationLoadBalancer tests', () => {
@@ -21,7 +21,9 @@ describe('SWBApplicationLoadBalancer tests', () => {
       vpc: new Vpc(stack, 'testVPC'),
       subnets: {},
       internetFacing: true,
-      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {})
+      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {
+        objectOwnership: ObjectOwnership.OBJECT_WRITER
+      })
     };
     new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
@@ -58,7 +60,9 @@ describe('SWBApplicationLoadBalancer tests', () => {
       vpc: vpc,
       subnets: vpc.selectSubnets({ subnetType: SubnetType.PUBLIC }),
       internetFacing: true,
-      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {})
+      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {
+        objectOwnership: ObjectOwnership.OBJECT_WRITER
+      })
     };
     new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
@@ -95,7 +99,9 @@ describe('SWBApplicationLoadBalancer tests', () => {
       vpc: vpc,
       subnets: vpc.selectSubnets({ subnetType: SubnetType.PRIVATE_WITH_NAT }),
       internetFacing: false,
-      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {})
+      accessLogsBucket: new Bucket(stack, 'testS3AccessLogsBucket', {
+        objectOwnership: ObjectOwnership.OBJECT_WRITER
+      })
     };
     new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
