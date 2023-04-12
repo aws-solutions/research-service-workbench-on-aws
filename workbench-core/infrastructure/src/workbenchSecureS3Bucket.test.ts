@@ -5,7 +5,7 @@
 
 import { RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
 import { WorkbenchSecureS3Bucket } from './workbenchSecureS3Bucket';
 
@@ -21,7 +21,8 @@ describe('SecureS3Bucket Test', () => {
       versioned: true,
       enforceSSL: true,
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
 
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {
@@ -52,6 +53,13 @@ describe('SecureS3Bucket Test', () => {
       },
       VersioningConfiguration: {
         Status: 'Enabled'
+      },
+      OwnershipControls: {
+        Rules: [
+          {
+            ObjectOwnership: 'ObjectWriter'
+          }
+        ]
       }
     });
 
@@ -69,7 +77,8 @@ describe('SecureS3Bucket Test', () => {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       versioned: true,
       enforceSSL: true,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
@@ -93,7 +102,8 @@ describe('SecureS3Bucket Test', () => {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       versioned: true,
       enforceSSL: true,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {
       encryption: BucketEncryption.S3_MANAGED,
@@ -120,7 +130,8 @@ describe('SecureS3Bucket Test', () => {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       versioned: true,
       enforceSSL: true,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     const encryptionKey = new WorkbenchEncryptionKeyWithRotation(stack, 'test-EncryptionKey');
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {
@@ -152,7 +163,8 @@ describe('SecureS3Bucket Test', () => {
       versioned: true,
       enforceSSL: true,
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {
       serverAccessLogsPrefix: 'test-s3-bucket-access-log',

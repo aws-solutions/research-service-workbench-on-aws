@@ -34,7 +34,7 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
-import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 
@@ -352,7 +352,8 @@ export class ExampleStack extends Stack {
       enforceSSL: true,
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true
+      autoDeleteObjects: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
 
     exampleS3AccessLogsBucket.addToResourcePolicy(
