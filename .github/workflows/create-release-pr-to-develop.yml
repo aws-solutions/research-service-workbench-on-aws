@@ -8,17 +8,6 @@ jobs:
   rebase-release:
     runs-on: ubuntu-20.04
     steps:
-      - name: create-pull-request
-        uses: repo-sync/pull-request@v2
-        id: pr
-        with:
-          source_branch: "rebase-${{ github.ref_name }}"
-          destination_branch: "develop"
-          pr_title: 'chore: merge ${{ github.ref_name }} to develop'
-          pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
-          pr_label: "auto-release-pr-to-develop"
-          pr_allow_empty: true
-          github_token: ${{ secrets.MERGE_TOKEN }}
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.MERGE_TOKEN }}
@@ -40,3 +29,15 @@ jobs:
           git checkout rebase-${{ github.ref_name }}
           git merge origin/develop --no-ff --no-edit
           git push origin rebase-${{ github.ref_name }}
+      - name: create-pull-request
+        if: always()
+        uses: repo-sync/pull-request@v2
+        id: pr
+        with:
+          source_branch: "rebase-${{ github.ref_name }}"
+          destination_branch: "develop"
+          pr_title: 'chore: merge ${{ github.ref_name }} to develop'
+          pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
+          pr_label: "auto-release-pr-to-develop"
+          pr_allow_empty: true
+          github_token: ${{ secrets.MERGE_TOKEN }}
