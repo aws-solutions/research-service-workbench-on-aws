@@ -46,7 +46,7 @@ import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
-import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
@@ -698,7 +698,8 @@ export class SWBStack extends Stack {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
-      versioned: true
+      versioned: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
 
     s3Bucket.addToResourcePolicy(
@@ -827,7 +828,8 @@ export class SWBStack extends Stack {
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
       encryptionKey: encryptionKey,
-      versioned: true
+      versioned: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
