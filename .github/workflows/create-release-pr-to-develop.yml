@@ -12,15 +12,6 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: enable merge commits
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -44,25 +35,8 @@ jobs:
           pr_label: "auto-release-pr-to-develop"
           pr_allow_empty: false
           github_token: ${{ secrets.MERGE_TOKEN }}
-      - name: Enable Pull Request Automerge
-        if: steps.pr.outputs.pr_created == 'true'
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          pull-request-number: ${{ steps.pr.outputs.pr_number }}
-          merge-method: merge
-          token: ${{ secrets.MERGE_TOKEN }}
       - name: rebase-with-develop
         run: |
           git checkout rebase-${{ github.ref_name }}
           git merge origin/develop --no-ff --no-edit
           git push origin rebase-${{ github.ref_name }}
-      - name: disable merge commits
-        if: always()
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}
-          owner: aws-solutions
-          repo: solution-spark-on-aws
-          allow_merge_commit: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
