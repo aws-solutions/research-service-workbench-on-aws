@@ -239,7 +239,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
-      aws-cdk: ^2.72.1
       aws-cdk-lib: ^2.72.1
       aws-sdk-client-mock: ^0.6.2
       constructs: ^10.0.0
@@ -281,7 +280,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 18.15.11
-      aws-cdk: 2.73.0
       aws-cdk-lib: 2.73.0_constructs@10.1.25
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       constructs: 10.1.25
@@ -643,7 +641,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
-      aws-cdk: ^2.72.1
       aws-cdk-lib: ^2.72.1
       aws-sdk-client-mock: ^0.6.2
       constructs: ^10.0.0
@@ -685,7 +682,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 18.15.11
-      aws-cdk: 2.73.0
       aws-cdk-lib: 2.73.0_constructs@10.1.25
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       constructs: 10.1.25
