@@ -218,10 +218,11 @@ export class SWBProjectService implements ProjectPlugin {
       ...this._generateIdentityPermissions(
         '*',
         SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-        ['CREATE', 'READ'],
+        ['CREATE', 'READ', 'DELETE'],
         paRole,
         { projectId: { $eq: projectId } }
       ),
+      // Adding a permission for SSH Key
       ...this._generateIdentityPermissions(
         '*',
         SwbAuthZSubject.SWB_SSH_KEY,
@@ -230,7 +231,10 @@ export class SWBProjectService implements ProjectPlugin {
         {
           projectId: { $eq: projectId }
         }
-      )
+      ),
+      // Adding a permission for ListUsers so that as soon as a Project Admin gets added to their first project
+      // they can begin to call ListUsers
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_USER, ['READ'], paRole)
     ];
   }
 
