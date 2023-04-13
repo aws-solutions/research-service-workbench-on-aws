@@ -19,11 +19,6 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-      - name: rebase-with-release
-        run: |
-          git checkout rebase-${{ github.ref_name }}
-          git merge origin/${{ github.ref_name }} --no-ff --no-edit -X theirs
-          git push origin rebase-${{ github.ref_name }}
       - name: create-pull-request
         uses: repo-sync/pull-request@v2
         id: pr
@@ -33,8 +28,13 @@ jobs:
           pr_title: 'chore: merge ${{ github.ref_name }} to develop'
           pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
           pr_label: "auto-release-pr-to-develop"
-          pr_allow_empty: false
+          pr_allow_empty: true
           github_token: ${{ secrets.MERGE_TOKEN }}
+      - name: rebase-with-release
+        run: |
+          git checkout rebase-${{ github.ref_name }}
+          git merge origin/${{ github.ref_name }} --no-ff --no-edit
+          git push origin rebase-${{ github.ref_name }}
       - name: rebase-with-develop
         run: |
           git checkout rebase-${{ github.ref_name }}
