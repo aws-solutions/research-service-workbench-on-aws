@@ -64,7 +64,6 @@
     "@types/heft-jest": "1.0.2",
     "@types/lodash": "^4.14.181",
     "@types/node": "^18.15.11",
-    "aws-cdk": "^2.72.1",
     "aws-cdk-lib": "^2.72.1",
     "aws-sdk-client-mock": "^0.6.2",
     "constructs": "^10.0.0",
