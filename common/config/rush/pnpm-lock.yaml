@@ -156,6 +156,7 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       qs: ^6.11.0
       sort-package-json: ^1.57.0
+      ts-jest: ^27.1.3
       ts-node: ^10.4.0
       typescript: ^4.5.2
       uuid: ^8.3.2
@@ -214,6 +215,7 @@ importers:
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_5bj2o3dcjliztyiwap3x4pk5tu
       sort-package-json: 1.57.0
+      ts-jest: 27.1.5_mztvuepcugxdxu5jjolcbqoxii
       ts-node: 10.8.0_exsqkxc76kw3xnrazzemrnx5cq
       typescript: 4.7.2
 
@@ -7777,7 +7779,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001477
+      caniuse-lite: 1.0.30001478
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -7894,8 +7896,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001477:
-    resolution: {integrity: sha512-lZim4iUHhGcy5p+Ri/G7m84hJwncj+Kz7S5aD4hoQfslKZJgt0tHc/hafVbqHC5bbhHb+mrW2JOUHkI5KH7toQ==}
+  /caniuse-lite/1.0.30001478:
+    resolution: {integrity: sha512-gMhDyXGItTHipJj2ApIvR+iVB5hd0KP3svMWWXDvZOmjzJJassGLMfxRkQCSYgGd2gtdL/ReeiyvMSFD1Ss6Mw==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -11862,7 +11864,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001477
+      caniuse-lite: 1.0.30001478
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -13878,7 +13880,7 @@ packages:
       json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.3.7
+      semver: 7.3.8
       typescript: 4.7.2
       yargs-parser: 20.2.9
     dev: true
@@ -13911,7 +13913,7 @@ packages:
       json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.3.7
+      semver: 7.3.8
       typescript: 4.7.4
       yargs-parser: 20.2.9
     dev: true
@@ -13945,7 +13947,41 @@ packages:
       json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
-      semver: 7.3.7
+      semver: 7.3.8
+      typescript: 4.7.2
+      yargs-parser: 20.2.9
+    dev: true
+
+  /ts-jest/27.1.5_mztvuepcugxdxu5jjolcbqoxii:
+    resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
+    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
+    hasBin: true
+    peerDependencies:
+      '@babel/core': '>=7.0.0-beta.0 <8'
+      '@types/jest': ^27.0.0
+      babel-jest: '>=27.0.0 <28'
+      esbuild: '*'
+      jest: ^27.0.0
+      typescript: '>=3.8 <5.0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@types/jest':
+        optional: true
+      babel-jest:
+        optional: true
+      esbuild:
+        optional: true
+    dependencies:
+      bs-logger: 0.2.6
+      esbuild: 0.14.42
+      fast-json-stable-stringify: 2.1.0
+      jest: 27.5.1_ts-node@10.8.0
+      jest-util: 27.5.1
+      json5: 2.2.2
+      lodash.memoize: 4.1.2
+      make-error: 1.3.6
+      semver: 7.3.8
       typescript: 4.7.2
       yargs-parser: 20.2.9
     dev: true

@@ -233,7 +233,7 @@ export class SWBProjectService implements ProjectPlugin {
         }
       ),
       // Adding a permission for ListUsers so that as soon as a Project Admin gets added to their first project
-      // they can begin to call ListUsers
+      // they can begin to call ListUsers and GetUser
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_USER, ['READ'], paRole)
     ];
   }
