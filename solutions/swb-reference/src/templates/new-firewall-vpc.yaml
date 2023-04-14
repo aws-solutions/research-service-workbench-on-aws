@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Description: >-
-  Security VPC Deployment: VM-Series Deployment with AWS Gateway Load Balancer (GWLB)
+  Security VPC Deployment: Network Firewall (e.g. VM-Series) Deployment with AWS Gateway Load Balancer (GWLB)
 # ======================================================================================================================
 #   Parameters
 # ======================================================================================================================
@@ -12,7 +12,7 @@ Parameters:
 
   RemoteManagementCIDR:
     Description: >-
-      Remote Management CIDR to be allowed management access to VM-Series Firewall (e.g. 192.168.0.0/25)
+      Remote Management CIDR to be allowed management access to Network Firewall (e.g. 192.168.0.0/25)
     Type: String
     Default: 0.0.0.0/0
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})
@@ -28,19 +28,19 @@ Parameters:
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: Must be in a CIDR (e.g. 192.168.0.0/25)
 
-# VMSeriesDataSubnet Subnets CIDRs
+# FirewallDataSubnet Subnets CIDRs
 
-  SecurityVPCVMSeriesDataSubnetCIDRAZ1:
+  SecurityVPCFirewallDataSubnetCIDRAZ1:
     Description: >-
-      CIDR for VMSeries Data Subnet (e.g. 10.0.0.0/28)
+      CIDR for Network Firewall Data Subnet (e.g. 10.0.0.0/28)
     Type: String
     Default: 10.0.0.0/28
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: Must be in a CIDR (e.g. 192.168.0.0/28)
 
-  SecurityVPCVMSeriesDataSubnetCIDRAZ2:
+  SecurityVPCFirewallDataSubnetCIDRAZ2:
     Description: >-
-      CIDR for VMSeries Data Subnet (e.g. 10.0.0.16/28)
+      CIDR for Network Firewall Data Subnet (e.g. 10.0.0.16/28)
     Type: String
     Default: 10.0.0.16/28
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
@@ -100,9 +100,9 @@ Parameters:
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: Must be in a CIDR (e.g. 192.168.0.0/28)
 
-# VM-Series Instance
+# Network Firewall (e.g. VM-Series) Instance
 
-  VMSeriesInstanceType:
+  FirewallInstanceType:
     Description: >-
       More information follow this link: https://docs.paloaltonetworks.com/vm-series/10-0/vm-series-performance-capacity/vm-series-performance-capacity/vm-series-on-aws-models-and-instances.html
     Type: String
@@ -143,17 +143,17 @@ Parameters:
       - c5n.18xlarge
     Default: m5.xlarge
 
-  VMSeriesAMI:
+  FirewallAMI:
     Description: >-
       AMI reference in the format 'ami-00000000000' for PAN-OS v10.0.2 or above.
     Type: AWS::EC2::Image::Id
 
   EC2KeyPair:
     Description: >-
-      AWS EC2 Instance Key Pair for authentication to the VM-Series Firewalls.
+      AWS EC2 Instance Key Pair for authentication to the Network Firewall (e.g. VM-Series).
     Type: AWS::EC2::KeyPair::KeyName
     AllowedPattern: .+
-    ConstraintDescription: Must set an EC2 Key Pair for VM-Series
+    ConstraintDescription: Must set an EC2 Key Pair for Network Firewall (e.g. VM-Series)
 
   TGWID:
     Description: >-
@@ -162,9 +162,9 @@ Parameters:
     AllowedPattern: tgw-\w{1,30}|^$
     ConstraintDescription: Must be a valid TGW ID (e.g. tgw-0a983c84cfca39f4c) or left blank for No TGW Attachment
 
-  VmseriesBootstrapS3BucketName:
+  FirewallBootstrapS3BucketName:
     Description: >-
-      Enter a AWS S3 Bucket containing the VM-Series Bootstrap files and folders or leave blank if you chose not to configure the firewalls with Bootstrap. For more information follow this link: https://docs.paloaltonetworks.com/vm-series/10-0/vm-series-deployment/bootstrap-the-vm-series-firewall.html
+      Enter a AWS S3 Bucket containing the Network Firewall (e.g. VM-Series) Bootstrap files and folders or leave blank if you chose not to configure the firewalls with Bootstrap. For more information follow this link: https://docs.paloaltonetworks.com/vm-series/10-0/vm-series-deployment/bootstrap-the-vm-series-firewall.html
     Type: String
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$|^$
     ConstraintDescription: Must be a valid S3 Bucket name or left blank for no Bootstrap.
@@ -181,8 +181,8 @@ Metadata:
           default: "Security VPC"
         Parameters:
           - SecurityVPCCIDR
-          - SecurityVPCVMSeriesDataSubnetCIDRAZ1
-          - SecurityVPCVMSeriesDataSubnetCIDRAZ2
+          - SecurityVPCFirewallDataSubnetCIDRAZ1
+          - SecurityVPCFirewallDataSubnetCIDRAZ2
           - SecurityVPCGWLBESubnetCIDRAZ1
           - SecurityVPCGWLBESubnetCIDRAZ2
           - SecurityVPCNATGWSubnetCIDRAZ1
@@ -191,12 +191,12 @@ Metadata:
           - SecurityVPCTGWSubnetCIDRAZ2 
       -
         Label:
-          default: "VM-Series Deployment"
+          default: "Network Firewall Deployment"
         Parameters:
-          - VMSeriesAMI
-          - VMSeriesInstanceType
+          - FirewallAMI
+          - FirewallInstanceType
           - EC2KeyPair
-          - VmseriesBootstrapS3BucketName
+          - FirewallBootstrapS3BucketName
       -
         Label:
           default: "Transit Gateway Attachment"
@@ -209,16 +209,16 @@ Metadata:
           - RemoteManagementCIDR
 
     ParameterLabels:
-      VmseriesBootstrapS3BucketName:
-        default: "AWS S3 Bucket Name containing the VM-Series Bootstrap Information:"
+      FirewallBootstrapS3BucketName:
+        default: "AWS S3 Bucket Name containing the Network Firewall (e.g. VM-Series) Bootstrap Information:"
       TGWID:
         default: "Specify which AWS Transit Gateway to attach to:"
       SecurityVPCCIDR:
         default: "IP CIDR for the Security VPC"
-      SecurityVPCVMSeriesDataSubnetCIDRAZ1:
-        default: "IP CIDR for VM-Series Data Plane Interface in AZ1"
-      SecurityVPCVMSeriesDataSubnetCIDRAZ2:
-        default: "IP CIDR for VM-Series Data Plane Interface in AZ2"
+      SecurityVPCFirewallDataSubnetCIDRAZ1:
+        default: "IP CIDR for Network Firewall (e.g. VM-Series) Data Plane Interface in AZ1"
+      SecurityVPCFirewallDataSubnetCIDRAZ2:
+        default: "IP CIDR for Network Firewall (e.g. VM-Series) Data Plane Interface in AZ2"
       SecurityVPCGWLBESubnetCIDRAZ1:
         default: "IP CIDR for GWLB Endpoint in AZ1"
       SecurityVPCGWLBESubnetCIDRAZ2:
@@ -231,14 +231,14 @@ Metadata:
         default: "IP CIDR for TGW Attachment in AZ1"
       SecurityVPCTGWSubnetCIDRAZ2:
         default: "IP CIDR for TGW Attachment in AZ2"
-      VMSeriesAMI:
-        default: "AMI ID of VM-Series"
-      VMSeriesInstanceType:
-        default: "EC2 Instance Type for VM-Series"
+      FirewallAMI:
+        default: "AMI ID of Network Firewall (e.g. VM-Series)"
+      FirewallInstanceType:
+        default: "EC2 Instance Type for Network Firewall (e.g. VM-Series)"
       EC2KeyPair:
         default: "EC2 Keypair for Authentication to EC2 Instances"
       RemoteManagementCIDR:
-        default: "IP CIDR for Allowed Remote Management of the VM-Series"
+        default: "IP CIDR for Allowed Remote Management of the Network Firewall (e.g. VM-Series)"
 
 # ======================================================================================================================
 #   Conditions
@@ -247,7 +247,7 @@ Metadata:
 Conditions:
   #CreateAttachmentToTGW: !Not [!Equals [!Ref TGWID, ""]]
   NoExistingTGW: !Equals [!Ref TGWID, ""]
-  BootstrapVmseries: !Not [!Equals [!Ref VmseriesBootstrapS3BucketName, ""]]
+  BootstrapFirewall: !Not [!Equals [!Ref FirewallBootstrapS3BucketName, ""]]
 
 # ======================================================================================================================
 #   Resources
@@ -431,25 +431,25 @@ Resources:
 #-----------------------------------------------------------------------------------------------------------------------
 # Firewall Data Subnets
 #-----------------------------------------------------------------------------------------------------------------------
-  VMSeriesDataSubnetAZ1:
+  FirewallDataSubnetAZ1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref SecurityVPC
-      CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ1
+      CidrBlock: !Ref SecurityVPCFirewallDataSubnetCIDRAZ1
       AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       Tags:
         - Key: Name
-          Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ1']]
+          Value: !Join ['-' , [!Ref "AWS::StackName", 'Firewall-Data-AZ1']]
 
-  VMSeriesDataSubnetAZ2:
+  FirewallDataSubnetAZ2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref SecurityVPC
-      CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ2
+      CidrBlock: !Ref SecurityVPCFirewallDataSubnetCIDRAZ2
       AvailabilityZone: !Select [ 1, !GetAZs  '' ]
       Tags:
         - Key: Name
-          Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ2']]
+          Value: !Join ['-' , [!Ref "AWS::StackName", 'Firewall-Data-AZ2']]
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transit Gateway and Attachment to Security VPC
@@ -761,33 +761,33 @@ Resources:
 # Route Table - SecurityVPC - Firewall & Data
 # ----------------------------------------------------------------------------------------------------------------------
 
-  VMSeriesDataRouteTableAZ1:
+  FirewallDataRouteTableAZ1:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref SecurityVPC
       Tags:
         - Key : Name
-          Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeriesData-AZ1']]
+          Value: !Join ['-' , [!Ref "AWS::StackName", 'FirewallData-AZ1']]
 
-  VMSeriesDataRouteTableAZ2:
+  FirewallDataRouteTableAZ2:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref SecurityVPC
       Tags:
         - Key : Name
-          Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeriesData-AZ2']]
+          Value: !Join ['-' , [!Ref "AWS::StackName", 'FirewallData-AZ2']]
 
-  VMSeriesDataRouteTableAssociationAZ1:
+  FirewallDataRouteTableAssociationAZ1:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref VMSeriesDataRouteTableAZ1
-      SubnetId: !Ref VMSeriesDataSubnetAZ1
+      RouteTableId: !Ref FirewallDataRouteTableAZ1
+      SubnetId: !Ref FirewallDataSubnetAZ1
 
-  VMSeriesDataRouteTableAssociationAZ2:
+  FirewallDataRouteTableAssociationAZ2:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref VMSeriesDataRouteTableAZ2
-      SubnetId: !Ref VMSeriesDataSubnetAZ2
+      RouteTableId: !Ref FirewallDataRouteTableAZ2
+      SubnetId: !Ref FirewallDataSubnetAZ2
 
 # ----------------------------------------------------------------------------------------------------------------------
 #  Gateway Load Balancer
@@ -798,7 +798,7 @@ Resources:
     Properties:
       Name: !Join ['-' , [ !Ref "AWS::StackName", 'GWLB' ]]
       Type: gateway
-      Subnets: [!Ref VMSeriesDataSubnetAZ1, !Ref VMSeriesDataSubnetAZ2]
+      Subnets: [!Ref FirewallDataSubnetAZ1, !Ref FirewallDataSubnetAZ2]
       LoadBalancerAttributes:
         - Key: load_balancing.cross_zone.enabled
           Value: true
@@ -806,7 +806,7 @@ Resources:
   GWLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Join ['-' , [ !Ref "AWS::StackName", 'VMSeries' ]]
+      Name: !Join ['-' , [ !Ref "AWS::StackName", 'Firewall' ]]
       Port: 6081
       Protocol: GENEVE
       HealthCheckPort: 80
@@ -818,8 +818,8 @@ Resources:
 
       TargetType: instance
       Targets:
-        - Id: !Ref VMSeriesInstanceAZ1
-        - Id: !Ref VMSeriesInstanceAZ2
+        - Id: !Ref FirewallInstanceAZ1
+        - Id: !Ref FirewallInstanceAZ2
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'GWLB']]
@@ -926,7 +926,7 @@ Resources:
       Runtime: python3.7
       Timeout: 900
 
-  GWLBESerivceName:
+  GWLBEServiceName:
     Type: Custom::DescribeVpcEndpointServiceConfigurations
     Properties:
       ServiceToken: !GetAtt DescribeGWLBEService.Arn
@@ -948,7 +948,7 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref SecurityVPC
-      ServiceName: !GetAtt GWLBESerivceName.Data
+      ServiceName: !GetAtt GWLBEServiceName.Data
       VpcEndpointType: GatewayLoadBalancer
       SubnetIds: [ !Ref GWLBESubnetAZ1 ]
 
@@ -956,18 +956,18 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref SecurityVPC
-      ServiceName: !GetAtt GWLBESerivceName.Data
+      ServiceName: !GetAtt GWLBEServiceName.Data
       VpcEndpointType: GatewayLoadBalancer
       SubnetIds: [ !Ref GWLBESubnetAZ2 ]
 # ----------------------------------------------------------------------------------------------------------------------
 # Security VPC - Management & Data Security Group
 # ----------------------------------------------------------------------------------------------------------------------
 
-  VMSeriesManagementSecurityGroup:
+  FirewallManagementSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref SecurityVPC
-      GroupDescription: VM-Series Management Security Group
+      GroupDescription: Network Firewall (e.g. VM-Series) Management Security Group
       SecurityGroupIngress:
         - CidrIp: !Ref RemoteManagementCIDR
           FromPort: 22
@@ -979,13 +979,13 @@ Resources:
           IpProtocol: tcp
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Management'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Management'] ]
 
-  VMSeriesDataSecurityGroup:
+  FirewallDataSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref SecurityVPC
-      GroupDescription: VM-Series Data Security Group
+      GroupDescription: Network Firewall (e.g. VM-Series) Data Security Group
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           FromPort: -1
@@ -993,93 +993,93 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Data'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Data'] ]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# VM-Series Deployment
+# Network Firewall (e.g. VM-Series) Deployment
 # ----------------------------------------------------------------------------------------------------------------------
 
-  VMSeriesManagementENIAZ1:
+  FirewallManagementENIAZ1:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: VM-Series Management - AZ1
-      GroupSet: [ !Ref VMSeriesManagementSecurityGroup ]
+      Description: Network Firewall (e.g. VM-Series) Management - AZ1
+      GroupSet: [ !Ref FirewallManagementSecurityGroup ]
       SubnetId: !Ref NATGWSubnetAZ1
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeriesManagement-AZ1'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'FirewallManagement-AZ1'] ]
 
-  VMSeriesManagementEIPAZ1:
+  FirewallManagementEIPAZ1:
     Type: AWS::EC2::EIP
     DependsOn: SecurityIGWAttachment
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeriesManagement-AZ1'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'FirewallManagement-AZ1'] ]
 
-  VMSeriesManagementEIPAssociationAZ1:
+  FirewallManagementEIPAssociationAZ1:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !GetAtt VMSeriesManagementEIPAZ1.AllocationId
-      NetworkInterfaceId: !Ref VMSeriesManagementENIAZ1
+      AllocationId: !GetAtt FirewallManagementEIPAZ1.AllocationId
+      NetworkInterfaceId: !Ref FirewallManagementENIAZ1
 
-  VMSeriesDataENIAZ1:
+  FirewallDataENIAZ1:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: VM-Series Data - AZ1
+      Description: Network Firewall (e.g. VM-Series) Data - AZ1
       SourceDestCheck: No
-      GroupSet: [ !Ref VMSeriesDataSecurityGroup ]
-      SubnetId: !Ref VMSeriesDataSubnetAZ1
+      GroupSet: [ !Ref FirewallDataSecurityGroup ]
+      SubnetId: !Ref FirewallDataSubnetAZ1
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Data-AZ1'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Data-AZ1'] ]
 
-  VMSeriesManagementENIAZ2:
+  FirewallManagementENIAZ2:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: VM-Series Management - AZ2
-      GroupSet: [ !Ref VMSeriesManagementSecurityGroup ]
+      Description: Network Firewall (e.g. VM-Series) Management - AZ2
+      GroupSet: [ !Ref FirewallManagementSecurityGroup ]
       SubnetId: !Ref NATGWSubnetAZ2
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Management-AZ2'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Management-AZ2'] ]
 
-  VMSeriesManagementEIPAZ2:
+  FirewallManagementEIPAZ2:
     Type: AWS::EC2::EIP
     DependsOn: SecurityIGWAttachment
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Management-AZ2'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Management-AZ2'] ]
 
-  VMSeriesManagementEIPAssociationAZ2:
+  FirewallManagementEIPAssociationAZ2:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !GetAtt VMSeriesManagementEIPAZ2.AllocationId
-      NetworkInterfaceId: !Ref VMSeriesManagementENIAZ2
+      AllocationId: !GetAtt FirewallManagementEIPAZ2.AllocationId
+      NetworkInterfaceId: !Ref FirewallManagementENIAZ2
 
-  VMSeriesDataENIAZ2:
+  FirewallDataENIAZ2:
     Type: AWS::EC2::NetworkInterface
     Properties:
-      Description: VM-Series Data - AZ2
+      Description: Network Firewall (e.g. VM-Series) Data - AZ2
       SourceDestCheck: No
-      GroupSet: [ !Ref VMSeriesDataSecurityGroup ]
-      SubnetId: !Ref VMSeriesDataSubnetAZ2
+      GroupSet: [ !Ref FirewallDataSecurityGroup ]
+      SubnetId: !Ref FirewallDataSubnetAZ2
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-Data-AZ2'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-Data-AZ2'] ]
 
-  VMSeriesInstanceAZ1:
+  FirewallInstanceAZ1:
     Type: AWS::EC2::Instance
     Properties:
       DisableApiTermination: false
       InstanceInitiatedShutdownBehavior: stop
       EbsOptimized: true
-      ImageId: !Ref VMSeriesAMI
-      InstanceType: !Ref VMSeriesInstanceType
+      ImageId: !Ref FirewallAMI
+      InstanceType: !Ref FirewallInstanceType
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -1090,20 +1090,20 @@ Resources:
       Monitoring: false
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-AZ1'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-AZ1'] ]
       NetworkInterfaces:
-        - NetworkInterfaceId: !Ref VMSeriesManagementENIAZ1
+        - NetworkInterfaceId: !Ref FirewallManagementENIAZ1
           DeviceIndex: '1'
-        - NetworkInterfaceId: !Ref VMSeriesDataENIAZ1
+        - NetworkInterfaceId: !Ref FirewallDataENIAZ1
           DeviceIndex: '0'
-      IamInstanceProfile: !If [BootstrapVmseries, !Ref VmseriesBootstrapInstanceProfile, !Ref AWS::NoValue]
+      IamInstanceProfile: !If [BootstrapFirewall, !Ref FirewallBootstrapInstanceProfile, !Ref AWS::NoValue]
       UserData:  !If
-        - BootstrapVmseries
+        - BootstrapFirewall
         - !Base64
           Fn::Join:
             - ''
-            - - vmseries-bootstrap-aws-s3bucket=
-              - !Ref VmseriesBootstrapS3BucketName
+            - - firewall-bootstrap-aws-s3bucket=
+              - !Ref FirewallBootstrapS3BucketName
         - !Base64
           Fn::Join:
             - ';'
@@ -1128,14 +1128,14 @@ Resources:
               - dhcp-accept-server-hostname=yes
               - dhcp-accept-server-domain=yes
 
-  VMSeriesInstanceAZ2:
+  FirewallInstanceAZ2:
     Type: AWS::EC2::Instance
     Properties:
       DisableApiTermination: false
       InstanceInitiatedShutdownBehavior: stop
       EbsOptimized: true
-      ImageId: !Ref VMSeriesAMI
-      InstanceType: !Ref VMSeriesInstanceType
+      ImageId: !Ref FirewallAMI
+      InstanceType: !Ref FirewallInstanceType
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -1146,20 +1146,20 @@ Resources:
       Monitoring: false
       Tags:
         - Key: Name
-          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'VMSeries-AZ2'] ]
+          Value: !Join [ '-' , [ !Ref "AWS::StackName", 'Firewall-AZ2'] ]
       NetworkInterfaces:
-        - NetworkInterfaceId: !Ref VMSeriesManagementENIAZ2
+        - NetworkInterfaceId: !Ref FirewallManagementENIAZ2
           DeviceIndex: '1'
-        - NetworkInterfaceId: !Ref VMSeriesDataENIAZ2
+        - NetworkInterfaceId: !Ref FirewallDataENIAZ2
           DeviceIndex: '0'
-      IamInstanceProfile: !If [BootstrapVmseries, !Ref VmseriesBootstrapInstanceProfile, !Ref AWS::NoValue]
+      IamInstanceProfile: !If [BootstrapFirewall, !Ref FirewallBootstrapInstanceProfile, !Ref AWS::NoValue]
       UserData:  !If
-        - BootstrapVmseries
+        - BootstrapFirewall
         - !Base64
           Fn::Join:
             - ''
-            - - vmseries-bootstrap-aws-s3bucket=
-              - !Ref VmseriesBootstrapS3BucketName
+            - - firewall-bootstrap-aws-s3bucket=
+              - !Ref FirewallBootstrapS3BucketName
         - !Base64
           Fn::Join:
             - ';'
@@ -1185,12 +1185,12 @@ Resources:
               - dhcp-accept-server-domain=yes
 
 # ----------------------------------------------------------------------------------------------------------------------
-#   VM-Series Bootstrap IAM Role
+#   Network Firewall (e.g. VM-Series) Bootstrap IAM Role
 # ----------------------------------------------------------------------------------------------------------------------
 
-  VmseriesBootstrapRole:
+  FirewallBootstrapRole:
     Type: AWS::IAM::Role
-    Condition: BootstrapVmseries
+    Condition: BootstrapFirewall
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -1201,7 +1201,7 @@ Resources:
             Action: sts:AssumeRole
       Path: /
       Policies:
-        - PolicyName: VmseriesBootstrapRolePolicy
+        - PolicyName: FirewallBootstrapRolePolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -1210,13 +1210,13 @@ Resources:
                 Resource: !Join
                   - ''
                   - - 'arn:aws:s3:::'
-                    - !Ref VmseriesBootstrapS3BucketName
+                    - !Ref FirewallBootstrapS3BucketName
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Join
                   - ''
                   - - 'arn:aws:s3:::'
-                    - !Ref VmseriesBootstrapS3BucketName
+                    - !Ref FirewallBootstrapS3BucketName
                     - /*
               - Effect: Allow
                 Action:
@@ -1224,17 +1224,17 @@ Resources:
                 Resource:
                   - '*'
 
-  VmseriesBootstrapInstanceProfile:
+  FirewallBootstrapInstanceProfile:
     Type: AWS::IAM::InstanceProfile
-    Condition: BootstrapVmseries
+    Condition: BootstrapFirewall
     Properties:
       Path: /
       Roles:
-        - !Ref VmseriesBootstrapRole
+        - !Ref FirewallBootstrapRole
 
   S3EndpointAz1:
     Type: AWS::EC2::VPCEndpoint
-    Condition: BootstrapVmseries
+    Condition: BootstrapFirewall
     Properties:
       PolicyDocument:
         Version: 2012-10-17
@@ -1246,7 +1246,7 @@ Resources:
             Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
-                - !Ref VmseriesBootstrapS3BucketName
+                - !Ref FirewallBootstrapS3BucketName
           - Effect: Allow
             Principal: '*'
             Action:
@@ -1254,16 +1254,16 @@ Resources:
             Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
-                - !Ref VmseriesBootstrapS3BucketName
+                - !Ref FirewallBootstrapS3BucketName
                 - '/*'
       RouteTableIds:
-        - !Ref VMSeriesDataRouteTableAZ1
+        - !Ref FirewallDataRouteTableAZ1
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
       VpcId: !Ref SecurityVPC
 
   S3EndpointAz2:
     Type: AWS::EC2::VPCEndpoint
-    Condition: BootstrapVmseries
+    Condition: BootstrapFirewall
     Properties:
       PolicyDocument:
         Version: 2012-10-17
@@ -1275,7 +1275,7 @@ Resources:
             Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
-                - !Ref VmseriesBootstrapS3BucketName
+                - !Ref FirewallBootstrapS3BucketName
           - Effect: Allow
             Principal: '*'
             Action:
@@ -1283,10 +1283,10 @@ Resources:
             Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
-                - !Ref VmseriesBootstrapS3BucketName
+                - !Ref FirewallBootstrapS3BucketName
                 - '/*'
       RouteTableIds:
-        - !Ref VMSeriesDataRouteTableAZ2
+        - !Ref FirewallDataRouteTableAZ2
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
       VpcId: !Ref SecurityVPC
 
@@ -1300,5 +1300,5 @@ Outputs:
     Value: !If [NoExistingTGW, !Ref TransitGateway, !Ref TGWID]
   GWLBServiceId:
     Description: GWLB Service ID for use for additional GWLB Endpoints
-    Value: !GetAtt GWLBESerivceName.Data
+    Value: !GetAtt GWLBEServiceName.Data
   

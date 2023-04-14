@@ -36,21 +36,13 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
       cidr: '1.1.1.1/32',
       description: 'blah',
       instanceId: '123',
-      error: undefined,
       name: 'sagemaker',
-      outputs: [],
       projectId: 'proj-123',
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah',
-      type: 'envTypeTest',
-      dependency: 'proj-123',
-      updatedBy: 'blah',
-      createdBy: 'blah',
       PROJ: {
         subnetId: 'subnet-07f475d83291a3603',
-        accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
-        resourceType: 'project',
         hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-hosting-account-role',
         awsAccountId: '123456789012',
         environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
@@ -61,19 +53,11 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
         encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
         externalId: 'workbench',
         updatedAt: '2022-05-18T20:33:42.608Z',
-        sk: 'PROJ#proj-123',
-        pk: 'ENV#6e185c8c-caeb-4305-8f08-d408b316dca7',
         id: 'proj-123'
       },
       ETC: {
-        pk: 'ETC',
-        sk: 'ET#envType-123ETC#envTypeConfig-123',
         createdAt: '2022-02-03T20:06:45.428Z',
-        createdBy: 'u-HJtc1fiQnF5XNmrIu6KLU',
-        desc: 'An Amazon SageMaker Jupyter Notebook',
         id: 'envTypeConfig-123',
-        name: 'Jupyter Notebook',
-        owner: 'u-HJtc1fiQnF5XNmrIu6KLU',
         params: [
           {
             key: 'IamPolicyDocument',
@@ -94,11 +78,8 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
         ],
         productId: 'prod-hxwmltpkg2edy',
         provisioningArtifactId: 'pa-fh6spfcycydtq',
-        resourceType: 'envTypeConfig',
-        status: 'approved',
         type: 'sagemaker',
-        updatedAt: '2022-02-03T20:07:56.697Z',
-        updatedBy: 'u-HJtc1fiQnF5XNmrIu6KLU'
+        updatedAt: '2022-02-03T20:07:56.697Z'
       }
     };
 

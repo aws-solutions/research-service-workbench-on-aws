@@ -29,15 +29,17 @@ export class SWBApplicationLoadBalancer extends Construct {
       vpcSubnets: subnets,
       internetFacing
     });
-    if (!isSolutionsBuild()) this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
-    if (isSolutionsBuild()) {
+    // logAccessLogs() depends on region being specified on the stack, which is only possible during non-Solutions deployment
+    if (!isSolutionsBuild()) {
+      this.applicationLoadBalancer.logAccessLogs(accessLogsBucket);
+    } else {
       const albMetadataNode = this.applicationLoadBalancer.node.defaultChild as CfnResource;
       albMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         rules_to_suppress: [
           {
             id: 'W52',
-            reason: 'TODO: Enable access logging for Solutions Implementation'
+            reason: 'Enabling ALB access logging for Solutions Implementation is documented as a manual step'
           }
         ]
       });

@@ -35,6 +35,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
   const datasetKeyTypeId = 'DS';
   const endpointKeyTypeId = 'EP';
+  const storageLocationKeyTypeId = 'SL';
 
   const mockDataSetId = `${datasetKeyTypeId.toLowerCase()}-sampleId`;
   const mockDataSetName = 'Sample-DataSet';
@@ -59,14 +60,18 @@ describe('DdbDataSetMetadataPlugin', () => {
   let plugin: DdbDataSetMetadataPlugin;
   let mockDdb: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
 
+  beforeAll(() => {
+    mockDdb = mockClient(DynamoDBClient);
+  });
+
   beforeEach(() => {
     jest.resetModules();
+    mockDdb.reset();
     expect.hasAssertions();
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
-    plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId);
-    mockDdb = mockClient(DynamoDBClient);
+    plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId, storageLocationKeyTypeId);
     jest.spyOn(Date.prototype, 'toISOString').mockImplementation(() => mockCreatedAt);
   });
 
@@ -262,10 +267,47 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('removeDataSet', () => {
     it('returns nothing when the dataset is removed.', async () => {
-      mockDdb.on(DeleteItemCommand).resolves({});
+      mockDdb.on(DeleteItemCommand).resolves({
+        Attributes: {
+          storageName: { S: mockDataSetStorageName },
+          storageType: { S: mockDataSetStorageType },
+          awsAccountId: { S: mockAwsAccountId },
+          region: { S: mockDataSetRegion }
+        }
+      });
+      mockDdb.on(UpdateItemCommand).resolves({
+        Attributes: {
+          datasetCount: {
+            N: '1'
+          }
+        }
+      });
 
       await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
       expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(1);
+    });
+    it('deletes the storage location if the deleted dataset is the last in the storage location.', async () => {
+      mockDdb
+        .on(DeleteItemCommand)
+        .resolvesOnce({
+          Attributes: {
+            storageName: { S: mockDataSetStorageName },
+            storageType: { S: mockDataSetStorageType },
+            awsAccountId: { S: mockAwsAccountId },
+            region: { S: mockDataSetRegion }
+          }
+        })
+        .resolves({});
+      mockDdb.on(UpdateItemCommand).resolves({
+        Attributes: {
+          datasetCount: {
+            N: '0'
+          }
+        }
+      });
+
+      await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(2);
     });
   });
 
@@ -410,14 +452,10 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(QueryCommand).resolves({
         Items: [
           {
-            id: { S: mockDataSetId },
-            name: { S: mockDataSetName },
-            path: { S: mockDataSetPath },
             awsAccountId: { S: mockAwsAccountId },
-            storageType: { S: mockDataSetStorageType },
-            storageName: { S: mockDataSetStorageName },
-            region: { S: mockAwsBucketRegion },
-            createdAt: { S: mockCreatedAt }
+            type: { S: mockDataSetStorageType },
+            name: { S: mockDataSetStorageName },
+            region: { S: mockAwsBucketRegion }
           }
         ]
       });

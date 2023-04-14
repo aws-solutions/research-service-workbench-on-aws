@@ -54,8 +54,8 @@ export default class StatusHandler {
     // Get hosting account SDK instance
     const envHelper = this._getEnvHelper();
     const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
       operation: `StatusHandler-${event.operation}`,
       envType: event.metadata.detail.EnvType
     });

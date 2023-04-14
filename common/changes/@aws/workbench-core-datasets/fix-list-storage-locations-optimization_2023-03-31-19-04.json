@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Optimized listStorageLocations to query storageLocation ddb entry.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

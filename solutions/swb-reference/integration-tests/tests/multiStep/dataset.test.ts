@@ -87,22 +87,15 @@ describe('multiStep dataset integration test', () => {
       .environments()
       .environment(env.id)
       .get();
-    const awsRegion = settings.get('awsRegion');
-    const mainAccountId = settings.get('mainAccountId');
-    const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 12)}`;
     expect(envDetails).toMatchObject({
       ENDPOINTS: expect.arrayContaining([
         expect.objectContaining({
-          endPointUrl: `s3://arn:aws:s3:${awsRegion}:${mainAccountId}:accesspoint/${accessPointName}`,
-          storageArn: `arn:aws:s3:::${settings.get('DataSetsBucketName')}`,
-          dataSetId: dataSet.id,
-          path: datasetName
+          dataSetId: dataSet.id
         })
       ]),
       DATASETS: expect.arrayContaining([
         expect.objectContaining({
-          id: dataSet.id,
-          name: datasetName
+          id: dataSet.id
         })
       ])
     });
@@ -116,8 +109,7 @@ describe('multiStep dataset integration test', () => {
       .get();
     // Dataset was created just for this test case, so we expect only one endpoint
     expect(dataSetDetails).toMatchObject({
-      ...dataSetBody,
-      externalEndpoints: [envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]]
+      ...dataSetBody
     });
 
     console.log('ASSOCIATE WITH PROJECT');
