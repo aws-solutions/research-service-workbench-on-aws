@@ -63,3 +63,9 @@ solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToPr
 solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:38
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:48
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:86
+
+# Fake emails used: setupIntegTestEnv.sh script
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:66
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:207
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:225
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:243
