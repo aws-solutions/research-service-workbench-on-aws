@@ -11,6 +11,7 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import csrf from 'csurf';
 import { NextFunction, Request, Response } from 'express';
 import { tokens } from './__mocks__/authenticationService';
+import { getRequestOrigin } from './authenticationMiddleware';
 import {
   AuthenticationService,
   CognitoAuthenticationPlugin,
@@ -1136,6 +1137,33 @@ describe('authenticationMiddleware tests', () => {
         ...defaultCookieOpts,
         maxAge: tokens.accessToken.expiresIn
       });
+    });
+  });
+
+  describe('getRequestOrigin', () => {
+    it('can read origin from Origin header', () => {
+      expect(
+        getRequestOrigin({
+          headers: {
+            Origin: 'http://localhost',
+            referer: 'http://localhost/foo/bar'
+          }
+        })
+      ).toBe('http://localhost');
+    });
+
+    it('can read origin from referer if Origin header is missing', () => {
+      expect(
+        getRequestOrigin({
+          headers: {
+            referer: 'http://localhost/foo/bar'
+          }
+        })
+      ).toBe('http://localhost');
+    });
+
+    it('returns undefined if no headers are present', () => {
+      expect(getRequestOrigin({ headers: {} })).toBeUndefined();
     });
   });
 });

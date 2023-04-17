@@ -52,7 +52,7 @@ export function csurf(
   });
 }
 
-const getRequestOrigin = (req: Request): string | undefined => {
+export const getRequestOrigin = (req: Pick<Request, 'headers'>): string | undefined => {
   const { origin, referer } = req.headers;
   // HTTP header Origin is optional and may not be included (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
   return origin ?? (referer ? new URL(referer.toString()).origin : undefined);
