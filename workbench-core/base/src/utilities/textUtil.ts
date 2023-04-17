@@ -24,7 +24,7 @@ const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
 
 function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
+  return new RegExp(`${prefix.toLowerCase()}-${uuidRegExpAsString}$`);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
