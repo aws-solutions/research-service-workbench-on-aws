@@ -4,12 +4,28 @@
  */
 
 import * as Boom from '@hapi/boom';
-import { z, ZodTypeAny } from 'zod';
+import { z, ZodString, ZodTypeAny } from 'zod';
+import { uuidWithLowercasePrefixRegExp } from './textUtil';
 
 interface ZodPagination {
   pageSize: z.ZodOptional<z.ZodEffects<z.ZodString, number, string>>;
   paginationToken: z.ZodOptional<z.ZodString>;
 }
+
+declare module 'zod' {
+  export interface ZodString {
+    required: () => ZodString;
+    swbId: (prefix: string) => ZodString;
+  }
+}
+
+z.ZodString.prototype.required = function (): ZodString {
+  return this.min(1, { message: 'Required' });
+};
+
+z.ZodString.prototype.swbId = function (prefix: string): ZodString {
+  return this.regex(uuidWithLowercasePrefixRegExp(prefix), { message: 'Invalid ID' });
+};
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {
   return {
@@ -59,4 +75,4 @@ function validateAndParse<T>(parser: ZodTypeAny, data: unknown): T {
   );
 }
 
-export { validateAndParse, getPaginationParser };
+export { validateAndParse, getPaginationParser, z };
