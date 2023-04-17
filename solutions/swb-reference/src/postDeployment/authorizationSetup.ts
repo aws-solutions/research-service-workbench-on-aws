@@ -38,7 +38,7 @@ export default class AuthorizationSetup {
     const projectToUserAssociationPermissions = this._mapActions(
       itAdmin,
       SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-      ['CREATE', 'DELETE']
+      ['CREATE', 'READ', 'DELETE']
     );
     const environmentPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT, [
       'READ',
@@ -145,7 +145,7 @@ export default class AuthorizationSetup {
   /**
    * Map list of actions to list of {@link IdentityPermission}
    * @param identityId - group id
-   * @param identityId - subject, e.g. Project, CostCenter, etc.
+   * @param subjectType - subject, e.g. Project, CostCenter, etc.
    * @param actions - list of actions allowed for group
    * @returns list of {@link IdentityPermission}
    */

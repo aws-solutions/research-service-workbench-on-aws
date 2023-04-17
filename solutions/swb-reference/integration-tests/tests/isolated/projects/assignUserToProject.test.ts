@@ -6,39 +6,25 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { User } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('assign user to project negative tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
-  let project: { id: string };
+  let project1Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: `TestProject-${uuidv4()}`,
-      description: 'Project for assign user to project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
+    ({ adminSession, project1Id } = await paabHelper.createResources());
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('missing parameters', () => {
@@ -128,7 +114,7 @@ describe('assign user to project negative tests', () => {
 
     test('cannot assign user to the same project', async () => {
       const response = await adminSession.resources.projects
-        .project(project.id)
+        .project(project1Id)
         .assignUserToProject(userId ?? '', { role: 'Researcher' });
 
       expect(response.status).toBe(204);
@@ -136,18 +122,18 @@ describe('assign user to project negative tests', () => {
       // expect subsequent call to fail
       try {
         await adminSession.resources.projects
-          .project(project.id)
+          .project(project1Id)
           .assignUserToProject(userId ?? '', { role: 'Researcher' });
 
         // if we are here - expectation is not fulfilled
-        console.error(`Assigning user ${userId} to the same project ${project.id} did not cause error`);
+        console.error(`Assigning user ${userId} to the same project ${project1Id} did not cause error`);
         expect(false).toBeTruthy();
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `User ${userId} is already assigned to the project ${project.id}`
+            message: `User ${userId} is already assigned to the project ${project1Id}`
           })
         );
       }
