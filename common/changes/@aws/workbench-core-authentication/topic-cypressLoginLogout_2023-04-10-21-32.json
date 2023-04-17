@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "End to end tests for authentication",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
