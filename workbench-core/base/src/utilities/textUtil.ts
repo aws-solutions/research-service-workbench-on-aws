@@ -9,7 +9,7 @@ import resourceTypeToKey from '../constants/resourceTypeToKey';
 function uuidWithLowercasePrefix(prefix: string): string {
   return `${prefix.toLowerCase()}-${uuidv4()}`;
 }
-const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
 const groupIDRegExpAsString: string = '\\S{1,128}';
 
@@ -24,7 +24,7 @@ const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
 
 function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
+  return new RegExp(`${prefix.toLowerCase()}-${uuidRegExpAsString}$`);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
