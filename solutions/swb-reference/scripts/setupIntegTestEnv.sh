@@ -297,34 +297,34 @@ function run() {
     echo -e "${PURPLE}\nGenerate Integration test config file"
     echo -e "-------------------------------------"
     echo "
-    # Default Env Config for launching a new environment
-    envTypeId: '$envTypeId'
-    envTypeConfigId: '$envTypeConfigId'
-    projectId: '$projectId'
-    envType: 'sagemakerNotebook'
+# Default Env Config for launching a new environment
+envTypeId: '$envTypeId'
+envTypeConfigId: '$envTypeConfigId'
+projectId: '$projectId'
+envType: 'sagemakerNotebook'
 
-    #Cognito Integ Test Client
-    rootUserNameParamStorePath: '$rootUserNameParamStorePath'
-    rootPasswordParamStorePath: '$rootPasswordParamStorePath'
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '$rootUserNameParamStorePath'
+rootPasswordParamStorePath: '$rootPasswordParamStorePath'
 
-    projectAdmin1UserNameParamStorePath: '$projectAdmin1UserNameParamStorePath'
-    projectAdmin1PasswordParamStorePath: '$projectAdmin1PasswordParamStorePath'
+projectAdmin1UserNameParamStorePath: '$projectAdmin1UserNameParamStorePath'
+projectAdmin1PasswordParamStorePath: '$projectAdmin1PasswordParamStorePath'
 
-    projectAdmin2UserNameParamStorePath: '$projectAdmin2UserNameParamStorePath'
-    projectAdmin2PasswordParamStorePath: '$projectAdmin2PasswordParamStorePath'
+projectAdmin2UserNameParamStorePath: '$projectAdmin2UserNameParamStorePath'
+projectAdmin2PasswordParamStorePath: '$projectAdmin2PasswordParamStorePath'
 
-    researcher1UserNameParamStorePath: '$researcher1UserNameParamStorePath'
-    researcher1PasswordParamStorePath: '$researcher1PasswordParamStorePath'
+researcher1UserNameParamStorePath: '$researcher1UserNameParamStorePath'
+researcher1PasswordParamStorePath: '$researcher1PasswordParamStorePath'
 
-    ## Default Hosting Account
-    defaultHostingAccountId: '$accountId'
+## Default Hosting Account
+defaultHostingAccountId: '$accountId'
 
-    ## Hosting account used for Account Creation tests
-    hostAwsAccountIdParamStorePath: '$hostAwsAccountIdParamStorePath'
-    hostingAccountHandlerRoleArnParamStorePath: '$hostingAccountHandlerRoleArnParamStorePath'
-    envMgmtRoleArnParamStorePath: '$envMgmtRoleArnParamStorePath'
-    encryptionKeyArnParamStorePath: '$encryptionKeyArnParamStorePath'
-    " | tee -a ${INTEGRATION_TEST_CONFIG_FILE} && echo -e "\n\nIntegration Test Config File: ${INTEGRATION_TEST_CONFIG_FILE} ${NC}"
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '$hostAwsAccountIdParamStorePath'
+hostingAccountHandlerRoleArnParamStorePath: '$hostingAccountHandlerRoleArnParamStorePath'
+envMgmtRoleArnParamStorePath: '$envMgmtRoleArnParamStorePath'
+encryptionKeyArnParamStorePath: '$encryptionKeyArnParamStorePath'
+" | tee -a ${INTEGRATION_TEST_CONFIG_FILE} && echo -e "\nIntegration Test Config File: ${INTEGRATION_TEST_CONFIG_FILE} ${NC}"
 }
 
 main $@
