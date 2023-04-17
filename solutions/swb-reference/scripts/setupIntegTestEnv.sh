@@ -25,6 +25,13 @@ function main(){
 
 function help(){
     echo -e "${GREEN}
+    Pre-requisites(Follow these steps in <PROJECT_ROOT>/solutions/swb-reference/README.md):
+        Installation steps:
+        i) Setup Config File
+        ii) Setup CDK
+        iii) Deploy the code
+        iv) Deploy to the Hosting Account
+
     This script performs the following actions:
     1. Reset Cognito ITAdmin password
     2. Get accessToken, csrfCookie and csrfToken
@@ -43,7 +50,7 @@ function help(){
         i) Reset Researcher1 user password
         ii) Assign Researcher1 to Researcher Group
     11. Update SSM Params
-    12. Generate Integration test config file
+    12. Generate Integration test config file in the integration-tests/confg dir
 
 Usage: `basename $0`
     -h [Help]
