@@ -5,7 +5,6 @@
 
 import { Readable } from 'stream';
 
-import { PolicyDocument } from '@aws-cdk/aws-iam';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -41,6 +40,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import _ from 'lodash';
 import AccountService from '../services/accountService';

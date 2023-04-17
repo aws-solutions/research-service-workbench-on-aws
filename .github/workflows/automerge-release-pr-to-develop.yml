@@ -9,7 +9,7 @@ on:
 jobs:
   automerge-relese-pr-to-develop:
     runs-on: ubuntu-20.04
-    if: contains(github.event.pull_request.labels.*.name, 'automerge-enabled') && contains(github.event.pull_request.labels.*.name, 'auto-release-pr-develop')
+    if: contains(github.event.pull_request.labels.*.name, 'automerge-enabled') && contains(github.event.pull_request.labels.*.name, 'auto-release-pr-to-develop')
     steps:
       - uses: actions/checkout@v3
         with:
