@@ -18,15 +18,15 @@ import {
   DataSetFileUploadRequestParser
 } from './dataSets/DataSetFileUploadRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import {
+  GetDataSetByProjectRequest,
+  GetDataSetByProjectRequestParser
+} from './dataSets/getDataSetByProjectRequestParser';
 import { GetDataSetRequest, GetDataSetRequestParser } from './dataSets/getDataSetRequestParser';
 import {
   ListDataSetAccessPermissionsRequest,
   ListDataSetAccessPermissionsRequestParser
 } from './dataSets/listDataSetAccessPermissionsRequestParser';
-import {
-  ListDataSetByProjectRequest,
-  ListDataSetByProjectRequestParser
-} from './dataSets/listDataSetByProjectRequestParser';
 import { ListDataSetRequest, ListDataSetRequestParser } from './dataSets/listDataSetRequestParser';
 import {
   ProjectAddAccessRequest,
@@ -66,8 +66,8 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.get(
     '/projects/:projectId/datasets/:dataSetId',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<ListDataSetByProjectRequest>(
-        ListDataSetByProjectRequestParser,
+      const validatedRequest = validateAndParse<GetDataSetByProjectRequest>(
+        GetDataSetByProjectRequestParser,
         {
           ...req.params,
           user: res.locals.user

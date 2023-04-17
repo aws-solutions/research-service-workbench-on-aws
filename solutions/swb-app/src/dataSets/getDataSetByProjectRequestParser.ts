@@ -6,10 +6,10 @@ import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const ListDataSetByProjectRequestParser = z.object({
+export const GetDataSetByProjectRequestParser = z.object({
   projectId: z.string().swbId(resourceTypeToKey.project).required(),
   dataSetId: z.string().swbId(resourceTypeToKey.dataset).required(),
   user: AuthenticatedUserParser
 });
 
-export type ListDataSetByProjectRequest = z.infer<typeof ListDataSetByProjectRequestParser>;
+export type GetDataSetByProjectRequest = z.infer<typeof GetDataSetByProjectRequestParser>;
