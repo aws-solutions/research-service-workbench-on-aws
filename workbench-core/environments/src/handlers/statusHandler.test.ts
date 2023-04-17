@@ -6,8 +6,9 @@
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
+import { Environment } from '../models/environments/environment';
 import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
-import { EnvironmentService, Environment } from '../services/environmentService';
+import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
 
@@ -53,18 +54,25 @@ describe('StatusHandler', () => {
       cidr: '1.1.1.1/32',
       description: 'blah',
       instanceId: '123',
-      error: undefined,
       name: 'sagemaker',
-      outputs: [],
       projectId: '123',
-      PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
+      PROJ: {
+        subnetId: 'subnet-07f475d83291a3603',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
+        awsAccountId: '123456789012',
+        environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
+        createdAt: '2022-05-18T20:33:42.608Z',
+        vpcId: 'vpc-0b0bc7ae01d82e7b3',
+        name: 'Example project',
+        encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
+        externalId: 'workbench',
+        updatedAt: '2022-05-18T20:33:42.608Z',
+        id: 'id',
+        envMgmtRoleArn: 'sampleEnvMgmtRoleArn'
+      },
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
-      owner: 'blah',
-      type: 'testEnvType',
-      dependency: '123',
-      updatedBy: 'blah',
-      createdBy: 'blah'
+      owner: 'blah'
     };
 
     const dynamoDBService = new DynamoDBService({

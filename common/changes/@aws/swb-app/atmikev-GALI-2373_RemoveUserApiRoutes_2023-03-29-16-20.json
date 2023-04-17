@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "remove role endpoints from userRoutes",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

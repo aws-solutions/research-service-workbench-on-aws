@@ -9,7 +9,7 @@ import {
   S3DataSetStoragePlugin,
   WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
-import { dataSetPrefix, endpointPrefix } from '../configs/constants';
+import { dataSetPrefix, endpointPrefix, storageLocationPrefix } from '../configs/constants';
 import { auditService } from './auditService';
 import { datasetAws } from './awsService';
 import { dynamicAuthorizationService } from './dynamicAuthorizationService';
@@ -18,7 +18,7 @@ import { logger } from './loggingService';
 const dataSetService: DataSetService = new DataSetService(
   auditService,
   logger,
-  new DdbDataSetMetadataPlugin(datasetAws, dataSetPrefix, endpointPrefix),
+  new DdbDataSetMetadataPlugin(datasetAws, dataSetPrefix, endpointPrefix, storageLocationPrefix),
   new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
 );
 

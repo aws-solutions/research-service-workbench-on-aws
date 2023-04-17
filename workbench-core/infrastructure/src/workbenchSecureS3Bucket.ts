@@ -11,7 +11,8 @@ import {
   BucketAccessControl,
   BucketEncryption,
   BucketProps,
-  CfnBucketPolicy
+  CfnBucketPolicy,
+  ObjectOwnership
 } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
@@ -31,7 +32,8 @@ export class WorkbenchSecureS3Bucket extends Construct {
       versioned: true,
       enforceSSL: true,
       accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
-      serverAccessLogsPrefix: props?.serverAccessLogsPrefix ?? `${id.toLowerCase()}-access-log`
+      serverAccessLogsPrefix: props?.serverAccessLogsPrefix ?? `${id.toLowerCase()}-access-log`,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     };
 
     this.bucket = new Bucket(this, `${id}-Bucket`, secureS3BucketProps);

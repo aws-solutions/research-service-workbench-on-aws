@@ -200,7 +200,8 @@ export class DataSetService implements DataSetPlugin {
     const response = await this._workbenchDataSetService.getAllDataSetAccessPermissions(
       request.dataSetId,
       request.authenticatedUser,
-      request.paginationToken
+      request.paginationToken,
+      request.pageSize
     );
 
     return PermissionsResponseParser.parse(response);

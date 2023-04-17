@@ -20,7 +20,8 @@
     "<rootDir>/src/dynamicRouteConfig.ts",
     "<rootDir>/src/mocks/mockDatabaseService.ts",
     "<rootDir>/src/services/databaseService.ts",
-    "<rootDir>/src/services/projectEnvTypeConfigService.ts"
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts",
+    "<rootDir>/src/services/swbEnvironmentService.ts"
   ],
   "coverageThreshold": {
     "global": {

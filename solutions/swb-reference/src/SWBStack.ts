@@ -26,6 +26,7 @@ import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/
 import {
   ApplicationTargetGroup,
   ListenerCondition,
+  SslPolicy,
   TargetType
 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
@@ -45,7 +46,7 @@ import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
-import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
@@ -439,7 +440,7 @@ export class SWBStack extends Stack {
     const proxyLambda = new Function(this, 'LambdaProxy', {
       handler: 'proxyHandlerLambda.handler',
       code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -478,18 +479,8 @@ export class SWBStack extends Stack {
     });
     const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
       port: 443,
-      certificates: [certificate]
-    });
-
-    const listenerMetadataNode = httpsListener.node.defaultChild as CfnResource;
-    listenerMetadataNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        {
-          id: 'W55',
-          reason: 'TODO: Elastic Load Balancer V2 Listener SslPolicy should use TLS 1.2'
-        }
-      ]
+      certificates: [certificate],
+      sslPolicy: SslPolicy.RECOMMENDED_TLS
     });
 
     const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
@@ -713,7 +704,8 @@ export class SWBStack extends Stack {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
-      versioned: true
+      versioned: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
 
     s3Bucket.addToResourcePolicy(
@@ -842,7 +834,8 @@ export class SWBStack extends Stack {
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       encryption: BucketEncryption.KMS,
       encryptionKey: encryptionKey,
-      versioned: true
+      versioned: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
@@ -856,7 +849,7 @@ export class SWBStack extends Stack {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -944,7 +937,7 @@ export class SWBStack extends Stack {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: this.lambdaEnvVars,
       memorySize: 256,
       timeout: Duration.minutes(4)
@@ -1094,7 +1087,7 @@ export class SWBStack extends Stack {
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_18_X,
       environment: {
         ...this.lambdaEnvVars,
         FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
@@ -1307,8 +1300,7 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W59',
-          reason:
-            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+          reason: 'AuthN with Congnito + JWT and AuthZ with CASL is implemented.'
         }
       ]
     });

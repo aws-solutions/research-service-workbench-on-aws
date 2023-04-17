@@ -21,7 +21,8 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import _ from 'lodash';
-import { Environment, EnvironmentService } from '../services/environmentService';
+import { Environment } from '../models/environments/environment';
+import { EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
 
@@ -66,7 +67,7 @@ export default class EnvironmentLifecycleHelper {
     this.dataSetService = new DataSetService(
       auditService,
       logger,
-      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
+      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT', 'STORAGELOCATION'),
       new WbcDataSetsAuthorizationPlugin(authzService)
     );
     this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
@@ -276,7 +277,7 @@ export default class EnvironmentLifecycleHelper {
     // Call IAM policy generator here, and return both strings
     const iamPolicyDocument = this.generateIamPolicy(
       endpointsCreated,
-      envMetadata.PROJ.encryptionKeyArn,
+      envMetadata.PROJ!.encryptionKeyArn,
       mainAcctEncryptionArnList
     );
     const s3Mounts = JSON.stringify(datasetsToMount);

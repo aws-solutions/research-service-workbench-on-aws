@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProjectEnvPlugin, ProjectDeletedError } from '@aws/swb-app';
+import { ProjectEnvPlugin, ProjectDeletedError, EnvironmentItem } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import {
@@ -14,7 +14,8 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
-import { Environment, EnvironmentService, EnvironmentStatus } from '@aws/workbench-core-environments';
+import { PaginatedResponse } from '@aws/workbench-core-base';
+import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 
@@ -35,17 +36,12 @@ export class ProjectEnvService implements ProjectEnvPlugin {
 
   public async createEnvironment(
     params: {
-      instanceId?: string;
-      cidr: string;
       description: string;
-      error?: { type: string; value: string };
       name: string;
-      outputs: { id: string; value: string; description: string }[];
       projectId: string;
       datasetIds: string[];
       envTypeId: string;
       envTypeConfigId: string;
-      status?: EnvironmentStatus;
     },
     authenticatedUser: AuthenticatedUser
   ): Promise<Environment> {
@@ -56,7 +52,10 @@ export class ProjectEnvService implements ProjectEnvPlugin {
       throw new ProjectDeletedError(`Project ${projectId} was deleted`);
     }
 
-    const env: Environment = await this._envService.createEnvironment(params, authenticatedUser);
+    const env: Environment = await this._envService.createEnvironment(
+      { ...params, cidr: '', outputs: [] },
+      authenticatedUser
+    );
 
     const projectAdmin = getProjectAdminRole(projectId);
     const projectResearcher = getResearcherRole(projectId);
@@ -93,12 +92,11 @@ export class ProjectEnvService implements ProjectEnvPlugin {
 
   public async listProjectEnvs(
     projectId: string,
-    user: AuthenticatedUser,
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
+  ): Promise<PaginatedResponse<EnvironmentItem>> {
     await this._projectService.getProject({ projectId: projectId });
-    return this._envService.listEnvironments(user, { project: projectId }, pageSize, paginationToken);
+    return this._envService.listEnvironmentsByProject({ projectId: projectId, pageSize, paginationToken });
   }
 
   public async updateEnvironment(
