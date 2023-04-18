@@ -6,7 +6,7 @@ import { MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateInvalidIds } from '../../../support/utils/utilities';
 
 describe('list datasets for project tests', () => {
   let paabHelper: PaabHelper;
@@ -62,7 +62,7 @@ describe('list datasets for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            message: `pageSize: Must be Between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
@@ -79,7 +79,7 @@ describe('list datasets for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            message: `pageSize: Must be Between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
@@ -103,7 +103,20 @@ describe('list datasets for project tests', () => {
       dataset1Id = response1.data.id;
       dataset2Id = response2.data.id;
     });
-
+    const invalidProjects: string[] = generateInvalidIds('proj');
+    test.each(invalidProjects)('invalid project Id throws validation exception', async (invalidProject) => {
+      try {
+        await itAdminSession.resources.projects.project(invalidProject).dataSets().get();
+      } catch (error) {
+        checkHttpError(
+          error,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `projectId: Invalid ID`
+          })
+        );
+      }
+    });
     test('Project Admin can list datasets for a project', async () => {
       const { data } = await pa1Session.resources.projects.project(project1Id).dataSets().get();
 
@@ -115,7 +128,6 @@ describe('list datasets for project tests', () => {
       );
       expect(data.data.length).toBe(2);
     });
-
     test('Researcher can list datasets for a project', async () => {
       const { data } = await researcher1Session.resources.projects.project(project1Id).dataSets().get();
 
