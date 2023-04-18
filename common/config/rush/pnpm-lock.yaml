@@ -1353,8 +1353,10 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
+      zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-base': link:../base
+      zod: 3.19.1
     devDependencies:
       '@aws-sdk/client-cognito-identity-provider': 3.226.0
       '@aws-sdk/client-dynamodb': 3.226.0
