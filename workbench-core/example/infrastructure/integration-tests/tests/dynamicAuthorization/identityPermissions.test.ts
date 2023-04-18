@@ -593,27 +593,8 @@ describe('dynamic authorization identity permission integration tests', () => {
       ).rejects.toThrowError(new HttpError(403, {}));
     });
 
-    test('remove user from group should be immediate and user is forbidden', async () => {
-      await adminSession.resources.groups.group(groupId).removeUser({ userId: mockAuthenticatedUser.id });
-      //READ sampleField on subject
-      const dynamicOperation: DynamicOperation = {
-        action: 'READ',
-        subject: {
-          subjectId,
-          subjectType,
-          parentId
-        },
-        field: 'sampleField'
-      };
-      await expect(
-        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
-          dynamicOperation,
-          authenticatedUser: mockAuthenticatedUser
-        })
-      ).rejects.toThrowError(new HttpError(403, {}));
-    });
-
     test('remove and add user from group should be immediate and user is forbidden/allowed', async () => {
+      // Remove user should be immediate
       await adminSession.resources.groups.group(groupId).removeUser({ userId: mockAuthenticatedUser.id });
       //READ sampleField on subject
       const dynamicOperation: DynamicOperation = {
@@ -631,6 +612,8 @@ describe('dynamic authorization identity permission integration tests', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrowError(new HttpError(403, {}));
+
+      // Add user should be immediate
       await adminSession.resources.groups.group(groupId).addUser({ userId: mockAuthenticatedUser.id });
       const response = await adminSession.resources.identityPermissions.isAuthorizedOnSubject({
         dynamicOperation,
