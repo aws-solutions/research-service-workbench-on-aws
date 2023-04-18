@@ -59,7 +59,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
       loading={props.isLoading}
       loadingText="Loading Compute Platforms"
       onSelectionChange={({ detail }) => {
-        setSelectedItems((prevState) => detail.selectedItems);
+        setSelectedItems((_prevState) => detail.selectedItems);
         props.onSelect(detail);
       }}
       selectedItems={selectedItems}

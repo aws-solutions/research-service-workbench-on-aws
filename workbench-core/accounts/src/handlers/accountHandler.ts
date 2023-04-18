@@ -22,7 +22,7 @@ export default class AccountHandler {
     this._accountService = accountService;
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
-  public async execute(event: any): Promise<void> {
+  public async execute(_event: any): Promise<void> {
     // eslint-disable-next-line
     const hostingAccounts = await this._getAccountMetadata();
     const portfolioName = process.env.SC_PORTFOLIO_NAME!;

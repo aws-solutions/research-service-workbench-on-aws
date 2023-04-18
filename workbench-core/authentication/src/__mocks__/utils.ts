@@ -10,6 +10,6 @@ export enum TimeUnits {
   SECONDS = 'seconds'
 }
 
-export function getTimeInMS(length: number, units: TimeUnits): number {
+export function getTimeInMS(_length: number, _units: TimeUnits): number {
   return 1;
 }

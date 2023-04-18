@@ -20,7 +20,7 @@ export default class Authentication extends CollectionResource {
     this._csrfToken = csrf.create(this._csrfSecret);
   }
 
-  public async create(body: unknown = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
+  public async create(_body: unknown = {}, _applyDefault: boolean = true): Promise<AxiosResponse> {
     throw new Error('Authentication should not be creating new resources.');
   }
 

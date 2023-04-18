@@ -44,7 +44,7 @@ export class MockDatabaseService implements DatabaseServicePlugin {
     this._associations.set(key, associations.concat(relations));
   }
 
-  private _deleteAssociations(entity: Associable, relations: Associable[]): void {
+  private _deleteAssociations(entity: Associable, _relations: Associable[]): void {
     const key = this._keyForAssociable(entity);
     let associations = this._associations.get(key) || [];
 

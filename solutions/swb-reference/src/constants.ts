@@ -240,7 +240,7 @@ function getDynamicAuthTableName(): string {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
   );
-  const stackName = Object.entries(outputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+  const stackName = Object.entries(outputs).map(([key, _value]) => key)[0]; //output has a format { stackname: {...props} }
   // eslint-disable-next-line security/detect-object-injection
   return outputs[stackName].dynamicAuthDDBTableName;
 }

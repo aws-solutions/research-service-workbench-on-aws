@@ -238,7 +238,7 @@ export function setUpProjectEnvRoutes(
   // Get environment
   router.get(
     '/projects/:projectId/environments/:id',
-    wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
+    wrapAsync(async (req: Request, res: Response, _next: NextFunction) => {
       const validatedRequest = validateAndParse<GetEnvironmentRequest>(GetEnvironmentRequestParser, {
         environmentId: req.params.id,
         projectId: req.params.projectId

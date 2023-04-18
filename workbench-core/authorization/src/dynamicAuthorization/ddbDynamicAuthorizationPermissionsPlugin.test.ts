@@ -296,7 +296,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     itProp(
       `get operations by route with a valid route but invalid method should throw RouteNotFoundError`,
       [fc.string()],
-      async (route) => {
+      async (_route) => {
         await expect(
           dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
             route: '/dynamic/sampleSubjectType/sampleSubjectId',

@@ -36,7 +36,7 @@ describe('Audit Service', () => {
       ipAddress: 'sampleIPAddress'
     };
     mockAuditPlugin = {
-      write: jest.fn(async (metadata: Metadata, auditEntry: Readonly<AuditEntry>): Promise<void> => {}),
+      write: jest.fn(async (_metadata: Metadata, _auditEntry: Readonly<AuditEntry>): Promise<void> => {}),
       prepare: jest.fn(async (metadata: Metadata, auditEntry: AuditEntry): Promise<void> => {
         auditEntry.action = metadata.action;
         auditEntry.statusCode = metadata.statusCode;

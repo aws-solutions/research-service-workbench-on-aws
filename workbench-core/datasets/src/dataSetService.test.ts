@@ -168,7 +168,7 @@ describe('DataSetService', () => {
 
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets')
-      .mockImplementation(async (pageSize: number, paginationToken: string | undefined) => {
+      .mockImplementation(async (_pageSize: number, _paginationToken: string | undefined) => {
         return {
           data: [
             {
@@ -252,7 +252,7 @@ describe('DataSetService', () => {
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'removeDataSet').mockImplementation(async () => {});
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
-      .mockImplementation(async (dataSetId: string, endpointId: string) => {
+      .mockImplementation(async (_dataSetId: string, endpointId: string) => {
         if (endpointId === mockNoRolesEndpointId) {
           return {
             id: mockExistingEndpointId,
@@ -325,7 +325,7 @@ describe('DataSetService', () => {
     });
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations')
-      .mockImplementation(async (pageSize: number, paginationToken: string | undefined) => {
+      .mockImplementation(async (_pageSize: number, _paginationToken: string | undefined) => {
         return {
           data: [
             {

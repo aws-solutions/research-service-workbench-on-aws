@@ -14,7 +14,7 @@ export const mockMetadata: Metadata = {
 };
 
 export const BaseExtractor: Extractor = {
-  getMetadata: jest.fn((req: Request, res: Response): Metadata => {
+  getMetadata: jest.fn((_req: Request, _res: Response): Metadata => {
     return {
       action: 'GET /user',
       source: { ip: 'sampleIp' },

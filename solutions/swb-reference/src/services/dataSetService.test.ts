@@ -367,7 +367,7 @@ describe('DataSetService', () => {
         };
 
         mockDynamicAuthService.createIdentityPermissions = jest.fn(
-          (request: CreateIdentityPermissionsRequest): Promise<CreateIdentityPermissionsResponse> => {
+          (_request: CreateIdentityPermissionsRequest): Promise<CreateIdentityPermissionsResponse> => {
             return Promise.resolve({
               data: {
                 identityPermissions: []
@@ -489,7 +489,7 @@ describe('DataSetService', () => {
         };
 
         mockDynamicAuthService.deleteIdentityPermissions = jest.fn(
-          (request: DeleteIdentityPermissionsRequest): Promise<DeleteIdentityPermissionsResponse> => {
+          (_request: DeleteIdentityPermissionsRequest): Promise<DeleteIdentityPermissionsResponse> => {
             return Promise.resolve({
               data: {
                 identityPermissions: []

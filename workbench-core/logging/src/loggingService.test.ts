@@ -51,9 +51,9 @@ describe('LoggingService tests', () => {
     it('should use options.loggingPlugin when defined', () => {
       class FakePlugin implements LoggingPlugin {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        public log(level: LogLevel, message: any, ...meta: any[]): void {}
-        public setMaxLogLevel(level: LogLevel): void {}
-        public setDefaultMetadata(metadata: LogMessageObject): void {}
+        public log(_level: LogLevel, _message: any, ..._meta: any[]): void {}
+        public setMaxLogLevel(_level: LogLevel): void {}
+        public setDefaultMetadata(_metadata: LogMessageObject): void {}
       }
 
       const logger = new LoggingService({ loggingPlugin: new FakePlugin() });

@@ -145,7 +145,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   public async addRoleToExternalEndpoint(
-    name: string,
+    _name: string,
     path: string,
     externalEndpointName: string,
     externalRoleName: string,
@@ -165,9 +165,9 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   public async removeRoleFromExternalEndpoint(
-    name: string,
-    externalEndpointName: string,
-    externalRoleArn: string
+    _name: string,
+    _externalEndpointName: string,
+    _externalRoleArn: string
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -185,9 +185,9 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   public async createPresignedMultiPartUploadUrls(
-    dataSetName: string,
-    numberOfParts: number,
-    timeToLiveSeconds: number
+    _dataSetName: string,
+    _numberOfParts: number,
+    _timeToLiveSeconds: number
   ): Promise<string[]> {
     throw new Error('Method not implemented.');
   }

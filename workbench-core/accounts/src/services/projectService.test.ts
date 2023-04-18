@@ -1762,13 +1762,13 @@ describe('ProjectService', () => {
 
     let projectId: string;
     let request: DeleteProjectRequest;
-    let checkDependency = async function (projectId: string): Promise<void> {
+    let checkDependency = async function (_projectId: string): Promise<void> {
       return;
     };
 
     beforeEach(() => {
       request = { authenticatedUser: user, projectId };
-      checkDependency = async function (projectId: string): Promise<void> {
+      checkDependency = async function (_projectId: string): Promise<void> {
         return;
       };
     });

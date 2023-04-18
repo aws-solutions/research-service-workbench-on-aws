@@ -110,7 +110,7 @@ describe('dynamicAuthorizationMiddleware tests', () => {
   test('missing user should return a 403', async () => {
     const next = jest.fn();
     const response: Response = {
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -132,7 +132,7 @@ describe('dynamicAuthorizationMiddleware tests', () => {
       locals: {
         user: mockUser
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -153,7 +153,7 @@ describe('dynamicAuthorizationMiddleware tests', () => {
       locals: {
         user: mockUser
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -178,7 +178,7 @@ describe('dynamicAuthorizationMiddleware tests', () => {
       locals: {
         user: mockUser
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()

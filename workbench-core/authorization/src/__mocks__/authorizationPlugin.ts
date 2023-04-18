@@ -13,8 +13,8 @@ import {
 
 export class MockAuthorizationPlugin implements AuthorizationPlugin {
   public async isAuthorizedOnDynamicOperations(
-    identityPermissions: IdentityPermission[],
-    dynamicOperations: DynamicOperation[]
+    _identityPermissions: IdentityPermission[],
+    _dynamicOperations: DynamicOperation[]
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }

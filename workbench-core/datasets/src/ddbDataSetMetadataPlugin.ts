@@ -98,13 +98,13 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return DataSetParser.parse(response.Item);
   }
 
-  public async listDataSetObjects(dataSetName: string): Promise<string[]> {
+  public async listDataSetObjects(_dataSetName: string): Promise<string[]> {
     throw new Error('Method not implemented.');
   }
 
   public async getDataSetObjectMetadata(
-    dataSetName: string,
-    objectName: string
+    _dataSetName: string,
+    _objectName: string
   ): Promise<Record<string, string>> {
     throw new Error('Method not implemented.');
   }

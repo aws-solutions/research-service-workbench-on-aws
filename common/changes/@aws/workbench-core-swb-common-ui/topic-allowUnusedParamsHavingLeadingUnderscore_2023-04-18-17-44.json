@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "Allow unused method parameters to have a leading underscore",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

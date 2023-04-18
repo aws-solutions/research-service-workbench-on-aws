@@ -104,7 +104,7 @@ describe('authorization middleware', () => {
       locals: {
         user: mockGuest
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -125,7 +125,7 @@ describe('authorization middleware', () => {
       locals: {
         user: mockGuest
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -146,7 +146,7 @@ describe('authorization middleware', () => {
       locals: {
         user: mockGuest
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -164,7 +164,7 @@ describe('authorization middleware', () => {
     const next = jest.fn();
     const response: Response = {
       locals: {},
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -187,7 +187,7 @@ describe('authorization middleware', () => {
           roles: ['guest']
         }
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -210,7 +210,7 @@ describe('authorization middleware', () => {
           id: 'sampleId'
         }
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()
@@ -244,7 +244,7 @@ describe('authorization middleware', () => {
           id: 'sampleId'
         }
       },
-      status: jest.fn().mockImplementation((statusCode: number) => {
+      status: jest.fn().mockImplementation((_statusCode: number) => {
         return response;
       }),
       json: jest.fn()

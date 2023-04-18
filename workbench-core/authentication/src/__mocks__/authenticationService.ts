@@ -23,7 +23,7 @@ export const tokens = {
 } as const;
 
 export class AuthenticationService {
-  public constructor(authenticationPlugin: AuthenticationPlugin) {}
+  public constructor(_authenticationPlugin: AuthenticationPlugin) {}
 
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
     if (accessToken === 'validToken') {
@@ -48,18 +48,18 @@ export class AuthenticationService {
     throw new Error();
   }
 
-  public getUserIdFromToken(decodedToken: DecodedJWT): string {
+  public getUserIdFromToken(_decodedToken: DecodedJWT): string {
     return 'id';
   }
 
-  public getUserRolesFromToken(decodedToken: DecodedJWT): string[] {
+  public getUserRolesFromToken(_decodedToken: DecodedJWT): string[] {
     return ['role'];
   }
 
   public async handleAuthorizationCode(
     code: string,
     codeVerifier: string,
-    websiteUrl: string
+    _websiteUrl: string
   ): Promise<Tokens> {
     if (code === 'validCode' && codeVerifier === 'validCodeVerifier') {
       return tokens;

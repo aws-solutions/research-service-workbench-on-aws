@@ -53,7 +53,7 @@ export class DatabaseService implements DatabaseServicePlugin {
     }
   }
 
-  public getAssociations(type: string, id: string): Promise<Associable[]> {
+  public getAssociations(_type: string, _id: string): Promise<Associable[]> {
     return Promise.resolve([]);
   }
 

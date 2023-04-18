@@ -8,11 +8,11 @@ import Metadata from '../metadata';
 
 export default class AuditService {
   public constructor(
-    auditPlugin: AuditPlugin,
-    continueOnError: boolean = false,
-    requiredAuditValues: string[] = ['actor', 'source', 'statusCode', 'action'],
-    fieldsToMask: string[] = ['password', 'accessKey']
+    _auditPlugin: AuditPlugin,
+    _continueOnError: boolean = false,
+    _requiredAuditValues: string[] = ['actor', 'source', 'statusCode', 'action'],
+    _fieldsToMask: string[] = ['password', 'accessKey']
   ) {}
 
-  public async write(metadata: Metadata, body?: object): Promise<void> {}
+  public async write(_metadata: Metadata, _body?: object): Promise<void> {}
 }

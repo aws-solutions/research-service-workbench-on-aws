@@ -64,7 +64,7 @@ describe('S3DataSetStoragePlugin', () => {
     itProp(
       'class is intialized given the specified parameters',
       [fc.string(), fc.string(), fc.string()],
-      (accessKeyId: string, secretAccessKey, kmsKeyArn) => {
+      (accessKeyId: string, secretAccessKey, _kmsKeyArn) => {
         const randomAwsCreds = {
           accessKeyId: accessKeyId,
           secretAccessKey: secretAccessKey

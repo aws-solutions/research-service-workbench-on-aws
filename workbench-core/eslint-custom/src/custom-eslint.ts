@@ -7,7 +7,18 @@
 import { importConvention } from './rules/import-convention';
 import { namingConvention } from './rules/naming-convention';
 
-const rules: any = Object.assign({}, namingConvention.rules, importConvention.rules);
+const rules: any = Object.assign({}, namingConvention.rules, importConvention.rules, {
+  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+  '@typescript-eslint/naming-convention': [
+    'error',
+    {
+      selector: 'parameter',
+      modifiers: ['unused'],
+      format: ['strictCamelCase'],
+      leadingUnderscore: 'allow'
+    }
+  ]
+});
 
 export const customESLint: any = {
   plugins: ['security', 'import'],
@@ -18,7 +29,7 @@ export const customESLint: any = {
     'plugin:import/recommended',
     'plugin:import/typescript'
   ],
-  rules: rules,
+  rules,
   settings: {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx']

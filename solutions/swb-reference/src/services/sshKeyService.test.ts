@@ -176,7 +176,7 @@ describe('SshKeyService', () => {
             test('it succeeds, and response with a list of multiple sshKeys is returned', async () => {
               // BUILD
               mockResponse = { sshKeys: [] };
-              keyPairs.forEach((key) => {
+              keyPairs.forEach((_key) => {
                 mockResponse.sshKeys.push({
                   sshKeyId: mockKeyName,
                   createTime: mockCreateTime.toISOString(),

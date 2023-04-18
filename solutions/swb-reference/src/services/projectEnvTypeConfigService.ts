@@ -237,7 +237,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     projectId: string,
     envTypeId: string,
     envTypeConfigId: string,
-    user: AuthenticatedUser
+    _user: AuthenticatedUser
   ): Promise<void> {
     const typeId = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
     let paginationToken: string | undefined = undefined;

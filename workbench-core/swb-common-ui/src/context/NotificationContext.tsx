@@ -18,8 +18,8 @@ export interface NotificationProps {
 
 const NotificationsContext: React.Context<NotificationProps> = React.createContext({
   notifications: {} as Notifications,
-  displayNotification: (id: string, notification: FlashbarProps.MessageDefinition) => {},
-  closeNotification: (id: string) => {}
+  displayNotification: (_id: string, _notification: FlashbarProps.MessageDefinition) => {},
+  closeNotification: (_id: string) => {}
 });
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }): JSX.Element {

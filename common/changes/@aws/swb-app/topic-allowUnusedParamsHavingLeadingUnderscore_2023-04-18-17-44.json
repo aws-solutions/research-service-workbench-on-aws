@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Allow unused method parameters to have a leading underscore",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

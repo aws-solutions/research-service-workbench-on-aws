@@ -57,11 +57,11 @@ describe('authenticationMiddleware tests', () => {
 
   beforeEach(() => {
     res = {
-      cookie: jest.fn((name, val, opts) => res),
-      clearCookie: jest.fn((name, opts) => res),
-      status: jest.fn((code) => res),
-      sendStatus: jest.fn((code) => res),
-      json: jest.fn((body) => res),
+      cookie: jest.fn((_name, _val, _opts) => res),
+      clearCookie: jest.fn((_name, _opts) => res),
+      status: jest.fn((_code) => res),
+      sendStatus: jest.fn((_code) => res),
+      json: jest.fn((_body) => res),
       locals: {}
     } as unknown as Response;
   });
