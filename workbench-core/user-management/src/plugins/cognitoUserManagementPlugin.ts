@@ -4,7 +4,7 @@
  */
 
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, DynamoDBService, buildDynamoDbKey } from '@aws/workbench-core-base';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -15,23 +15,33 @@ import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
 import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
+import { AccessType, TempRoleAccessEntry, TempRoleAccessEntryParser } from './tempRoleAccessEntry';
 
 /**
  * A CognitoUserManagementPlugin instance that interfaces with Cognito to provide user management services.
  */
 export class CognitoUserManagementPlugin implements UserManagementPlugin {
+  // default 15 minutes time to live for each temp access/revoke set in seconds
+  private readonly _defaultTempRoleAccesssTTL: number = 15 * 60;
+  private readonly _tempRoleAccessEntryPrefix: string = 'TempRoleAccess';
+
   private _userPoolId: string;
   private _aws: AwsService;
+  private _tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number };
 
   /**
    *
    * @param userPoolId - the user pool id to update with the plugin
    * @param aws - a {@link AwsService} instance with permissions to perform Cognito actions
    */
-  public constructor(userPoolId: string, aws: AwsService) {
+  public constructor(
+    userPoolId: string,
+    aws: AwsService,
+    tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number }
+  ) {
     this._userPoolId = userPoolId;
-
     this._aws = aws;
+    this._tempRoleAccessSettings = tempRoleAccessSettings;
   }
 
   /**
@@ -523,6 +533,12 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         Username: id,
         GroupName: role
       });
+      // Temporarily allow user access to the group
+      await this._modifyTempRoleAccess({
+        userId: id,
+        roleId: role,
+        access: 'ALLOW'
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -565,6 +581,12 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         UserPoolId: this._userPoolId,
         Username: id,
         GroupName: role
+      });
+      // Temporarily deny user access to the group
+      await this._modifyTempRoleAccess({
+        userId: id,
+        roleId: role,
+        access: 'DENY'
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -662,5 +684,69 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       throw error;
     }
+  }
+
+  /**
+   * Validate user roles to ensure given/revoked roles are modified.
+   * @param userId - ID of the user to be validated
+   * @param roles - roles of the user to be validated
+   *
+   * @returns - a list of validated user roles
+   */
+  public async validateUserRoles(userId: string, roles: string[]): Promise<string[]> {
+    // No settings for temp role access
+    if (!this._tempRoleAccessSettings) return roles;
+    //retrieve the access list and remove and add roles if necessary
+    const setOfRoleIds = new Set(roles);
+    const key = {
+      name: 'pk',
+      value: buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix)
+    };
+
+    const tempRoleAccessResults = await this._tempRoleAccessSettings.ddbService
+      .query({
+        key
+      })
+      .execute();
+
+    if (tempRoleAccessResults.Items) {
+      tempRoleAccessResults.Items.forEach((item) => {
+        const tempRoleAccessEntry = TempRoleAccessEntryParser.parse(item);
+        const expired = Math.round(Date.now() / 1000) > tempRoleAccessEntry.expirationTime;
+        if (!expired) {
+          if (tempRoleAccessEntry.access === 'ALLOW') setOfRoleIds.add(tempRoleAccessEntry.roleId);
+          else if (tempRoleAccessEntry.access === 'DENY') setOfRoleIds.delete(tempRoleAccessEntry.roleId);
+        }
+      });
+    }
+    return Array.from(setOfRoleIds.values());
+  }
+
+  private async _modifyTempRoleAccess(params: {
+    userId: string;
+    roleId: string;
+    access: AccessType;
+  }): Promise<void> {
+    // No settings for temp role access
+    if (!this._tempRoleAccessSettings) return;
+    const { userId, roleId, access } = params;
+    //add the roles permissions to the ddb service
+    const tempRoleAccessEntryKey = {
+      pk: buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix),
+      sk: buildDynamoDbKey(roleId, this._tempRoleAccessEntryPrefix)
+    };
+    const ttl = this._tempRoleAccessSettings.ttl ?? this._defaultTempRoleAccesssTTL;
+    const tempRoleAccessEntry: TempRoleAccessEntry = {
+      roleId: roleId,
+      access: access,
+      expirationTime: Math.round(Date.now() / 1000) + ttl
+    };
+
+    await this._tempRoleAccessSettings.ddbService.updateExecuteAndFormat({
+      key: tempRoleAccessEntryKey,
+      params: {
+        item: tempRoleAccessEntry
+      }
+    });
   }
 }

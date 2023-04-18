@@ -1374,7 +1374,8 @@ export class SWBStack extends Stack {
           partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
-      ]
+      ],
+      timeToLiveAttribute: 'expirationTime'
     });
 
     new CfnOutput(this, 'dynamicAuthDDBTableArn', {

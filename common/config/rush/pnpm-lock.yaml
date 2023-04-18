@@ -1331,6 +1331,7 @@ importers:
   ../../workbench-core/user-management:
     specifiers:
       '@aws-sdk/client-cognito-identity-provider': ^3.212.0
+      '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
@@ -1354,6 +1355,7 @@ importers:
       '@aws/workbench-core-base': link:../base
     devDependencies:
       '@aws-sdk/client-cognito-identity-provider': 3.226.0
+      '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/types': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -7777,7 +7779,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001477
+      caniuse-lite: 1.0.30001480
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -7894,8 +7896,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001477:
-    resolution: {integrity: sha512-lZim4iUHhGcy5p+Ri/G7m84hJwncj+Kz7S5aD4hoQfslKZJgt0tHc/hafVbqHC5bbhHb+mrW2JOUHkI5KH7toQ==}
+  /caniuse-lite/1.0.30001480:
+    resolution: {integrity: sha512-q7cpoPPvZYgtyC4VaBSN0Bt+PJ4c4EYRf0DrduInOz2SkFpHD5p3LnvEpqBp7UnJn+8x1Ogl1s38saUxe+ihQQ==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -11862,7 +11864,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001477
+      caniuse-lite: 1.0.30001480
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
