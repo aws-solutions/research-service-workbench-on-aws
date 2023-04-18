@@ -600,6 +600,7 @@ Complete the following sections and then run the automation script to setup the 
 1. [Deploy to the Hosting Account](#deploy-to-the-hosting-account)
 1. Run the automation script:
     ```bash
+    # Set the credentials for the main account and run the script
     cd solutions/swb-reference/scripts
     ./setupIntegTestEnv.sh -h [This will display the help screen along with an example on how to run this script]
     ```

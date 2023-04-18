@@ -56,14 +56,14 @@ Usage: `basename $0`
     -h [Help]
     -m [MAIN ACCOUNT EMAIL]
     -p [NEW PASSWORD FOR COGNITO USERS]
-    -s [STAGE NAME FOR INTEGRATION TEST DEPLOYMENT]
+    -s [STAGE NAME USED FOR DEPLOYMENT]
     -r [REGION SHORTNAME USED IN <STAGE>.yml]
     -i [HOSTING ACCOUNT ID]
-    -e [EXTERNAL ID]
+    -e [EXTERNAL ID USED FOR HOSTING ACCOUNT DEPLOYMENT]
     -k [EncryptionKeyArn FROM HOSTING ACCOUNT DEPLOYMENT]
 
 Example:
-    `basename $0` -m '<example@email.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:us-east-2:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX'
+    `basename $0` -m '<email@example.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:XXXXXXXX:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX'
           ${NC}"
 }
 
