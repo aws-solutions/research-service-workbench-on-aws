@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Effect, IPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { Effect, IPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
 
 export interface ComparisonResult {

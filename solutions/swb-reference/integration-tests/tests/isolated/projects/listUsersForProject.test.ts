@@ -3,41 +3,27 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list users for project tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
-  let project: { id: string };
+  let pa1Session: ClientSession;
+  let project1Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-
-    const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
-      accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test object'
-    });
-
-    const { data } = await adminSession.resources.projects.create({
-      name: `TestProject-${uuidv4()}`,
-      description: 'Project for list users for project tests',
-      costCenterId: costCenter.id
-    });
-
-    project = data;
+    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources());
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('negative tests', () => {
@@ -58,7 +44,7 @@ describe('list users for project tests', () => {
 
     test('cannot list users for non existing roles', async () => {
       try {
-        await adminSession.resources.projects.project(project.id).listUsersForProject('abc');
+        await adminSession.resources.projects.project(project1Id).listUsersForProject('abc');
       } catch (e) {
         checkHttpError(
           e,
@@ -72,8 +58,18 @@ describe('list users for project tests', () => {
   });
 
   describe('basic tests', () => {
-    test.each(['ProjectAdmin', 'Researcher'])('list users for role: %p', async (role: string) => {
-      const response = await adminSession.resources.projects.project(project.id).listUsersForProject(role);
+    // test IT Admin
+    test.each(['ProjectAdmin', 'Researcher'])('ITAdmin list users for role: %p', async (role: string) => {
+      const response = await adminSession.resources.projects.project(project1Id).listUsersForProject(role);
+
+      expect(response.status).toBe(200);
+      expect(response.data.users).toBeInstanceOf(Array);
+      expect(response.data.users.length).toBeGreaterThanOrEqual(0);
+    });
+
+    // test Project Admin
+    test.each(['ProjectAdmin', 'Researcher'])('PA list users for role: %p', async (role: string) => {
+      const response = await pa1Session.resources.projects.project(project1Id).listUsersForProject(role);
 
       expect(response.status).toBe(200);
       expect(response.data.users).toBeInstanceOf(Array);

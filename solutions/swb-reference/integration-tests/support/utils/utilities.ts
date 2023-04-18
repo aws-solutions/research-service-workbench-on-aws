@@ -61,4 +61,20 @@ async function poll<T>(
   }
 }
 
-export { sleep, checkHttpError, poll, getFakeEnvId };
+function generateInvalidIds(prefix: string): string[] {
+  return [
+    `${prefix}1-12345678-1234-1234-123f-1234567890ab`, //invalid prefix
+    `${prefix}-1234567g-1234-1234-123f-1234567890ab`, //invalid out of range g in 1st uuid section
+    `${prefix}-12345678f-1234-1234-123f-1234567890ab`, //invalid extra char in 1st uuid section
+    `${prefix}-12345678-123g-1234-123f-1234567890ab`, //invalid out of range g in 2nd uuid section
+    `${prefix}-12345678-1234f-1234-123f-1234567890ab`, //invalid extra char in 2nd uuid section
+    `${prefix}-12345678-1234-123g-123f-1234567890ab`, //invalid out of range g in 3rd uuid section
+    `${prefix}-12345678-1234-1234f-123f-1234567890ab`, //invalid extra char in 3rd uuid section
+    `${prefix}-12345678-1234-1234-123g-1234567890ab`, //invalid out of range g in 4th uuid section
+    `${prefix}-12345678-1234-1234-123ff-1234567890ab`, //invalid extra char in 4th uuid section
+    `${prefix}-12345678-1234-1234-123f-1234567890ag`, //invalid out of range g in 5th uuid section
+    `${prefix}-12345678-1234-1234-123f-1234567890abf` //invalid extra char in 5ht uuid section
+  ];
+}
+
+export { sleep, checkHttpError, poll, getFakeEnvId, generateInvalidIds };

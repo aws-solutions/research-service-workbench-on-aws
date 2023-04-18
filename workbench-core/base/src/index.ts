@@ -52,7 +52,7 @@ import {
   validRolesRegExpAsString,
   validSshKeyUuidRegExpAsString
 } from './utilities/textUtil';
-import { getPaginationParser, validateAndParse } from './utilities/validatorHelper';
+import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
 
 export {
   AwsService,
@@ -102,5 +102,6 @@ export {
   fromPaginationToken,
   runInBatches,
   validSshKeyUuidRegExpAsString,
-  getPaginationParser
+  getPaginationParser,
+  z
 };

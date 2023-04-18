@@ -104,7 +104,6 @@ importers:
 
   ../../solutions/swb-reference:
     specifiers:
-      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-ec2': ^3.212.0
       '@aws-sdk/client-ec2-instance-connect': ^3.267.0
       '@aws-sdk/client-s3': ^3.212.0
@@ -186,7 +185,6 @@ importers:
       qs: 6.11.0
       uuid: 8.3.2
     devDependencies:
-      '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-sagemaker': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
@@ -219,7 +217,6 @@ importers:
 
   ../../workbench-core/accounts:
     specifiers:
-      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.212.0
       '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-ec2': ^3.212.0
@@ -242,7 +239,9 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
+      aws-cdk-lib: ^2.72.1
       aws-sdk-client-mock: ^0.6.2
+      constructs: ^10.0.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
       jest: ^27.5.1
@@ -256,7 +255,6 @@ importers:
       typescript: ^4.5.2
       zod: ^3.19.1
     dependencies:
-      '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-cloudformation': 3.226.0
       '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-ec2': 3.226.0
@@ -282,7 +280,9 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 18.15.11
+      aws-cdk-lib: 2.73.0_constructs@10.1.25
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
+      constructs: 10.1.25
       depcheck: 1.4.3
       eslint: 8.16.0
       jest: 27.5.1
@@ -623,7 +623,6 @@ importers:
 
   ../../workbench-core/datasets:
     specifiers:
-      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-kms': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
@@ -642,7 +641,9 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
+      aws-cdk-lib: ^2.72.1
       aws-sdk-client-mock: ^0.6.2
+      constructs: ^10.0.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
       fast-check: ^2.24.0
@@ -659,7 +660,6 @@ importers:
       typescript: ^4.5.2
       zod: ^3.19.1
     dependencies:
-      '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-kms': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
@@ -682,7 +682,9 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 18.15.11
+      aws-cdk-lib: 2.73.0_constructs@10.1.25
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
+      constructs: 10.1.25
       depcheck: 1.4.3
       eslint: 8.16.0
       fast-check: 2.25.0
@@ -1394,15 +1396,6 @@ packages:
   /@aws-cdk/asset-node-proxy-agent-v5/2.0.106:
     resolution: {integrity: sha512-SRKa/ZHAIXYT7DgGI6kw1FuhCyR4xhmPgIopVFfOwt0yHu35NELAR9It98tGWOOWmnFikF+n4UR8OUjW1rcvsg==}
 
-  /@aws-cdk/aws-iam/1.159.0:
-    resolution: {integrity: sha512-Zl2dBMIw143IzeyLlnHP37Sdiqu446sE9KyOaiWQEv00woTWblaGbdmMCcJygjiAcCGG0T2R0Vaxusa8KZxwyg==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      '@aws-cdk/core': 1.159.0
-      '@aws-cdk/cx-api': 1.159.0
-      '@aws-cdk/region-info': 1.159.0
-      constructs: 3.4.25
-
   /@aws-cdk/aws-servicecatalogappregistry-alpha/2.61.0-alpha.0_hvqvamap3eti3gy6vfrvrsabw4:
     resolution: {integrity: sha512-hbigorGAW0jUc5KhwebD5/gmBztWPuSzV84qsrambSC1RAlDDUFQ9N+jEgyqV6U6D/OsDp/XnbGKjtTh6OIZ1Q==}
     engines: {node: '>= 14.15.0'}
@@ -1413,47 +1406,6 @@ packages:
       aws-cdk-lib: 2.73.0_constructs@10.1.25
       constructs: 10.1.25
     dev: false
-
-  /@aws-cdk/cloud-assembly-schema/1.159.0:
-    resolution: {integrity: sha512-/j0wrbcyugAtq0JC7peYUhyEMREU+esFU9PEoeYZFOlUbFkkOeaLNiZj4mc21XgOKbScw+RfQRpD3YX6+QAw3w==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      jsonschema: 1.4.1
-      semver: 7.3.8
-    bundledDependencies:
-      - jsonschema
-      - semver
-
-  /@aws-cdk/core/1.159.0:
-    resolution: {integrity: sha512-9OlmxiJ8nzYCGEyjnAWMg+idNXWIiHuzEaJYBGHFwSTWdkh2gnrL4box15JDdOO+/lMVq6q7Fnm7nfERxFzcIA==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.159.0
-      '@aws-cdk/cx-api': 1.159.0
-      '@aws-cdk/region-info': 1.159.0
-      '@balena/dockerignore': 1.0.2
-      constructs: 3.4.25
-      fs-extra: 9.1.0
-      ignore: 5.2.4
-      minimatch: 3.1.2
-    bundledDependencies:
-      - fs-extra
-      - minimatch
-      - '@balena/dockerignore'
-      - ignore
-
-  /@aws-cdk/cx-api/1.159.0:
-    resolution: {integrity: sha512-lIRoqjUxNPVgB93b8x2IOOZFLVdoISeglQUS6PEFDCnVIKtSsBvgqgmZPUccAacyrAp7F5L9Fil3kKmLOXwi+g==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.159.0
-      semver: 7.3.8
-    bundledDependencies:
-      - semver
-
-  /@aws-cdk/region-info/1.159.0:
-    resolution: {integrity: sha512-RrCXLeMcGPSuCR0LxAMTLrVlk1dG7d+BFfEnTV8BZDz6sxaGm4gs10xUZ2QQW4ebQdN5zn0xUnEiElO1PFR/Qg==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
 
   /@aws-crypto/crc32/2.0.0:
     resolution: {integrity: sha512-TvE1r2CUueyXOuHdEigYjIZVesInd9KN+K/TFFNfkkxRThiNxO6i4ZqqAVMoEjAamZZ1AA8WXJkjCz7YShHPQA==}
@@ -8147,10 +8099,6 @@ packages:
 
   /constructs/10.1.25:
     resolution: {integrity: sha512-etUavUwFJ3oTxoP9ax8Dvzv47Nzk9QHRnubL3cEOxLATd8b0SOLFN4xB7FP6eEg/D+cI7rgXTOQH9Oj4rIhwqw==}
-    engines: {node: '>= 14.17.0'}
-
-  /constructs/3.4.25:
-    resolution: {integrity: sha512-Ilp8VFOVHCS9+TQxp0o+kD43s4Q53rqfu26vrI5ubVAFtxTEKsUyCnugeqwjm+rtMHM1iNFGujk0tGVFNhSnxQ==}
     engines: {node: '>= 14.17.0'}
 
   /content-disposition/0.5.4:
