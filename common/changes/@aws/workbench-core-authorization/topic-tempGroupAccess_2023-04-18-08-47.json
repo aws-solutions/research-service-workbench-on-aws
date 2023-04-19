@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "add validate user groups",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
