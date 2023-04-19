@@ -213,9 +213,13 @@ describe('zod.nonHTML', () => {
       // String is Single quote HTML
       { id: "<tag key='value'/>" },
       // String contains HTML
+      { id: "randomString<tag key='value'></tag> randomString" },
+      { id: "randomString<tag key='value'>content</tag> randomString" },
       { id: "randomString<tag key='value'/> randomString" },
+      // String contains multiple HTML
+      { id: "randomString<tag key='value'/> randomString <tag key='value'/> randomString" },
       //multi-line with HTML
-      { id: 'randomString<tag ' + "key='value'/> randomString" }
+      { id: "randomString<tag\nkey='value'/> randomString" }
     ];
     test.each(invalidObjects)('returns required message', (invalidObject) => {
       expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(
