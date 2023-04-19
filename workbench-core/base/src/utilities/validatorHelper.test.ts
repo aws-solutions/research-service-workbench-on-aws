@@ -189,3 +189,38 @@ describe('zod.required', () => {
     });
   });
 });
+
+describe('zod.nonHTML', () => {
+  const zodParser = z.object({
+    id: z.string().nonHTML()
+  });
+  type NonHTMLType = z.infer<typeof zodParser>;
+
+  describe('when input does not contains', () => {
+    const validObjects = [{ id: 'non HTML' }, { id: '<' }, { id: '>' }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<NonHTMLType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input contains HTML', () => {
+    const invalidObjects = [
+      // String is HTML with empty quote
+      { id: '<>' },
+      // String is HTML with double quote
+      { id: "<tag key='value'></tag>" },
+      { id: "<tag key='value'>content</tag>" },
+      // String is Single quote HTML
+      { id: "<tag key='value'/>" },
+      // String contains HTML
+      { id: "randomString<tag key='value'/> randomString" },
+      //multi-line with HTML
+      { id: 'randomString<tag ' + "key='value'/> randomString" }
+    ];
+    test.each(invalidObjects)('returns required message', (invalidObject) => {
+      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(
+        'id: Input contains HTML'
+      );
+    });
+  });
+});

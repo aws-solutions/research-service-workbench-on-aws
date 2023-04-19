@@ -5,7 +5,7 @@
 
 import * as Boom from '@hapi/boom';
 import { z, ZodString, ZodTypeAny } from 'zod';
-import { uuidWithLowercasePrefixRegExp } from './textUtil';
+import { nonHtmlRegExp, uuidWithLowercasePrefixRegExp } from './textUtil';
 
 interface ZodPagination {
   pageSize: z.ZodOptional<z.ZodEffects<z.ZodString, number, string>>;
@@ -16,6 +16,7 @@ declare module 'zod' {
   export interface ZodString {
     required: () => ZodString;
     swbId: (prefix: string) => ZodString;
+    nonHTML: () => ZodString;
   }
 }
 
@@ -25,6 +26,10 @@ z.ZodString.prototype.required = function (): ZodString {
 
 z.ZodString.prototype.swbId = function (prefix: string): ZodString {
   return this.regex(uuidWithLowercasePrefixRegExp(prefix), { message: 'Invalid ID' });
+};
+
+z.ZodString.prototype.nonHTML = function (): ZodString {
+  return this.regex(nonHtmlRegExp(), { message: 'Input contains HTML' });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {

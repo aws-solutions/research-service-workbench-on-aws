@@ -27,6 +27,12 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   return new RegExp(`${prefix.toLowerCase()}-${uuidRegExpAsString}$`);
 }
 
+function nonHtmlRegExp(): RegExp {
+  const htmlRegExpAsString = /<[^>]*>/gm;
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(`^(?!.*${htmlRegExpAsString.source}).*$`);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
@@ -35,6 +41,7 @@ export {
   uuidWithLowercasePrefix,
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
+  nonHtmlRegExp,
   uuidRegExpAsString,
   productIdRegExpString,
   provisionArtifactIdRegExpString,
