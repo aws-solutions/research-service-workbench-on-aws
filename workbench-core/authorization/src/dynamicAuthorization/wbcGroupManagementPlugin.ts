@@ -30,6 +30,11 @@ import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './m
 import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 import { SetGroupMetadata } from './models/SetGroupMetadata';
 import { SetGroupStatusRequest, SetGroupStatusResponse } from './models/setGroupStatus';
+import {
+  ValidateUserGroupsRequest,
+  ValidateUserGroupsRequestParser,
+  ValidateUserGroupsResponse
+} from './models/validateUserGroups';
 
 /**
  * A WBCGroupManagementPlugin instance that interfaces with Workbench Core's UserManagementService to provide group management.
@@ -266,5 +271,12 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       }
       throw err;
     }
+  }
+  public async validateUserGroups(request: ValidateUserGroupsRequest): Promise<ValidateUserGroupsResponse> {
+    const { userId, groupIds } = ValidateUserGroupsRequestParser.parse(request);
+    const validGroupIds = await this._userManagementService.validateUserRoles(userId, groupIds);
+    return {
+      validGroupIds
+    };
   }
 }

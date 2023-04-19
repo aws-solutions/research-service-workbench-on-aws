@@ -10,7 +10,7 @@
     }
   },
   "coveragePathIgnorePatterns": ["<rootDir>/src/index.ts"],
-  "coverageReporters": ["json-summary", "json", "lcov"],
+  "coverageReporters": ["json-summary", "json", "lcov", "text"],
   "moduleNameMapper": {
     "#node-web-compat": "./node-web-compat-node.js"
   }
