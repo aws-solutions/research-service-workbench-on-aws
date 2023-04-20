@@ -5,6 +5,7 @@
 
 import { LoggingService } from '@aws/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { AuthenticatedUserParser } from '../models/authenticatedUser';
 import { HTTPMethodParser } from '../models/routesMap';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
@@ -18,12 +19,33 @@ export default function withDynamicAuth(
   dynamicAuthorizationService: DynamicAuthorizationService,
   options?: {
     logger?: LoggingService;
+    rateLimiter?: {
+      duration: number;
+      points: number;
+    };
   }
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  // Allows 10 requests per 1 second from a single source
+  const defaultRateLimitingOptions = {
+    duration: 1,
+    points: 10
+  };
+
+  const ratelimitOpts = options?.rateLimiter ?? defaultRateLimitingOptions;
+  // Utilize in memory rate limiter
+  const rateLimiter = new RateLimiterMemory(ratelimitOpts);
   /**
    * Authorization Middleware
    */
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // Check for rate limiter
+    try {
+      await rateLimiter.consume(req.ip);
+    } catch (rejRes) {
+      res.status(429).json({ error: 'Too Many Requests' });
+      return;
+    }
+
     try {
       const route: string = req.baseUrl + req.path;
       const method = HTTPMethodParser.parse(req.method);
