@@ -4,6 +4,7 @@
  */
 
 import JSONValue from '../types/json';
+import { swbNameMaxLength, swbDescriptionMaxLength } from './textUtil';
 import { getPaginationParser, validateAndParse, z } from './validatorHelper';
 
 describe('getPaginationProperties', () => {
@@ -190,13 +191,13 @@ describe('zod.required', () => {
   });
 });
 
-describe('zod.nonHTML', () => {
+describe('tests for zod.nonHTML', () => {
   const zodParser = z.object({
     id: z.string().nonHTML()
   });
   type NonHTMLType = z.infer<typeof zodParser>;
 
-  describe('when input does not contains', () => {
+  describe('when input does not contains HTML', () => {
     const validObjects = [{ id: 'non HTML' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<NonHTMLType>(zodParser, validObject)).toEqual(validObject);
@@ -230,6 +231,89 @@ describe('zod.nonHTML', () => {
       expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(
         'id: Input contains HTML'
       );
+    });
+  });
+});
+
+describe('tests for zod.swbName', () => {
+  const zodParser = z.object({
+    id: z.string().swbName()
+  });
+  type SwbNameType = z.infer<typeof zodParser>;
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: 'ABCabc123-_.' }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<SwbNameType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when length exceed maximum', () => {
+      const invalidObjects = [
+        // String exceeds max length
+        { id: 'A'.repeat(swbNameMaxLength + 1) }
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
+          `id: Input must be less than ${swbNameMaxLength} characters`
+        );
+      });
+    });
+
+    describe('when contains invalid char', () => {
+      const invalidObjects = [
+        // String contains invalid character
+        { id: '<' },
+        { id: ' ' },
+        { id: 'aaa&123' }
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
+          'invalid input characters'
+        );
+      });
+    });
+  });
+});
+
+describe('tests for zod.swbDescription', () => {
+  const zodParser = z.object({
+    id: z.string().swbDescription()
+  });
+  type SwbDescriptionType = z.infer<typeof zodParser>;
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: 'ABCabc123-_. ' }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<SwbDescriptionType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when length exceed maximum', () => {
+      const invalidObjects = [
+        // String exceeds max length
+        { id: 'A'.repeat(swbDescriptionMaxLength + 1) }
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
+          `id: Input must be less than ${swbDescriptionMaxLength} characters`
+        );
+      });
+    });
+
+    describe('when contains invalid char', () => {
+      const invalidObjects = [
+        // String contains invalid character
+        { id: '<' },
+        { id: 'aaa&123' }
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
+          'invalid input characters'
+        );
+      });
     });
   });
 });

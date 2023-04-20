@@ -5,7 +5,14 @@
 
 import * as Boom from '@hapi/boom';
 import { z, ZodString, ZodTypeAny } from 'zod';
-import { nonHtmlRegExp, uuidWithLowercasePrefixRegExp } from './textUtil';
+import {
+  nonHtmlRegExp,
+  swbNameRegExp,
+  swbDescriptionRegExp,
+  swbDescriptionMaxLength,
+  swbNameMaxLength,
+  uuidWithLowercasePrefixRegExp
+} from './textUtil';
 
 interface ZodPagination {
   pageSize: z.ZodOptional<z.ZodEffects<z.ZodString, number, string>>;
@@ -17,6 +24,8 @@ declare module 'zod' {
     required: () => ZodString;
     swbId: (prefix: string) => ZodString;
     nonHTML: () => ZodString;
+    swbName: () => ZodString;
+    swbDescription: () => ZodString;
   }
 }
 
@@ -30,6 +39,18 @@ z.ZodString.prototype.swbId = function (prefix: string): ZodString {
 
 z.ZodString.prototype.nonHTML = function (): ZodString {
   return this.regex(nonHtmlRegExp(), { message: 'Input contains HTML' });
+};
+
+z.ZodString.prototype.swbName = function (): ZodString {
+  return this.max(swbNameMaxLength, {
+    message: `Input must be less than ${swbNameMaxLength} characters`
+  }).regex(swbNameRegExp(), { message: 'invalid input characters' });
+};
+
+z.ZodString.prototype.swbDescription = function (): ZodString {
+  return this.max(swbDescriptionMaxLength, {
+    message: `Input must be less than ${swbDescriptionMaxLength} characters`
+  }).regex(swbDescriptionRegExp(), { message: 'invalid input characters' });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {
