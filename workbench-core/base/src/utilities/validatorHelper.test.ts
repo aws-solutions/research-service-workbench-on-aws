@@ -4,7 +4,13 @@
  */
 
 import JSONValue from '../types/json';
-import { swbNameMaxLength, swbDescriptionMaxLength } from './textUtil';
+import {
+  nonHTMLValidChar,
+  swbNameMaxLength,
+  swbNameValidChar,
+  swbDescriptionMaxLength,
+  swbDescriptionValidChar
+} from './textUtil';
 import { getPaginationParser, validateAndParse, z } from './validatorHelper';
 
 describe('getPaginationProperties', () => {
@@ -228,9 +234,7 @@ describe('tests for zod.nonHTML', () => {
       { id: "randomString<tag\nkey='value'/> randomString" }
     ];
     test.each(invalidObjects)('returns required message', (invalidObject) => {
-      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(
-        'id: Input contains HTML'
-      );
+      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(nonHTMLValidChar);
     });
   });
 });
@@ -270,7 +274,7 @@ describe('tests for zod.swbName', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          'invalid input characters'
+          `${swbNameValidChar}`
         );
       });
     });
@@ -311,7 +315,7 @@ describe('tests for zod.swbDescription', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          'invalid input characters'
+          `${swbDescriptionValidChar}`
         );
       });
     });

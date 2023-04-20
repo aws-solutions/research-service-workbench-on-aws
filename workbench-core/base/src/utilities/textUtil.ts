@@ -11,13 +11,15 @@ function uuidWithLowercasePrefix(prefix: string): string {
 }
 const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
+const nonHTMLValidChar: string = 'must not contain any of <>{}';
 const nonHtmlRegExpAsString: string = '^([^<>{}]*)$';
 
-// swbName must contain only letters, numbers, hyphens, underscores, and periods
+const swbNameValidChar: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
 const swbNameRegExpAsString: string = '^[A-Za-z0-9-_.]+$';
 const swbNameMaxLength: number = 112;
 
-// swbDescription must contain only letters, numbers, hyphens, underscores, periods, and spaces
+const swbDescriptionValidChar: string =
+  'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
 const swbDescriptionRegExpAsString: string = '^[A-Za-z0-9-_. ]+$';
 const swbDescriptionMaxLength: number = 400;
 
@@ -60,9 +62,12 @@ export {
   uuidWithLowercasePrefix,
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
+  nonHTMLValidChar,
   nonHtmlRegExp,
+  swbNameValidChar,
   swbNameRegExp,
   swbNameMaxLength,
+  swbDescriptionValidChar,
   swbDescriptionRegExp,
   swbDescriptionMaxLength,
   uuidRegExpAsString,
