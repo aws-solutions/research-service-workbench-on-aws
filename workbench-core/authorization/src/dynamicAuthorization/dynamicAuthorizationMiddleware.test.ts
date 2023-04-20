@@ -231,7 +231,7 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     dynamicAuthzMiddleware = withDynamicAuth(dynamicAuthorizationService, {
       rateLimiter: {
         duration: 1,
-        points: 0
+        requests: 0
       }
     });
     await dynamicAuthzMiddleware(request, response, next);

@@ -20,18 +20,22 @@ export default function withDynamicAuth(
   options?: {
     logger?: LoggingService;
     rateLimiter?: {
+      /**
+       * Duration in seconds
+       */
       duration: number;
-      points: number;
+      /**
+       * Number of requests per duration
+       */
+      requests: number;
     };
   }
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
-  // Allows 10 requests per 1 second from a single source
-  const defaultRateLimitingOptions = {
-    duration: 1,
-    points: 10
+  // Default allows 10 requests per 1 second from a single source
+  const ratelimitOpts = {
+    duration: options?.rateLimiter?.duration ?? 1,
+    points: options?.rateLimiter?.requests ?? 10
   };
-
-  const ratelimitOpts = options?.rateLimiter ?? defaultRateLimitingOptions;
   // Utilize in memory rate limiter
   const rateLimiter = new RateLimiterMemory(ratelimitOpts);
   /**
