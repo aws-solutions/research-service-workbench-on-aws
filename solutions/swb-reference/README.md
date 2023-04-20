@@ -155,6 +155,7 @@ Follow these steps to request a quota increase for App Registry application reso
 1. Choose **Request**.
 
 
+### Setup Integration Test Config File
 
 ## Get access token
 
@@ -168,6 +169,13 @@ Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_
 
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
+1. Follow these steps to assign a value to `terminatedEnvId` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Follow instructions in [Launch Sagemaker Notebook Environment](#launch-sagemaker-notebook-instance) to create a new Sagemaker environment and wait for COMPLETED status.
+    1. Copy the `id` value from the response
+    1. Use the `id` of the new environment to [Stop the environment](#stop-an-environment) and wait for STOPPED status.
+    1. Use the `id` of the new environment to [Terminate the environment](#terminate-the-environment).
+    1. Use new instance information to [Terminate](#terminate-the-environment)
+    1. In `./integration-tests/config` directory assign the `id` of the new environment to the `terminatedEnvId` in `<STAGE>.yaml` file  
 
 ## Setup Account Resources
 ### Onboard hosting account
@@ -179,6 +187,10 @@ In the body tab set `envMgmtRoleArn` parameter to the `EnvMgmtRoleArn` value fro
 
 In the body tab set `hostingAccountHandlerRoleArn` parameter to the `HostingAccountHandlerRoleArn` value from [Deploy to the Hosting Account step](#deploy-to-the-hosting-account).
 
+1. Follow these steps to assign a value to `projectAdmin1UserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
+    1. Uncomment `projectAdmin1UserNameParamStorePath` and provide a name for a SSM parameter that will contain a Project Admin user's email address, e.g. `/swb/<STAGE>/PA/email`.
+    1. Follow instructions in [Create User Step](#create-users) to create a new Project Admin user for the integration tests
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `projectAdmin1UserNameParamStorePath` and the value as the created Project Admin's email.
 
 Send a **Create Hosting Account** request 
 

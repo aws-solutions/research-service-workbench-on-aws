@@ -46,7 +46,7 @@ describe('datasets get integration test', () => {
       const endpoint = dataset.children.get(endpointData.mountObject.endpointId)!;
       const { data } = await endpoint.getMountObject();
 
-      expect(data).toMatchObject<GetDataSetMountPointResponse>(endpointData);
+      expect(data).toStrictEqual<GetDataSetMountPointResponse>(endpointData);
     });
 
     it('throws when getting the mount object of a dataset which does not exist', async () => {

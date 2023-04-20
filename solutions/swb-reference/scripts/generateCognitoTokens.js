@@ -27,7 +27,7 @@ try {
   );
 }
 
-const clientId = outputs.cognitoUserPoolClientId;
+const clientId = outputs.cognitoProgrammaticAccessUserPoolClientId;
 const userPoolId = outputs.cognitoUserPoolId;
 const region = outputs.awsRegion;
 const rootUserName = process.argv[2];

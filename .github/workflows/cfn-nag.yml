@@ -42,6 +42,8 @@ jobs:
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk:synth
+        env:
+          CDK_DEFAULT_ACCOUNT: '111111111111' #Dummy account number for synth to succeed
 
       - name: Run cfn-nag on all .template.json files
         uses: stelligent/cfn_nag@master

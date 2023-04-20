@@ -8,8 +8,9 @@
 # Used for local Lambda development; grab them from Cognito console after cdk-deploy completes.
 # Once values are entered, re-run cdk-deploy.
 #userPoolId: ''
-#clientId: ''
-#clientSecret: ''
+#webUiClientId: ''
+#webUiClientSecret: ''
+#programmaticAccessClientId: ''
 
 # Please provide the following values if you have a custom network for SWB to use
 #vpcId: ''

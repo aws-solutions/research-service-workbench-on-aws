@@ -99,7 +99,7 @@ describe('dynamic authorization group integration tests', () => {
 
       const { data } = await adminSession.resources.groups.getUserGroups(userData.id);
 
-      expect(data).toMatchObject({ groupIds: [groupData.groupId] });
+      expect(data).toStrictEqual({ groupIds: [groupData.groupId] });
     });
 
     it('returns a 404 error when the user doesnt exist', async () => {
@@ -130,7 +130,7 @@ describe('dynamic authorization group integration tests', () => {
       await adminSession.resources.groups.group(groupData.groupId).addUser({ userId: userData.id });
       const { data } = await adminSession.resources.groups.group(groupData.groupId).getGroupUsers();
 
-      expect(data).toMatchObject({ userIds: [userData.id] });
+      expect(data).toStrictEqual({ userIds: [userData.id] });
     });
 
     it('returns a 404 error when the Group doesnt exist', async () => {
@@ -155,7 +155,7 @@ describe('dynamic authorization group integration tests', () => {
       const { data } = await adminSession.resources.groups.group(createGroupData.groupId).addUser({
         userId: createUserData.id
       });
-      expect(data).toMatchObject({ groupId: createGroupData.groupId, userId: createUserData.id });
+      expect(data).toStrictEqual({ groupId: createGroupData.groupId, userId: createUserData.id });
     });
 
     test.each([{}, { userId: 123 }, { userId: 'testUserId', badParam: 'bad' }])(
@@ -211,14 +211,14 @@ describe('dynamic authorization group integration tests', () => {
       const { data } = await adminSession.resources.groups
         .group(groupData.groupId)
         .isUserAssigned(userData.id);
-      expect(data).toMatchObject({ isAssigned: true });
+      expect(data).toStrictEqual({ isAssigned: true });
     });
 
     it('returns false when the user is not in the group', async () => {
       const { data: userData } = await adminSession.resources.users.create(user);
 
       const { data } = await adminSession.resources.groups.group('fakeGroupId').isUserAssigned(userData.id);
-      expect(data).toMatchObject({ isAssigned: false });
+      expect(data).toStrictEqual({ isAssigned: false });
     });
 
     it('returns a 404 error when the user doesnt exist', async () => {
@@ -252,7 +252,7 @@ describe('dynamic authorization group integration tests', () => {
       const { data } = await adminSession.resources.groups
         .group(groupData.groupId)
         .removeUser({ userId: userData.id });
-      expect(data).toMatchObject({ groupId: groupData.groupId, userId: userData.id });
+      expect(data).toStrictEqual({ groupId: groupData.groupId, userId: userData.id });
     });
 
     test.each([{}, { userId: 123 }, { userId: 'testUserId', badParam: 'bad' }])(
@@ -300,7 +300,7 @@ describe('dynamic authorization group integration tests', () => {
 
       const { data } = await group.delete();
 
-      expect(data).toMatchObject({ groupId });
+      expect(data).toStrictEqual({ groupId });
     });
 
     it('returns a 404 error when trying to delete a group that does not exists', async () => {
@@ -318,7 +318,7 @@ describe('dynamic authorization group integration tests', () => {
         groupId = data.groupId;
       }
       const { data } = await adminSession.resources.groups.group(groupId).doesGroupExist();
-      expect(data).toMatchObject({
+      expect(data).toStrictEqual({
         exist: groupExists
       });
     });
