@@ -28,9 +28,9 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
 }
 
 function nonHtmlRegExp(): RegExp {
-  const htmlRegExpAsString = /<[^>]*>/gm;
+  const nonHtmlRegExpAsString = '^([^<>{}]*)$';
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^(?!.*${htmlRegExpAsString.source}).*$`);
+  return new RegExp(nonHtmlRegExpAsString);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';

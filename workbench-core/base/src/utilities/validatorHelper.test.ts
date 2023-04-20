@@ -197,7 +197,7 @@ describe('zod.nonHTML', () => {
   type NonHTMLType = z.infer<typeof zodParser>;
 
   describe('when input does not contains', () => {
-    const validObjects = [{ id: 'non HTML' }, { id: '<' }, { id: '>' }];
+    const validObjects = [{ id: 'non HTML' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<NonHTMLType>(zodParser, validObject)).toEqual(validObject);
     });
@@ -205,6 +205,11 @@ describe('zod.nonHTML', () => {
 
   describe('when input contains HTML', () => {
     const invalidObjects = [
+      // String with any of <>{}
+      { id: '<' },
+      { id: '>' },
+      { id: '{' },
+      { id: '}' },
       // String is HTML with empty quote
       { id: '<>' },
       // String is HTML with double quote
