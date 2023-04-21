@@ -521,7 +521,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'CREATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-          subjectId: '${projectId}' // Not using userId because no boundary on which users can be used
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ],
@@ -530,7 +531,8 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-          subjectId: '${projectId}' // Not using userId because no boundary on which users can be used
+          subjectId: '*',
+          projectId: '${projectId}'
         }
       }
     ]
@@ -540,7 +542,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_USER,
+          subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
           subjectId: '*',
           projectId: '${projectId}'
         }

@@ -39,7 +39,7 @@ workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorizati
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:148
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:200
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:242
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/identityPermissions.test.ts:413
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/identityPermissions.test.ts:411
 # Fake email for DataSetsService integration tests
 workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:30
@@ -60,5 +60,13 @@ workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:109
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:136
 workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:161
 # Fake emails for user to project integ tests
-solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:105
-solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:51
+solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:91
+solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:38
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:48
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:86
+
+# Fake emails used: setupIntegTestEnv.sh script
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:66
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:207
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:225
+solutions/swb-reference/scripts/setupIntegTestEnv.sh:243

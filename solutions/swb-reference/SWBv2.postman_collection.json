@@ -1293,7 +1293,7 @@
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects",
               "host": ["{{API_URL}}"],
-              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId", "projects"],
               "query": [
                 {
                   "key": "paginationToken",
@@ -1315,7 +1315,7 @@
                 {
                   "key": "envTypeConfigId",
                   "value": "",
-                  "description": "ID of environment type config to associate"
+                  "description": "ID of environment type config"
                 }
               ]
             }
@@ -1641,7 +1641,7 @@
           "response": []
         },
         {
-          "name": "Get EnvTypeConfigs associated with Project",
+          "name": "List Environment Type Configs for Project",
           "request": {
             "method": "GET",
             "header": [
@@ -1954,8 +1954,8 @@
       ]
     },
     {
-      "name": "hosting accounts",
-      "items": [
+      "name": "hostingAccounts",
+      "item": [
         {
           "name": "Create Hosting Account",
           "request": {
@@ -2119,15 +2119,19 @@
                 }
               }
             },
-            "url": "{{API_URL}}/awsAccountTemplateUrls"
+            "url": {
+              "raw": "{{API_URL}}/awsAccountTemplateUrls",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccountTemplateUrls"]
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "SSH keys",
-      "items": [
+      "name": "sshKeys",
+      "item": [
         {
           "name": "List User SSH Keys for Project",
           "request": {

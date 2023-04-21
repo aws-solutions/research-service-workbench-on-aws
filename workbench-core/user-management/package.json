@@ -27,10 +27,12 @@
     "test": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-base": "workspace:*"
+    "@aws/workbench-core-base": "workspace:*",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
+    "@aws-sdk/client-dynamodb": "^3.212.0",
     "@aws-sdk/client-s3": "^3.212.0",
     "@aws-sdk/types": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

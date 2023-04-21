@@ -1,7 +1,7 @@
-import { PolicyDocument } from '@aws-cdk/aws-iam';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
 import Setup from '../setup';
 import Settings from '../utils/settings';

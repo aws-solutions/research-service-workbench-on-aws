@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {

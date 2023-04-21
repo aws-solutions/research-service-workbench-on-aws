@@ -34,7 +34,7 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { addAccessPointDelegationStatement, createAccessLogsBucket } from './helpers/helper-function';
@@ -336,7 +336,8 @@ export class ExampleStack extends Stack {
           partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
-      ]
+      ],
+      timeToLiveAttribute: 'expirationTime'
     });
 
     // eslint-disable-next-line no-new
@@ -349,6 +350,79 @@ export class ExampleStack extends Stack {
     });
 
     return dynamicAuthDDBTable.table;
+  }
+
+  private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          StringEquals: {
+            's3:DataAccessPointAccount': Aws.ACCOUNT_ID
+          }
+        }
+      })
+    );
+  }
+
+  private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
+    const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      versioned: true,
+      enforceSSL: true,
+      encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER
+    });
+
+    exampleS3AccessLogsBucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
+        actions: ['s3:PutObject'],
+        resources: [`${exampleS3AccessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        conditions: {
+          StringEquals: {
+            'aws:SourceAccount': Aws.ACCOUNT_ID
+          }
+        }
+      })
+    );
+
+    //CFN NAG Suppression
+    const exampleS3AccessLogsBucketNode = exampleS3AccessLogsBucket.node.defaultChild as CfnBucket;
+    exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        // S3 Bucket should have access logging configured
+        {
+          id: 'W35',
+          reason:
+            "This is an access log bucket, we don't need to configure access logging for access log buckets"
+        }
+      ]
+    });
+
+    new CfnOutput(this, bucketNameOutput, {
+      value: exampleS3AccessLogsBucket.bucketName,
+      exportName: bucketNameOutput
+    });
+
+    //CDK NAG Suppression
+    NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
+      // The S3 Bucket has server access logs disabled.
+      {
+        id: 'AwsSolutions-S1',
+        reason:
+          "This is an access log bucket, we don't need to configure access logging for access log buckets"
+      }
+    ]);
+
+    return exampleS3AccessLogsBucket;
   }
 
   private _createRestApi(exampleLambda: Function): void {

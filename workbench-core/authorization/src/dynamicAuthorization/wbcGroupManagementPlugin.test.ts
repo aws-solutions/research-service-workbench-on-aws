@@ -69,7 +69,8 @@ describe('WBCGroupManagemntPlugin', () => {
       addUserToRole: jest.fn(),
       removeUserFromRole: jest.fn(),
       createRole: jest.fn(),
-      deleteRole: jest.fn()
+      deleteRole: jest.fn(),
+      validateUserRoles: jest.fn()
     };
     ddbMock = mockClient(DynamoDBClient);
   });

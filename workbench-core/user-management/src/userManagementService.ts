@@ -216,4 +216,15 @@ export class UserManagementService {
   public async deleteRole(role: string): Promise<void> {
     await this._userManagementPlugin.deleteRole(role);
   }
+
+  /**
+   * Validate user roles to ensure given/revoked roles are modified.
+   * @param userId - ID of the user to be validated
+   * @param roles - roles of the user to be validated
+   *
+   * @returns - a list of validated user roles
+   */
+  public async validateUserRoles(id: string, roles: string[]): Promise<string[]> {
+    return this._userManagementPlugin.validateUserRoles(id, roles);
+  }
 }

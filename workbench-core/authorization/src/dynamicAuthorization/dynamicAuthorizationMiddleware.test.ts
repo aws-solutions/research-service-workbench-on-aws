@@ -37,7 +37,12 @@ describe('dynamicAuthorizationMiddleware tests', () => {
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
       setGroupStatus: jest.fn(),
-      doesGroupExist: jest.fn()
+      doesGroupExist: jest.fn(),
+      validateUserGroups: jest.fn().mockImplementation((request) => {
+        return {
+          validGroupIds: request.groupIds
+        };
+      })
     };
     mockDynamicAuthorizationPermissionsPlugin = {
       isRouteIgnored: jest.fn(),

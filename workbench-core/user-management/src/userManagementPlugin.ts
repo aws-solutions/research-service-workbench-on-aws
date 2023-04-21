@@ -189,4 +189,13 @@ export interface UserManagementPlugin {
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   deleteRole(role: string): Promise<void>;
+
+  /**
+   * Validate user roles to ensure given/revoked roles are modified.
+   * @param userId - ID of the user to be validated
+   * @param roles - roles of the user to be validated
+   *
+   * @returns - a list of validated user roles
+   */
+  validateUserRoles(userId: string, roles: string[]): Promise<string[]>;
 }
