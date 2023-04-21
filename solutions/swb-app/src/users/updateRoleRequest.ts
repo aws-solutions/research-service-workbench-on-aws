@@ -9,7 +9,7 @@ import { z } from 'zod';
 export const UpdateRoleRequestParser = z
   .object({
     username: z.string().min(1),
-    roleName: z.string().min(1)
+    roleName: z.string().min(1).max(55)
   })
   .strict();
 

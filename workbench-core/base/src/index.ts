@@ -50,6 +50,7 @@ import {
   provisionArtifactIdRegExpString,
   groupIDRegExpAsString,
   validRolesRegExpAsString,
+  userGroupRegExpString,
   validSshKeyUuidRegExpAsString
 } from './utilities/textUtil';
 import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
@@ -79,6 +80,7 @@ export {
   QueryNumberParamFilter,
   QueryNumberParamFilterParser,
   validRolesRegExpAsString,
+  userGroupRegExpString,
   QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,

@@ -8,7 +8,7 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateRoleRequestParser = z
   .object({
-    roleName: z.string().min(1)
+    roleName: z.string().min(1).max(55)
   })
   .strict();
 

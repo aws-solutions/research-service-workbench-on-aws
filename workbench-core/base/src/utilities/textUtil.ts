@@ -29,6 +29,8 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
+const userGroupRegExpString: string = `(${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}#${validRolesRegExpAsString}|ITAdmin)`;
+
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
 
 export {
@@ -40,6 +42,7 @@ export {
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
   validRolesRegExpAsString,
+  userGroupRegExpString,
   groupIDRegExpAsString,
   validSshKeyUuidRegExpAsString
 };

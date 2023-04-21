@@ -8,8 +8,8 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const AuthenticatedUserParser = z
   .object({
-    id: z.string(),
-    roles: z.array(z.string())
+    id: z.string().min(1),
+    roles: z.array(z.string().min(1).max(55))
   })
   .strict();
 
