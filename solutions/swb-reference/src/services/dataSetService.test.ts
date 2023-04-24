@@ -58,7 +58,7 @@ describe('DataSetService', () => {
     mockDynamicAuthService = {} as DynamicAuthorizationService;
 
     mockUser = {
-      id: 'sampleId',
+      id: '12345678-1234-1234-1234-123456789012',
       roles: []
     };
     projectId = 'proj-projectId';

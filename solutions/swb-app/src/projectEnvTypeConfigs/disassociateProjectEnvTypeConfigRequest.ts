@@ -3,18 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
+import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DisassociateProjectEnvTypeConfigRequestParser = z
   .object({
-    envTypeId: z.string(),
-    envTypeConfigId: z.string(),
-    projectId: z.string(),
-    user: z.object({
-      id: z.string(),
-      roles: z.array(z.string())
-    })
+    envTypeId: z.string().etId().required(),
+    envTypeConfigId: z.string().swbId(resourceTypeToKey.envTypeConfig).required(),
+    projectId: z.string().swbId(resourceTypeToKey.project).required(),
+    user: AuthenticatedUserParser
   })
   .strict();
 

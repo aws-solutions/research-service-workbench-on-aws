@@ -169,7 +169,7 @@ describe('zod.swbId', () => {
 
   describe('is not valid', () => {
     test.each(invalidObjects)('returns invalid Id message', (invalidId) => {
-      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError(': Invalid ID');
+      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
     });
   });
 });
@@ -318,6 +318,35 @@ describe('tests for zod.swbDescription', () => {
           `${swbDescriptionValidChar}`
         );
       });
+    });
+  });
+});
+describe('zod.etId', () => {
+  const zodParser = z.object({
+    id: z.string().etId()
+  });
+  type SWBIdType = z.infer<typeof zodParser>;
+  const invalidObjects: SWBIdType[] = [
+    { id: 'et1-prod-1234567890123,pa-1234567890123' }, //invalid prefix
+    { id: 'et-prod1-1234567890123,pa-1234567890123' }, //invalid product prefix
+    { id: 'et-prod-12345678901234,pa-1234567890123' }, //invalid product length
+    { id: 'et-prod-123456789012$,pa-1234567890123' }, //invalid product character
+    { id: 'et-prod-1234567890123,pa1-1234567890123' }, //invalid provisioning artifact prefix
+    { id: 'et-prod-1234567890123,pa-1234567890123423' }, //invalid provisioning artifact length
+    { id: 'et-prod-1234567890123,pa-123456789012$' }, //invalid provisioning artifact character
+    { id: '' } //empty value
+  ];
+
+  describe('is valid', () => {
+    const validObject = { id: 'et-prod-1234567890123,pa-1234567890123' };
+    test('returns valid Id', () => {
+      expect(validateAndParse<SWBIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('is not valid', () => {
+    test.each(invalidObjects)('returns invalid et Id message', (invalidId) => {
+      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
     });
   });
 });

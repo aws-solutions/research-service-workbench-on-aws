@@ -54,6 +54,11 @@ function swbDescriptionRegExp(): RegExp {
   return new RegExp(swbDescriptionRegExpAsString);
 }
 
+function etIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(`${envTypeIdRegExpString}$`);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
@@ -76,5 +81,6 @@ export {
   envTypeIdRegExpString,
   validRolesRegExpAsString,
   groupIDRegExpAsString,
-  validSshKeyUuidRegExpAsString
+  validSshKeyUuidRegExpAsString,
+  etIdRegex
 };

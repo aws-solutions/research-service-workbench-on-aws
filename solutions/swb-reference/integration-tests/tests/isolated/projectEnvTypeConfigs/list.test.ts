@@ -52,9 +52,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find project invalid-project-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `projectId: Invalid ID`
         })
       );
     }
@@ -90,9 +90,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type invalid-envType-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
