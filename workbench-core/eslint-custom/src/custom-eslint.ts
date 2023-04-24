@@ -8,16 +8,7 @@ import { importConvention } from './rules/import-convention';
 import { namingConvention } from './rules/naming-convention';
 
 const rules: any = Object.assign({}, namingConvention.rules, importConvention.rules, {
-  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-  '@typescript-eslint/naming-convention': [
-    'error',
-    {
-      selector: 'parameter',
-      modifiers: ['unused'],
-      format: ['strictCamelCase'],
-      leadingUnderscore: 'allow'
-    }
-  ]
+  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
 });
 
 export const customESLint: any = {

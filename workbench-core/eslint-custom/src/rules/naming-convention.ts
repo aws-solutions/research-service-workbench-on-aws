@@ -34,6 +34,7 @@ export const namingConvention: any = {
           selectors: ['parameter'],
 
           format: ['camelCase'],
+          leadingUnderscore: 'allow',
 
           filter: {
             regex: [
