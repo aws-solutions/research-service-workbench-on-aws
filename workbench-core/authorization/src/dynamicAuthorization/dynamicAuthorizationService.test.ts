@@ -106,7 +106,7 @@ describe('DynamicAuthorizationService', () => {
     groupId = 'groupId';
     userId = 'userId';
     mockUser = {
-      id: 'sampleId',
+      id: '12345678-1234-1234-1234-123456789012',
       roles: []
     };
 
@@ -153,7 +153,7 @@ describe('DynamicAuthorizationService', () => {
     let params: IsAuthorizedOnSubjectRequest;
     beforeEach(() => {
       mockUser = {
-        id: 'sampleId',
+        id: '12345678-1234-1234-1234-123456789012',
         roles: ['sampleGroupId']
       };
       mockDynamicOperation = {
@@ -344,7 +344,7 @@ describe('DynamicAuthorizationService', () => {
     let mockParams: Record<string, string>;
     beforeEach(() => {
       mockUser = {
-        id: 'sampleId',
+        id: '12345678-1234-1234-1234-123456789012',
         roles: ['sampleGroupId']
       };
       auditAction = 'isAuthorizedOnRoute';

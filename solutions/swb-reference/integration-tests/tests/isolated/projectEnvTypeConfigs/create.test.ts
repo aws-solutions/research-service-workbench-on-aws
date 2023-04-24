@@ -47,9 +47,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find project invalid-project-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `projectId: Invalid ID`
         })
       );
     }
@@ -127,9 +127,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
@@ -167,9 +167,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config invalid-etc-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeConfigId: Invalid ID`
         })
       );
     }

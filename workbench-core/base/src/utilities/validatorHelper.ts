@@ -14,7 +14,8 @@ import {
   swbDescriptionValidChar,
   swbDescriptionMaxLength,
   swbNameMaxLength,
-  uuidWithLowercasePrefixRegExp
+  uuidWithLowercasePrefixRegExp,
+  etIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -29,6 +30,7 @@ declare module 'zod' {
     nonHTML: () => ZodString;
     swbName: () => ZodString;
     swbDescription: () => ZodString;
+    etId: () => ZodString;
   }
 }
 
@@ -54,6 +56,10 @@ z.ZodString.prototype.swbDescription = function (): ZodString {
   return this.max(swbDescriptionMaxLength, {
     message: `Input must be less than ${swbDescriptionMaxLength} characters`
   }).regex(swbDescriptionRegExp(), { message: swbDescriptionValidChar });
+};
+
+z.ZodString.prototype.etId = function (): ZodString {
+  return this.regex(etIdRegex(), { message: 'Invalid ID' });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {
