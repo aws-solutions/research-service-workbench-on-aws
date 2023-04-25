@@ -323,7 +323,6 @@ describe('dynamic authorization identity permission integration tests', () => {
     let subjectId: string;
     let parentId: string;
     let randomTextGenerator: RandomTextGenerator;
-    // let newAdminSession: ClientSession;
     let groupId: string;
     beforeAll(async () => {
       const { data } = await adminSession.resources.groups.create();
@@ -365,7 +364,6 @@ describe('dynamic authorization identity permission integration tests', () => {
       await adminSession.resources.groups
         .group(groupId)
         .addUser({ userId: adminSession.getSettings().get('rootUserId') });
-      // newAdminSession = await setup.createAdminSession();
     });
     //These routes are defined in dynamicRouteConfig and sampleRoutes
     test('is authorized on to PUT /parentResource/:parentId/resource/:resourceId with correct permissions', async () => {
