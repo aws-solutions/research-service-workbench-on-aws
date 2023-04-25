@@ -60,7 +60,6 @@
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "pkce-challenge": "^3.0.0",
-    "postman2openapi": "~1.0.0",
     "qs": "^6.11.0",
     "uuid": "^8.3.2"
   },
