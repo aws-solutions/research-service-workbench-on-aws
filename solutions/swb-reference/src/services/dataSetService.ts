@@ -36,7 +36,7 @@ import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
-const timeToLiveSeconds: number = 60 * 15; // 15 min
+const timeToLiveSeconds: number = 60 * 2; // 2 min
 
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
