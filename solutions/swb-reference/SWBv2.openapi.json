@@ -2922,6 +2922,240 @@
           }
         }
       ]
+    },
+    "/login": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "description": "Login",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "stateVerifier",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "codeChallenge",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{API_URL}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/token": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Exchange Auth Code for Token",
+        "description": "Exchange Auth Code for Token",
+        "operationId": "exchangeAuthCodeForToken",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{API_URL}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "authCode"
+                  },
+                  "codeVerifier": {
+                    "type": "string",
+                    "example": "codeChallenge"
+                  }
+                }
+              },
+              "example": {
+                "code": "authCode",
+                "codeVerifier": "codeChallenge"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logout",
+        "description": "Logout",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{API_URL}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Refresh",
+        "description": "Refresh",
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{API_URL}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/loggedIn": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "IsLoggedIn",
+        "description": "IsLoggedIn",
+        "operationId": "isloggedin",
+        "parameters": [
+          {
+            "name": "Cookie",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}"
+            }
+          },
+          {
+            "name": "csrf-token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{CSRF_TOKEN}}"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{API_URL}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -2951,6 +3185,9 @@
     },
     {
       "name": "sshKeys"
+    },
+    {
+      "name": "auth"
     }
   ]
 }
