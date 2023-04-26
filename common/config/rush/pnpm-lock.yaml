@@ -11,6 +11,7 @@ overrides:
   http-cache-semantics: '>=4.1.1'
   cacheable-request: '>=10.2.7'
   xml2js: '>=0.5.0'
+  yaml: '>=2.2.2'
 
 importers:
 
@@ -153,6 +154,7 @@ importers:
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
+      pkce-challenge: ^3.0.0
       qs: ^6.11.0
       sort-package-json: ^1.57.0
       ts-node: ^10.4.0
@@ -182,6 +184,7 @@ importers:
       express: 4.18.1
       js-yaml: 4.1.0
       lodash: 4.17.21
+      pkce-challenge: 3.0.0
       qs: 6.11.0
       uuid: 8.3.2
     devDependencies:
@@ -7539,7 +7542,7 @@ packages:
       punycode: 2.3.0
       semver: 7.3.8
       table: 6.8.1
-      yaml: 1.10.2
+      yaml: 2.2.2
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -7735,7 +7738,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001480
+      caniuse-lite: 1.0.30001481
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -7852,8 +7855,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001480:
-    resolution: {integrity: sha512-q7cpoPPvZYgtyC4VaBSN0Bt+PJ4c4EYRf0DrduInOz2SkFpHD5p3LnvEpqBp7UnJn+8x1Ogl1s38saUxe+ihQQ==}
+  /caniuse-lite/1.0.30001481:
+    resolution: {integrity: sha512-KCqHwRnaa1InZBtqXzP98LPg0ajCVujMKjqKDhZEthIpAsJl/YEIa3YvXjGXPVqzZVguccuu7ga9KOE1J9rKPQ==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -8172,7 +8175,7 @@ packages:
       import-fresh: 3.3.0
       parse-json: 5.2.0
       path-type: 4.0.0
-      yaml: 1.10.2
+      yaml: 2.2.2
     dev: true
 
   /create-require/1.1.1:
@@ -11816,7 +11819,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001480
+      caniuse-lite: 1.0.30001481
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -14463,9 +14466,9 @@ packages:
       js-yaml: 4.1.0
     dev: true
 
-  /yaml/1.10.2:
-    resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
-    engines: {node: '>= 6'}
+  /yaml/2.2.2:
+    resolution: {integrity: sha512-CBKFWExMn46Foo4cldiChEzn7S7SRV+wqiluAb6xmueD/fGyRHIhX8m14vVGgeFWjN540nKCNVj6P21eQjgTuA==}
+    engines: {node: '>= 14'}
 
   /yargs-parser/13.1.2:
     resolution: {integrity: sha512-3lbsNRf/j+A4QuSZfDRA7HRSfWrzO0YjqTJd5kjAq37Zep1CEgaYmrH9Q3GwPiB9cHyd1Y1UwggGhJGoxipbzg==}

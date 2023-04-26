@@ -98,7 +98,8 @@
       "jszip": ">=3.8.0",
       "http-cache-semantics": ">=4.1.1",
       "cacheable-request": ">=10.2.7",
-      "xml2js": ">=0.5.0"
+      "xml2js": ">=0.5.0",
+      "yaml":  ">=2.2.2"
     },
 
     /**
