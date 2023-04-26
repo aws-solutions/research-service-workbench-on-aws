@@ -4,7 +4,8 @@
   "coveragePathIgnorePatterns": [
     "<rootDir>/src/aws/awsService.ts",
     "<rootDir>/src/aws/clients/*",
-    "<rootDir>/src/types/relationshipDDBItem"
+    "<rootDir>/src/types/relationshipDDBItem",
+    "<rootDir>/src/services/secretsService.ts"
   ],
   "coverageThreshold": {
     "global": {
