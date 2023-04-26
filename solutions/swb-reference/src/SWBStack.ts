@@ -716,6 +716,21 @@ export class SWBStack extends Stack {
       })
     );
 
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          Bool: {
+            'aws:SecureTransport': 'false'
+          }
+        }
+      })
+    );
+
     new CfnOutput(this, bucketNameOutput, {
       value: s3Bucket.bucketName,
       exportName: bucketNameOutput
