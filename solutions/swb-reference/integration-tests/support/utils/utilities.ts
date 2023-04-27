@@ -77,4 +77,12 @@ function generateInvalidIds(prefix: string): string[] {
   ];
 }
 
-export { sleep, checkHttpError, poll, getFakeEnvId, generateInvalidIds };
+function generateRandomAlphaNumericString(length: number): string {
+  const validChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += validChars.charAt(Math.floor(Math.random() * validChars.length));
+  }
+  return result;
+}
+export { sleep, checkHttpError, poll, getFakeEnvId, generateInvalidIds, generateRandomAlphaNumericString };

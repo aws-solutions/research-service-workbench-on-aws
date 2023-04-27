@@ -62,7 +62,7 @@ export function setUpProjectEnvTypeConfigRoutes(
           `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
         );
       }
-      res.status(201).send();
+      res.status(204).send();
     })
   );
 
@@ -105,7 +105,7 @@ export function setUpProjectEnvTypeConfigRoutes(
       );
       try {
         const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
-        res.status(201).send(relationships);
+        res.status(200).send(relationships);
       } catch (e) {
         if (Boom.isBoom(e)) {
           throw e;
@@ -127,7 +127,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         envTypeConfigId: req.params.envTypeConfigId
       });
       const relationship = await projectEnvTypeConfigService.getEnvTypeConfig(request);
-      res.status(201).send(relationship);
+      res.status(200).send(relationship);
     })
   );
 
@@ -139,7 +139,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.query }
       );
       const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
-      res.status(201).send(relationships);
+      res.status(200).send(relationships);
     })
   );
 }

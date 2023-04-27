@@ -6,7 +6,16 @@
 const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
 jest.mock('uuid', () => ({ v4: () => randomUuid }));
 
-import { uuidRegExp, uuidWithLowercasePrefix, uuidWithLowercasePrefixRegExp } from './textUtil';
+import {
+  etIdRegex,
+  lengthValidationMessage,
+  nonHtmlRegExp,
+  swbDescriptionRegExp,
+  swbNameRegExp,
+  uuidRegExp,
+  uuidWithLowercasePrefix,
+  uuidWithLowercasePrefixRegExp
+} from './textUtil';
 
 describe('textUtil', () => {
   describe('uuidWithLowercasePrefix', () => {
@@ -36,6 +45,53 @@ describe('textUtil', () => {
     test('invalid uuid with prefix', () => {
       const prefix = 'ABC';
       expect(`${prefix}-${randomUuid}`.match(uuidWithLowercasePrefixRegExp(prefix))).toEqual(null);
+    });
+  });
+  describe('nonHtmlRegExp', () => {
+    test('valid nonHtml', () => {
+      expect('this is a valid non html @#'.match(nonHtmlRegExp())).toEqual(
+        expect.arrayContaining([`this is a valid non html @#`])
+      );
+    });
+
+    test('invalid nonHtml', () => {
+      expect(`<script>function(){while(true)}</script>`.match(nonHtmlRegExp())).toEqual(null);
+    });
+  });
+  describe('swbNameRegExp', () => {
+    test('valid swbName', () => {
+      expect('name.name-1'.match(swbNameRegExp())).toEqual(expect.arrayContaining([`name.name-1`]));
+    });
+
+    test('invalid swbName', () => {
+      expect(`invalid name$`.match(swbNameRegExp())).toEqual(null);
+    });
+  });
+  describe('swbDescriptionRegExp', () => {
+    test('valid swbDescription', () => {
+      expect('description- desc'.match(swbDescriptionRegExp())).toEqual(
+        expect.arrayContaining([`description- desc`])
+      );
+    });
+
+    test('invalid swbDescription', () => {
+      expect(`%$<>`.match(swbDescriptionRegExp())).toEqual(null);
+    });
+  });
+  describe('etIdRegex', () => {
+    test('valid etId', () => {
+      expect('et-prod-1234567890123,pa-1234567890123'.match(etIdRegex())).toEqual(
+        expect.arrayContaining([`et-prod-1234567890123,pa-1234567890123`])
+      );
+    });
+
+    test('invalid etId', () => {
+      expect(`invalid`.match(etIdRegex())).toEqual(null);
+    });
+  });
+  describe('lengthValidationMessage', () => {
+    test('returns validation message', () => {
+      expect(lengthValidationMessage(3)).toEqual('Input must be less than 3 characters');
     });
   });
 });
