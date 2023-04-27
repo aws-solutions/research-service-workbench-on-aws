@@ -23,6 +23,11 @@ const swbDescriptionValidChar: string =
 const swbDescriptionRegExpAsString: string = '^[A-Za-z0-9-_. ]+$';
 const swbDescriptionMaxLength: number = 400;
 
+const nonEmptyMessage: string = 'Cannot be empty';
+const invalidIdMessage: string = 'Invalid ID';
+const requiredMessage: string = 'Required';
+const urlFilterMaxLength: number = 128;
+
 const groupIDRegExpAsString: string = '\\S{1,128}';
 
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
@@ -33,6 +38,10 @@ const envTypeIdRegExpString: string = `${resourceTypeToKey.envType.toLowerCase()
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
+
+function lengthValidationMessage(length: number): string {
+  return `Input must be less than ${length} characters`;
+}
 
 function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
@@ -82,5 +91,10 @@ export {
   validRolesRegExpAsString,
   groupIDRegExpAsString,
   validSshKeyUuidRegExpAsString,
-  etIdRegex
+  etIdRegex,
+  nonEmptyMessage,
+  invalidIdMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  lengthValidationMessage
 };

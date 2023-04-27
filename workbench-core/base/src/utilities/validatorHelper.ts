@@ -15,7 +15,11 @@ import {
   swbDescriptionMaxLength,
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
-  etIdRegex
+  etIdRegex,
+  nonEmptyMessage,
+  invalidIdMessage,
+  requiredMessage,
+  lengthValidationMessage
 } from './textUtil';
 
 interface ZodPagination {
@@ -31,15 +35,16 @@ declare module 'zod' {
     swbName: () => ZodString;
     swbDescription: () => ZodString;
     etId: () => ZodString;
+    nonEmpty: () => ZodString;
   }
 }
 
 z.ZodString.prototype.required = function (): ZodString {
-  return this.min(1, { message: 'Required' });
+  return this.min(1, { message: requiredMessage });
 };
 
 z.ZodString.prototype.swbId = function (prefix: string): ZodString {
-  return this.regex(uuidWithLowercasePrefixRegExp(prefix), { message: 'Invalid ID' });
+  return this.regex(uuidWithLowercasePrefixRegExp(prefix), { message: invalidIdMessage });
 };
 
 z.ZodString.prototype.nonHTML = function (): ZodString {
@@ -48,18 +53,22 @@ z.ZodString.prototype.nonHTML = function (): ZodString {
 
 z.ZodString.prototype.swbName = function (): ZodString {
   return this.max(swbNameMaxLength, {
-    message: `Input must be less than ${swbNameMaxLength} characters`
+    message: lengthValidationMessage(swbNameMaxLength)
   }).regex(swbNameRegExp(), { message: swbNameValidChar });
 };
 
 z.ZodString.prototype.swbDescription = function (): ZodString {
   return this.max(swbDescriptionMaxLength, {
-    message: `Input must be less than ${swbDescriptionMaxLength} characters`
+    message: lengthValidationMessage(swbDescriptionMaxLength)
   }).regex(swbDescriptionRegExp(), { message: swbDescriptionValidChar });
 };
 
 z.ZodString.prototype.etId = function (): ZodString {
-  return this.regex(etIdRegex(), { message: 'Invalid ID' });
+  return this.regex(etIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.nonEmpty = function (): ZodString {
+  return this.min(1, { message: nonEmptyMessage });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {

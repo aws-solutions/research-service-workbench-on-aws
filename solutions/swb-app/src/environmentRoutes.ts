@@ -19,7 +19,7 @@ export function setUpEnvRoutes(router: Router, environmentService: EnvironmentPl
     wrapAsync(async (req: Request, res: Response) => {
       const request = validateAndParse<ListEnvironmentsRequest>(ListEnvironmentsRequestParser, req.query);
       const response = await environmentService.listEnvironments(request);
-      res.send(response);
+      res.status(200).send(response);
     })
   );
 }

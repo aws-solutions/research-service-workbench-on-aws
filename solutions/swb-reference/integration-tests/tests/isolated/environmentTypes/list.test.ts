@@ -2,10 +2,11 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { lengthValidationMessage, urlFilterMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('list environment types', () => {
   const setup: Setup = Setup.getSetup();
@@ -81,6 +82,23 @@ describe('list environment types', () => {
         new HttpError(400, {
           error: 'Bad Request',
           message: 'Cannot apply a filter and sort to different properties at the same time'
+        })
+      );
+    }
+  });
+  test('list environments types fails when filter by name exceeding length', async () => {
+    try {
+      await adminSession.resources.environmentTypes.get({
+        filter: {
+          name: { begins: generateRandomAlphaNumericString(urlFilterMaxLength + 1) }
+        }
+      });
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `filter.name.begins: ${lengthValidationMessage(urlFilterMaxLength)}`
         })
       );
     }

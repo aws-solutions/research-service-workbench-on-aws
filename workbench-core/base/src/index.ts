@@ -50,7 +50,17 @@ import {
   provisionArtifactIdRegExpString,
   groupIDRegExpAsString,
   validRolesRegExpAsString,
-  validSshKeyUuidRegExpAsString
+  validSshKeyUuidRegExpAsString,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionValidChar,
+  swbNameValidChar,
+  nonHTMLValidChar,
+  swbDescriptionMaxLength,
+  lengthValidationMessage
 } from './utilities/textUtil';
 import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
 
@@ -103,5 +113,15 @@ export {
   runInBatches,
   validSshKeyUuidRegExpAsString,
   getPaginationParser,
-  z
+  z,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionValidChar,
+  swbNameValidChar,
+  nonHTMLValidChar,
+  swbDescriptionMaxLength,
+  lengthValidationMessage
 };
