@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Updating ssh key service send ssh public key to take in project id",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

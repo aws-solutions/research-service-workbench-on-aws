@@ -2243,10 +2243,14 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:environmentId/sshKeys",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:environmentId/sshKeys",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":environmentId", "sshKeys"],
+              "path": ["projects", ":projectId", "environments", ":environmentId", "sshKeys"],
               "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
                 {
                   "key": "environmentId",
                   "value": ""
