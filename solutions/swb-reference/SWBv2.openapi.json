@@ -2883,7 +2883,7 @@
         }
       ]
     },
-    "/environments/{environmentId}/sshKeys": {
+    "/projects/{projectId}/environments/{environmentId}/sshKeys": {
       "get": {
         "tags": ["sshKeys"],
         "summary": "Send SSH Public Key",
@@ -2912,6 +2912,15 @@
         }
       },
       "parameters": [
+        {
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": ""
+          }
+        },
         {
           "name": "environmentId",
           "in": "path",

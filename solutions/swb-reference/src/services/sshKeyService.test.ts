@@ -16,6 +16,7 @@ import { DescribeInstancesCommandOutput, EC2, KeyPairInfo } from '@aws-sdk/clien
 import { EC2InstanceConnect, SendSSHPublicKeyCommandOutput } from '@aws-sdk/client-ec2-instance-connect';
 import {
   AwsServiceError,
+  ConflictError,
   ConnectionInfoNotDefinedError,
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
@@ -503,6 +504,7 @@ describe('SshKeyService', () => {
 
     beforeEach(() => {
       sendPublicKeyRequest = {
+        projectId: 'proj-123',
         environmentId: 'env-123',
         userId: '1234'
       };
@@ -544,6 +546,19 @@ describe('SshKeyService', () => {
           owner: sendPublicKeyRequest.userId
         };
         environmentService.getEnvironment = jest.fn(() => Promise.resolve(environment));
+      });
+
+      describe('but projectId does not match requested project id', () => {
+        beforeEach(() => {
+          environment.projectId = 'proj-incorrect-project-id';
+        });
+
+        test('it throws ConflictError', async () => {
+          // OPERATE n CHECK
+          await expect(() => sshKeyService.sendPublicKey(sendPublicKeyRequest)).rejects.toThrow(
+            ConflictError
+          );
+        });
       });
 
       describe('but instanceId is not defined', () => {

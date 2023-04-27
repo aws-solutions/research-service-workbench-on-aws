@@ -16,6 +16,7 @@ import {
 import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 import {
   AwsServiceError,
+  ConflictError,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
   DeleteSshKeyRequest,
@@ -226,10 +227,15 @@ export default class SshKeyService implements SshKeyPlugin {
    * @param request - a {@link SendPublicKeyRequest}
    */
   public async sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
-    const { environmentId, userId } = request;
+    const { projectId: reqProjectId, environmentId, userId } = request;
 
     // get environment instanceId and projectId
     const { instanceId, projectId, status } = await this._environmentService.getEnvironment(environmentId);
+    if (reqProjectId !== projectId) {
+      throw new ConflictError(
+        `Requested Project ID ${reqProjectId} does not match environment Project ID ${projectId}`
+      );
+    }
     if (!instanceId) {
       // getEnvironment could return an environment before the instance is spun up
       throw new NoInstanceFoundError(

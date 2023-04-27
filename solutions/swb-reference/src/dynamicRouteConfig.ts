@@ -633,6 +633,18 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         }
       }
     ]
+  },
+  '/projects/:projectId/environments/:environmentId/sshKeys': {
+    GET: [
+      {
+        action: 'READ',
+        subject: {
+          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
+          subjectId: '*',
+          projectId: '${projectId}'
+        }
+      }
+    ]
   }
 };
 
