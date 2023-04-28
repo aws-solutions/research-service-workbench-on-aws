@@ -16,6 +16,8 @@ import {
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
   etIdRegex,
+  awsAccountIdRegExp,
+  awsAccountIdMessage,
   etcIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
@@ -38,10 +40,12 @@ declare module 'zod' {
     etId: () => ZodString;
     etcId: () => ZodString;
     nonEmpty: () => ZodString;
+    awsAccountId: () => ZodString;
   }
 }
 
 z.ZodString.prototype.required = function (): ZodString {
+  // field is required
   return this.min(1, { message: requiredMessage });
 };
 
@@ -74,7 +78,12 @@ z.ZodString.prototype.etcId = function (): ZodString {
 };
 
 z.ZodString.prototype.nonEmpty = function (): ZodString {
+  // field should be nonEmpty but is optional
   return this.min(1, { message: nonEmptyMessage });
+};
+
+z.ZodString.prototype.awsAccountId = function (): ZodString {
+  return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {
