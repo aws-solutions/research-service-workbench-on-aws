@@ -35,6 +35,7 @@ const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
 
 const envTypeIdRegExpString: string = `${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}`;
+const envTypeConfigIdRegExpString: string = `${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -68,6 +69,11 @@ function etIdRegex(): RegExp {
   return new RegExp(`${envTypeIdRegExpString}$`);
 }
 
+function etcIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(`${envTypeConfigIdRegExpString}$`);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
@@ -88,10 +94,12 @@ export {
   productIdRegExpString,
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
+  envTypeConfigIdRegExpString,
   validRolesRegExpAsString,
   groupIDRegExpAsString,
   validSshKeyUuidRegExpAsString,
   etIdRegex,
+  etcIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,

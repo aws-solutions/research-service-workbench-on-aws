@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 import { EnvironmentTypeConfigStatus } from '../../constants/environmentTypeConfigStatus';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentTypeConfigParser = z.object({
-  id: z.string(),
+  id: z.string().etcId().required(),
   type: z.string(),
-  description: z.string(),
-  name: z.string(),
+  description: z.string().swbDescription().optional(),
+  name: z.string().swbName().nonEmpty().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   estimatedCost: z.string().optional(),
