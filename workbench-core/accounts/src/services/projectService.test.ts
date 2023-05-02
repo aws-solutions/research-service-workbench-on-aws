@@ -2,6 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+const expectedUuid = '123';
+const projId = `proj-${expectedUuid}`;
+jest.mock('uuid', () => ({ v4: () => expectedUuid }));
 
 import {
   BatchGetItemCommand,
@@ -32,8 +35,6 @@ import CostCenterService from './costCenterService';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
-  const expectedUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
-  const projId = `proj-123`;
   const ddbMock = mockClient(DynamoDBClient);
   const TABLE_NAME = 'exampleDDBTable';
   const dynamoDBService = new DynamoDBService({
@@ -49,12 +50,11 @@ describe('ProjectService', () => {
     roles: []
   };
   let projects: Project[];
-  const randomCostCenter = `cc-${expectedUuid}`;
   const project1: Project = {
     id: 'proj-123',
     name: 'name1',
     description: '',
-    costCenterId: randomCostCenter,
+    costCenterId: 'cc-1',
     status: ProjectStatus.AVAILABLE,
     createdAt: '2022-11-10T04:19:00.000Z',
     updatedAt: '',
@@ -72,7 +72,7 @@ describe('ProjectService', () => {
     id: 'proj-456',
     name: 'name2',
     description: '',
-    costCenterId: 'cc-1234abcd-2222-abcd-1234-abcd1234abcd',
+    costCenterId: 'cc-2',
     status: ProjectStatus.SUSPENDED,
     createdAt: '2022-11-10T04:20:00.000Z',
     updatedAt: '',
@@ -90,7 +90,7 @@ describe('ProjectService', () => {
     id: 'proj-789',
     name: 'name3',
     description: '',
-    costCenterId: 'cc-1234abcd-3333-abcd-1234-abcd1234abcd',
+    costCenterId: 'cc-3',
     status: ProjectStatus.DELETED,
     createdAt: '2022-11-10T04:21:00.000Z',
     updatedAt: '',
@@ -149,7 +149,7 @@ describe('ProjectService', () => {
     awsAccountId: '123456789012',
     createdAt: timestamp,
     description: 'Example project',
-    costCenterId: randomCostCenter,
+    costCenterId: 'cc-123',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
@@ -174,8 +174,8 @@ describe('ProjectService', () => {
 
   // DDB object for cost item
   const costCenterItem = {
-    pk: `CC#${randomCostCenter}`,
-    sk: `CC#${randomCostCenter}`,
+    pk: 'CC#cc-123',
+    sk: 'CC#cc-123',
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     createdAt: timestamp,
@@ -185,7 +185,7 @@ describe('ProjectService', () => {
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     externalId: 'workbench',
-    id: randomCostCenter,
+    id: 'cc-123',
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
@@ -356,7 +356,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':dependency': {
-              S: randomCostCenter
+              S: 'cc-123'
             }
           },
           Limit: 50
@@ -367,7 +367,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: randomCostCenter } }
+          filter: { dependency: { eq: 'cc-123' } }
         },
         itAdminUserGroups
       );
@@ -833,7 +833,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: randomCostCenter } }
+          filter: { dependency: { eq: 'cc-1' } }
         },
         multipleNonITGroups
       );
@@ -1235,8 +1235,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1309,8 +1309,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1359,16 +1359,14 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
           })
         })
         .resolves({});
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow(
-        `Could not find cost center ${randomCostCenter}`
-      );
+      await expect(projService.createProject(params)).rejects.toThrow('Could not find cost center cc-123');
     });
 
     test('fail on create a project with deleted cost center', async () => {
@@ -1413,16 +1411,14 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
           })
         })
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow(
-        `Cost center ${randomCostCenter} was deleted`
-      );
+      await expect(projService.createProject(params)).rejects.toThrow('Cost center cc-123 was deleted');
     });
 
     test('fail on update to DDB call', async () => {
@@ -1467,8 +1463,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${proj.costCenterId}`,
-            sk: `CC#${proj.costCenterId}`
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
           })
         })
         .resolves(getCostCenterGetItemResponse);
