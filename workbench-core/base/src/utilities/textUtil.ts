@@ -66,12 +66,12 @@ function swbDescriptionRegExp(): RegExp {
 
 function etIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`${envTypeIdRegExpString}$`);
+  return new RegExp(`^${envTypeIdRegExpString}$`);
 }
 
 function etcIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`${envTypeConfigIdRegExpString}$`);
+  return new RegExp(`^${envTypeConfigIdRegExpString}$`);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
