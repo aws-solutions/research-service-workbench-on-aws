@@ -3,8 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-jest.mock('uuid', () => ({ v4: () => 'someId' }));
-
 import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
@@ -20,12 +18,13 @@ import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostC
 import CostCenterService from './costCenterService';
 
 describe('CostCenterService', () => {
+  const randomUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
   const ORIGINAL_ENV = process.env;
   let account: Account;
   const costCenterService = new CostCenterService(
     new DynamoDBService({ region: 'us-east-1', table: 'tableName' })
   );
-  const accountId = 'acc-someId';
+  const accountId = `acc-${randomUuid}`;
   const ddbMock = mockClient(DynamoDBClient);
   const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
   type CostCenterJson = Omit<CostCenter, 'accountId'> & {
@@ -45,7 +44,7 @@ describe('CostCenterService', () => {
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
     account = AccountParser.parse({
-      name: '',
+      name: 'accountName',
       id: accountId,
       cidr: '',
       hostingAccountHandlerRoleArn: '',
@@ -56,7 +55,7 @@ describe('CostCenterService', () => {
       environmentInstanceFiles: '',
       stackName: `${process.env.STACK_NAME!}-hosting-account`,
       status: 'CURRENT',
-      awsAccountId: 'awsAccountId',
+      awsAccountId: '123456789012',
       externalId: 'externalId',
       updatedAt: '',
       createdAt: '',
@@ -75,7 +74,7 @@ describe('CostCenterService', () => {
       let expectedCostCenter: CostCenter | undefined;
 
       beforeEach(() => {
-        costCenterId = 'cc-someId';
+        costCenterId = `cc-${randomUuid}`;
 
         expectedCostCenter = {
           createdAt: mockDateObject.toISOString(),
@@ -138,7 +137,7 @@ describe('CostCenterService', () => {
     let costCenterJson: CostCenterJson;
     let expectedCostCenter: CostCenter;
     beforeAll(() => {
-      costCenterId = 'cc-someId';
+      costCenterId = `cc-${randomUuid}`;
       costCenterJson = {
         pk: `CC#${costCenterId}`,
         sk: `CC#${costCenterId}`,
@@ -237,7 +236,7 @@ describe('CostCenterService', () => {
       let createCostCenter: CreateCostCenterRequest;
 
       beforeEach(() => {
-        accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+        accountId = `acc-${randomUuid}`;
         createCostCenter = {
           name: 'the name',
           description: 'the description',
@@ -253,9 +252,9 @@ describe('CostCenterService', () => {
               removeUndefinedValues: true
             })
           });
-          accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+          accountId = `acc-${randomUuid}`;
 
-          const costCenterId = `cc-someId`;
+          const costCenterId = `cc-${randomUuid}`;
           costCenter = {
             createdAt: mockDateObject.toISOString(),
             updatedAt: mockDateObject.toISOString(),
@@ -306,7 +305,7 @@ describe('CostCenterService', () => {
     let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
-      costCenterId = 'cc-someId';
+      costCenterId = `cc-${randomUuid}`;
       costCenterJson = {
         pk: `CC#${costCenterId}`,
         sk: `CC#${costCenterId}`,
@@ -390,7 +389,7 @@ describe('CostCenterService', () => {
     let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
-      costCenterId = 'cc-someId';
+      costCenterId = `cc-${randomUuid}`;
       costCenterName = 'CostCenter-1';
       costCenterDescription = 'Description for CostCenter-1';
       costCenterJson = {
@@ -429,8 +428,8 @@ describe('CostCenterService', () => {
         await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).resolves.toEqual({
           id: costCenterId,
           name: costCenterName,
-          accountId: 'acc-someId',
-          dependency: 'acc-someId',
+          accountId: `acc-${randomUuid}`,
+          dependency: `acc-${randomUuid}`,
           description: costCenterDescription,
           subnetId: 'subnet-123',
           vpcId: 'vpc-123',
@@ -439,7 +438,7 @@ describe('CostCenterService', () => {
           encryptionKeyArn: 'sampleEncryptionKeyArn',
           environmentInstanceFiles: '',
           hostingAccountHandlerRoleArn: '',
-          awsAccountId: 'awsAccountId',
+          awsAccountId: account.awsAccountId,
           createdAt: '2021-02-26T22:42:16.652Z',
           updatedAt: '2021-02-26T22:42:16.652Z',
           status: CostCenterStatus.AVAILABLE
@@ -468,7 +467,7 @@ describe('CostCenterService', () => {
     let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
-      costCenterId = 'cc-someId';
+      costCenterId = `cc-${randomUuid}`;
       costCenterJson = {
         pk: `CC#${costCenterId}`,
         sk: `CC#${costCenterId}`,
@@ -552,7 +551,7 @@ describe('CostCenterService', () => {
     let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
-      costCenterId = 'cc-someId';
+      costCenterId = `cc-${randomUuid}`;
       costCenterName = 'CostCenter-1';
       costCenterDescription = 'Description for CostCenter-1';
       costCenterJson = {
@@ -591,8 +590,8 @@ describe('CostCenterService', () => {
         await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).resolves.toEqual({
           id: costCenterId,
           name: costCenterName,
-          accountId: 'acc-someId',
-          dependency: 'acc-someId',
+          accountId: `acc-${randomUuid}`,
+          dependency: `acc-${randomUuid}`,
           description: costCenterDescription,
           subnetId: 'subnet-123',
           vpcId: 'vpc-123',
@@ -601,7 +600,7 @@ describe('CostCenterService', () => {
           encryptionKeyArn: 'sampleEncryptionKeyArn',
           environmentInstanceFiles: '',
           hostingAccountHandlerRoleArn: '',
-          awsAccountId: 'awsAccountId',
+          awsAccountId: account.awsAccountId,
           createdAt: '2021-02-26T22:42:16.652Z',
           updatedAt: '2021-02-26T22:42:16.652Z',
           status: CostCenterStatus.AVAILABLE

@@ -31,7 +31,7 @@ const urlFilterMaxLength: number = 128;
 const groupIDRegExpAsString: string = '\\S{1,128}';
 
 const awsAccountIdMessage: string = 'must be a 12 digit number';
-const awsAccountIdRegExpAsString: string = '^d{12}';
+const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
 
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 

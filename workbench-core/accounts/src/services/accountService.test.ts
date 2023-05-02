@@ -3,8 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
-
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -28,7 +26,8 @@ describe('AccountService', () => {
   let accountMetadata: { [id: string]: string } = {};
   let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let accountService: AccountService;
-  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+  const randomUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
+  const randomAccountId = `${resourceTypeToKey.account.toLowerCase()}-${randomUuid}`;
 
   beforeEach(() => {
     jest.resetModules();
@@ -50,7 +49,7 @@ describe('AccountService', () => {
     accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
 
     accountMetadata = {
-      id: accountId,
+      id: randomAccountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -125,19 +124,17 @@ describe('AccountService', () => {
         status: { S: 'CURRENT' },
         updatedAt: { S: '2023-01-09T19:45:12.397Z' },
         createdAt: { S: '2023-01-09T19:45:12.397Z' },
-        awsAccountId: { S: 'someOtherAwsAccountId' },
+        awsAccountId: { S: '210987654321' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },
-        id: { S: 'sampleAccId' },
-        accountId: { S: 'sampleAccId' }
+        id: { S: randomAccountId }
       }
     });
 
     // OPERATE & CHECK
     await expect(
       accountService.update({
-        id: 'sampleAccId',
-        accountId: 'sampleAccId',
+        id: randomAccountId,
         awsAccountId: '123456789012',
         externalId: 'workbench'
       })
@@ -148,13 +145,12 @@ describe('AccountService', () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({});
 
-    accountMetadata.id = 'sampleAccId';
-    accountMetadata.accountId = 'sampleAccId';
+    accountMetadata.id = randomAccountId;
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
     await expect(accountService.update(accountMetadata)).rejects.toThrow(
-      `Could not find account ${accountMetadata.accountId}`
+      `Could not find account ${accountMetadata.id}`
     );
   });
 
@@ -194,6 +190,7 @@ describe('AccountService', () => {
 
   test('getAllAccounts returns list of onboarded accounts', async () => {
     const account: Account = {
+      id: randomAccountId,
       name: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
@@ -205,7 +202,6 @@ describe('AccountService', () => {
       subnetId: '',
       vpcId: '',
       awsAccountId: '123456789012',
-      id: 'sampleAccId',
       updatedAt: '',
       createdAt: ''
     };
@@ -234,7 +230,7 @@ describe('AccountService', () => {
 
     beforeEach(() => {
       accountJson = {
-        name: '',
+        name: 'fakeName',
         cidr: '',
         encryptionKeyArn: '',
         envMgmtRoleArn: '',
@@ -246,7 +242,7 @@ describe('AccountService', () => {
         subnetId: '',
         vpcId: '',
         awsAccountId: '123456789012',
-        id: 'sampleAccId',
+        id: 'acc-1234abcd-1234-abcd-1234-abcd1234abcd',
         updatedAt: '',
         createdAt: ''
       };
@@ -288,7 +284,7 @@ describe('AccountService', () => {
       let dynamoAccountItem: Account & { pk: string; sk: string };
 
       beforeEach(() => {
-        expectedAccountId = 'acc-expectedAccountId';
+        expectedAccountId = randomAccountId;
         account = AccountParser.parse({
           envMgmtRoleArn: '',
           vpcId: '',
@@ -297,8 +293,8 @@ describe('AccountService', () => {
           environmentInstanceFiles: '',
           stackName: '',
           status: 'CURRENT',
-          name: '',
-          awsAccountId: '',
+          name: 'abc',
+          awsAccountId: '123456789012',
           externalId: '',
           id: expectedAccountId,
           hostingAccountHandlerRoleArn: '',
@@ -331,15 +327,15 @@ describe('AccountService', () => {
         let expectedCCId: string;
 
         beforeEach(() => {
-          expectedCCId = 'cc-12345';
+          expectedCCId = `cc-${randomUuid}`;
           costCenterPK = `CC#${expectedCCId}`;
 
           costCenter = {
-            accountId: '',
+            accountId: randomAccountId,
             dependency: '',
-            awsAccountId: '',
+            awsAccountId: '123456789012',
             createdAt: '',
-            description: '',
+            description: 'fakeDescription',
             encryptionKeyArn: '',
             envMgmtRoleArn: '',
             environmentInstanceFiles: '',

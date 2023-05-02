@@ -9,7 +9,8 @@ import {
   swbNameMaxLength,
   swbNameValidChar,
   swbDescriptionMaxLength,
-  swbDescriptionValidChar
+  swbDescriptionValidChar,
+  awsAccountIdMessage
 } from './textUtil';
 import { getPaginationParser, validateAndParse, z } from './validatorHelper';
 
@@ -321,6 +322,45 @@ describe('tests for zod.swbDescription', () => {
     });
   });
 });
+
+describe('tests for zod.awsAccountId', () => {
+  const zodParser = z.object({
+    id: z.string().awsAccountId()
+  });
+  type AwsAccountIdType = z.infer<typeof zodParser>;
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: '123456789012' }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<AwsAccountIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when length is not 12', () => {
+      const invalidObjects = [{ id: '1'.repeat(13) }, { id: '1'.repeat(11) }];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<AwsAccountIdType>(zodParser, invalidObject)).toThrowError(
+          `id: ${awsAccountIdMessage}`
+        );
+      });
+    });
+
+    describe('when contains invalid char', () => {
+      const invalidObjects = [
+        // String contains invalid character
+        { id: '<'.repeat(12) },
+        { id: 'a'.repeat(12) }
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<AwsAccountIdType>(zodParser, invalidObject)).toThrowError(
+          `${awsAccountIdMessage}`
+        );
+      });
+    });
+  });
+});
+
 describe('zod.etId', () => {
   const zodParser = z.object({
     id: z.string().etId()
