@@ -24,7 +24,7 @@ describe('CostCenterService', () => {
   const costCenterService = new CostCenterService(
     new DynamoDBService({ region: 'us-east-1', table: 'tableName' })
   );
-  const accountId = `acc-${randomUuid}`;
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-${randomUuid}`;
   const ddbMock = mockClient(DynamoDBClient);
   const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
   type CostCenterJson = Omit<CostCenter, 'accountId'> & {

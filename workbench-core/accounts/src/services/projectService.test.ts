@@ -4,7 +4,6 @@
  */
 const expectedUuid = '123';
 const projId = `proj-${expectedUuid}`;
-jest.mock('uuid', () => ({ v4: () => expectedUuid }));
 
 import {
   BatchGetItemCommand,
