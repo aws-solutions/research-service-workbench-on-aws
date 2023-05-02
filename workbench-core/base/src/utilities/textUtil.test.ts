@@ -8,6 +8,7 @@ jest.mock('uuid', () => ({ v4: () => randomUuid }));
 
 import {
   etIdRegex,
+  etcIdRegex,
   lengthValidationMessage,
   nonHtmlRegExp,
   swbDescriptionRegExp,
@@ -87,6 +88,15 @@ describe('textUtil', () => {
 
     test('invalid etId', () => {
       expect(`invalid`.match(etIdRegex())).toEqual(null);
+    });
+  });
+  describe('etcIdRegex', () => {
+    test('valid etcId', () => {
+      expect(`etc-${randomUuid}`.match(etcIdRegex())).toEqual(expect.arrayContaining([`etc-${randomUuid}`]));
+    });
+
+    test('invalid etcId', () => {
+      expect(`invalid`.match(etcIdRegex())).toEqual(null);
     });
   });
   describe('lengthValidationMessage', () => {

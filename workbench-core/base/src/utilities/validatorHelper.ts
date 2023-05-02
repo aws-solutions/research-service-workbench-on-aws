@@ -16,6 +16,7 @@ import {
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
   etIdRegex,
+  etcIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
@@ -35,6 +36,7 @@ declare module 'zod' {
     swbName: () => ZodString;
     swbDescription: () => ZodString;
     etId: () => ZodString;
+    etcId: () => ZodString;
     nonEmpty: () => ZodString;
   }
 }
@@ -65,6 +67,10 @@ z.ZodString.prototype.swbDescription = function (): ZodString {
 
 z.ZodString.prototype.etId = function (): ZodString {
   return this.regex(etIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.etcId = function (): ZodString {
+  return this.regex(etcIdRegex(), { message: invalidIdMessage });
 };
 
 z.ZodString.prototype.nonEmpty = function (): ZodString {

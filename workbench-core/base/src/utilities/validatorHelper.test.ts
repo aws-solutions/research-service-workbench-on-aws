@@ -350,6 +350,31 @@ describe('zod.etId', () => {
     });
   });
 });
+describe('zod.etcId', () => {
+  const zodParser = z.object({
+    id: z.string().etcId()
+  });
+  type SWBIdType = z.infer<typeof zodParser>;
+  const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
+  const invalidObjects: SWBIdType[] = [
+    { id: `invalid-${randomUuid}` }, //invalid prefix
+    { id: 'etc-invalid-uuid' }, //invalid uuid format
+    { id: '' } //empty value
+  ];
+
+  describe('is valid', () => {
+    const validObject = { id: `etc-${randomUuid}` };
+    test('returns valid Id', () => {
+      expect(validateAndParse<SWBIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('is not valid', () => {
+    test.each(invalidObjects)('returns invalid et Id message', (invalidId) => {
+      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
+    });
+  });
+});
 describe('zod.nonEmpty', () => {
   const zodParser = z.object({
     id: z.string().nonEmpty()

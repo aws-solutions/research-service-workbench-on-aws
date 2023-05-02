@@ -93,7 +93,7 @@ export function setUpEnvTypeConfigRoutes(
       );
 
       const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);
-      res.send(envTypeConfig);
+      res.status(200).send(envTypeConfig);
     })
   );
 
