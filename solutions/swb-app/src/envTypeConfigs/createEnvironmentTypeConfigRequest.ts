@@ -9,15 +9,17 @@ import { z } from '@aws/workbench-core-base';
 export const CreateEnvironmentTypeConfigRequestParser = z
   .object({
     envTypeId: z.string().etId().required(),
-    type: z.string(),
-    description: z.string().swbDescription().optional(),
+    type: z.string().required(),
+    description: z.string().swbDescription().required(),
     name: z.string().swbName().nonEmpty().optional(),
     estimatedCost: z.optional(z.string()),
     params: z.array(
-      z.object({
-        key: z.string(),
-        value: z.string()
-      })
+      z
+        .object({
+          key: z.string(),
+          value: z.string()
+        })
+        .required()
     )
   })
   .strict();

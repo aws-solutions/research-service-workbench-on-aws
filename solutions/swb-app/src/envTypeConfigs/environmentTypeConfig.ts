@@ -12,7 +12,7 @@ export enum EnvironmentTypeConfigStatus {
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentTypeConfigParser = z.object({
-  id: z.string().etId().required(),
+  id: z.string().etcId().required(),
   type: z.string(),
   description: z.string().swbDescription().optional(),
   name: z.string().swbName().nonEmpty().optional(),

@@ -52,6 +52,26 @@ describe('create environment type configs', () => {
         );
       }
     });
+    test('fails when trying to create without description', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            type: 'typeTest',
+            name: 'name',
+            params: []
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: 'description: Required'
+          })
+        );
+      }
+    });
 
     test('fails when trying to create without type', async () => {
       try {
