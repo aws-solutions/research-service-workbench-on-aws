@@ -4,12 +4,12 @@
  */
 
 // Schema for GetTemplate API
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AwsAccountTemplateUrlsRequestParser = z
   .object({
-    externalId: z.string()
+    externalId: z.string().required()
   })
   .strict();
 

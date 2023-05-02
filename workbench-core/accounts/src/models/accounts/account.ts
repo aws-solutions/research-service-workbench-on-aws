@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 import { HOSTING_ACCOUNT_STATUS } from '../../constants/hostingAccountStatus';
 import { CostCenterParser } from '../costCenters/costCenter';
 
@@ -15,9 +15,9 @@ const ErrorParser = z.object({
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AccountParser = z.object({
-  id: z.string(),
-  name: z.string(),
-  awsAccountId: z.string(),
+  accountId: z.string().swbId(resourceTypeToKey.account.toLowerCase()),
+  name: z.string().swbName(),
+  awsAccountId: z.string().awsAccountId(),
   envMgmtRoleArn: z.string(),
   error: ErrorParser.optional(),
   hostingAccountHandlerRoleArn: z.string(),

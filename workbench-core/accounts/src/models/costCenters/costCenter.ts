@@ -8,9 +8,9 @@ import { CostCenterStatus } from '../../constants/costCenterStatus';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CostCenterParser = z.object({
-  id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()).required(),
-  name: z.string().nonEmpty().optional(),
-  description: z.string().swbDescription().nonEmpty().optional(),
+  id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()),
+  name: z.string().nonEmpty(),
+  description: z.string().swbDescription().nonEmpty(),
   subnetId: z.string(),
   vpcId: z.string(),
   envMgmtRoleArn: z.string(),
@@ -19,7 +19,7 @@ export const CostCenterParser = z.object({
   environmentInstanceFiles: z.string(),
   hostingAccountHandlerRoleArn: z.string(),
   awsAccountId: z.string().awsAccountId(),
-  accountId: z.string().swbId(resourceTypeToKey.account.toLowerCase()).required(),
+  accountId: z.string().swbId(resourceTypeToKey.account.toLowerCase()),
   createdAt: z.string(),
   updatedAt: z.string(),
   dependency: z.string(),

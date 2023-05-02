@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateAccountRequestParser = z.object({
-  name: z.string(),
-  awsAccountId: z.string(),
-  envMgmtRoleArn: z.string(),
-  hostingAccountHandlerRoleArn: z.string(),
-  externalId: z.string()
+  name: z.string().swbName().required(),
+  awsAccountId: z.string().awsAccountId().required(),
+  envMgmtRoleArn: z.string().required(),
+  hostingAccountHandlerRoleArn: z.string().required(),
+  externalId: z.string().required()
 });
 
 export type CreateAccountRequest = z.infer<typeof CreateAccountRequestParser>;
