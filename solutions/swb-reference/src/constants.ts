@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import { join } from 'path';
+import { UserAgent } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
 import yaml from 'js-yaml';
 
@@ -50,6 +51,7 @@ interface Constants {
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
+  USER_AGENT_STRING: string;
 }
 
 interface SecretConstants {
@@ -61,6 +63,14 @@ const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
 const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
 const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
 const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
+const customUserAgentString: string = `AwsSolution/${SolutionId}/${SolutionVersion}`;
+
+const customUserAgent: UserAgent = [
+  [
+    customUserAgentString.slice(0, customUserAgentString.lastIndexOf('/')),
+    customUserAgentString.slice(customUserAgentString.lastIndexOf('/') + 1)
+  ]
+];
 
 const regionShortNamesMap: { [id: string]: string } = {
   'us-east-2': 'oh',
@@ -139,6 +149,7 @@ function getConstants(region?: string): Constants {
   const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
   const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
   const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
+  const USER_AGENT_STRING = customUserAgentString;
 
   return {
     STAGE: config.stage,
@@ -181,7 +192,8 @@ function getConstants(region?: string): Constants {
     ECS_SUBNET_IDS_OUTPUT_KEY,
     ECS_SUBNET_AZS_OUTPUT_KEY,
     ALB_INTERNET_FACING,
-    FIELDS_TO_MASK_WHEN_AUDITING
+    FIELDS_TO_MASK_WHEN_AUDITING,
+    USER_AGENT_STRING
   };
 }
 
@@ -196,7 +208,7 @@ function isSolutionsBuild(): boolean {
 async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   const config = getConfig();
   const AWS_REGION = config.awsRegion;
-  const awsService = new AwsService({ region: AWS_REGION });
+  const awsService = new AwsService({ region: AWS_REGION, userAgent: customUserAgentString });
   const rootUserParamStorePath = config.rootUserEmailParamStorePath;
 
   const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
@@ -284,5 +296,7 @@ export {
   SolutionId,
   SolutionName,
   SolutionVersion,
+  customUserAgentString,
+  customUserAgent,
   ApplicationType
 };
