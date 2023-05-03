@@ -9,8 +9,8 @@ import { CostCenterStatus } from '../../constants/costCenterStatus';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CostCenterParser = z.object({
   id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()).required(),
-  name: z.string().nonEmpty(),
-  description: z.string().swbDescription().nonEmpty(),
+  name: z.string().required(),
+  description: z.string().swbDescription().required(),
   subnetId: z.string(),
   vpcId: z.string(),
   envMgmtRoleArn: z.string(),

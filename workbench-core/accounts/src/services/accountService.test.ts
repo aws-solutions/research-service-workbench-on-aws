@@ -124,7 +124,7 @@ describe('AccountService', () => {
         status: { S: 'CURRENT' },
         updatedAt: { S: '2023-01-09T19:45:12.397Z' },
         createdAt: { S: '2023-01-09T19:45:12.397Z' },
-        awsAccountId: { S: '210987654321' },
+        awsAccountId: { S: '111122223333' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },
         id: { S: randomAccountId }
