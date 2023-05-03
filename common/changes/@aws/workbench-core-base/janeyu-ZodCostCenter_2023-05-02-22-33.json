@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-base",
-      "comment": "",
-      "type": "none"
+      "comment": "add zod awsAccountId method",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-base"

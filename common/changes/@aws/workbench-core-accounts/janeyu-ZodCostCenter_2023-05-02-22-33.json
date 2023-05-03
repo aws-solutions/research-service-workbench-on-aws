@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-accounts",
-      "comment": "git status",
+      "comment": "add zod regex to cost center and account parser",
       "type": "patch"
     }
   ],

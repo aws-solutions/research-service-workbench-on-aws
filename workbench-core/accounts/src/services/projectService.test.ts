@@ -18,7 +18,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
+import { DynamoDBService, JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import { UpdateUnmarshalledOutput } from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/interfaces/updateUnmarshalledOutput';
 import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
@@ -34,7 +34,9 @@ import CostCenterService from './costCenterService';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
-  const randomUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
+  const mockUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
+  const mockCostCenterId = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid}`;
+  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-${mockUuid}`;
   const projId = `proj-123`;
   const ddbMock = mockClient(DynamoDBClient);
   const TABLE_NAME = 'exampleDDBTable';
@@ -51,12 +53,11 @@ describe('ProjectService', () => {
     roles: []
   };
   let projects: Project[];
-  const randomCostCenter = `cc-${randomUuid}`;
   const project1: Project = {
     id: 'proj-123',
     name: 'name1',
     description: '',
-    costCenterId: randomCostCenter,
+    costCenterId: mockCostCenterId,
     status: ProjectStatus.AVAILABLE,
     createdAt: '2022-11-10T04:19:00.000Z',
     updatedAt: '',
@@ -147,11 +148,11 @@ describe('ProjectService', () => {
   // Project object
   const proj: Project = {
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
-    accountId: `acc-${randomUuid}`,
+    accountId: mockAccountId,
     awsAccountId: '123456789012',
     createdAt: timestamp,
     description: 'Example project',
-    costCenterId: randomCostCenter,
+    costCenterId: mockCostCenterId,
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
@@ -176,18 +177,18 @@ describe('ProjectService', () => {
 
   // DDB object for cost item
   const costCenterItem = {
-    pk: `CC#${randomCostCenter}`,
-    sk: `CC#${randomCostCenter}`,
+    pk: `CC#${mockCostCenterId}`,
+    sk: `CC#${mockCostCenterId}`,
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     createdAt: timestamp,
     description: 'Example cost center',
-    dependency: `acc-${randomUuid}`,
+    dependency: mockAccountId,
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     externalId: 'workbench',
-    id: randomCostCenter,
+    id: mockCostCenterId,
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
@@ -358,7 +359,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':dependency': {
-              S: randomCostCenter
+              S: mockCostCenterId
             }
           },
           Limit: 50
@@ -369,7 +370,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: randomCostCenter } }
+          filter: { dependency: { eq: mockCostCenterId } }
         },
         itAdminUserGroups
       );
@@ -835,7 +836,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: randomCostCenter } }
+          filter: { dependency: { eq: mockCostCenterId } }
         },
         multipleNonITGroups
       );
@@ -1237,8 +1238,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1311,8 +1312,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1361,15 +1362,15 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves({});
 
       // OPERATE n CHECK
       await expect(projService.createProject(params)).rejects.toThrow(
-        `Could not find cost center ${randomCostCenter}`
+        `Could not find cost center ${mockCostCenterId}`
       );
     });
 
@@ -1415,15 +1416,15 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `CC#${randomCostCenter}`,
-            sk: `CC#${randomCostCenter}`
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
       await expect(projService.createProject(params)).rejects.toThrow(
-        `Cost center ${randomCostCenter} was deleted`
+        `Cost center ${mockCostCenterId} was deleted`
       );
     });
 

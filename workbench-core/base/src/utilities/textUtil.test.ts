@@ -82,7 +82,7 @@ describe('textUtil', () => {
   });
 
   describe('awsAccountIdRegExp', () => {
-    test('valid sawsAccountId', () => {
+    test('valid awsAccountId', () => {
       expect('123456789012'.match(awsAccountIdRegExp())).toEqual(expect.arrayContaining([`123456789012`]));
     });
 
