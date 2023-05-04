@@ -20,6 +20,7 @@ import {
   awsAccountIdMessage,
   etcIdRegex,
   projIdRegex,
+  envIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
@@ -84,6 +85,10 @@ z.ZodString.prototype.etcId = function (): ZodString {
 
 z.ZodString.prototype.projId = function (): ZodString {
   return this.regex(projIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.envId = function (): ZodString {
+  return this.regex(envIdRegex(), { message: invalidIdMessage });
 };
 
 /**
