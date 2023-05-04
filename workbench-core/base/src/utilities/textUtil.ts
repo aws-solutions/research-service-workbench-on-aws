@@ -36,6 +36,8 @@ const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
 
 const envTypeIdRegExpString: string = `${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}`;
 const envTypeConfigIdRegExpString: string = `${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`;
+const projIdRegExpString: string = `${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
+const envIdRegExpString: string = `${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -74,6 +76,16 @@ function etcIdRegex(): RegExp {
   return new RegExp(`^${envTypeConfigIdRegExpString}$`);
 }
 
+function projIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(`^${projIdRegExpString}$`);
+}
+
+function envIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(`^${envIdRegExpString}$`);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
@@ -100,6 +112,8 @@ export {
   validSshKeyUuidRegExpAsString,
   etIdRegex,
   etcIdRegex,
+  projIdRegex,
+  envIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,

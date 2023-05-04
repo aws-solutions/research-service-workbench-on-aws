@@ -17,6 +17,7 @@ import {
   uuidWithLowercasePrefixRegExp,
   etIdRegex,
   etcIdRegex,
+  projIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
@@ -37,6 +38,8 @@ declare module 'zod' {
     swbDescription: () => ZodString;
     etId: () => ZodString;
     etcId: () => ZodString;
+    projId: () => ZodString;
+    envId: () => ZodString;
     nonEmpty: () => ZodString;
   }
 }
@@ -71,6 +74,10 @@ z.ZodString.prototype.etId = function (): ZodString {
 
 z.ZodString.prototype.etcId = function (): ZodString {
   return this.regex(etcIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.projId = function (): ZodString {
+  return this.regex(projIdRegex(), { message: invalidIdMessage });
 };
 
 z.ZodString.prototype.nonEmpty = function (): ZodString {

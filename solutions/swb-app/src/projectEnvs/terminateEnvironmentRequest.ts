@@ -7,8 +7,8 @@ import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const TerminateEnvironmentRequestParser = z.object({
-  projectId: z.string().min(1).required(),
-  environmentId: z.string().min(1).required()
+  projectId: z.string().projId().min(1).required(),
+  environmentId: z.string().envId().min(1).required()
 });
 
 export type TerminateEnvironmentRequest = z.infer<typeof TerminateEnvironmentRequestParser>;
