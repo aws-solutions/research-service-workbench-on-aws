@@ -51,6 +51,7 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
+  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-1234abcd-1234-abcd-1234-abcd1234abcd`;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
   let accountMetadata = {};
 
@@ -83,7 +84,7 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     accountMetadata = {
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      id: mockAccountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -173,7 +174,7 @@ describe('HostingAccountLifecycleService', () => {
 
     await expect(
       hostingAccountLifecycleService.updateAccount({
-        id: 'abc-xyz',
+        id: mockAccountId,
         name: 'someName'
       })
     ).resolves.not.toThrowError();

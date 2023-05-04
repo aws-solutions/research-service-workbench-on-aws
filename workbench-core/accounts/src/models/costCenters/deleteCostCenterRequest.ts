@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteCostCenterRequestParser = z
   .object({
-    id: z.string()
+    id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()).required()
   })
   .strict();
 

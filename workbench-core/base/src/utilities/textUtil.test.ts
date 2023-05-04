@@ -12,6 +12,7 @@ import {
   lengthValidationMessage,
   nonHtmlRegExp,
   swbDescriptionRegExp,
+  awsAccountIdRegExp,
   swbNameRegExp,
   uuidRegExp,
   uuidWithLowercasePrefix,
@@ -79,6 +80,20 @@ describe('textUtil', () => {
       expect(`%$<>`.match(swbDescriptionRegExp())).toEqual(null);
     });
   });
+
+  describe('awsAccountIdRegExp', () => {
+    test('valid awsAccountId', () => {
+      expect('123456789012'.match(awsAccountIdRegExp())).toEqual(expect.arrayContaining([`123456789012`]));
+    });
+
+    test('invalid awsAccountId', () => {
+      expect(`abd`.match(awsAccountIdRegExp())).toEqual(null);
+      expect(`123`.match(awsAccountIdRegExp())).toEqual(null);
+      expect(`1`.repeat(13).match(awsAccountIdRegExp())).toEqual(null);
+      expect(`1`.repeat(11).match(awsAccountIdRegExp())).toEqual(null);
+    });
+  });
+
   describe('etIdRegex', () => {
     test('valid etId', () => {
       expect('et-prod-1234567890123,pa-1234567890123'.match(etIdRegex())).toEqual(

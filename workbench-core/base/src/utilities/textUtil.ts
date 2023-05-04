@@ -30,6 +30,9 @@ const urlFilterMaxLength: number = 128;
 
 const groupIDRegExpAsString: string = '\\S{1,128}';
 
+const awsAccountIdMessage: string = 'must be a 12 digit number';
+const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
+
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
@@ -74,6 +77,11 @@ function etcIdRegex(): RegExp {
   return new RegExp(`^${envTypeConfigIdRegExpString}$`);
 }
 
+function awsAccountIdRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(awsAccountIdRegExpAsString);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
@@ -99,6 +107,8 @@ export {
   groupIDRegExpAsString,
   validSshKeyUuidRegExpAsString,
   etIdRegex,
+  awsAccountIdMessage,
+  awsAccountIdRegExp,
   etcIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
