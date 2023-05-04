@@ -61,8 +61,12 @@ describe('textUtil', () => {
     });
   });
   describe('swbNameRegExp', () => {
-    test('valid swbName', () => {
+    test('valid swbName valid char', () => {
       expect('name.name-1'.match(swbNameRegExp())).toEqual(expect.arrayContaining([`name.name-1`]));
+    });
+
+    test('valid swbName empty string', () => {
+      expect(''.match(swbNameRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
     test('invalid swbName', () => {
@@ -70,10 +74,14 @@ describe('textUtil', () => {
     });
   });
   describe('swbDescriptionRegExp', () => {
-    test('valid swbDescription', () => {
+    test('valid swbDescription valid char', () => {
       expect('description- desc'.match(swbDescriptionRegExp())).toEqual(
         expect.arrayContaining([`description- desc`])
       );
+    });
+
+    test('valid swbDescription empty string', () => {
+      expect(''.match(swbDescriptionRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
     test('invalid swbDescription', () => {

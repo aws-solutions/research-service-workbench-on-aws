@@ -10,7 +10,8 @@ import {
   swbNameValidChar,
   swbDescriptionMaxLength,
   swbDescriptionValidChar,
-  awsAccountIdMessage
+  awsAccountIdMessage,
+  nonEmptyMessage
 } from './textUtil';
 import { getPaginationParser, validateAndParse, z } from './validatorHelper';
 
@@ -117,6 +118,7 @@ describe('getPaginationProperties', () => {
     });
   });
 });
+
 describe('validateAndParse', () => {
   const testParser = z
     .object({
@@ -141,6 +143,7 @@ describe('validateAndParse', () => {
     });
   });
 });
+
 describe('zod.swbId', () => {
   const zodParser = z.object({
     id: z.string().swbId('prefix')
@@ -174,6 +177,7 @@ describe('zod.swbId', () => {
     });
   });
 });
+
 describe('zod.required', () => {
   const zodParser = z.object({
     id: z.string().required()
@@ -247,7 +251,7 @@ describe('tests for zod.swbName', () => {
   type SwbNameType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
-    const validObjects = [{ id: 'ABCabc123-_.' }];
+    const validObjects = [{ id: 'ABCabc123-_.' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<SwbNameType>(zodParser, validObject)).toEqual(validObject);
     });
@@ -289,7 +293,7 @@ describe('tests for zod.swbDescription', () => {
   type SwbDescriptionType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
-    const validObjects = [{ id: 'ABCabc123-_. ' }];
+    const validObjects = [{ id: 'ABCabc123-_. ' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<SwbDescriptionType>(zodParser, validObject)).toEqual(validObject);
     });
@@ -390,6 +394,7 @@ describe('zod.etId', () => {
     });
   });
 });
+
 describe('zod.etcId', () => {
   const zodParser = z.object({
     id: z.string().etcId()
@@ -415,6 +420,7 @@ describe('zod.etcId', () => {
     });
   });
 });
+
 describe('zod.optionalNonEmpty', () => {
   const zodParser = z.object({
     id: z.string().optionalNonEmpty()
@@ -432,7 +438,7 @@ describe('zod.optionalNonEmpty', () => {
     const invalidObject = { id: '' };
     test('returns nonEmpty message', () => {
       expect(() => validateAndParse<OptionalNonEmpType>(zodParser, invalidObject)).toThrowError(
-        'id: Cannot be empty'
+        `id: ${nonEmptyMessage}`
       );
     });
   });

@@ -9,21 +9,23 @@ import resourceTypeToKey from '../constants/resourceTypeToKey';
 function uuidWithLowercasePrefix(prefix: string): string {
   return `${prefix.toLowerCase()}-${uuidv4()}`;
 }
+
+const emtpyStringAsString: string = '^$';
 const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
 const nonHTMLValidChar: string = 'must not contain any of <>{}';
 const nonHtmlRegExpAsString: string = '^([^<>{}]*)$';
 
 const swbNameValidChar: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
-const swbNameRegExpAsString: string = '^[A-Za-z0-9-_.]+$';
+const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
 const swbNameMaxLength: number = 112;
 
 const swbDescriptionValidChar: string =
   'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
-const swbDescriptionRegExpAsString: string = '^[A-Za-z0-9-_. ]+$';
+const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
 const swbDescriptionMaxLength: number = 400;
 
-const nonEmptyMessage: string = 'Cannot be empty';
+const nonEmptyMessage: string = 'optional, but cannot be empty if included';
 const invalidIdMessage: string = 'Invalid ID';
 const requiredMessage: string = 'Required';
 const urlFilterMaxLength: number = 128;
