@@ -55,7 +55,7 @@ export function setUpEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId }
       );
       const envTypeConfig = await environmentTypeConfigService.getEnvTypeConfig(envTypeConfigRequest);
-      res.send(envTypeConfig);
+      res.status(200).send(envTypeConfig);
     })
   );
 
@@ -73,7 +73,7 @@ export function setUpEnvTypeConfigRoutes(
       );
       try {
         const envTypeConfig = await environmentTypeConfigService.deleteEnvTypeConfig(validatedRequest);
-        res.send(envTypeConfig);
+        res.status(204).send(envTypeConfig);
       } catch (e) {
         if (isConflictError(e)) {
           throw Boom.conflict(e.message);

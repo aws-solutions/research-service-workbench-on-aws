@@ -226,7 +226,7 @@ export function setUpProjectEnvRoutes(
           authCredResponse,
           instructionResponse
         };
-        res.send(response);
+        res.status(200).send(response);
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
@@ -253,7 +253,7 @@ export function setUpProjectEnvRoutes(
           `Couldnt find environment ${validatedRequest.environmentId} with project ${validatedRequest.projectId}`
         );
       }
-      res.send(env);
+      res.status(200).send(env);
     })
   );
 
@@ -277,7 +277,7 @@ export function setUpProjectEnvRoutes(
           pageSize ? Number(pageSize) : undefined,
           paginationToken
         );
-        res.send(response);
+        res.status(200).send(response);
       }
     })
   );

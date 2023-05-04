@@ -19,6 +19,8 @@ import {
   awsAccountIdRegExp,
   awsAccountIdMessage,
   etcIdRegex,
+  projIdRegex,
+  envIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
@@ -39,6 +41,8 @@ declare module 'zod' {
     swbDescription: () => ZodString;
     etId: () => ZodString;
     etcId: () => ZodString;
+    projId: () => ZodString;
+    envId: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
   }
@@ -77,6 +81,14 @@ z.ZodString.prototype.etId = function (): ZodString {
 
 z.ZodString.prototype.etcId = function (): ZodString {
   return this.regex(etcIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.projId = function (): ZodString {
+  return this.regex(projIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.envId = function (): ZodString {
+  return this.regex(envIdRegex(), { message: invalidIdMessage });
 };
 
 /**
