@@ -6,12 +6,12 @@
 import * as Boom from '@hapi/boom';
 import { z, ZodString, ZodTypeAny, ZodOptional } from 'zod';
 import {
-  nonHTMLValidChar,
+  nonHTMLMessage,
   nonHtmlRegExp,
-  swbNameValidChar,
+  swbNameMessage,
   swbNameRegExp,
   swbDescriptionRegExp,
-  swbDescriptionValidChar,
+  swbDescriptionMessage,
   swbDescriptionMaxLength,
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
@@ -56,19 +56,19 @@ z.ZodString.prototype.swbId = function (prefix: string): ZodString {
 };
 
 z.ZodString.prototype.nonHTML = function (): ZodString {
-  return this.regex(nonHtmlRegExp(), { message: nonHTMLValidChar });
+  return this.regex(nonHtmlRegExp(), { message: nonHTMLMessage });
 };
 
 z.ZodString.prototype.swbName = function (): ZodString {
   return this.max(swbNameMaxLength, {
     message: lengthValidationMessage(swbNameMaxLength)
-  }).regex(swbNameRegExp(), { message: swbNameValidChar });
+  }).regex(swbNameRegExp(), { message: swbNameMessage });
 };
 
 z.ZodString.prototype.swbDescription = function (): ZodString {
   return this.max(swbDescriptionMaxLength, {
     message: lengthValidationMessage(swbDescriptionMaxLength)
-  }).regex(swbDescriptionRegExp(), { message: swbDescriptionValidChar });
+  }).regex(swbDescriptionRegExp(), { message: swbDescriptionMessage });
 };
 
 z.ZodString.prototype.etId = function (): ZodString {

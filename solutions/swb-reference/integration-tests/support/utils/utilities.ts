@@ -7,6 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_POLLING_INTERVAL_SECONDS, DEFAULT_POLLING_MAX_WAITING_SECONDS } from './constants';
 import HttpError from './HttpError';
 
+const validAlphaNumeric: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+const validSwbName: string = validAlphaNumeric + '-_.';
+const validSwbDescription: string = validAlphaNumeric + '-_. ';
+
 /**
  * Returns a promise that will be resolved in the requested time, ms.
  * Example: await sleep(200);
@@ -77,12 +81,26 @@ function generateInvalidIds(prefix: string): string[] {
   ];
 }
 
-function generateRandomAlphaNumericString(length: number): string {
-  const validChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+function generateRandomString(length: number, validChars: string): string {
   let result = '';
   for (let i = 0; i < length; i++) {
     result += validChars.charAt(Math.floor(Math.random() * validChars.length));
   }
   return result;
 }
-export { sleep, checkHttpError, poll, getFakeEnvId, generateInvalidIds, generateRandomAlphaNumericString };
+
+function generateRandomAlphaNumericString(length: number): string {
+  return generateRandomString(length, validAlphaNumeric);
+}
+export {
+  sleep,
+  checkHttpError,
+  poll,
+  getFakeEnvId,
+  generateInvalidIds,
+  generateRandomString,
+  generateRandomAlphaNumericString,
+  validAlphaNumeric,
+  validSwbName,
+  validSwbDescription
+};

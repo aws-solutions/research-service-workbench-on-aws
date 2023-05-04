@@ -13,14 +13,14 @@ function uuidWithLowercasePrefix(prefix: string): string {
 const emtpyStringAsString: string = '^$';
 const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
-const nonHTMLValidChar: string = 'must not contain any of <>{}';
+const nonHTMLMessage: string = 'must not contain any of <>{}';
 const nonHtmlRegExpAsString: string = '^([^<>{}]*)$';
 
-const swbNameValidChar: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
+const swbNameMessage: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
 const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
 const swbNameMaxLength: number = 112;
 
-const swbDescriptionValidChar: string =
+const swbDescriptionMessage: string =
   'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
 const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
 const swbDescriptionMaxLength: number = 400;
@@ -92,12 +92,12 @@ export {
   uuidWithLowercasePrefix,
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
-  nonHTMLValidChar,
+  nonHTMLMessage,
   nonHtmlRegExp,
-  swbNameValidChar,
+  swbNameMessage,
   swbNameRegExp,
   swbNameMaxLength,
-  swbDescriptionValidChar,
+  swbDescriptionMessage,
   swbDescriptionRegExp,
   swbDescriptionMaxLength,
   uuidRegExpAsString,

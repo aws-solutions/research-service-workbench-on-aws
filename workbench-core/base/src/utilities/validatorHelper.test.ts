@@ -5,11 +5,11 @@
 
 import JSONValue from '../types/json';
 import {
-  nonHTMLValidChar,
+  nonHTMLMessage,
   swbNameMaxLength,
-  swbNameValidChar,
+  swbNameMessage,
   swbDescriptionMaxLength,
-  swbDescriptionValidChar,
+  swbDescriptionMessage,
   awsAccountIdMessage,
   nonEmptyMessage
 } from './textUtil';
@@ -239,7 +239,7 @@ describe('tests for zod.nonHTML', () => {
       { id: "randomString<tag\nkey='value'/> randomString" }
     ];
     test.each(invalidObjects)('returns required message', (invalidObject) => {
-      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(nonHTMLValidChar);
+      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(nonHTMLMessage);
     });
   });
 });
@@ -279,7 +279,7 @@ describe('tests for zod.swbName', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          `${swbNameValidChar}`
+          `${swbNameMessage}`
         );
       });
     });
@@ -320,7 +320,7 @@ describe('tests for zod.swbDescription', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          `${swbDescriptionValidChar}`
+          `${swbDescriptionMessage}`
         );
       });
     });
