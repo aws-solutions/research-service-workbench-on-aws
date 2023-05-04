@@ -415,22 +415,23 @@ describe('zod.etcId', () => {
     });
   });
 });
-describe('zod.nonEmpty', () => {
+describe('zod.optionalNonEmpty', () => {
   const zodParser = z.object({
-    id: z.string().nonEmpty()
+    id: z.string().optionalNonEmpty()
   });
-  type NonEmpType = z.infer<typeof zodParser>;
+  type OptionalNonEmpType = z.infer<typeof zodParser>;
+
   describe('is valid', () => {
-    const validObject = { id: 'non empty value' };
-    test('returns valid Id', () => {
-      expect(validateAndParse<NonEmpType>(zodParser, validObject)).toEqual(validObject);
+    const validObjects = [{ id: 'nonEmptyId' }, { id: undefined }, {}];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<OptionalNonEmpType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
   describe('is not valid', () => {
     const invalidObject = { id: '' };
     test('returns nonEmpty message', () => {
-      expect(() => validateAndParse<NonEmpType>(zodParser, invalidObject)).toThrowError(
+      expect(() => validateAndParse<OptionalNonEmpType>(zodParser, invalidObject)).toThrowError(
         'id: Cannot be empty'
       );
     });

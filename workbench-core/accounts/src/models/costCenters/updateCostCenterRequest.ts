@@ -9,8 +9,8 @@ import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 export const UpdateCostCenterRequestParser = z
   .object({
     id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()).required(),
-    name: z.string().nonEmpty().optional(),
-    description: z.string().swbDescription().nonEmpty().optional()
+    name: z.string().optionalNonEmpty(),
+    description: z.string().swbDescription().optionalNonEmpty()
   })
   .strict();
 

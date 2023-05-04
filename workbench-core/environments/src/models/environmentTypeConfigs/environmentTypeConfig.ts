@@ -11,7 +11,7 @@ export const EnvironmentTypeConfigParser = z.object({
   id: z.string().etcId().required(),
   type: z.string(),
   description: z.string().swbDescription().optional(),
-  name: z.string().swbName().nonEmpty().optional(),
+  name: z.string().swbName().optionalNonEmpty(),
   createdAt: z.string(),
   updatedAt: z.string(),
   estimatedCost: z.string().optional(),
