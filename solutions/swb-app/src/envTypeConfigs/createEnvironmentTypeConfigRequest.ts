@@ -11,7 +11,7 @@ export const CreateEnvironmentTypeConfigRequestParser = z
     envTypeId: z.string().etId().required(),
     type: z.string().required(),
     description: z.string().swbDescription().required(),
-    name: z.string().swbName().nonEmpty().optional(),
+    name: z.string().swbName().optionalNonEmpty(),
     estimatedCost: z.optional(z.string()),
     params: z.array(
       z

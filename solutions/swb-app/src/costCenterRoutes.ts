@@ -65,14 +65,14 @@ export function setUpCostCenterRoutes(
         UpdateCostCenterRequestParser,
         updateCostCenterRequest
       );
-      res.send(await costCenterService.updateCostCenter(validatedRequest));
+      res.status(200).send(await costCenterService.updateCostCenter(validatedRequest));
     })
   );
 
   router.get(
     '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(await costCenterService.getCostCenter(req.params.id));
+      res.status(200).send(await costCenterService.getCostCenter(req.params.id));
     })
   );
 
@@ -83,7 +83,7 @@ export function setUpCostCenterRoutes(
         ListCostCentersRequestParser,
         req.query
       );
-      res.send(await costCenterService.listCostCenters(validatedRequest));
+      res.status(200).send(await costCenterService.listCostCenters(validatedRequest));
     })
   );
 }

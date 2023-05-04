@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 const expectedUuid = '123';
-const projId = `proj-${expectedUuid}`;
 jest.mock('uuid', () => ({ v4: () => expectedUuid }));
 
 import {
@@ -19,7 +18,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
+import { DynamoDBService, JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import { UpdateUnmarshalledOutput } from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/interfaces/updateUnmarshalledOutput';
 import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
@@ -35,6 +34,10 @@ import CostCenterService from './costCenterService';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
+  const mockUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
+  const mockCostCenterId = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid}`;
+  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-${mockUuid}`;
+  const projId = `proj-123`;
   const ddbMock = mockClient(DynamoDBClient);
   const TABLE_NAME = 'exampleDDBTable';
   const dynamoDBService = new DynamoDBService({
@@ -54,7 +57,7 @@ describe('ProjectService', () => {
     id: 'proj-123',
     name: 'name1',
     description: '',
-    costCenterId: 'cc-1',
+    costCenterId: mockCostCenterId,
     status: ProjectStatus.AVAILABLE,
     createdAt: '2022-11-10T04:19:00.000Z',
     updatedAt: '',
@@ -72,7 +75,7 @@ describe('ProjectService', () => {
     id: 'proj-456',
     name: 'name2',
     description: '',
-    costCenterId: 'cc-2',
+    costCenterId: 'cc-1234abcd-2222-abcd-1234-abcd1234abcd',
     status: ProjectStatus.SUSPENDED,
     createdAt: '2022-11-10T04:20:00.000Z',
     updatedAt: '',
@@ -90,7 +93,7 @@ describe('ProjectService', () => {
     id: 'proj-789',
     name: 'name3',
     description: '',
-    costCenterId: 'cc-3',
+    costCenterId: 'cc-1234abcd-3333-abcd-1234-abcd1234abcd',
     status: ProjectStatus.DELETED,
     createdAt: '2022-11-10T04:21:00.000Z',
     updatedAt: '',
@@ -145,11 +148,11 @@ describe('ProjectService', () => {
   // Project object
   const proj: Project = {
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
-    accountId: 'acc-123',
+    accountId: mockAccountId,
     awsAccountId: '123456789012',
     createdAt: timestamp,
     description: 'Example project',
-    costCenterId: 'cc-123',
+    costCenterId: mockCostCenterId,
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
@@ -174,18 +177,18 @@ describe('ProjectService', () => {
 
   // DDB object for cost item
   const costCenterItem = {
-    pk: 'CC#cc-123',
-    sk: 'CC#cc-123',
+    pk: `CC#${mockCostCenterId}`,
+    sk: `CC#${mockCostCenterId}`,
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     createdAt: timestamp,
     description: 'Example cost center',
-    dependency: 'acc-123',
+    dependency: mockAccountId,
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     externalId: 'workbench',
-    id: 'cc-123',
+    id: mockCostCenterId,
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
@@ -356,7 +359,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':dependency': {
-              S: 'cc-123'
+              S: mockCostCenterId
             }
           },
           Limit: 50
@@ -367,7 +370,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: 'cc-123' } }
+          filter: { dependency: { eq: mockCostCenterId } }
         },
         itAdminUserGroups
       );
@@ -833,7 +836,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { dependency: { eq: 'cc-1' } }
+          filter: { dependency: { eq: mockCostCenterId } }
         },
         multipleNonITGroups
       );
@@ -1235,8 +1238,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1309,8 +1312,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
@@ -1359,14 +1362,16 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves({});
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow('Could not find cost center cc-123');
+      await expect(projService.createProject(params)).rejects.toThrow(
+        `Could not find cost center ${mockCostCenterId}`
+      );
     });
 
     test('fail on create a project with deleted cost center', async () => {
@@ -1411,14 +1416,16 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
+            pk: `CC#${mockCostCenterId}`,
+            sk: `CC#${mockCostCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow('Cost center cc-123 was deleted');
+      await expect(projService.createProject(params)).rejects.toThrow(
+        `Cost center ${mockCostCenterId} was deleted`
+      );
     });
 
     test('fail on update to DDB call', async () => {
@@ -1463,8 +1470,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
+            pk: `CC#${proj.costCenterId}`,
+            sk: `CC#${proj.costCenterId}`
           })
         })
         .resolves(getCostCenterGetItemResponse);
