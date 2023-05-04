@@ -4,7 +4,7 @@
  */
 
 import * as Boom from '@hapi/boom';
-import { z, ZodString, ZodTypeAny } from 'zod';
+import { z, ZodString, ZodTypeAny, ZodOptional } from 'zod';
 import {
   nonHTMLValidChar,
   nonHtmlRegExp,
@@ -16,6 +16,8 @@ import {
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
   etIdRegex,
+  awsAccountIdRegExp,
+  awsAccountIdMessage,
   etcIdRegex,
   projIdRegex,
   nonEmptyMessage,
@@ -40,10 +42,14 @@ declare module 'zod' {
     etcId: () => ZodString;
     projId: () => ZodString;
     envId: () => ZodString;
-    nonEmpty: () => ZodString;
+    optionalNonEmpty: () => ZodOptional<ZodString>;
+    awsAccountId: () => ZodString;
   }
 }
 
+/**
+ * validate the field is required with min length 1
+ */
 z.ZodString.prototype.required = function (): ZodString {
   return this.min(1, { message: requiredMessage });
 };
@@ -80,8 +86,16 @@ z.ZodString.prototype.projId = function (): ZodString {
   return this.regex(projIdRegex(), { message: invalidIdMessage });
 };
 
-z.ZodString.prototype.nonEmpty = function (): ZodString {
-  return this.min(1, { message: nonEmptyMessage });
+/**
+ * validate the field is optional but should be nonEmpty with min length 1 if provided
+ */
+z.ZodString.prototype.optionalNonEmpty = function (): ZodOptional<ZodString> {
+  // field should be nonEmpty but is optional
+  return this.min(1, { message: nonEmptyMessage }).optional();
+};
+
+z.ZodString.prototype.awsAccountId = function (): ZodString {
+  return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {

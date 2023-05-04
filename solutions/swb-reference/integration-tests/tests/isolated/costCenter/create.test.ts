@@ -1,8 +1,9 @@
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateInvalidIds } from '../../../support/utils/utilities';
 
 describe('Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
@@ -27,7 +28,7 @@ describe('Cost Center negative tests', () => {
     await setup.cleanup();
   });
 
-  describe('with missing parameters', () => {
+  describe('with invalid parameters', () => {
     describe('with missing name', () => {
       test('it throw 400 error', async () => {
         const invalidCreateRequest = {
@@ -84,6 +85,29 @@ describe('Cost Center negative tests', () => {
           );
         }
       });
+    });
+    test('with invalid accountId', async () => {
+      const invalidAccountIds: string[] = generateInvalidIds(resourceTypeToKey.account.toLowerCase());
+      const invailidCreateRequests = invalidAccountIds.map((accountId) => ({
+        accountId,
+        name: validCreateRequest.name,
+        description: validCreateRequest.description
+      }));
+      await Promise.all(
+        invailidCreateRequests.map(async (invalidCreateRequest) => {
+          try {
+            await adminSession.resources.costCenters.create(invalidCreateRequest, false);
+          } catch (error) {
+            checkHttpError(
+              error,
+              new HttpError(400, {
+                error: 'Bad Request',
+                message: `accountId: Invalid ID`
+              })
+            );
+          }
+        })
+      );
     });
   });
 });
