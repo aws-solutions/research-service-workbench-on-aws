@@ -5,7 +5,6 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { UserAgent } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
 import yaml from 'js-yaml';
 
@@ -290,6 +289,5 @@ export {
   SolutionName,
   SolutionVersion,
   customUserAgentString,
-  customUserAgent,
   ApplicationType
 };
