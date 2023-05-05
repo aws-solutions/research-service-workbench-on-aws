@@ -613,7 +613,7 @@ export class SWBStack extends Stack {
             'sagemaker:DeleteNotebookInstanceLifecycleConfig'
           ],
           resources: [
-            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/BasicNotebookInstanceLifecycleConfig-*'
+            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/?asic?otebook?nstance?ifecycle?onfig-*'
           ]
         }),
         new PolicyStatement({
@@ -625,7 +625,7 @@ export class SWBStack extends Stack {
             'sagemaker:StopNotebookInstance',
             'sagemaker:DeleteNotebookInstance'
           ],
-          resources: ['arn:aws:sagemaker:*:*:notebook-instance/BasicNotebookInstance-*']
+          resources: ['arn:aws:sagemaker:*:*:notebook-instance/?asic?otebook?nstance-*']
         }),
         new PolicyStatement({
           actions: ['s3:GetObject', 's3:GetObjectVersion'],
