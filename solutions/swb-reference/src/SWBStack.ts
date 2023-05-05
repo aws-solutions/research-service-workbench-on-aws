@@ -613,7 +613,7 @@ export class SWBStack extends Stack {
             'sagemaker:DeleteNotebookInstanceLifecycleConfig'
           ],
           resources: [
-            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/?asic?otebook?nstance?ifecycleConfig-*'
+            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/?asic?otebook?nstance?ifecycle?onfig-*'
           ]
         }),
         new PolicyStatement({
