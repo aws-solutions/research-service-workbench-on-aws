@@ -24,7 +24,9 @@ import {
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
-  lengthValidationMessage
+  lengthValidationMessage,
+  accountIdRegex,
+  costCenterIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -43,6 +45,8 @@ declare module 'zod' {
     etcId: () => ZodString;
     projId: () => ZodString;
     envId: () => ZodString;
+    costCenterId: () => ZodString;
+    accountId: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
   }
@@ -89,6 +93,14 @@ z.ZodString.prototype.projId = function (): ZodString {
 
 z.ZodString.prototype.envId = function (): ZodString {
   return this.regex(envIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.costCenterId = function (): ZodString {
+  return this.regex(costCenterIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.accountId = function (): ZodString {
+  return this.regex(accountIdRegex(), { message: invalidIdMessage });
 };
 
 /**

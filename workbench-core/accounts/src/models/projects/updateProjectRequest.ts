@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateProjectRequestParser = z
   .object({
-    projectId: z.string().swbId(resourceTypeToKey.project.toLowerCase()).required(),
+    projectId: z.string().projId().required(),
     updatedValues: z.object({
       name: z.string().swbName().optionalNonEmpty(),
       description: z.string().swbDescription().optionalNonEmpty()

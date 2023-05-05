@@ -4,13 +4,13 @@
  */
 
 import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteProjectRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
-    projectId: z.string().swbId(resourceTypeToKey.project.toLowerCase()).required()
+    projectId: z.string().projId().required()
   })
   .strict();
 

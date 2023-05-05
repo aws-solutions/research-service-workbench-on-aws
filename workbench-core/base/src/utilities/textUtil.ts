@@ -39,10 +39,12 @@ const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
 
-const envTypeIdRegExpString: string = `${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}`;
-const envTypeConfigIdRegExpString: string = `${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`;
-const projIdRegExpString: string = `${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`;
-const envIdRegExpString: string = `${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`;
+const envTypeIdRegExpString: string = `^${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}$`;
+const envTypeConfigIdRegExpString: string = `^${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}$`;
+const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}$`;
+const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
+const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
+const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -73,23 +75,34 @@ function swbDescriptionRegExp(): RegExp {
 
 function etIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^${envTypeIdRegExpString}$`);
+  return new RegExp(envTypeIdRegExpString);
 }
 
 function etcIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^${envTypeConfigIdRegExpString}$`);
+  return new RegExp(envTypeConfigIdRegExpString);
 }
 
 function projIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^${projIdRegExpString}$`);
+  return new RegExp(projIdRegExpString);
 }
 
 function envIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^${envIdRegExpString}$`);
+  return new RegExp(envIdRegExpString);
 }
+
+function costCenterIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(costCenterIdRegExpString);
+}
+
+function accountIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(accountIdRegExpString);
+}
+
 function awsAccountIdRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(awsAccountIdRegExpAsString);
@@ -125,6 +138,8 @@ export {
   etcIdRegex,
   projIdRegex,
   envIdRegex,
+  costCenterIdRegex,
+  accountIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,

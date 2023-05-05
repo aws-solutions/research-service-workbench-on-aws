@@ -18,7 +18,9 @@ import {
   swbNameRegExp,
   uuidRegExp,
   uuidWithLowercasePrefix,
-  uuidWithLowercasePrefixRegExp
+  uuidWithLowercasePrefixRegExp,
+  costCenterIdRegex,
+  accountIdRegex
 } from './textUtil';
 
 describe('textUtil', () => {
@@ -135,6 +137,31 @@ describe('textUtil', () => {
       expect(`invalid`.match(projIdRegex())).toEqual(null);
     });
   });
+
+  describe('costCenterIdRegex', () => {
+    test('valid costCenterId', () => {
+      expect(`cc-${randomUuid}`.match(costCenterIdRegex())).toEqual(
+        expect.arrayContaining([`cc-${randomUuid}`])
+      );
+    });
+
+    test('invalid projId', () => {
+      expect(`invalid`.match(costCenterIdRegex())).toEqual(null);
+    });
+  });
+
+  describe('accountIdRegex', () => {
+    test('valid accountId', () => {
+      expect(`acc-${randomUuid}`.match(accountIdRegex())).toEqual(
+        expect.arrayContaining([`acc-${randomUuid}`])
+      );
+    });
+
+    test('invalid projId', () => {
+      expect(`acc-${randomUuid}#`.match(accountIdRegex())).toEqual(null);
+    });
+  });
+
   describe('envIdRegex', () => {
     test('valid envId', () => {
       expect(`env-${randomUuid}`.match(envIdRegex())).toEqual(expect.arrayContaining([`env-${randomUuid}`]));
