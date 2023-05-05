@@ -19,6 +19,7 @@ interface PaabResources {
   project1Id: string;
   project2Id: string;
   project3Id: string;
+  project4Id: string;
 }
 
 export class PaabHelper {
@@ -44,7 +45,7 @@ export class PaabHelper {
     });
 
     // create two projects
-    const projectNames: string[] = ['Project1', 'Project2', 'Project3'];
+    const projectNames: string[] = ['Project1', 'Project2', 'Project3', 'Project4'];
     const projectIds: string[] = [];
 
     for (const projectName of projectNames) {
@@ -56,18 +57,21 @@ export class PaabHelper {
       });
       projectIds.push(projectResponse.data.id);
     }
-    const [project1Id, project2Id, project3Id] = projectIds;
+    const [project1Id, project2Id, project3Id, project4Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
-    let pa1Session: ClientSession = await this._setup.getSessionForUserType(
+    const pa1Session: ClientSession = await this._setup.getSessionForUserType(
       'projectAdmin1',
       this._outputError
     );
-    let pa2Session: ClientSession = await this._setup.getSessionForUserType(
+    const pa2Session: ClientSession = await this._setup.getSessionForUserType(
       'projectAdmin2',
       this._outputError
     );
-    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1', this._outputError);
+    const rs1Session: ClientSession = await this._setup.getSessionForUserType(
+      'researcher1',
+      this._outputError
+    );
 
     // associate users with corresponding projects properly (as IT Admin)
     await adminSession.resources.projects
@@ -86,10 +90,6 @@ export class PaabHelper {
       .project(project3Id)
       .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
 
-    pa1Session = await this._setup.getSessionForUserType('projectAdmin1', this._outputError);
-    pa2Session = await this._setup.getSessionForUserType('projectAdmin2', this._outputError);
-    rs1Session = await this._setup.getSessionForUserType('researcher1', this._outputError);
-
     return {
       adminSession,
       pa1Session,
@@ -97,7 +97,8 @@ export class PaabHelper {
       rs1Session,
       project1Id,
       project2Id,
-      project3Id
+      project3Id,
+      project4Id
     };
   }
 

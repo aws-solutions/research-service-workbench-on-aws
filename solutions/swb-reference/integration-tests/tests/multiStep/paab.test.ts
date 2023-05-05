@@ -58,10 +58,11 @@ describe('multiStep environment test', () => {
   let project1Id: string;
   let project2Id: string;
   let project3Id: string;
+  let project4Id: string;
   let rs1Session: ClientSession;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session } =
+    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session, project4Id } =
       await paabHelper.createResources());
   });
 
@@ -80,6 +81,10 @@ describe('multiStep environment test', () => {
       .configurations()
       .create(defaultSageMakerETCBody);
     const { data: etc3 } = await adminSession.resources.environmentTypes
+      .environmentType(etId)
+      .configurations()
+      .create(defaultSageMakerETCBody);
+    const { data: etc4 } = await adminSession.resources.environmentTypes
       .environmentType(etId)
       .configurations()
       .create(defaultSageMakerETCBody);
@@ -105,6 +110,13 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .environmentTypeConfig(etc3.id)
+      .associate();
+    await adminSession.resources.projects
+      .project(project4Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc4.id)
       .associate();
 
     console.log('Creating Environment1 for Project1...');
@@ -172,6 +184,83 @@ describe('multiStep environment test', () => {
       .project(project1Id)
       .dataSets()
       .create(dataSetBody, false);
+
+    console.log('Test to ensure access is given immediately when a user is added to a project');
+
+    console.log('Verifying PA1 CANNOT see Project4...');
+    const { data: pa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
+    expect(pa1Projects.data.filter((proj) => proj.id === project2Id).length).toEqual(0);
+
+    // Get Projects
+    try {
+      await pa1Session.resources.projects.project(project4Id).get();
+    } catch (err) {
+      checkHttpError(err, unauthorizedHttpError);
+    }
+
+    console.log('Verifying PA1 CANNOT see ETC4');
+    try {
+      await pa1Session.resources.projects
+        .project(project4Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc4.id)
+        .get();
+    } catch (e) {
+      checkHttpError(e, unauthorizedHttpError);
+    }
+
+    console.log('Adding PA1 to Project4 as a Project Admin');
+    await adminSession.resources.projects
+      .project(project4Id)
+      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+
+    console.log('Verifying PA1 CAN see Project4...');
+    const { data: updatedPa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
+    expect(updatedPa1Projects.data.filter((proj) => proj.id === project2Id).length).toEqual(1);
+    const { data: receivedProject4 } = await pa1Session.resources.projects.project(project4Id).get();
+
+    expect(receivedProject4.id).toStrictEqual(project4Id);
+
+    console.log('Verifying PA1 CAN see ETC4');
+    const { data: receivedEtc4 } = await pa1Session.resources.projects
+      .project(project4Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc4.id)
+      .get();
+
+    expect(receivedEtc4).toStrictEqual(etc4);
+
+    console.log('Test to ensure access is revoked immediately when a user is removed from a project');
+
+    console.log('Removing PA1 from Project4');
+    await adminSession.resources.projects.project(project4Id).removeUserFromProject(pa1Session.getUserId()!);
+
+    console.log('Verifying PA1 CANNOT see Project4');
+    // Get Projects
+    try {
+      await pa1Session.resources.projects.project(project4Id).get();
+    } catch (err) {
+      checkHttpError(err, unauthorizedHttpError);
+    }
+
+    console.log('Verifying PA1 CANNOT see ETC4');
+    try {
+      await pa1Session.resources.projects
+        .project(project4Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc4.id)
+        .get();
+    } catch (e) {
+      checkHttpError(e, unauthorizedHttpError);
+    }
+
+    console.log('Successfully completed immediate allowed and revoked project access');
 
     console.log('Verifying PA1 CANNOT see Project2...');
     // List Projects
@@ -606,6 +695,13 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .environmentTypeConfig(etc3.id)
+      .disassociate();
+    await adminSession.resources.projects
+      .project(project4Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc4.id)
       .disassociate();
   });
 });
