@@ -189,7 +189,7 @@ describe('multiStep environment test', () => {
 
     console.log('Verifying PA1 CANNOT see Project4...');
     const { data: pa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
-    expect(pa1Projects.data.filter((proj) => proj.id === project2Id).length).toEqual(0);
+    expect(pa1Projects.data.filter((proj) => proj.id === project4Id).length).toEqual(0);
 
     // Get Projects
     try {
@@ -218,7 +218,7 @@ describe('multiStep environment test', () => {
 
     console.log('Verifying PA1 CAN see Project4...');
     const { data: updatedPa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
-    expect(updatedPa1Projects.data.filter((proj) => proj.id === project2Id).length).toEqual(1);
+    expect(updatedPa1Projects.data.filter((proj) => proj.id === project4Id).length).toEqual(1);
     const { data: receivedProject4 } = await pa1Session.resources.projects.project(project4Id).get();
 
     expect(receivedProject4.id).toStrictEqual(project4Id);
