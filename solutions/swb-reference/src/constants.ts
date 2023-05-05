@@ -65,13 +65,6 @@ const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
 const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
 const customUserAgentString: string = `AwsSolution/${SolutionId}/${SolutionVersion}`;
 
-const customUserAgent: UserAgent = [
-  [
-    customUserAgentString.slice(0, customUserAgentString.lastIndexOf('/')),
-    customUserAgentString.slice(customUserAgentString.lastIndexOf('/') + 1)
-  ]
-];
-
 const regionShortNamesMap: { [id: string]: string } = {
   'us-east-2': 'oh',
   'us-east-1': 'va',
