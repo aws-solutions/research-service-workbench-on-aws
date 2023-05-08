@@ -888,7 +888,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"status\": \"APPROVED\"\n}",
+              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"JupyterNotebook\",\n    \"status\": \"APPROVED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
