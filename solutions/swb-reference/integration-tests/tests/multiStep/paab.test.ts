@@ -58,11 +58,10 @@ describe('multiStep environment test', () => {
   let project1Id: string;
   let project2Id: string;
   let project3Id: string;
-  let project4Id: string;
   let rs1Session: ClientSession;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session, project4Id } =
+    ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session } =
       await paabHelper.createResources());
   });
 
@@ -110,13 +109,6 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .environmentTypeConfig(etc3.id)
-      .associate();
-    await adminSession.resources.projects
-      .project(project4Id)
-      .environmentTypes()
-      .environmentType(etId)
-      .configurations()
-      .environmentTypeConfig(etc4.id)
       .associate();
 
     console.log('Creating Environment1 for Project1...');
@@ -187,74 +179,74 @@ describe('multiStep environment test', () => {
 
     console.log('Test to ensure access is given immediately when a user is added to a project');
 
-    console.log('Verifying PA1 CANNOT see Project4...');
-    const { data: pa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
-    expect(pa1Projects.data.filter((proj) => proj.id === project4Id).length).toEqual(0);
+    console.log('Verifying PA2 CANNOT see Project3...');
+    const { data: pa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(pa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(0);
 
     // Get Projects
     try {
-      await pa1Session.resources.projects.project(project4Id).get();
+      await pa2Session.resources.projects.project(project3Id).get();
     } catch (err) {
       checkHttpError(err, unauthorizedHttpError);
     }
 
-    console.log('Verifying PA1 CANNOT see ETC4');
+    console.log('Verifying PA2 CANNOT see ETC3');
     try {
-      await pa1Session.resources.projects
-        .project(project4Id)
+      await pa2Session.resources.projects
+        .project(project3Id)
         .environmentTypes()
         .environmentType(etId)
         .configurations()
-        .environmentTypeConfig(etc4.id)
+        .environmentTypeConfig(etc3.id)
         .get();
     } catch (e) {
       checkHttpError(e, unauthorizedHttpError);
     }
 
-    console.log('Adding PA1 to Project4 as a Project Admin');
+    console.log('Adding PA2 to Project3 as a Project Admin');
     await adminSession.resources.projects
-      .project(project4Id)
-      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+      .project(project3Id)
+      .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
 
-    console.log('Verifying PA1 CAN see Project4...');
-    const { data: updatedPa1Projects }: ListProjectsResponse = await pa1Session.resources.projects.get();
-    expect(updatedPa1Projects.data.filter((proj) => proj.id === project4Id).length).toEqual(1);
-    const { data: receivedProject4 } = await pa1Session.resources.projects.project(project4Id).get();
+    console.log('Verifying PA2 CAN see Project3...');
+    const { data: updatedPa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(updatedPa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(1);
+    const { data: receivedProject3 } = await pa2Session.resources.projects.project(project3Id).get();
 
-    expect(receivedProject4.id).toStrictEqual(project4Id);
+    expect(receivedProject3.id).toStrictEqual(project3Id);
 
-    console.log('Verifying PA1 CAN see ETC4');
-    const { data: receivedEtc4 } = await pa1Session.resources.projects
-      .project(project4Id)
+    console.log('Verifying PA2 CAN see ETC3');
+    const { data: receivedEtc3 } = await pa2Session.resources.projects
+      .project(project3Id)
       .environmentTypes()
       .environmentType(etId)
       .configurations()
-      .environmentTypeConfig(etc4.id)
+      .environmentTypeConfig(etc3.id)
       .get();
 
-    expect(receivedEtc4).toStrictEqual(etc4);
+    expect(receivedEtc3).toStrictEqual(etc3);
 
     console.log('Test to ensure access is revoked immediately when a user is removed from a project');
 
-    console.log('Removing PA1 from Project4');
-    await adminSession.resources.projects.project(project4Id).removeUserFromProject(pa1Session.getUserId()!);
+    console.log('Removing PA2 from Project3');
+    await adminSession.resources.projects.project(project3Id).removeUserFromProject(pa2Session.getUserId()!);
 
-    console.log('Verifying PA1 CANNOT see Project4');
+    console.log('Verifying PA2 CANNOT see Project3');
     // Get Projects
     try {
-      await pa1Session.resources.projects.project(project4Id).get();
+      await pa2Session.resources.projects.project(project3Id).get();
     } catch (err) {
       checkHttpError(err, unauthorizedHttpError);
     }
 
-    console.log('Verifying PA1 CANNOT see ETC4');
+    console.log('Verifying PA2 CANNOT see ETC3');
     try {
-      await pa1Session.resources.projects
-        .project(project4Id)
+      await pa2Session.resources.projects
+        .project(project3Id)
         .environmentTypes()
         .environmentType(etId)
         .configurations()
-        .environmentTypeConfig(etc4.id)
+        .environmentTypeConfig(etc3.id)
         .get();
     } catch (e) {
       checkHttpError(e, unauthorizedHttpError);
@@ -695,13 +687,6 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .environmentTypeConfig(etc3.id)
-      .disassociate();
-    await adminSession.resources.projects
-      .project(project4Id)
-      .environmentTypes()
-      .environmentType(etId)
-      .configurations()
-      .environmentTypeConfig(etc4.id)
       .disassociate();
   });
 });

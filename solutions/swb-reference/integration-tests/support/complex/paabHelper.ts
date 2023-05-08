@@ -19,7 +19,6 @@ interface PaabResources {
   project1Id: string;
   project2Id: string;
   project3Id: string;
-  project4Id: string;
 }
 
 export class PaabHelper {
@@ -45,7 +44,7 @@ export class PaabHelper {
     });
 
     // create two projects
-    const projectNames: string[] = ['Project1', 'Project2', 'Project3', 'Project4'];
+    const projectNames: string[] = ['Project1', 'Project2', 'Project3'];
     const projectIds: string[] = [];
 
     for (const projectName of projectNames) {
@@ -57,7 +56,7 @@ export class PaabHelper {
       });
       projectIds.push(projectResponse.data.id);
     }
-    const [project1Id, project2Id, project3Id, project4Id] = projectIds;
+    const [project1Id, project2Id, project3Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
     const pa1Session: ClientSession = await this._setup.getSessionForUserType(
@@ -97,8 +96,7 @@ export class PaabHelper {
       rs1Session,
       project1Id,
       project2Id,
-      project3Id,
-      project4Id
+      project3Id
     };
   }
 
