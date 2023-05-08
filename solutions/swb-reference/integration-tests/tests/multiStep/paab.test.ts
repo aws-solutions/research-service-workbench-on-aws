@@ -83,10 +83,6 @@ describe('multiStep environment test', () => {
       .environmentType(etId)
       .configurations()
       .create(defaultSageMakerETCBody);
-    const { data: etc4 } = await adminSession.resources.environmentTypes
-      .environmentType(etId)
-      .configurations()
-      .create(defaultSageMakerETCBody);
 
     console.log('Associating Environment Type Configs to Projects...');
     await adminSession.resources.projects
