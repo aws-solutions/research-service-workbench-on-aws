@@ -4,6 +4,7 @@
  */
 
 import {
+  ConflictError,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetExternalEndpointRequest,
@@ -512,6 +513,8 @@ describe('DataSetService', () => {
         };
 
         mockDataSetsAuthPlugin.removeAccessPermissions = jest.fn().mockReturnValueOnce(permissionsResponse);
+
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
       });
 
       describe('when a projectAdmin removes access', () => {
@@ -527,11 +530,13 @@ describe('DataSetService', () => {
               dataSetId,
               projectId
             };
+
+            mockDataSet.owner = getProjectAdminRole(projectId);
           });
 
           test('it throws an error', async () => {
             await expect(dataSetService.removeAccessForProject(projectRemoveAccessRequest)).rejects.toThrow(
-              new Error(
+              new ConflictError(
                 `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
               )
             );
