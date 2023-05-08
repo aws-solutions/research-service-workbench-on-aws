@@ -10,7 +10,12 @@ import { ApplicationType, SolutionId, SolutionName, SolutionVersion } from './co
 import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-const swbBackendStack: SWBStack = new SWBStack(app);
+const swbBackendStack: SWBStack = new SWBStack(app, {
+  solutionId: SolutionId,
+  solutionName: SolutionName,
+  solutionVersion: SolutionVersion
+});
+
 new WorkbenchAppRegistry(swbBackendStack, `${swbBackendStack.stackName}-AppRegistryStack`, {
   solutionId: SolutionId,
   solutionName: SolutionName,
