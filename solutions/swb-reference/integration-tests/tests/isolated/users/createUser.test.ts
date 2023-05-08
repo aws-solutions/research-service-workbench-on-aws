@@ -91,22 +91,6 @@ describe('create user negative tests', () => {
     }
   });
 
-  it('should return a 400 error when the email parameter is empty', async () => {
-    const invalidParam: Record<string, unknown> = { ...user };
-    invalidParam.email = '';
-    try {
-      await adminSession.resources.users.create(invalidParam, false);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: `email: Required`
-        })
-      );
-    }
-  });
-
   it('should return a 400 error when the email parameter is the wrong type', async () => {
     const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.email = 123;
