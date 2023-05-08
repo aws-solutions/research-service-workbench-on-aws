@@ -18,7 +18,9 @@ import {
   swbNameRegExp,
   uuidRegExp,
   uuidWithLowercasePrefix,
-  uuidWithLowercasePrefixRegExp
+  uuidWithLowercasePrefixRegExp,
+  costCenterIdRegex,
+  accountIdRegex
 } from './textUtil';
 
 describe('textUtil', () => {
@@ -63,8 +65,12 @@ describe('textUtil', () => {
     });
   });
   describe('swbNameRegExp', () => {
-    test('valid swbName', () => {
+    test('valid swbName valid char', () => {
       expect('name.name-1'.match(swbNameRegExp())).toEqual(expect.arrayContaining([`name.name-1`]));
+    });
+
+    test('valid swbName empty string', () => {
+      expect(''.match(swbNameRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
     test('invalid swbName', () => {
@@ -72,10 +78,14 @@ describe('textUtil', () => {
     });
   });
   describe('swbDescriptionRegExp', () => {
-    test('valid swbDescription', () => {
+    test('valid swbDescription valid char', () => {
       expect('description- desc'.match(swbDescriptionRegExp())).toEqual(
         expect.arrayContaining([`description- desc`])
       );
+    });
+
+    test('valid swbDescription empty string', () => {
+      expect(''.match(swbDescriptionRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
     test('invalid swbDescription', () => {
@@ -127,6 +137,31 @@ describe('textUtil', () => {
       expect(`invalid`.match(projIdRegex())).toEqual(null);
     });
   });
+
+  describe('costCenterIdRegex', () => {
+    test('valid costCenterId', () => {
+      expect(`cc-${randomUuid}`.match(costCenterIdRegex())).toEqual(
+        expect.arrayContaining([`cc-${randomUuid}`])
+      );
+    });
+
+    test('invalid projId', () => {
+      expect(`invalid`.match(costCenterIdRegex())).toEqual(null);
+    });
+  });
+
+  describe('accountIdRegex', () => {
+    test('valid accountId', () => {
+      expect(`acc-${randomUuid}`.match(accountIdRegex())).toEqual(
+        expect.arrayContaining([`acc-${randomUuid}`])
+      );
+    });
+
+    test('invalid projId', () => {
+      expect(`acc-${randomUuid}#`.match(accountIdRegex())).toEqual(null);
+    });
+  });
+
   describe('envIdRegex', () => {
     test('valid envId', () => {
       expect(`env-${randomUuid}`.match(envIdRegex())).toEqual(expect.arrayContaining([`env-${randomUuid}`]));

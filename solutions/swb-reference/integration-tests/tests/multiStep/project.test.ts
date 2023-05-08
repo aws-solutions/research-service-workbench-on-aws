@@ -4,13 +4,12 @@
  */
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
-import RandomTextGenerator from '../../support/utils/randomTextGenerator';
+import { generateRandomString, validSwbName } from '../../support/utils/utilities';
 
 describe('multiStep project tests', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
-  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let projectName: string;
 
   beforeAll(async () => {
@@ -19,13 +18,13 @@ describe('multiStep project tests', () => {
 
   beforeEach(async () => {
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'project integration test cost center',
+      name: 'project-integration-test-cost-center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
 
     costCenterId = costCenter.id;
-    projectName = randomTextGenerator.getFakeText('test-project-name');
+    projectName = generateRandomString(10, validSwbName);
   });
 
   afterAll(async () => {
@@ -51,8 +50,8 @@ describe('multiStep project tests', () => {
     expect(listProject.data).toEqual([createdProject]);
 
     console.log('Updating Project');
-    const newName = randomTextGenerator.getFakeText('test-project-name');
-    const newDescription = 'Happy path--Not a Project studying dragons!';
+    const newName = generateRandomString(10, validSwbName);
+    const newDescription = 'Happy path--Not a Project studying dragons';
     const { data: updatedProject } = await adminSession.resources.projects
       .project(createdProject.id)
       .update({ name: newName, description: newDescription }, true);
@@ -71,7 +70,7 @@ describe('multiStep project tests', () => {
 
   test('createProject', async () => {
     console.log('Creating Project');
-    const projectName = randomTextGenerator.getFakeText('test-project-name');
+    const projectName = generateRandomString(10, validSwbName);
     const { data: createdProject1 } = await adminSession.resources.projects.create({
       name: projectName,
       description: 'My uniquely name project',
@@ -103,7 +102,7 @@ describe('multiStep project tests', () => {
       costCenterId
     });
 
-    const otherName = randomTextGenerator.getFakeText('test-project-name');
+    const otherName = generateRandomString(10, validSwbName);
     const { data: createdProject2 } = await adminSession.resources.projects.create({
       name: otherName,
       description: 'Backlog project',

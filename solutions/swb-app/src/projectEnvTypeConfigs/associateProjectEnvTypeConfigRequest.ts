@@ -4,14 +4,14 @@
  */
 
 import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AssociateProjectEnvTypeConfigRequestParser = z
   .object({
     envTypeId: z.string().etId().required(),
-    envTypeConfigId: z.string().swbId(resourceTypeToKey.envTypeConfig).required(),
-    projectId: z.string().swbId(resourceTypeToKey.project).required(),
+    envTypeConfigId: z.string().etcId().required(),
+    projectId: z.string().projId().required(),
     user: AuthenticatedUserParser
   })
   .strict();

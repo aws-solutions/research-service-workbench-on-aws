@@ -21,7 +21,7 @@ describe('multiStep user to project integration test', () => {
     ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources());
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
+      name: 'test-cost-center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
