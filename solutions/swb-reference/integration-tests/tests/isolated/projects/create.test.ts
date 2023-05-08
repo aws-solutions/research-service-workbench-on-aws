@@ -7,7 +7,12 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError } from '../../../support/utils/utilities';
+import {
+  checkHttpError,
+  generateRandomString,
+  validSwbName,
+  validSwbDescription
+} from '../../../support/utils/utilities';
 
 interface CreateRequest {
   name?: string;
@@ -35,14 +40,14 @@ describe('Create Project negative tests', () => {
     expect.hasAssertions();
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'project integration test cost center',
+      name: generateRandomString(10, validSwbName),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test costcenter'
+      description: generateRandomString(10, validSwbDescription)
     });
     costCenterId = costCenter.id;
 
     createRequest = {
-      name: 'valid name',
+      name: 'validName',
       description: 'valid description',
       costCenterId
     };
@@ -51,7 +56,7 @@ describe('Create Project negative tests', () => {
   describe('with a name', () => {
     describe('that belongs to an existing project', () => {
       beforeEach(async () => {
-        existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+        existingProjectName = generateRandomString(10, validSwbName);
         await adminSession.resources.projects.create({
           name: existingProjectName,
           description: 'Create Project negative tests--Project for TOP SECRET dragon research',
@@ -121,7 +126,7 @@ describe('Create Project negative tests', () => {
   describe('with a cost center', () => {
     describe('that does not exist', () => {
       beforeEach(async () => {
-        createRequest.costCenterId = 'cc-invalid-cost-center';
+        createRequest.costCenterId = 'cc-1234abcd-1234-abcd-1234-abcd1234abcd';
       });
 
       test('it throws 400 error', async () => {
@@ -132,7 +137,7 @@ describe('Create Project negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Could not find cost center cc-invalid-cost-center`
+              message: `Could not find cost center cc-1234abcd-1234-abcd-1234-abcd1234abcd`
             })
           );
         }
@@ -162,9 +167,9 @@ describe('Create Project negative tests', () => {
     describe('that was deleted', () => {
       beforeEach(async () => {
         const { data: costCenter } = await adminSession.resources.costCenters.create({
-          name: 'project integration test cost center',
+          name: generateRandomString(10, validSwbName),
           accountId: setup.getSettings().get('defaultHostingAccountId'),
-          description: 'a test costcenter'
+          description: generateRandomString(10, validSwbDescription)
         });
         costCenterId = costCenter.id;
 

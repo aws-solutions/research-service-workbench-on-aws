@@ -5,12 +5,14 @@
 
 import JSONValue from '../types/json';
 import {
-  nonHTMLValidChar,
+  nonHTMLMessage,
   swbNameMaxLength,
-  swbNameValidChar,
+  swbNameMessage,
   swbDescriptionMaxLength,
-  swbDescriptionValidChar,
-  awsAccountIdMessage
+  swbDescriptionMessage,
+  awsAccountIdMessage,
+  nonEmptyMessage,
+  invalidIdMessage
 } from './textUtil';
 import { getPaginationParser, validateAndParse, z } from './validatorHelper';
 
@@ -117,6 +119,7 @@ describe('getPaginationProperties', () => {
     });
   });
 });
+
 describe('validateAndParse', () => {
   const testParser = z
     .object({
@@ -141,6 +144,7 @@ describe('validateAndParse', () => {
     });
   });
 });
+
 describe('zod.swbId', () => {
   const zodParser = z.object({
     id: z.string().swbId('prefix')
@@ -174,6 +178,7 @@ describe('zod.swbId', () => {
     });
   });
 });
+
 describe('zod.required', () => {
   const zodParser = z.object({
     id: z.string().required()
@@ -235,7 +240,7 @@ describe('tests for zod.nonHTML', () => {
       { id: "randomString<tag\nkey='value'/> randomString" }
     ];
     test.each(invalidObjects)('returns required message', (invalidObject) => {
-      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(nonHTMLValidChar);
+      expect(() => validateAndParse<NonHTMLType>(zodParser, invalidObject)).toThrowError(nonHTMLMessage);
     });
   });
 });
@@ -247,7 +252,7 @@ describe('tests for zod.swbName', () => {
   type SwbNameType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
-    const validObjects = [{ id: 'ABCabc123-_.' }];
+    const validObjects = [{ id: 'ABCabc123-_.' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<SwbNameType>(zodParser, validObject)).toEqual(validObject);
     });
@@ -275,7 +280,7 @@ describe('tests for zod.swbName', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          `${swbNameValidChar}`
+          `${swbNameMessage}`
         );
       });
     });
@@ -289,7 +294,7 @@ describe('tests for zod.swbDescription', () => {
   type SwbDescriptionType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
-    const validObjects = [{ id: 'ABCabc123-_. ' }];
+    const validObjects = [{ id: 'ABCabc123-_. ' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
       expect(validateAndParse<SwbDescriptionType>(zodParser, validObject)).toEqual(validObject);
     });
@@ -316,7 +321,7 @@ describe('tests for zod.swbDescription', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          `${swbDescriptionValidChar}`
+          `${swbDescriptionMessage}`
         );
       });
     });
@@ -390,6 +395,100 @@ describe('zod.etId', () => {
     });
   });
 });
+
+describe('tests for zod.projId', () => {
+  const zodParser = z.object({
+    id: z.string().projId()
+  });
+  type ProjIdType = z.infer<typeof zodParser>;
+  const randomUuid = '1234abcd-1234-abcd-1234-aaaabbbbcccc';
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: `proj-${randomUuid}` }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<ProjIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when contains invalid char', () => {
+      const invalidObjects: ProjIdType[] = [
+        { id: `invalid-${randomUuid}` }, //invalid prefix
+        { id: 'proj-invalid-uuid' }, //invalid uuid format
+        { id: `proj-${randomUuid}#ProjAdmin` }, //invalid uuid format
+        { id: '' } //empty value
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<ProjIdType>(zodParser, invalidObject)).toThrowError(
+          `${invalidIdMessage}`
+        );
+      });
+    });
+  });
+});
+
+describe('tests for zod.accountId', () => {
+  const zodParser = z.object({
+    id: z.string().accountId()
+  });
+  type AccountIdType = z.infer<typeof zodParser>;
+  const randomUuid = '1234abcd-1234-abcd-1234-aaaabbbbcccc';
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: `acc-${randomUuid}` }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<AccountIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when contains invalid char', () => {
+      const invalidObjects: AccountIdType[] = [
+        { id: `invalid-${randomUuid}` }, //invalid prefix
+        { id: 'acc-invalid-uuid' }, //invalid uuid format
+        { id: `acc-${randomUuid}#ProjAdmin` }, //invalid uuid format
+        { id: '' } //empty value
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<AccountIdType>(zodParser, invalidObject)).toThrowError(
+          `${invalidIdMessage}`
+        );
+      });
+    });
+  });
+});
+
+describe('tests for zod.costCenterId', () => {
+  const zodParser = z.object({
+    id: z.string().costCenterId()
+  });
+  type CostCenterIdType = z.infer<typeof zodParser>;
+  const randomUuid = '1234abcd-1234-abcd-1234-aaaabbbbcccc';
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: `cc-${randomUuid}` }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<CostCenterIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when contains invalid char', () => {
+      const invalidObjects: CostCenterIdType[] = [
+        { id: `invalid-${randomUuid}` }, //invalid prefix
+        { id: 'cc-invalid-uuid' }, //invalid uuid format
+        { id: `cc-${randomUuid}#ProjAdmin` }, //invalid uuid format
+        { id: '' } //empty value
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<CostCenterIdType>(zodParser, invalidObject)).toThrowError(
+          `${invalidIdMessage}`
+        );
+      });
+    });
+  });
+});
+
 describe('zod.etcId', () => {
   const zodParser = z.object({
     id: z.string().etcId()
@@ -415,6 +514,7 @@ describe('zod.etcId', () => {
     });
   });
 });
+
 describe('zod.optionalNonEmpty', () => {
   const zodParser = z.object({
     id: z.string().optionalNonEmpty()
@@ -432,7 +532,7 @@ describe('zod.optionalNonEmpty', () => {
     const invalidObject = { id: '' };
     test('returns nonEmpty message', () => {
       expect(() => validateAndParse<OptionalNonEmpType>(zodParser, invalidObject)).toThrowError(
-        'id: Cannot be empty'
+        `id: ${nonEmptyMessage}`
       );
     });
   });
