@@ -8,7 +8,7 @@ import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import Settings from '../../../support/utils/settings';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomString, validSwbName } from '../../../support/utils/utilities';
 
 describe('Associate Project with EnvTypeConfig', () => {
   const setup: Setup = Setup.getSetup();
@@ -82,12 +82,12 @@ describe('Associate Project with EnvTypeConfig', () => {
       'projectEnvTypeConfig-isolatedTest-create-failsWhenUsingDeletedProject'
     );
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: `${testName} cost center`,
+      name: generateRandomString(10, validSwbName),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
     const { data: createdProject } = await adminSession.resources.projects.create({
-      name: `${testName} project`,
+      name: `${testName}Project`,
       description: 'test description',
       costCenterId: costCenter.id
     });
