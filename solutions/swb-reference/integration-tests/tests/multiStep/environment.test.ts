@@ -58,7 +58,7 @@ describe('multiStep environment test', () => {
       envType: settings.get('envType'),
       datasetIds: [],
       name: randomTextGenerator.getFakeText('environment-multistep-test-envA'),
-      description: 'EnvironmentA for multistep/environment.test'
+      description: 'EnvironmentA for multistep environment.test'
     };
     const { data: environmentA } = await paSessionEnvironments.create(envABody, false);
     expect(environmentA).toMatchObject({
@@ -78,7 +78,7 @@ describe('multiStep environment test', () => {
       envType: settings.get('envType'),
       datasetIds: [],
       name: randomTextGenerator.getFakeText('environment-multistep-test-envB'),
-      description: 'EnvironmentB for multistep/environment.test'
+      description: 'EnvironmentB for multistep environment.test'
     };
     const { data: environmentB } = await paSessionEnvironments.create(envBBody, false);
     expect(environmentB).toMatchObject({

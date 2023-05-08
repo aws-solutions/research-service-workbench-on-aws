@@ -348,7 +348,7 @@ Running the **List envTypes** request in postman should return a json with the f
 In the response take note of the `id` of the environment type you are looking for, the `name` will have the format `<product name>-<provisioning artifact name>`, e.g. `sageMakerNotebook-v1`. We'll need it for the next step. We'll refer to this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
-In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environemnt type.
+In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environment type.
 
 In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 

@@ -54,12 +54,14 @@ const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITI
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
+  userAgent: process.env.USER_AGENT_STRING,
   ddbTableName: process.env.STACK_NAME!
 });
 
 // Dynamic Auth
 const dynamicAuthAws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
+  userAgent: process.env.USER_AGENT_STRING,
   ddbTableName: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
 });
 const cognitoUserManagementPlugin: CognitoUserManagementPlugin = new CognitoUserManagementPlugin(
