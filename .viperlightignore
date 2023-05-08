@@ -21,9 +21,7 @@ workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:190
 workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:250
 # SecretAccessKey: 'sampleSecretAccessKey' is not real secret
 workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:293
-# email: 'john@doe.com' is not real email
-workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
-# email: 'sample.user@amazon.com' is not real email
+# email: 'sample.user@example.com' is not real email
 solutions/example-ui-app/src/models/User.ts:19
 # "email": "hello@cypress.io" is not real email
 solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
