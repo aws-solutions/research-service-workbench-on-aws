@@ -69,7 +69,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'Invalid parameter: Invalid email address format.'
+          message: 'email: Invalid Email'
         })
       );
     }

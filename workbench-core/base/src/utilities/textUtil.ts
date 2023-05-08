@@ -25,6 +25,7 @@ const swbDescriptionMaxLength: number = 400;
 
 const nonEmptyMessage: string = 'Cannot be empty';
 const invalidIdMessage: string = 'Invalid ID';
+const invalidEmailMessage: string = 'Invalid Email';
 const requiredMessage: string = 'Required';
 const urlFilterMaxLength: number = 128;
 
@@ -125,6 +126,7 @@ export {
   envIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
+  invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
   lengthValidationMessage
