@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { z } from '@aws/workbench-core-base';
 import { CostCenterStatus } from '../../constants/costCenterStatus';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CostCenterParser = z.object({
-  id: z.string().swbId(resourceTypeToKey.costCenter.toLowerCase()).required(),
+  id: z.string().costCenterId().required(),
   name: z.string().required(),
   description: z.string().swbDescription().required(),
   subnetId: z.string(),
@@ -19,7 +19,7 @@ export const CostCenterParser = z.object({
   environmentInstanceFiles: z.string(),
   hostingAccountHandlerRoleArn: z.string(),
   awsAccountId: z.string().awsAccountId(),
-  accountId: z.string().swbId(resourceTypeToKey.account.toLowerCase()),
+  accountId: z.string().accountId(),
   createdAt: z.string(),
   updatedAt: z.string(),
   dependency: z.string(),
