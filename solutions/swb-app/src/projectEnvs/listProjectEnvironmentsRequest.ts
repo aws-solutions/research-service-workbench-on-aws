@@ -9,7 +9,7 @@ import { getPaginationParser } from '../validatorHelper';
 export const ListProjectEnvironmentsRequestParser = z
   .object({
     ...getPaginationParser(),
-    projectId: z.string().projId().min(1).required()
+    projectId: z.string().projId().required()
   })
   .strict();
 

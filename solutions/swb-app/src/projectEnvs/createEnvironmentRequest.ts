@@ -8,12 +8,12 @@ import { z } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateEnvironmentRequestParser = z
   .object({
-    projectId: z.string().projId().min(1).required(),
-    name: z.string().swbName().min(1).required(),
+    projectId: z.string().projId().required(),
+    name: z.string().swbName().required(),
     description: z.string().min(1).swbDescription().required(),
-    envTypeId: z.string().etId().min(1).required(),
-    envTypeConfigId: z.string().etcId().min(1).required(),
-    envType: z.string().min(1).required(),
+    envTypeId: z.string().etId().required(),
+    envTypeConfigId: z.string().etcId().required(),
+    envType: z.string().required(),
     datasetIds: z.array(z.string()).default([])
   })
   .strict();

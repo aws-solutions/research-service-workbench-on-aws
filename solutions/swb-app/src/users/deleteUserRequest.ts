@@ -8,7 +8,7 @@ import { z } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteUserRequestParser = z
   .object({
-    userId: z.string().min(1).required()
+    userId: z.string().required()
   })
   .strict();
 
