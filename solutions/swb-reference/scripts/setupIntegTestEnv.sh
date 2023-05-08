@@ -164,7 +164,7 @@ function run() {
     approveEnvType=$(curl --location --request PATCH "https://$swbDomainName/api/environmentTypes/$envTypeId" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
     --data "{
         \"description\": \"An Amazon SageMaker Jupyter Notebook\",
-        \"name\": \"Jupyter Notebook\",
+        \"name\": \"JupyterNotebook\",
         \"status\": \"APPROVED\"
     }")
     echo "\nEnv type is getting updated..."
@@ -176,7 +176,7 @@ function run() {
     --data "{
         \"type\": \"sagemakerNotebook\",
         \"description\": \"Example config 1\",
-        \"name\": \"config 1\",
+        \"name\": \"config-1\",
         \"estimatedCost\": \"estimated cost\",
         \"params\": [
             {
@@ -232,7 +232,7 @@ function run() {
 
     echo -e "${YELLOW}\nReset ProjectAdmin2 user password"
     echo -e "---------------------------------"
-    aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $PA2_EMAIL --password $newPassword --region $AWS_DEFAULT_REGION --permanent > /dev/null
+    aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $PA2_EMAIL --password $newPassword --permanent > /dev/null
 
     echo -e "${PURPLE}\nAssign ProjectAdmin2 to ProjectAdmin Group"
     echo -e "------------------------------------------"
