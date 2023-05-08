@@ -57,9 +57,9 @@ import {
   invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
-  swbDescriptionValidChar,
-  swbNameValidChar,
-  nonHTMLValidChar,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
   swbDescriptionMaxLength,
   lengthValidationMessage
 } from './utilities/textUtil';
@@ -121,9 +121,9 @@ export {
   invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
-  swbDescriptionValidChar,
-  swbNameValidChar,
-  nonHTMLValidChar,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
   swbDescriptionMaxLength,
   lengthValidationMessage
 };

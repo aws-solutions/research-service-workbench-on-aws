@@ -6,12 +6,12 @@
 import * as Boom from '@hapi/boom';
 import { z, ZodString, ZodTypeAny, ZodOptional } from 'zod';
 import {
-  nonHTMLValidChar,
+  nonHTMLMessage,
   nonHtmlRegExp,
-  swbNameValidChar,
+  swbNameMessage,
   swbNameRegExp,
   swbDescriptionRegExp,
-  swbDescriptionValidChar,
+  swbDescriptionMessage,
   swbDescriptionMaxLength,
   swbNameMaxLength,
   uuidWithLowercasePrefixRegExp,
@@ -24,7 +24,9 @@ import {
   nonEmptyMessage,
   invalidIdMessage,
   requiredMessage,
-  lengthValidationMessage
+  lengthValidationMessage,
+  accountIdRegex,
+  costCenterIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -43,6 +45,8 @@ declare module 'zod' {
     etcId: () => ZodString;
     projId: () => ZodString;
     envId: () => ZodString;
+    costCenterId: () => ZodString;
+    accountId: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
   }
@@ -60,19 +64,19 @@ z.ZodString.prototype.swbId = function (prefix: string): ZodString {
 };
 
 z.ZodString.prototype.nonHTML = function (): ZodString {
-  return this.regex(nonHtmlRegExp(), { message: nonHTMLValidChar });
+  return this.regex(nonHtmlRegExp(), { message: nonHTMLMessage });
 };
 
 z.ZodString.prototype.swbName = function (): ZodString {
   return this.max(swbNameMaxLength, {
     message: lengthValidationMessage(swbNameMaxLength)
-  }).regex(swbNameRegExp(), { message: swbNameValidChar });
+  }).regex(swbNameRegExp(), { message: swbNameMessage });
 };
 
 z.ZodString.prototype.swbDescription = function (): ZodString {
   return this.max(swbDescriptionMaxLength, {
     message: lengthValidationMessage(swbDescriptionMaxLength)
-  }).regex(swbDescriptionRegExp(), { message: swbDescriptionValidChar });
+  }).regex(swbDescriptionRegExp(), { message: swbDescriptionMessage });
 };
 
 z.ZodString.prototype.etId = function (): ZodString {
@@ -89,6 +93,14 @@ z.ZodString.prototype.projId = function (): ZodString {
 
 z.ZodString.prototype.envId = function (): ZodString {
   return this.regex(envIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.costCenterId = function (): ZodString {
+  return this.regex(costCenterIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.accountId = function (): ZodString {
+  return this.regex(accountIdRegex(), { message: invalidIdMessage });
 };
 
 /**

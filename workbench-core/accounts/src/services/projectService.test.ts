@@ -2,8 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-const expectedUuid = '123';
-jest.mock('uuid', () => ({ v4: () => expectedUuid }));
+const mockUuid = '1234abcd-1111-abcd-1234-abcd1234abcd';
+jest.mock('uuid', () => ({ v4: () => mockUuid }));
 
 import {
   BatchGetItemCommand,
@@ -34,10 +34,20 @@ import CostCenterService from './costCenterService';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
-  const mockUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
+  const mockUuid = '1234abcd-1111-abcd-1234-abcd1234abcd';
+  const mockUuid2 = '1234abcd-2222-abcd-1234-abcd1234abcd';
+  const mockUuid3 = '1234abcd-3333-abcd-1234-abcd1234abcd';
+
   const mockCostCenterId = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid}`;
+  const mockCostCenterId2 = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid2}`;
+  const mockCostCenterId3 = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid3}`;
+
   const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-${mockUuid}`;
-  const projId = `proj-123`;
+
+  const mockProjId = `${resourceTypeToKey.project.toLowerCase()}-${mockUuid}`;
+  const mockProjId2 = `${resourceTypeToKey.project.toLowerCase()}-${mockUuid2}`;
+  const mockProjId3 = `${resourceTypeToKey.project.toLowerCase()}-${mockUuid3}`;
+
   const ddbMock = mockClient(DynamoDBClient);
   const TABLE_NAME = 'exampleDDBTable';
   const dynamoDBService = new DynamoDBService({
@@ -54,9 +64,9 @@ describe('ProjectService', () => {
   };
   let projects: Project[];
   const project1: Project = {
-    id: 'proj-123',
+    id: mockProjId,
     name: 'name1',
-    description: '',
+    description: 'description1',
     costCenterId: mockCostCenterId,
     status: ProjectStatus.AVAILABLE,
     createdAt: '2022-11-10T04:19:00.000Z',
@@ -72,10 +82,10 @@ describe('ProjectService', () => {
     accountId: ''
   };
   const project2: Project = {
-    id: 'proj-456',
+    id: mockProjId2,
     name: 'name2',
-    description: '',
-    costCenterId: 'cc-1234abcd-2222-abcd-1234-abcd1234abcd',
+    description: 'description2',
+    costCenterId: mockCostCenterId2,
     status: ProjectStatus.SUSPENDED,
     createdAt: '2022-11-10T04:20:00.000Z',
     updatedAt: '',
@@ -90,10 +100,10 @@ describe('ProjectService', () => {
     accountId: ''
   };
   const project3: Project = {
-    id: 'proj-789',
+    id: mockProjId3,
     name: 'name3',
-    description: '',
-    costCenterId: 'cc-1234abcd-3333-abcd-1234-abcd1234abcd',
+    description: 'description3',
+    costCenterId: mockCostCenterId3,
     status: ProjectStatus.DELETED,
     createdAt: '2022-11-10T04:21:00.000Z',
     updatedAt: '',
@@ -111,8 +121,8 @@ describe('ProjectService', () => {
   // DDB object for project1
   const projItem1: Record<string, string> = {
     ...project1,
-    pk: `PROJ#proj-123`,
-    sk: `PROJ#proj-123`,
+    pk: `PROJ#${mockProjId}`,
+    sk: `PROJ#${mockProjId}`,
     resourceType: 'project',
     dependency: project1.costCenterId
   };
@@ -120,8 +130,8 @@ describe('ProjectService', () => {
   // DDB object for project2
   const projItem2: Record<string, string> = {
     ...project2,
-    pk: `PROJ#proj-456`,
-    sk: `PROJ#proj-456`,
+    pk: `PROJ#${mockProjId2}`,
+    sk: `PROJ#${mockProjId2}`,
     resourceType: 'project',
     dependency: project2.costCenterId
   };
@@ -129,8 +139,8 @@ describe('ProjectService', () => {
   // DDB object for project3
   const projItem3: Record<string, string> = {
     ...project3,
-    pk: `PROJ#proj-789`,
-    sk: `PROJ#proj-789`,
+    pk: `PROJ#${mockProjId3}`,
+    sk: `PROJ#${mockProjId3}`,
     resourceType: 'project',
     dependency: project3.costCenterId
   };
@@ -151,14 +161,14 @@ describe('ProjectService', () => {
     accountId: mockAccountId,
     awsAccountId: '123456789012',
     createdAt: timestamp,
-    description: 'Example project',
+    description: 'Example project description',
     costCenterId: mockCostCenterId,
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     externalId: 'workbench',
-    id: `${projId}`,
-    name: 'Example project',
+    id: mockProjId,
+    name: 'ExampleProject',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3',
@@ -168,8 +178,8 @@ describe('ProjectService', () => {
   // DDB object for project item
   const projItem: Record<string, string> = {
     ...proj,
-    pk: `PROJ#${projId}`,
-    sk: `PROJ#${projId}`,
+    pk: `PROJ#${mockProjId}`,
+    sk: `PROJ#${mockProjId}`,
     resourceType: 'project',
     dependency: proj.costCenterId
   };
@@ -189,7 +199,7 @@ describe('ProjectService', () => {
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     externalId: 'workbench',
     id: mockCostCenterId,
-    name: 'Example cost center',
+    name: 'ExampleCostCenter',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3',
@@ -200,9 +210,13 @@ describe('ProjectService', () => {
 
   const itAdminUserGroups: string[] = ['ITAdmin'];
 
-  const multipleNonITGroups: string[] = ['proj-123#PA', 'proj-456#PA', 'proj-789#PA'];
+  const multipleNonITGroups: string[] = [
+    `proj-${mockProjId}#PA`,
+    `proj-${mockProjId2}#PA`,
+    `proj-${mockProjId3}#PA`
+  ];
 
-  const singleNonITGroup = ['proj-123#PA'];
+  const singleNonITGroup = [`proj-${mockProjId}#PA`];
 
   describe('listProjects', () => {
     test('should fail on list projects for negative pageSize', async () => {
@@ -447,7 +461,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           },
           Limit: 50
@@ -458,7 +472,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects(
         {
           user,
-          filter: { name: { eq: 'Example project' } }
+          filter: { name: { eq: 'ExampleProject' } }
         },
         itAdminUserGroups
       );
@@ -1139,7 +1153,7 @@ describe('ProjectService', () => {
       jest.spyOn(DynamoDBService.prototype as any, 'getItem').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject({ projectId: 'proj-123' });
+      const actualResponse = await projService.getProject({ projectId: mockProjId });
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1155,15 +1169,15 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: 'PROJ#proj-123',
-            sk: 'PROJ#proj-123'
+            pk: `PROJ#${mockProjId}`,
+            sk: `PROJ#${mockProjId}`
           })
         })
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject({ projectId: 'proj-123' })).rejects.toThrow(
-        'Could not find project proj-123'
+      await expect(projService.getProject({ projectId: mockProjId })).rejects.toThrow(
+        `Could not find project ${mockProjId}`
       );
     });
   });
@@ -1178,7 +1192,7 @@ describe('ProjectService', () => {
         .mockImplementationOnce(() => [getItemResponse]);
 
       // OPERATE
-      const actualResponse = await projService.getProjects({ projectIds: ['proj-123'] });
+      const actualResponse = await projService.getProjects({ projectIds: [mockProjId] });
 
       // CHECK
       expect(actualResponse).toEqual([proj]);
@@ -1188,7 +1202,7 @@ describe('ProjectService', () => {
       jest.spyOn(DynamoDBService.prototype as any, 'getItems').mockImplementationOnce(() => []);
 
       // OPERATE
-      const actualResponse = await projService.getProjects({ projectIds: ['proj-123'] });
+      const actualResponse = await projService.getProjects({ projectIds: [mockProjId] });
 
       // CHECK
       expect(actualResponse).toEqual([]);
@@ -1223,7 +1237,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           }
         })
@@ -1256,8 +1270,8 @@ describe('ProjectService', () => {
         .on(GetItemCommand, {
           TableName: 'exampleDDBTable',
           Key: marshall({
-            pk: `PROJ#${projId}`,
-            sk: `PROJ#${projId}`
+            pk: `PROJ#${mockProjId}`,
+            sk: `PROJ#${mockProjId}`
           })
         })
         .resolves(getItemResponse);
@@ -1297,7 +1311,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           }
         })
@@ -1320,7 +1334,7 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(projService.createProject(params)).rejects.toThrow(
-        'Project name "Example project" is in use by a non deleted project. Please use another name.'
+        'Project name "ExampleProject" is in use by a non deleted project. Please use another name.'
       );
     });
 
@@ -1351,7 +1365,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           }
         })
@@ -1401,7 +1415,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           }
         })
@@ -1455,7 +1469,7 @@ describe('ProjectService', () => {
               S: 'project'
             },
             ':name': {
-              S: 'Example project'
+              S: 'ExampleProject'
             }
           }
         })
@@ -1544,7 +1558,7 @@ describe('ProjectService', () => {
 
       describe('if project does not exist', () => {
         beforeEach(() => {
-          projectName = 'New Project Name';
+          projectName = 'NewProjectName';
           updatedProject1.name = projectName;
           request.projectId = 'Invalid project id';
           request.updatedValues = { name: projectName };
@@ -1614,7 +1628,7 @@ describe('ProjectService', () => {
 
         describe('and name is not in use', () => {
           beforeEach(() => {
-            projectName = 'New Project Name';
+            projectName = 'NewProjectName';
             updatedProject1.name = projectName;
             updatedProjItem1.name = projectName;
             request.projectId = updatedProject1.id;
