@@ -30,7 +30,8 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    DYNAMIC_AUTH_TABLE_NAME
+    DYNAMIC_AUTH_TABLE_NAME,
+    USER_AGENT_STRING
   } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -80,6 +81,7 @@ async function run(): Promise<void> {
 
   const awsService = new AwsService({
     region: AWS_REGION,
+    userAgent: USER_AGENT_STRING,
     ddbTableName: STACK_NAME
   });
 
