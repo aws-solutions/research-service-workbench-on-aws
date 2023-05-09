@@ -365,11 +365,12 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
+    const reqDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
     const projectAdmin = getProjectAdminRole(request.projectId);
 
     //Make sure you're not removing the access for your project
-    if (request.authenticatedUser.roles.includes(projectAdmin)) {
-      throw new Error(
+    if (projectAdmin === reqDataset.owner) {
+      throw new ConflictError(
         `${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
       );
     }

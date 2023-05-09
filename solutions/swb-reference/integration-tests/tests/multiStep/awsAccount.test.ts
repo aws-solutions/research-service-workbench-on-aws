@@ -76,7 +76,8 @@ describe('multiStep awsAccount integration test', () => {
     expect(getResponse.status).toEqual(200);
     expect(getResponse.data.id).toEqual(accountId);
 
-    const name = `integration-test-${new Date().toISOString()}`;
+    const dateString = new Date().toISOString().replace(/:/g, '');
+    const name = `integrationTest${dateString}`;
     const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name }, true);
     expect(updateResponse.status).toEqual(200);
     expect(updateResponse.data.name).toEqual(name);

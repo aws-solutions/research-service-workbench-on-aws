@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateAccountRequestParser = z.object({
-  id: z.string().swbId(resourceTypeToKey.account.toLowerCase()).required(),
+  id: z.string().accountId().required(),
   name: z.string().swbName().optional()
 });
 

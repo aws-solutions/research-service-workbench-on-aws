@@ -55,15 +55,21 @@ export default class AwsService {
     appRegistryService: AppRegistryService;
   };
 
-  public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
+  public constructor(options: {
+    region: string;
+    ddbTableName?: string;
+    userAgent?: string;
+    credentials?: Credentials;
+  }) {
     const customBackoff = (retryCount: number): number => {
       console.log(`retry count: ${retryCount}, waiting: 100ms`);
       return 100;
     };
-    const { region, ddbTableName } = options;
+    const { region, ddbTableName, userAgent } = options;
     const sdkOptions = {
       maxRetries: 5,
       retryDelayOptions: { customBackoff },
+      customUserAgent: userAgent || '',
       ...options
     };
 
