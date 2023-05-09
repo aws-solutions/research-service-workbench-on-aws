@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const mockSshKeyId = 'mockvalues';
+const mockSshKeyId = '1234abcd-1111-abcd-1234-abcd1234abcd';
 jest.mock('crypto', () => {
   return {
     createHash: jest.fn().mockReturnThis(),
@@ -53,8 +53,8 @@ describe('SshKeyService', () => {
     let listUserSshKeysForProjectRequest: ListUserSshKeysForProjectRequest;
     beforeEach(() => {
       listUserSshKeysForProjectRequest = {
-        projectId: 'proj-123',
-        userId: 'user-123'
+        projectId: 'proj-1234abcd-1111-abcd-1234-abcd1234abcd',
+        userId: '1234abcd-1111-abcd-1234-abcd1234abcd'
       };
     });
 
@@ -234,9 +234,9 @@ describe('SshKeyService', () => {
 
     beforeEach(() => {
       deleteSshKeyRequest = {
-        projectId: 'proj-123',
-        sshKeyId: 'sshkey-user-123#proj-123',
-        currentUserId: 'user-123'
+        projectId: 'proj-1234abcd-1111-abcd-1234-abcd1234abcd',
+        sshKeyId: 'sshkey-1234567812345678123456781234567812345678123456781234567812345678',
+        currentUserId: '1234abcd-1111-abcd-1234-abcd1234abcd'
       };
     });
 
@@ -395,7 +395,10 @@ describe('SshKeyService', () => {
     let createSshKeyRequest: CreateSshKeyRequest;
 
     beforeEach(() => {
-      createSshKeyRequest = { projectId: 'proj-123', userId: '1234' };
+      createSshKeyRequest = {
+        projectId: 'proj-1234abcd-1111-abcd-1234-abcd1234abcd',
+        userId: '1234abcd-1111-abcd-1234-abcd1234abcd'
+      };
     });
 
     describe('when project does not exist', () => {
@@ -504,9 +507,9 @@ describe('SshKeyService', () => {
 
     beforeEach(() => {
       sendPublicKeyRequest = {
-        projectId: 'proj-123',
-        environmentId: 'env-123',
-        userId: '1234'
+        projectId: 'proj-1234abcd-1111-abcd-1234-abcd1234abcd',
+        environmentId: 'env-1234abcd-1111-abcd-1234-abcd1234abcd',
+        userId: '1234abcd-1111-abcd-1234-abcd1234abcd'
       };
     });
 

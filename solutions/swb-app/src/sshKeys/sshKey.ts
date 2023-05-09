@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const SshKeyParser = z.object({
-  sshKeyId: z.string(),
-  projectId: z.string(),
-  owner: z.string(),
-  publicKey: z.string(),
-  createTime: z.string()
+  sshKeyId: z.string().sshKeyId().required(),
+  projectId: z.string().projId().required(),
+  owner: z.string().required(),
+  publicKey: z.string().required(),
+  createTime: z.string().required()
 });
 
 export type SshKey = z.infer<typeof SshKeyParser>;
