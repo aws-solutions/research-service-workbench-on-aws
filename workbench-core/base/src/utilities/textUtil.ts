@@ -27,6 +27,7 @@ const swbDescriptionMaxLength: number = 400;
 
 const nonEmptyMessage: string = 'optional, but cannot be empty if included';
 const invalidIdMessage: string = 'Invalid ID';
+const invalidEmailMessage: string = 'Invalid Email';
 const requiredMessage: string = 'Required';
 const urlFilterMaxLength: number = 128;
 
@@ -147,6 +148,7 @@ export {
   accountIdRegex,
   nonEmptyMessage,
   invalidIdMessage,
+  invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
   lengthValidationMessage,

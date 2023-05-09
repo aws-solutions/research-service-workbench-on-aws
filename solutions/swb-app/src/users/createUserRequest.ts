@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z, invalidEmailMessage } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateUserRequestParser = z
   .object({
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
-    email: z.string().min(1)
+    firstName: z.string().swbName().required(),
+    lastName: z.string().swbName().required(),
+    email: z.string().email(invalidEmailMessage).required()
   })
   .strict();
 
