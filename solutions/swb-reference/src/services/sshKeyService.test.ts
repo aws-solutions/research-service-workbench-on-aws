@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const mockSshKeyId = '1234abcd-1111-abcd-1234-abcd1234abcd';
+const mockSshKeyId = '1234567812345678123456781234567812345678123456781234567812345678';
 jest.mock('crypto', () => {
   return {
     createHash: jest.fn().mockReturnThis(),
@@ -533,7 +533,7 @@ describe('SshKeyService', () => {
       let projectId: string;
 
       beforeEach(() => {
-        projectId = 'proj-123';
+        projectId = 'proj-1234abcd-1111-abcd-1234-abcd1234abcd';
         environment = {
           id: sendPublicKeyRequest.environmentId,
           instanceId: 'i-123',
