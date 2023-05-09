@@ -173,6 +173,83 @@ describe('multiStep environment test', () => {
       .dataSets()
       .create(dataSetBody, false);
 
+    console.log('Test to ensure access is given immediately when a user is added to a project');
+
+    console.log('Verifying PA2 CANNOT see Project3...');
+    const { data: pa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(pa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(0);
+
+    // Get Projects
+    try {
+      await pa2Session.resources.projects.project(project3Id).get();
+    } catch (err) {
+      checkHttpError(err, unauthorizedHttpError);
+    }
+
+    console.log('Verifying PA2 CANNOT see ETC3');
+    try {
+      await pa2Session.resources.projects
+        .project(project3Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc3.id)
+        .get();
+    } catch (e) {
+      checkHttpError(e, unauthorizedHttpError);
+    }
+
+    console.log('Adding PA2 to Project3 as a Project Admin');
+    await adminSession.resources.projects
+      .project(project3Id)
+      .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
+
+    console.log('Verifying PA2 CAN see Project3...');
+    const { data: updatedPa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(updatedPa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(1);
+    const { data: receivedProject3 } = await pa2Session.resources.projects.project(project3Id).get();
+
+    expect(receivedProject3.id).toStrictEqual(project3Id);
+
+    console.log('Verifying PA2 CAN see ETC3');
+    const { data: receivedEtc3 } = await pa2Session.resources.projects
+      .project(project3Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc3.id)
+      .get();
+
+    expect(receivedEtc3).toStrictEqual(etc3);
+
+    console.log('Test to ensure access is revoked immediately when a user is removed from a project');
+
+    console.log('Removing PA2 from Project3');
+    await adminSession.resources.projects.project(project3Id).removeUserFromProject(pa2Session.getUserId()!);
+
+    console.log('Verifying PA2 CANNOT see Project3');
+    // Get Projects
+    try {
+      await pa2Session.resources.projects.project(project3Id).get();
+    } catch (err) {
+      checkHttpError(err, unauthorizedHttpError);
+    }
+
+    console.log('Verifying PA2 CANNOT see ETC3');
+    try {
+      await pa2Session.resources.projects
+        .project(project3Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc3.id)
+        .get();
+    } catch (e) {
+      checkHttpError(e, unauthorizedHttpError);
+    }
+
+    console.log('Successfully completed immediate allowed and revoked project access');
+
     console.log('Verifying PA1 CANNOT see Project2...');
     // List Projects
     const { data: listProjects1 }: ListProjectsResponse = await pa1Session.resources.projects.get();
