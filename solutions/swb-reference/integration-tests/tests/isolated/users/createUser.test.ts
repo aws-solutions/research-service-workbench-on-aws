@@ -69,7 +69,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'Invalid parameter: Invalid email address format.'
+          message: 'email: Invalid Email'
         })
       );
     }
@@ -123,6 +123,22 @@ describe('create user negative tests', () => {
     }
   });
 
+  it('should return a 400 error when the firstName parameter is empty', async () => {
+    const invalidParam: Record<string, unknown> = { ...user };
+    invalidParam.firstName = '';
+    try {
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `firstName: Required`
+        })
+      );
+    }
+  });
+
   it('should return a 400 error when the firstName parameter is the wrong type', async () => {
     const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.firstName = 123;
@@ -142,6 +158,22 @@ describe('create user negative tests', () => {
   it('should return a 400 error when the lastName parameter is missing', async () => {
     const invalidParam: Record<string, unknown> = { ...user };
     delete invalidParam.lastName;
+    try {
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `lastName: Required`
+        })
+      );
+    }
+  });
+
+  it('should return a 400 error when the lastName parameter is empty', async () => {
+    const invalidParam: Record<string, unknown> = { ...user };
+    invalidParam.lastName = '';
     try {
       await adminSession.resources.users.create(invalidParam, false);
     } catch (e) {

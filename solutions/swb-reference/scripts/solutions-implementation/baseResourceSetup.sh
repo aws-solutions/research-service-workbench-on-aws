@@ -85,7 +85,7 @@ export envTypeId=$(echo $envTypes | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\
 approveEnvType=$(curl --location --request PATCH "https://$swbDomainName/api/environmentTypes/$envTypeId" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
 --data "{
     \"description\": \"An Amazon SageMaker Jupyter Notebook\",
-    \"name\": \"Jupyter Notebook\",
+    \"name\": \"JupyterNotebook\",
     \"status\": \"APPROVED\"
 }")
 echo "Env type is getting updated..."
@@ -96,7 +96,7 @@ envTypeConfig=$(curl --location "https://$swbDomainName/api/environmentTypes/$en
 --data "{
     \"type\": \"sagemakerNotebook\",
     \"description\": \"Example config 1\",
-    \"name\": \"config 1\",
+    \"name\": \"config-1\",
     \"estimatedCost\": \"estimated cost\",
     \"params\": [
         {
