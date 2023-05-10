@@ -20,6 +20,10 @@ const swbNameMessage: string = 'must contain only letters, numbers, hyphens, und
 const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
 const swbNameMaxLength: number = 112;
 
+const personNameMessage: string = 'must contain only letters, spaces, numbers, and hyphens';
+const personNameRegExpAsString: string = '^[A-Za-z0-9- ]+$';
+const personNameMaxLength: number = 50;
+
 const swbDescriptionMessage: string =
   'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
 const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
@@ -67,6 +71,11 @@ function nonHtmlRegExp(): RegExp {
 function swbNameRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(swbNameRegExpAsString);
+}
+
+function personNameRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(personNameRegExpAsString);
 }
 
 function swbDescriptionRegExp(): RegExp {
@@ -122,6 +131,9 @@ export {
   swbNameMessage,
   swbNameRegExp,
   swbNameMaxLength,
+  personNameMessage,
+  personNameRegExp,
+  personNameMaxLength,
   swbDescriptionMessage,
   swbDescriptionRegExp,
   swbDescriptionMaxLength,

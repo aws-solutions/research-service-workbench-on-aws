@@ -322,11 +322,18 @@ export class DataSetService implements DataSetPlugin {
     const permissionRequest: AddRemoveAccessPermissionRequest = {
       authenticatedUser: request.authenticatedUser,
       dataSetId: request.dataSetId,
-      permission: {
-        identity: projectAdmin,
-        identityType: 'GROUP',
-        accessLevel: request.accessLevel
-      }
+      permission: [
+        {
+          identity: projectAdmin,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        },
+        {
+          identity: projectResearcher,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        }
+      ]
     };
 
     const response = await this.addAccessPermission(permissionRequest);
@@ -366,6 +373,7 @@ export class DataSetService implements DataSetPlugin {
 
   public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
     const reqDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
+    console.log(JSON.stringify(reqDataset));
     const projectAdmin = getProjectAdminRole(request.projectId);
 
     //Make sure you're not removing the access for your project

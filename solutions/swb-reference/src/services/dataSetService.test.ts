@@ -398,11 +398,18 @@ describe('DataSetService', () => {
         const permissionRequest: AddRemoveAccessPermissionRequest = {
           authenticatedUser: projectAddAccessRequest.authenticatedUser,
           dataSetId: projectAddAccessRequest.dataSetId,
-          permission: {
-            identity: 'projectId#ProjectAdmin',
-            identityType: 'GROUP',
-            accessLevel: projectAddAccessRequest.accessLevel!
-          }
+          permission: [
+            {
+              identity: 'projectId#ProjectAdmin',
+              identityType: 'GROUP',
+              accessLevel: projectAddAccessRequest.accessLevel!
+            },
+            {
+              identity: 'projectId#Researcher',
+              identityType: 'GROUP',
+              accessLevel: projectAddAccessRequest.accessLevel!
+            }
+          ]
         };
         expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
       });
