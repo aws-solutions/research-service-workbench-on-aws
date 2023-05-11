@@ -34,7 +34,7 @@ describe('list environment type configs', () => {
   });
 
   describe('ITAdmin tests', () => {
-    test('list environments type configs excecutes successfully', async () => {
+    test('list environments type configs executes successfully', async () => {
       const { data: response } = await itAdminSession.resources.environmentTypes
         .environmentType(envTypeId)
         .configurations()
