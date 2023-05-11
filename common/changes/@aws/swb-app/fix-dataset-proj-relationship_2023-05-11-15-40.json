@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "fix: DS api and user regex fixes",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
