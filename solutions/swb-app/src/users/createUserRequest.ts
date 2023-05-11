@@ -8,8 +8,8 @@ import { z, invalidEmailMessage } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateUserRequestParser = z
   .object({
-    firstName: z.string().swbName().required(),
-    lastName: z.string().swbName().required(),
+    firstName: z.string().personName().required(),
+    lastName: z.string().personName().required(),
     email: z.string().email(invalidEmailMessage).required()
   })
   .strict();

@@ -10,6 +10,9 @@ import {
   nonHtmlRegExp,
   swbNameMessage,
   swbNameRegExp,
+  personNameRegExp,
+  personNameMessage,
+  personNameMaxLength,
   swbDescriptionRegExp,
   swbDescriptionMessage,
   swbDescriptionMaxLength,
@@ -40,6 +43,7 @@ declare module 'zod' {
     swbId: (prefix: string) => ZodString;
     nonHTML: () => ZodString;
     swbName: () => ZodString;
+    personName: () => ZodString;
     swbDescription: () => ZodString;
     etId: () => ZodString;
     etcId: () => ZodString;
@@ -71,6 +75,12 @@ z.ZodString.prototype.swbName = function (): ZodString {
   return this.max(swbNameMaxLength, {
     message: lengthValidationMessage(swbNameMaxLength)
   }).regex(swbNameRegExp(), { message: swbNameMessage });
+};
+
+z.ZodString.prototype.personName = function (): ZodString {
+  return this.max(personNameMaxLength, {
+    message: lengthValidationMessage(personNameMaxLength)
+  }).regex(personNameRegExp(), { message: personNameMessage });
 };
 
 z.ZodString.prototype.swbDescription = function (): ZodString {
