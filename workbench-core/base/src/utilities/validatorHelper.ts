@@ -26,7 +26,10 @@ import {
   requiredMessage,
   lengthValidationMessage,
   accountIdRegex,
-  costCenterIdRegex
+  costCenterIdRegex,
+  userIdRegExp,
+  awsRegionRegex,
+  awsRegionMessage
 } from './textUtil';
 
 interface ZodPagination {
@@ -47,8 +50,10 @@ declare module 'zod' {
     envId: () => ZodString;
     costCenterId: () => ZodString;
     accountId: () => ZodString;
+    awsRegion: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
+    userId: () => ZodString;
   }
 }
 
@@ -103,6 +108,10 @@ z.ZodString.prototype.accountId = function (): ZodString {
   return this.regex(accountIdRegex(), { message: invalidIdMessage });
 };
 
+z.ZodString.prototype.userId = function (): ZodString {
+  return this.regex(userIdRegExp(), { message: invalidIdMessage });
+};
+
 /**
  * validate the field is optional but should be nonEmpty with min length 1 if provided
  */
@@ -113,6 +122,10 @@ z.ZodString.prototype.optionalNonEmpty = function (): ZodOptional<ZodString> {
 
 z.ZodString.prototype.awsAccountId = function (): ZodString {
   return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
+};
+
+z.ZodString.prototype.awsRegion = function (): ZodString {
+  return this.regex(awsRegionRegex(), { message: awsRegionMessage });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {

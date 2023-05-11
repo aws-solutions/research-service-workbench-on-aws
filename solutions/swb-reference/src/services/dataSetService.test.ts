@@ -62,10 +62,10 @@ describe('DataSetService', () => {
       id: '12345678-1234-1234-1234-123456789012',
       roles: []
     };
-    projectId = 'proj-projectId';
+    projectId = 'proj-12345678-1234-1234-1234-123456789012';
 
     mockDataSet = DataSetParser.parse({
-      id: 'dataSetId',
+      id: 'dataset-12345678-1234-1234-1234-123456789012',
       owner: `${projectId}#ProjectAdmin`,
       name: 'mockDataSet',
       path: 'path',
@@ -156,7 +156,7 @@ describe('DataSetService', () => {
           beforeEach(() => {
             identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
-            subjectId = 'dataSetId';
+            subjectId = 'dataset-12345678-1234-1234-1234-123456789012';
             subjectType = SwbAuthZSubject.SWB_DATASET;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE', 'DELETE'];
@@ -187,7 +187,7 @@ describe('DataSetService', () => {
           beforeEach(() => {
             identityId = `${projectId}#ProjectAdmin`;
             identityType = 'GROUP';
-            subjectId = `dataSetId`;
+            subjectId = `dataset-12345678-1234-1234-1234-123456789012`;
             subjectType = SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE', 'DELETE'];
@@ -302,7 +302,7 @@ describe('DataSetService', () => {
                   effect: 'ALLOW',
                   identityId: `${projectId}#ProjectAdmin`,
                   identityType: 'GROUP',
-                  subjectId: 'dataSetId',
+                  subjectId: 'dataset-12345678-1234-1234-1234-123456789012',
                   subjectType: SwbAuthZSubject.SWB_DATASET
                 };
               });
@@ -326,7 +326,7 @@ describe('DataSetService', () => {
                   effect: 'ALLOW',
                   identityId: `${projectId}#ProjectAdmin`,
                   identityType: 'GROUP',
-                  subjectId: `dataSetId`,
+                  subjectId: `dataset-12345678-1234-1234-1234-123456789012`,
                   subjectType: SwbAuthZSubject.SWB_DATASET_ACCESS_LEVEL
                 };
               });
@@ -866,7 +866,7 @@ describe('DataSetService', () => {
 
       // check when result set from ddb is larger than pageSize, we call workbenchDataSetService.getPaginationToken and return token from that
       describe('when workbenchDataSetService returns a dataset length greater than pageSize', () => {
-        projectId = 'proj-projectId';
+        projectId = 'proj-12345678-1234-1234-1234-123456789012';
         const mockDataSetWithoutID = {
           owner: `${projectId}#ProjectAdmin`,
           name: 'mockDataSet',
@@ -891,6 +891,10 @@ describe('DataSetService', () => {
           });
           customToken = 'customToken';
           mockWorkbenchDataSetService.getPaginationToken = jest.fn().mockReturnValueOnce(customToken);
+          mockUser = {
+            id: '12345678-1234-1234-1234-123456789012',
+            roles: []
+          };
         });
 
         test('pagination token from .getPaginationToken is returned', async () => {
@@ -901,6 +905,7 @@ describe('DataSetService', () => {
             pageSize,
             paginationToken
           );
+          console.log(actualResponse);
           // CHECK
           expect(mockWorkbenchDataSetService.getPaginationToken).toBeCalledWith(
             actualResponse.data[pageSize - 1].id!

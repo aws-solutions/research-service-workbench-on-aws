@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { z } from 'zod';
 import { AuthenticatedUserParser } from '../users/authenticatedUser';
 
@@ -10,8 +11,8 @@ import { AuthenticatedUserParser } from '../users/authenticatedUser';
 export const ProjectAddAccessRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
-    dataSetId: z.string(),
-    projectId: z.string(),
+    dataSetId: z.string().swbId(resourceTypeToKey.dataset).required(),
+    projectId: z.string().swbId(resourceTypeToKey.project).required(),
     accessLevel: z.enum(['read-write', 'read-only'])
   })
   .strict();

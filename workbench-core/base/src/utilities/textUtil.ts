@@ -36,6 +36,9 @@ const groupIDRegExpAsString: string = '\\S{1,128}';
 const awsAccountIdMessage: string = 'must be a 12 digit number';
 const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
 
+const awsRegionMessage: string = 'must be valid AWS region';
+const awsRegionRegExpAsString: string = '^(us|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\\d$';
+
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
@@ -104,14 +107,24 @@ function accountIdRegex(): RegExp {
   return new RegExp(accountIdRegExpString);
 }
 
+function awsRegionRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(awsRegionRegExpAsString);
+}
+
 function awsAccountIdRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(awsAccountIdRegExpAsString);
 }
 
+function userIdRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(uuidRegExpAsString);
+}
+
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
-const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
+const validSshKeyUuidRegExpAsString: string = '^[0-9a-f]{64}$';
 
 export {
   uuidWithLowercasePrefix,
@@ -136,11 +149,14 @@ export {
   etIdRegex,
   awsAccountIdMessage,
   awsAccountIdRegExp,
+  awsRegionMessage,
+  awsRegionRegex,
   etcIdRegex,
   projIdRegex,
   envIdRegex,
   costCenterIdRegex,
   accountIdRegex,
+  userIdRegExp,
   nonEmptyMessage,
   invalidIdMessage,
   invalidEmailMessage,

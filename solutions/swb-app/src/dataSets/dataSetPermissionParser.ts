@@ -10,9 +10,10 @@ import { DataSetAccessLevelParser } from './dataSetAccessLevelParser';
 export const DataSetPermissionParser = z
   .object({
     identityType: z.union([z.literal('USER'), z.literal('GROUP')]),
-    identity: z.string(),
+    identity: z.string().min(1),
     accessLevel: DataSetAccessLevelParser
   })
-  .strict();
+  .strict()
+  .required();
 
 export type DataSetPermission = z.infer<typeof DataSetPermissionParser>;
