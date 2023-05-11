@@ -63,7 +63,7 @@ describe('update user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'firstName: must contain only letters, numbers, hyphens, underscores, and periods'
+          message: 'firstName: must contain only letters, spaces, numbers, and hyphens'
         })
       );
     }
@@ -77,7 +77,7 @@ describe('update user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'lastName: must contain only letters, numbers, hyphens, underscores, and periods'
+          message: 'lastName: must contain only letters, spaces, numbers, and hyphens'
         })
       );
     }
