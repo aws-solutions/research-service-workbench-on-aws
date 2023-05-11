@@ -27,7 +27,7 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 ## Prerequisite
 * An AWS account for deploying SWBv2 API. This account will be called the `Main Account`.
    * On the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `Main Account` as the `default` profile 
-* An AWS account for hosting environments. This account will be called the `Hosting Account`. The `Hosting Account` should be different from `Main Account`.
+* An AWS account for hosting environments. This account will be called the `Hosting Account`. The `Hosting Account` must be different from `Main Account`.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
   * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/rush.json#L9)
@@ -751,7 +751,7 @@ const { data: response } = await adminSession.resources.users.get();
 1. Go to `swb-reference/scripts` folder
 1. Pull down all required dependencies by running `rushx build`
 1. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
-1. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests. (Note: csrf token is only required for state changing request)
+1. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests. (Note: csrf token is only required for state changing requests)
 
 
 ## Running Code Locally
