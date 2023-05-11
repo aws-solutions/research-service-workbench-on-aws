@@ -21,7 +21,9 @@ import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   costCenterIdRegex,
-  accountIdRegex
+  accountIdRegex,
+  sshKeyIdRegex,
+  userIdRegex
 } from './textUtil';
 
 describe('textUtil', () => {
@@ -175,7 +177,7 @@ describe('textUtil', () => {
       );
     });
 
-    test('invalid projId', () => {
+    test('invalid accountId', () => {
       expect(`acc-${randomUuid}#`.match(accountIdRegex())).toEqual(null);
     });
   });
@@ -192,6 +194,29 @@ describe('textUtil', () => {
   describe('lengthValidationMessage', () => {
     test('returns validation message', () => {
       expect(lengthValidationMessage(3)).toEqual('Input must be less than 3 characters');
+    });
+  });
+
+  describe('sshKeyIdRegex', () => {
+    test('valid sshKeyId', () => {
+      const randomSshKeyUuid = '1234567812345678123456781234567812345678123456781234567812345678';
+      expect(`sshkey-${randomSshKeyUuid}`.match(sshKeyIdRegex())).toEqual(
+        expect.arrayContaining([`sshkey-${randomSshKeyUuid}`])
+      );
+    });
+
+    test('invalid sshKeyId', () => {
+      expect(`invalid`.match(sshKeyIdRegex())).toEqual(null);
+    });
+  });
+
+  describe('userIdRegex', () => {
+    test('valid userId', () => {
+      expect(`${randomUuid}`.match(userIdRegex())).toEqual(expect.arrayContaining([randomUuid]));
+    });
+
+    test('invalid userId', () => {
+      expect(`invalid`.match(userIdRegex())).toEqual(null);
     });
   });
 });
