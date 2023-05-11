@@ -11,7 +11,7 @@ export const CreateSshKeyResponseParser = z
     projectId: z.string().projId().required(),
     privateKey: z.string().required(),
     id: z.string().sshKeyId().required(),
-    owner: z.string().required()
+    owner: z.string().userId().required()
   })
   .required()
   .strict();

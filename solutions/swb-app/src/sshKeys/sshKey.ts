@@ -10,7 +10,7 @@ export const SshKeyParser = z
   .object({
     sshKeyId: z.string().sshKeyId().required(),
     projectId: z.string().projId().required(),
-    owner: z.string().required(),
+    owner: z.string().userId().required(),
     publicKey: z.string().required(),
     createTime: z.string().required()
   })

@@ -9,7 +9,7 @@ import { z } from '@aws/workbench-core-base';
 export const DisassociateUserFromProjectRequestParser = z
   .object({
     userId: z.string().userId().required(),
-    projectId: z.string()
+    projectId: z.string().projId().required()
   })
   .strict();
 
