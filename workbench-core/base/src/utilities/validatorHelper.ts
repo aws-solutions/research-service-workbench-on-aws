@@ -29,7 +29,9 @@ import {
   requiredMessage,
   lengthValidationMessage,
   accountIdRegex,
-  costCenterIdRegex
+  costCenterIdRegex,
+  sshKeyIdRegex,
+  userIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -53,6 +55,8 @@ declare module 'zod' {
     accountId: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
+    sshKeyId: () => ZodString;
+    userId: () => ZodString;
   }
 }
 
@@ -111,6 +115,14 @@ z.ZodString.prototype.costCenterId = function (): ZodString {
 
 z.ZodString.prototype.accountId = function (): ZodString {
   return this.regex(accountIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.sshKeyId = function (): ZodString {
+  return this.regex(sshKeyIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.userId = function (): ZodString {
+  return this.regex(userIdRegex(), { message: invalidIdMessage });
 };
 
 /**
