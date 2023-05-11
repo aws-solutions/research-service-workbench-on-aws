@@ -905,7 +905,6 @@ describe('DataSetService', () => {
             pageSize,
             paginationToken
           );
-          console.log(actualResponse);
           // CHECK
           expect(mockWorkbenchDataSetService.getPaginationToken).toBeCalledWith(
             actualResponse.data[pageSize - 1].id!
