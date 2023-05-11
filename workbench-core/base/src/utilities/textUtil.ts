@@ -47,7 +47,8 @@ const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-
 const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
 const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
 const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
-const sshKeyIdRegExpString: string = `${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}`;
+const sshKeyIdRegExpString: string = `^${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}$`;
+const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -113,7 +114,12 @@ function awsAccountIdRegExp(): RegExp {
 
 function sshKeyIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(`^${sshKeyIdRegExpString}$`);
+  return new RegExp(sshKeyIdRegExpString);
+}
+
+function userIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(userIdRegExpString);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
@@ -152,5 +158,6 @@ export {
   requiredMessage,
   urlFilterMaxLength,
   lengthValidationMessage,
-  sshKeyIdRegex
+  sshKeyIdRegex,
+  userIdRegex
 };

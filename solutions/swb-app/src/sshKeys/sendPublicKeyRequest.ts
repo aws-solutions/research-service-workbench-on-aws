@@ -9,8 +9,9 @@ export const SendPublicKeyRequestParser = z
   .object({
     projectId: z.string().projId().required(),
     environmentId: z.string().envId().required(),
-    userId: z.string().required()
+    userId: z.string().userId().required()
   })
+  .required()
   .strict();
 
 export type SendPublicKeyRequest = z.infer<typeof SendPublicKeyRequestParser>;

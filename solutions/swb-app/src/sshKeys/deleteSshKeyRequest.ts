@@ -9,8 +9,9 @@ export const DeleteSshKeyRequestParser = z
   .object({
     projectId: z.string().projId().required(),
     sshKeyId: z.string().sshKeyId().required(),
-    currentUserId: z.string().required()
+    currentUserId: z.string().userId().required()
   })
+  .required()
   .strict();
 
 export type DeleteSshKeyRequest = z.infer<typeof DeleteSshKeyRequestParser>;

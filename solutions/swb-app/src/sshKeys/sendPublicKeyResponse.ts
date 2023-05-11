@@ -13,6 +13,7 @@ export const SendPublicKeyResponseParser = z
     privateDnsName: z.string().required(),
     privateIp: z.string().required()
   })
+  .required()
   .strict();
 
 export type SendPublicKeyResponse = z.infer<typeof SendPublicKeyResponseParser>;

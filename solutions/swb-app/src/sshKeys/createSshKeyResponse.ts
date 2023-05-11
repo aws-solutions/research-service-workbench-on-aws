@@ -13,6 +13,7 @@ export const CreateSshKeyResponseParser = z
     id: z.string().sshKeyId().required(),
     owner: z.string().required()
   })
+  .required()
   .strict();
 
 export type CreateSshKeyResponse = z.infer<typeof CreateSshKeyResponseParser>;

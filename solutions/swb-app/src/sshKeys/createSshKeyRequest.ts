@@ -8,8 +8,9 @@ import { z } from '@aws/workbench-core-base';
 export const CreateSshKeyRequestParser = z
   .object({
     projectId: z.string().projId().required(),
-    userId: z.string().required()
+    userId: z.string().userId().required()
   })
+  .required()
   .strict();
 
 export type CreateSshKeyRequest = z.infer<typeof CreateSshKeyRequestParser>;

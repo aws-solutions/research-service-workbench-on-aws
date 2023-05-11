@@ -9,7 +9,7 @@ import { z } from '@aws/workbench-core-base';
 export const AssignUserToProjectRequestParser = z
   .object({
     projectId: z.string().projId().required(),
-    userId: z.string(),
+    userId: z.string().userId().required(),
     role: z.enum(['ProjectAdmin', 'Researcher'])
   })
   .strict();

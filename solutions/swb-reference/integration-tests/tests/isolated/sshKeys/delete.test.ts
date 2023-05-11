@@ -49,7 +49,7 @@ describe('Delete Key Pair negative tests', () => {
         invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
       });
 
-      test.each(testBundle)('it throws 403', async (testCase) => {
+      test.each(testBundle)('it throws 404', async (testCase) => {
         const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
         const session = sessionFunc();
         const projectId = projectIdFunc();
