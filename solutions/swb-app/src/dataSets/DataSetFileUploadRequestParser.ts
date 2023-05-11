@@ -2,13 +2,12 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { z } from 'zod';
+import { resourceTypeToKey, z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DataSetFileUploadRequestParser = z.object({
   dataSetId: z.string().swbId(resourceTypeToKey.dataset).required(),
-  filenames: z.union([z.string().required(), z.array(z.string().required()).min(1)])
+  filenames: z.union([z.string().swbName().required(), z.array(z.string().swbName().required()).min(1)])
 });
 
 export type DataSetFileUploadRequest = z.infer<typeof DataSetFileUploadRequestParser>;
