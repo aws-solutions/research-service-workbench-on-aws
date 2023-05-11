@@ -20,8 +20,8 @@ const swbNameMessage: string = 'must contain only letters, numbers, hyphens, und
 const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
 const swbNameMaxLength: number = 112;
 
-const personNameMessage: string = 'must contain only letters, spaces, numbers, and hyphens';
-const personNameRegExpAsString: string = '^[A-Za-z0-9- ]+$';
+const personNameMessage: string = 'must contain only letters, spaces, numbers, hyphens, and periods';
+const personNameRegExpAsString: string = '^[A-Za-z0-9-. ]+$';
 const personNameMaxLength: number = 50;
 
 const swbDescriptionMessage: string =

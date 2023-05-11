@@ -83,6 +83,7 @@ describe('textUtil', () => {
       expect('John Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe']));
       expect('John Doe 1'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe 1']));
       expect('John Doe II'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe II']));
+      expect('Sr. John Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['Sr. John Doe']));
       expect('Jane-Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['Jane-Doe']));
     });
 
