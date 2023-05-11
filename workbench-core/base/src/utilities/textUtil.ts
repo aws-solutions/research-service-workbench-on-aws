@@ -43,6 +43,7 @@ const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
+const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
 
 const envTypeIdRegExpString: string = `^${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}$`;
 const envTypeConfigIdRegExpString: string = `^${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}$`;
@@ -50,6 +51,8 @@ const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-
 const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
 const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
 const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
+const sshKeyIdRegExpString: string = `^${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}$`;
+const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -118,9 +121,17 @@ function awsAccountIdRegExp(): RegExp {
   return new RegExp(awsAccountIdRegExpAsString);
 }
 
-const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
+function sshKeyIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(sshKeyIdRegExpString);
+}
 
-const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
+function userIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(userIdRegExpString);
+}
+
+const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
 
 export {
   uuidWithLowercasePrefix,
@@ -158,5 +169,7 @@ export {
   invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
-  lengthValidationMessage
+  lengthValidationMessage,
+  sshKeyIdRegex,
+  userIdRegex
 };
