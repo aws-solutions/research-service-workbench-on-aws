@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryStringParamFilterParser } from '@aws/workbench-core-base';
-import { z } from 'zod';
+import { QueryStringParamFilterParser, z } from '@aws/workbench-core-base';
 import { getPaginationParser } from '../validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var

@@ -347,11 +347,18 @@ export class DataSetService implements DataSetPlugin {
     const permissionRequest: AddRemoveAccessPermissionRequest = {
       authenticatedUser: request.authenticatedUser,
       dataSetId: request.dataSetId,
-      permission: {
-        identity: projectAdmin,
-        identityType: 'GROUP',
-        accessLevel: request.accessLevel
-      }
+      permission: [
+        {
+          identity: projectAdmin,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        },
+        {
+          identity: projectResearcher,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        }
+      ]
     };
 
     const response = await this.addAccessPermission(permissionRequest);

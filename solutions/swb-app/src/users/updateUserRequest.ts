@@ -3,17 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z, invalidEmailMessage } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateUserRequestParser = z
   .object({
-    userId: z.string().min(1),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    email: z.string().optional(),
+    userId: z.string().userId().required(),
+    firstName: z.string().personName().optional(),
+    lastName: z.string().personName().optional(),
+    email: z.string().email(invalidEmailMessage).optional(),
     status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
-    roles: z.array(z.string()).optional()
+    roles: z.array(z.string().max(55)).optional()
   })
   .strict();
 

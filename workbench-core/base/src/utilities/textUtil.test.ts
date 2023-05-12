@@ -16,11 +16,14 @@ import {
   swbDescriptionRegExp,
   awsAccountIdRegExp,
   swbNameRegExp,
+  personNameRegExp,
   uuidRegExp,
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   costCenterIdRegex,
-  accountIdRegex
+  accountIdRegex,
+  sshKeyIdRegex,
+  userIdRegex
 } from './textUtil';
 
 describe('textUtil', () => {
@@ -75,6 +78,23 @@ describe('textUtil', () => {
 
     test('invalid swbName', () => {
       expect(`invalid name$`.match(swbNameRegExp())).toEqual(null);
+    });
+  });
+  describe('personNameRegExp', () => {
+    test('valid personName valid char', () => {
+      expect('John Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe']));
+      expect('John Doe 1'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe 1']));
+      expect('John Doe II'.match(personNameRegExp())).toEqual(expect.arrayContaining(['John Doe II']));
+      expect('Sr. John Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['Sr. John Doe']));
+      expect('Jane-Doe'.match(personNameRegExp())).toEqual(expect.arrayContaining(['Jane-Doe']));
+    });
+
+    test('invalid personName empty string', () => {
+      expect(''.match(personNameRegExp())).toEqual(null);
+    });
+
+    test('invalid personName', () => {
+      expect(`invalid name$`.match(personNameRegExp())).toEqual(null);
     });
   });
   describe('swbDescriptionRegExp', () => {
@@ -157,7 +177,7 @@ describe('textUtil', () => {
       );
     });
 
-    test('invalid projId', () => {
+    test('invalid accountId', () => {
       expect(`acc-${randomUuid}#`.match(accountIdRegex())).toEqual(null);
     });
   });
@@ -174,6 +194,29 @@ describe('textUtil', () => {
   describe('lengthValidationMessage', () => {
     test('returns validation message', () => {
       expect(lengthValidationMessage(3)).toEqual('Input must be less than 3 characters');
+    });
+  });
+
+  describe('sshKeyIdRegex', () => {
+    test('valid sshKeyId', () => {
+      const randomSshKeyUuid = '1234567812345678123456781234567812345678123456781234567812345678';
+      expect(`sshkey-${randomSshKeyUuid}`.match(sshKeyIdRegex())).toEqual(
+        expect.arrayContaining([`sshkey-${randomSshKeyUuid}`])
+      );
+    });
+
+    test('invalid sshKeyId', () => {
+      expect(`invalid`.match(sshKeyIdRegex())).toEqual(null);
+    });
+  });
+
+  describe('userIdRegex', () => {
+    test('valid userId', () => {
+      expect(`${randomUuid}`.match(userIdRegex())).toEqual(expect.arrayContaining([randomUuid]));
+    });
+
+    test('invalid userId', () => {
+      expect(`invalid`.match(userIdRegex())).toEqual(null);
     });
   });
 });

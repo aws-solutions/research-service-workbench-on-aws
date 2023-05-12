@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ValidateUserGroupsRequestParser = z.object({
   /**
    * User ID being validated
    */
-  userId: z.string(),
+  userId: z.string().userId().required(),
   /**
    * Array of group IDs being validated
    */
