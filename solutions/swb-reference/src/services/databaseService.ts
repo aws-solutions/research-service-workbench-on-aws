@@ -3,10 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue, MetadataService } from '@aws/workbench-core-base';
+import { DynamoDBService, JSONValue, MetadataService, PaginatedResponse } from '@aws/workbench-core-base';
+import { ZodTypeAny } from 'zod';
 
 export interface DatabaseServicePlugin {
-  getAssociations(type: string, id: string): Promise<Associable[]>;
+  getAssociation(
+    entity: Associable,
+    relationship: Associable,
+    parser: ZodTypeAny
+  ): Promise<Associable | undefined>;
+
+  listAssociations(
+    entity: Associable,
+    relationType: string,
+    parser: ZodTypeAny,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<PaginatedResponse<Associable>>;
   storeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
   removeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
 }
@@ -53,8 +68,38 @@ export class DatabaseService implements DatabaseServicePlugin {
     }
   }
 
-  public getAssociations(type: string, id: string): Promise<Associable[]> {
-    return Promise.resolve([]);
+  public async listAssociations(
+    entity: Associable,
+    relationType: string,
+    parser: ZodTypeAny,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<PaginatedResponse<Associable>> {
+    const response = await this._metadataService.listDependentMetadata(
+      entity.type,
+      entity.id,
+      relationType,
+      parser,
+      queryParams
+    );
+
+    const associables: Associable[] = response.data.map((item) => {
+      return {
+        type: relationType,
+        id: item.id,
+        data: {
+          pk: item.pk,
+          sk: item.sk
+        }
+      };
+    });
+
+    return {
+      data: associables,
+      paginationToken: response.paginationToken
+    };
   }
 
   public async removeAssociations(entity: Associable, relations: Associable[]): Promise<void> {
@@ -76,6 +121,33 @@ export class DatabaseService implements DatabaseServicePlugin {
         relationType,
         relations.map((item) => item.id)
       );
+    }
+  }
+
+  public async getAssociation(
+    entity: Associable,
+    relationship: Associable,
+    parser: ZodTypeAny
+  ): Promise<Associable | undefined> {
+    try {
+      const association = await this._metadataService.getMetadataItem(
+        entity.type,
+        entity.id,
+        relationship.type,
+        relationship.id,
+        parser
+      );
+
+      return {
+        type: relationship.type,
+        id: relationship.id,
+        data: {
+          pk: association.pk,
+          sk: association.sk
+        }
+      };
+    } catch (e) {
+      return Promise.resolve(undefined);
     }
   }
 }

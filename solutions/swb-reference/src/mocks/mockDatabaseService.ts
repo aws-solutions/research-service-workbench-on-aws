@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { PaginatedResponse } from '@aws/workbench-core-base';
+import { ZodTypeAny } from 'zod';
 import { Associable, DatabaseServicePlugin } from '../services/databaseService';
 
 export class MockDatabaseService implements DatabaseServicePlugin {
@@ -30,7 +32,45 @@ export class MockDatabaseService implements DatabaseServicePlugin {
 
   public getAssociations(type: string, id: string): Promise<Associable[]> {
     const entityKey = `${type}#${id}`;
-    return Promise.resolve(this._associations.get(entityKey) as Associable[]);
+    const associables: Associable[] = this._associations.get(entityKey) || [];
+    return Promise.resolve(associables);
+  }
+
+  public async getAssociation(
+    entity: Associable,
+    relationship: Associable,
+    parser: ZodTypeAny
+  ): Promise<Associable | undefined> {
+    const associations = await this.getAssociations(entity.type, entity.id);
+
+    for (const association of associations) {
+      const isMatch = association.type === relationship.type && association.id === relationship.id;
+
+      if (isMatch) {
+        return Promise.resolve(association);
+      }
+    }
+
+    return Promise.resolve(undefined);
+  }
+
+  public async listAssociations(
+    entity: Associable,
+    relationType: string,
+    parser: ZodTypeAny,
+    queryParams?: { pageSize?: number; paginationToken?: string }
+  ): Promise<PaginatedResponse<Associable>> {
+    const associations = (await this.getAssociations(entity.type, entity.id)).map(
+      (association: Associable) => {
+        return parser.parse(association);
+      }
+    );
+
+    const response: PaginatedResponse<Associable> = {
+      data: associations
+    };
+
+    return Promise.resolve(response);
   }
 
   private _keyForAssociable(associable: Associable): string {

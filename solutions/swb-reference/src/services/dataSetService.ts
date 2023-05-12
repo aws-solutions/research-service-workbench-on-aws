@@ -17,6 +17,7 @@ import {
 import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
+import { ProjectParser } from '@aws/swb-app/lib/projectEnvTypeConfigs/project';
 import {
   Action,
   AuthenticatedUser,
@@ -311,6 +312,30 @@ export class DataSetService implements DataSetPlugin {
     const projectAdmin = getProjectAdminRole(request.projectId);
     const projectResearcher = getResearcherRole(request.projectId);
 
+    const dataset: Associable = {
+      type: SwbAuthZSubject.SWB_DATASET,
+      id: request.dataSetId,
+      data: {
+        id: request.projectId,
+        permission: request.accessLevel
+      }
+    };
+
+    const project: Associable = {
+      type: SwbAuthZSubject.SWB_PROJECT,
+      id: request.projectId,
+      data: {
+        id: request.dataSetId,
+        permission: request.accessLevel
+      }
+    };
+
+    const existingAssociation = await this._databaseService.getAssociation(dataset, project, ProjectParser);
+
+    if (existingAssociation) {
+      throw new ConflictError(`Project ${project.id} is already associated with Dataset ${dataset.id}`);
+    }
+
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
@@ -340,24 +365,6 @@ export class DataSetService implements DataSetPlugin {
         ['READ']
       );
     }
-
-    const dataset: Associable = {
-      type: SwbAuthZSubject.SWB_DATASET,
-      id: request.dataSetId,
-      data: {
-        id: request.projectId,
-        permission: request.accessLevel
-      }
-    };
-
-    const project: Associable = {
-      type: SwbAuthZSubject.SWB_PROJECT,
-      id: request.projectId,
-      data: {
-        id: request.dataSetId,
-        permission: request.accessLevel
-      }
-    };
 
     await this._databaseService.storeAssociations(dataset, [project]);
 

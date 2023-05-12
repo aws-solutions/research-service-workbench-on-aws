@@ -36,6 +36,7 @@ import {
 import { SwbAuthZSubject } from '../constants';
 import { MockDatabaseService } from '../mocks/mockDatabaseService';
 import { getProjectAdminRole } from '../utils/roleUtils';
+import { Associable } from './databaseService';
 import { DataSetService } from './dataSetService';
 
 describe('DataSetService', () => {
@@ -393,7 +394,7 @@ describe('DataSetService', () => {
         mockDataSetsAuthPlugin.addAccessPermission = jest.fn().mockReturnValueOnce(permissionsResponse);
       });
 
-      test('pass the request through to the datasets auth plugin', async () => {
+      test('it passes the request through to the datasets auth plugin', async () => {
         await dataSetService.addAccessForProject(projectAddAccessRequest);
         const permissionRequest: AddRemoveAccessPermissionRequest = {
           authenticatedUser: projectAddAccessRequest.authenticatedUser,
@@ -407,7 +408,38 @@ describe('DataSetService', () => {
         expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
       });
 
-      describe('when building the relationship between the Project and Dataset', () => {
+      describe('the Dataset is already associate with the Project', () => {
+        beforeEach(async () => {
+          const project: Associable = {
+            type: SwbAuthZSubject.SWB_PROJECT,
+            id: projectId,
+            data: {
+              id: dataSetId,
+              permission: accessLevel
+            }
+          };
+
+          const dataset: Associable = {
+            type: SwbAuthZSubject.SWB_DATASET,
+            id: dataSetId,
+            data: {
+              id: projectId,
+              permission: accessLevel
+            }
+          };
+
+          await mockDatabaseService.storeAssociations(dataset, [project]);
+        });
+
+        test('it throws a Conflict Error', async () => {
+          const error = new ConflictError('Project projectId is already associated with Dataset dataSetId');
+          await expect(dataSetService.addAccessForProject(projectAddAccessRequest)).rejects.toThrowError(
+            error
+          );
+        });
+      });
+
+      describe('when the Project and Dataset have not yet been associated', () => {
         describe('it adds entries for', () => {
           test('Project with Dataset', async () => {
             await dataSetService.addAccessForProject(projectAddAccessRequest);
