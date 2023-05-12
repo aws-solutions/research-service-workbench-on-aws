@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: This stack provisions resources necessary to use this AWS account with Service Workbench.
+Description: This stack provisions resources necessary to use this AWS account with Research Service Workbench.
 
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: This stack provisions resources necessary to use this AWS account with Service Workbench with a custom network.
+Description: This stack provisions resources necessary to use this AWS account with Research Service Workbench with a custom network.
 
 Parameters:
   EnableFlowLogs:
@@ -84,7 +84,7 @@ Mappings:
       ID: "SO0231"
       Version: "2.0.0"
       AppRegistryApplicationName: 'SWBAppReg'
-      SolutionName: 'Service Workbench on AWS v2'
+      SolutionName: 'Research Service Workbench'
       ApplicationType: 'AWS-Solutions'
 
 Resources:

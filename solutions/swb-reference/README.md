@@ -132,8 +132,8 @@ VpcSubnet
 ```
 ### Configuring App Registry applications limits
 
-Service Workbench v2.0 on AWS uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to created resources.
-By using App Registry, Service Workbench is able to organize its resources and track their dependencies more efficiently.
+Research Service Workbench on AWS uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to created resources.
+By using App Registry, Research Service Workbench is able to organize its resources and track their dependencies more efficiently.
 Every resource created in Service Workbench is associated to an App Registry application including all workspaces.
 App Registry currently has a default limit of 1000 resources per application.
 
