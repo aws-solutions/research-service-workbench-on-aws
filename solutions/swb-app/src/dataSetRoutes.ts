@@ -7,7 +7,8 @@ import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-
 import {
   DEFAULT_API_PAGE_SIZE,
   resourceTypeToKey,
-  uuidWithLowercasePrefixRegExp
+  uuidWithLowercasePrefixRegExp,
+  isInvalidPaginationTokenError
 } from '@aws/workbench-core-base';
 import { DataSetNotFoundError, isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
@@ -117,13 +118,27 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         user: res.locals.user
       });
       const { user, projectId, pageSize, paginationToken } = validatedRequest;
-      const response = await dataSetService.listDataSetsForProject(
-        projectId,
-        user,
-        pageSize || DEFAULT_API_PAGE_SIZE,
-        paginationToken
-      );
-      res.send(response);
+      try {
+        const response = await dataSetService.listDataSetsForProject(
+          projectId,
+          user,
+          pageSize || DEFAULT_API_PAGE_SIZE,
+          paginationToken
+        );
+        res.send(response);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing datasets for project ${validatedRequest.projectId}`
+        );
+      }
     })
   );
 
@@ -195,7 +210,21 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           dataSetId: req.params.datasetId
         }
       );
-      res.send(await dataSetService.listDataSetAccessPermissions(validatedRequest));
+      try {
+        res.send(await dataSetService.listDataSetAccessPermissions(validatedRequest));
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing permission for dataset ${validatedRequest.dataSetId}`
+        );
+      }
     })
   );
 

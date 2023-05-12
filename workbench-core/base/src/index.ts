@@ -13,6 +13,7 @@ import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/h
 import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
+import { isInvalidPaginationTokenError } from './errors/invalidPaginationTokenError';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
@@ -125,5 +126,6 @@ export {
   swbNameMessage,
   nonHTMLMessage,
   swbDescriptionMaxLength,
-  lengthValidationMessage
+  lengthValidationMessage,
+  isInvalidPaginationTokenError
 };
