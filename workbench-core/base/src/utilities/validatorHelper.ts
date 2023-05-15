@@ -33,7 +33,8 @@ import {
   awsRegionRegex,
   awsRegionMessage,
   sshKeyIdRegex,
-  userIdRegex
+  userIdRegex,
+  datasetIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -52,6 +53,7 @@ declare module 'zod' {
     etId: () => ZodString;
     etcId: () => ZodString;
     projId: () => ZodString;
+    datasetId: () => ZodString;
     envId: () => ZodString;
     costCenterId: () => ZodString;
     accountId: () => ZodString;
@@ -106,6 +108,10 @@ z.ZodString.prototype.etcId = function (): ZodString {
 
 z.ZodString.prototype.projId = function (): ZodString {
   return this.regex(projIdRegex(), { message: invalidIdMessage });
+};
+
+z.ZodString.prototype.datasetId = function (): ZodString {
+  return this.regex(datasetIdRegex(), { message: invalidIdMessage });
 };
 
 z.ZodString.prototype.envId = function (): ZodString {

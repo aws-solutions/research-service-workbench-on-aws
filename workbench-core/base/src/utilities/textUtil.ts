@@ -54,6 +54,7 @@ const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-
 const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
 const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
 const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
+const datasetIdRegExpString: string = `^${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}$`;
 const sshKeyIdRegExpString: string = `^${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}$`;
 const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 
@@ -102,6 +103,11 @@ function etcIdRegex(): RegExp {
 function projIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(projIdRegExpString);
+}
+
+function datasetIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(datasetIdRegExpString);
 }
 
 function envIdRegex(): RegExp {
@@ -181,5 +187,6 @@ export {
   urlFilterMaxLength,
   lengthValidationMessage,
   sshKeyIdRegex,
-  userIdRegex
+  userIdRegex,
+  datasetIdRegex
 };
