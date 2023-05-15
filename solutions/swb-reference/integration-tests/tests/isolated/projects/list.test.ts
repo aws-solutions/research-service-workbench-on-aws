@@ -2,20 +2,20 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
+import { nonEmptyMessage } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
-import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('list projects', () => {
+describe('List Project negative tests', () => {
   const paabHelper: PaabHelper = new PaabHelper();
-  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     expect.hasAssertions();
   });
 
@@ -27,7 +27,29 @@ describe('list projects', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
+  });
+
+  describe('with filter', () => {
+    describe('with name that is empty', () => {
+      beforeEach(async () => {});
+
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.projects.get({
+            filter: { name: { eq: '' } }
+          });
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `filter.name.eq: ${nonEmptyMessage}`
+            })
+          );
+        }
+      });
+    });
   });
 
   describe('with invalid paginationToken', () => {

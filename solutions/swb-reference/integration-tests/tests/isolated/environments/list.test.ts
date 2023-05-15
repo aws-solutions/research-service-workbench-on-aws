@@ -2,7 +2,12 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { lengthValidationMessage, urlFilterMaxLength, JSONValue } from '@aws/workbench-core-base';
+import {
+  lengthValidationMessage,
+  urlFilterMaxLength,
+  JSONValue,
+  nonEmptyMessage
+} from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
@@ -99,6 +104,20 @@ describe('list environments', () => {
       const { data: response } = await itAdminSession.resources.environments.get(queryParams);
 
       expect(Array.isArray(response.data)).toBe(true);
+    });
+
+    test('list project environments with filter on empty name', async () => {
+      try {
+        await itAdminSession.resources.environments.get({ filter: { name: { eq: '' } } });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `filter.name.eq: ${nonEmptyMessage}`
+          })
+        );
+      }
     });
 
     test('list project environments when project does not exist', async () => {
