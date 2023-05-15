@@ -61,7 +61,8 @@ import {
   swbNameMessage,
   nonHTMLMessage,
   swbDescriptionMaxLength,
-  lengthValidationMessage
+  lengthValidationMessage,
+  betweenFilterMessage
 } from './utilities/textUtil';
 import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
 
@@ -125,5 +126,6 @@ export {
   swbNameMessage,
   nonHTMLMessage,
   swbDescriptionMaxLength,
-  lengthValidationMessage
+  lengthValidationMessage,
+  betweenFilterMessage
 };
