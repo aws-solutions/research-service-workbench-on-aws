@@ -219,7 +219,7 @@ export function setUpProjectRoutes(
         }
 
         if (isUserRolesExceedLimitError(err)) {
-          throw Boom.badRequest(`User roles exceed limit`);
+          throw Boom.badRequest(err.message);
         }
 
         if (Boom.isBoom(err)) {
