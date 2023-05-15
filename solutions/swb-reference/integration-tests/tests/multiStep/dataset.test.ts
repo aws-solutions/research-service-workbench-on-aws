@@ -4,7 +4,6 @@
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
-import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
