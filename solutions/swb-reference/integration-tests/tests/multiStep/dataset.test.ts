@@ -45,16 +45,7 @@ describe('multiStep dataset integration test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(project1Id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(project1Id),
-          identityType: 'GROUP',
-          accessLevel: 'read-write'
-        }
-      ]
+      type: 'internal'
     });
 
     console.log('CREATE');
