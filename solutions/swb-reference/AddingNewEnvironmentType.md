@@ -1,5 +1,5 @@
 # Adding a new environment type
-Service Workbench (SWB) allows users to upload and provision custom AWS compute environments and manage them via SWB APIs. This document provides instruction for adding new custom environment types.
+Research Service Workbench (RSW) allows users to upload and provision custom AWS compute environments and manage them via SWB APIs. This document provides instruction for adding new custom environment types.
 
 At a high level, we'll need to do the following steps
 * Define environment AWS resources using CFN templates
@@ -7,12 +7,12 @@ At a high level, we'll need to do the following steps
 * Set up API routes and provide IAM permissions for managing the environment
 * Set up environment status updates
 
-[Code Sample](https://github.com/aws-solutions/solution-spark-on-aws/compare/develop...feat/sagemakerExample) for adding `sagemakerExample` environment. This is the code to add `sagemakerExample` for step 1 through 4.
+[Code Sample](https://github.com/aws-solutions/research-service-workbench-on-aws/compare/develop...feat/sagemakerExample) for adding `sagemakerExample` environment. This is the code to add `sagemakerExample` for step 1 through 4.
 
 ## Step 1: Define environment AWS resources
 In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
 1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerExample`.
-2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemakerNotebook.cfn.yaml](https://github.com/aws-solutions/solution-spark-on-aws/blob/feat/environments/solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebook.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
+2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemakerNotebook.cfn.yaml](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/feat/environments/solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebook.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
     ```yaml
     Parameters:
       InstanceType:

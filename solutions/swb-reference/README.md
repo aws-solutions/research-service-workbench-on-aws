@@ -2,12 +2,12 @@
 
 # swb-reference
 ## `main branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
 ## `develop branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
-The 0.1.0 beta release is available for customers to test the newly re-architected Service Workbench solution from AWS.
+The 0.1.0 beta release is available for customers to test the newly re-architected Research Service Workbench solution from AWS.
 
 This release includes:
 
@@ -30,7 +30,7 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 * An AWS account for hosting environments. This account will be called the `Hosting Account`.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
-  * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/rush.json#L9)
+  * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/rush.json#L9)
   * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN is not needed if you already have a preferred API client. 
 * The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
@@ -66,7 +66,7 @@ STAGE=<STAGE> rushx cdk bootstrap
 
 After bootstrap is completed you'll see a message like this
 ```bash
-Found configuration in /Users/<user>/workplace/solution-spark-on-aws/rush.json
+Found configuration in /Users/<user>/workplace/research-service-workbench-on-aws/rush.json
 
 Rush Multi-Project Build Tool 5.62.1 - Node.js 14.17.0 (LTS)
 > "cdk bootstrap"
@@ -134,10 +134,10 @@ VpcSubnet
 
 Research Service Workbench on AWS uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to created resources.
 By using App Registry, Research Service Workbench is able to organize its resources and track their dependencies more efficiently.
-Every resource created in Service Workbench is associated to an App Registry application including all workspaces.
+Every resource created in Research Service Workbench is associated to an App Registry application including all workspaces.
 App Registry currently has a default limit of 1000 resources per application.
 
-If you are estimating to have more than 999 Workspaces created in your Service Workbench instance a service quota increase will be needed.
+If you are estimating to have more than 999 Workspaces created in your Research Service Workbench instance a service quota increase will be needed.
 Follow these steps to request a quota increase for App Registry application resources:
 
 1. Sign in to your **Hosting Account** in the [AWS Management Console](https://console.aws.amazon.com/console/home?nc2=h_ct&src=header-signin).
@@ -755,8 +755,8 @@ const { data: response } = await adminSession.resources.users.get();
 
 If you have made changes to the `environment` package or the `swb-reference` package follow these steps
 
-1. In `solution-spark-on-aws` root directory run `rush build`
-1. In `solution-spark-on-aws/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
+1. In `research-service-workbench-on-aws` root directory run `rush build`
+1. In `research-service-workbench-on-aws/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
 
 
 ## Troubleshooting Guides

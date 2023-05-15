@@ -21,24 +21,24 @@ While following along steps you encounter further, please note that since you're
 ----
 ## Perform Post-Deployment
 
-Currently Service Workbench contains some steps that can only be performed upon the completion of the main account CloudFormation stack. Here are the final few steps to complete your main account setup:<br/>
+Currently Research Service Workbench (RSW) contains some steps that can only be performed upon the completion of the main account CloudFormation stack. Here are the final few steps to complete your main account setup:<br/>
 
 1. Using the same IAM role/user you used for deploying the CloudFormation stack, create a Cloud9 environment (in the same AWS account and region) as your CloudFormation stack deployment
    - Note: Please use instance type `m5.large` or higher for quick execution.
 2. Run the following code snipper on the environment:
 
 ```shell
-git clone https://github.com/aws-solutions/solution-spark-on-aws.git
-cd solution-spark-on-aws
+git clone https://github.com/aws-solutions/research-service-workbench-on-aws.git
+cd research-service-workbench-on-aws
 git checkout release/4debe38e-5796-47b6-96ec-881a87e0df2
 . ./solutions/swb-reference/scripts/solutions-implementation/postSolutionDeployment.sh
 ```
 ----
 ## Optional: Initial setup for base resources
 
-This section creates base Service Workbench resources required to provision workspaces in your onboarded hosting account. It is recommended to use the same Cloud9 instance from the previous step. 
+This section creates base Research Service Workbench resources required to provision workspaces in your onboarded hosting account. It is recommended to use the same Cloud9 instance from the previous step. 
 
-Run the code snippet below to have the following Service Workbench-specific resources created in the database:
+Run the code snippet below to have the following Research Service Workbench-specific resources created in the database:
 - Hosting Account
 - Cost Center
 - Project
