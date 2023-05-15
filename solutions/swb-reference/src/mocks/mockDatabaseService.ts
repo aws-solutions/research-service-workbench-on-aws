@@ -4,7 +4,6 @@
  */
 
 import { PaginatedResponse } from '@aws/workbench-core-base';
-import { ZodTypeAny } from 'zod';
 import { Associable, DatabaseServicePlugin } from '../services/databaseService';
 
 export class MockDatabaseService implements DatabaseServicePlugin {
@@ -36,11 +35,7 @@ export class MockDatabaseService implements DatabaseServicePlugin {
     return Promise.resolve(associables);
   }
 
-  public async getAssociation(
-    entity: Associable,
-    relationship: Associable,
-    parser: ZodTypeAny
-  ): Promise<Associable | undefined> {
+  public async getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined> {
     const associations = await this.getAssociations(entity.type, entity.id);
 
     for (const association of associations) {
@@ -57,14 +52,9 @@ export class MockDatabaseService implements DatabaseServicePlugin {
   public async listAssociations(
     entity: Associable,
     relationType: string,
-    parser: ZodTypeAny,
     queryParams?: { pageSize?: number; paginationToken?: string }
   ): Promise<PaginatedResponse<Associable>> {
-    const associations = (await this.getAssociations(entity.type, entity.id)).map(
-      (association: Associable) => {
-        return parser.parse(association);
-      }
-    );
+    const associations = await this.getAssociations(entity.type, entity.id);
 
     const response: PaginatedResponse<Associable> = {
       data: associations

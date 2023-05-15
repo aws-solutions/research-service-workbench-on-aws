@@ -3,20 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue, MetadataService, PaginatedResponse } from '@aws/workbench-core-base';
-import { ZodTypeAny } from 'zod';
+import {
+  DynamoDBService,
+  JSONValue,
+  MetadataService,
+  PaginatedResponse,
+  RelationshipDDBItemParser
+} from '@aws/workbench-core-base';
 
 export interface DatabaseServicePlugin {
-  getAssociation(
-    entity: Associable,
-    relationship: Associable,
-    parser: ZodTypeAny
-  ): Promise<Associable | undefined>;
+  getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined>;
 
   listAssociations(
     entity: Associable,
     relationType: string,
-    parser: ZodTypeAny,
     queryParams?: {
       pageSize?: number;
       paginationToken?: string;
@@ -71,7 +71,6 @@ export class DatabaseService implements DatabaseServicePlugin {
   public async listAssociations(
     entity: Associable,
     relationType: string,
-    parser: ZodTypeAny,
     queryParams?: {
       pageSize?: number;
       paginationToken?: string;
@@ -81,7 +80,7 @@ export class DatabaseService implements DatabaseServicePlugin {
       entity.type,
       entity.id,
       relationType,
-      parser,
+      RelationshipDDBItemParser,
       queryParams
     );
 
@@ -124,30 +123,26 @@ export class DatabaseService implements DatabaseServicePlugin {
     }
   }
 
-  public async getAssociation(
-    entity: Associable,
-    relationship: Associable,
-    parser: ZodTypeAny
-  ): Promise<Associable | undefined> {
-    try {
-      const association = await this._metadataService.getMetadataItem(
-        entity.type,
-        entity.id,
-        relationship.type,
-        relationship.id,
-        parser
-      );
+  public async getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined> {
+    const association = await this._metadataService.getMetadataItem(
+      entity.type,
+      entity.id,
+      relationship.type,
+      relationship.id,
+      RelationshipDDBItemParser
+    );
 
-      return {
-        type: relationship.type,
-        id: relationship.id,
-        data: {
-          pk: association.pk,
-          sk: association.sk
-        }
-      };
-    } catch (e) {
-      return Promise.resolve(undefined);
+    if (association === undefined) {
+      return undefined;
     }
+
+    return {
+      type: relationship.type,
+      id: relationship.id,
+      data: {
+        pk: association.pk as string,
+        sk: association.sk as string
+      }
+    };
   }
 }

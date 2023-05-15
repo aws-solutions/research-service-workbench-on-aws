@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import * as Boom from '@hapi/boom';
 import { ZodTypeAny } from 'zod';
 import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import PaginatedResponse from '../interfaces/paginatedResponse';
@@ -198,18 +197,18 @@ export class MetadataService {
     dependencyResourceType: string,
     dependencyId: string,
     parser: ZodTypeAny
-  ): Promise<DependencyMetadata> {
+  ): Promise<DependencyMetadata | undefined> {
     const item = await this._ddbService.getItem({
       key: {
         pk: `${mainEntityResourceType}#${mainEntityId}`,
         sk: `${dependencyResourceType}#${dependencyId}`
       }
     });
+
     if (item === undefined) {
-      throw Boom.notFound('Resource not found');
-    } else {
-      const resource: DependencyMetadata = parser.parse(item);
-      return Promise.resolve(resource);
+      return undefined;
     }
+    const resource: DependencyMetadata = parser.parse(item);
+    return Promise.resolve(resource);
   }
 }

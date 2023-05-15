@@ -17,7 +17,6 @@ import {
 import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
-import { ProjectParser } from '@aws/swb-app/lib/projectEnvTypeConfigs/project';
 import {
   Action,
   AuthenticatedUser,
@@ -330,7 +329,7 @@ export class DataSetService implements DataSetPlugin {
       }
     };
 
-    const existingAssociation = await this._databaseService.getAssociation(dataset, project, ProjectParser);
+    const existingAssociation = await this._databaseService.getAssociation(dataset, project);
 
     if (existingAssociation) {
       throw new ConflictError(`Project ${project.id} is already associated with Dataset ${dataset.id}`);
