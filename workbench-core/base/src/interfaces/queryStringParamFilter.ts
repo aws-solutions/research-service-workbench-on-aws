@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { lengthValidationMessage, urlFilterMaxLength } from '../utilities/textUtil';
+import { lengthValidationMessage, urlFilterMaxLength, betweenFilterMessage } from '../utilities/textUtil';
 import { z } from '../utilities/validatorHelper';
 
 /************
@@ -17,18 +17,21 @@ const parameterFilterParser: z.ZodString = z
 // eslint-disable-next-line @rushstack/typedef-var
 export const QueryStringParamFilterParser = z
   .object({
-    eq: parameterFilterParser.optional(),
-    lt: parameterFilterParser.optional(),
-    lte: parameterFilterParser.optional(),
-    gt: parameterFilterParser.optional(),
-    gte: parameterFilterParser.optional(),
+    eq: parameterFilterParser.optionalNonEmpty(),
+    lt: parameterFilterParser.optionalNonEmpty(),
+    lte: parameterFilterParser.optionalNonEmpty(),
+    gt: parameterFilterParser.optionalNonEmpty(),
+    gte: parameterFilterParser.optionalNonEmpty(),
     between: z
       .object({
-        value1: parameterFilterParser,
-        value2: parameterFilterParser
+        value1: parameterFilterParser.required(),
+        value2: parameterFilterParser.required()
+      })
+      .refine((data) => data.value1 <= data.value2, {
+        message: betweenFilterMessage
       })
       .optional(),
-    begins: parameterFilterParser.optional()
+    begins: parameterFilterParser.optionalNonEmpty()
   })
   .strict();
 

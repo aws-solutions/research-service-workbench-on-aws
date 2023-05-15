@@ -49,7 +49,8 @@ import {
   TooManyRequestsError,
   User,
   UserAlreadyExistsError,
-  UserNotFoundError
+  UserNotFoundError,
+  UserRolesExceedLimitError
 } from '..';
 import { Status } from '../user';
 
@@ -964,13 +965,27 @@ describe('CognitoUserManagementPlugin tests', () => {
   describe('addUserToRole tests', () => {
     beforeEach(() => {
       ddbMock.on(UpdateItemCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
     });
+
+    describe('when user has reached role limit', () => {
+      beforeEach(() => {
+        roles = Array(plugin.userRoleLimit).fill('Role1');
+        cognitoMock
+          .on(AdminListGroupsForUserCommand)
+          .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+      });
+      it('should throw an error', async () => {
+        await expect(plugin.addUserToRole(userInfo.id, 'Role2')).rejects.toThrow(UserRolesExceedLimitError);
+      });
+    });
+
     it('should add the requested User to the group when the user id and group both exist', async () => {
       const addUserToRoleMock = cognitoMock.on(AdminAddUserToGroupCommand).resolves({});
 
       await plugin.addUserToRole(userInfo.id, roles[0]);
 
-      expect(addUserToRoleMock.calls().length).toBe(1);
+      expect(addUserToRoleMock.calls().length).toBe(2);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -1033,7 +1048,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       await plugin.addUserToRole(userInfo.id, roles[0]);
 
-      expect(addUserToRoleMock.calls().length).toBe(1);
+      expect(addUserToRoleMock.calls().length).toBe(2);
     });
 
     it('Settings configured for long ttl on temp role access', async () => {
@@ -1045,7 +1060,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       await plugin.addUserToRole(userInfo.id, roles[0]);
 
-      expect(addUserToRoleMock.calls().length).toBe(1);
+      expect(addUserToRoleMock.calls().length).toBe(2);
     });
   });
 
