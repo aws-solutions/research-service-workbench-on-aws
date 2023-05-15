@@ -133,7 +133,8 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'firstName: must contain only letters, spaces, numbers, and hyphens. firstName: Required'
+          message:
+            'firstName: must contain only letters, spaces, numbers, hyphens, and periods. firstName: Required'
         })
       );
     }
@@ -181,7 +182,8 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'lastName: must contain only letters, spaces, numbers, and hyphens. lastName: Required'
+          message:
+            'lastName: must contain only letters, spaces, numbers, hyphens, and periods. lastName: Required'
         })
       );
     }
