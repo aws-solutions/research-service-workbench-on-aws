@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "revert-1062",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}
