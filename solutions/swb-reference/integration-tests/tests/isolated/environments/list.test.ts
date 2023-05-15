@@ -6,7 +6,8 @@ import {
   lengthValidationMessage,
   urlFilterMaxLength,
   JSONValue,
-  nonEmptyMessage
+  nonEmptyMessage,
+  betweenFilterMessage
 } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
@@ -106,7 +107,7 @@ describe('list environments', () => {
       expect(Array.isArray(response.data)).toBe(true);
     });
 
-    test('list project environments with filter on empty name', async () => {
+    test('list environments with filter on empty name', async () => {
       try {
         await itAdminSession.resources.environments.get({ filter: { name: { eq: '' } } });
       } catch (e) {
@@ -115,6 +116,29 @@ describe('list environments', () => {
           new HttpError(400, {
             error: 'Bad Request',
             message: `filter.name.eq: ${nonEmptyMessage}`
+          })
+        );
+      }
+    });
+
+    test('list environments with filter createdAt between value1 > value2', async () => {
+      try {
+        await itAdminSession.resources.environments.get({
+          filter: {
+            createdAt: {
+              between: {
+                value1: '2023-05-14T07:23:39.311Z',
+                value2: '2023-05-11T07:23:39.311Z'
+              }
+            }
+          }
+        });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `filter.createdAt.between: ${betweenFilterMessage}`
           })
         );
       }
