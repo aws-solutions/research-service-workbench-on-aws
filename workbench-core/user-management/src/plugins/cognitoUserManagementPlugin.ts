@@ -13,6 +13,7 @@ import { RoleNotFoundError } from '../errors/roleNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
+import { UserRolesExceedLimitError } from '../errors/userRolesExceedLimitError';
 import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 import { AccessType, TempRoleAccessEntry, TempRoleAccessEntryParser } from './tempRoleAccessEntry';
@@ -28,6 +29,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   private _userPoolId: string;
   private _aws: AwsService;
   private _tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number };
+  public readonly userRoleLimit: number = 25;
 
   /**
    *
@@ -525,9 +527,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
+   * @throws {@link UserRolesExceedLimitError} if user has reached Cognito group limit
    */
   public async addUserToRole(id: string, role: string): Promise<void> {
     try {
+      // check if user has reached role limits
+      const existingRoles = await this.getUserRoles(id);
+      if (existingRoles.length >= this.userRoleLimit) {
+        throw new UserRolesExceedLimitError(
+          `This user has reached Cognito group limit: ${this.userRoleLimit}`
+        );
+      }
+
       await this._aws.clients.cognito.adminAddUserToGroup({
         UserPoolId: this._userPoolId,
         Username: id,
