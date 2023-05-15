@@ -13,6 +13,7 @@ describe('list environments', () => {
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let validProjectId: string;
   const validEnvStatuses = [
     'PENDING',
     'COMPLETED',
@@ -63,6 +64,7 @@ describe('list environments', () => {
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    validProjectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
@@ -182,6 +184,69 @@ describe('list environments', () => {
           })
         );
       }
+    });
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await itAdminSession.resources.environments.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    // PA & Researcher must be project environment route
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => paSession,
+        projectId: () => validProjectId
+      },
+      {
+        username: 'researcher',
+        session: () => researcherSession,
+        projectId: () => validProjectId
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc, projectId: projectFunc } = testCase;
+      let session: ClientSession;
+      let projectId: string;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+        projectId = projectFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects
+            .project(projectId)
+            .environments()
+            .listProjectEnvironments(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
     });
   });
 });

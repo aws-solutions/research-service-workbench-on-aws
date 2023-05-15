@@ -172,4 +172,47 @@ describe('list datasets for project tests', () => {
       expect(lastRequest.paginationToken).toBeUndefined();
     });
   });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => pa1Session,
+        projectId: () => project1Id
+      },
+      {
+        username: 'researcher',
+        session: () => researcher1Session,
+        projectId: () => project1Id
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc, projectId: projectFunc } = testCase;
+      let session: ClientSession;
+      let projectId: string;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+        projectId = projectFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects.project(projectId).dataSets().get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+  });
 });
