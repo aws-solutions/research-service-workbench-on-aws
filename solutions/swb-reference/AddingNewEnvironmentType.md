@@ -232,13 +232,13 @@ Note: Executing `run-postDeployment` command will create an Environment Type whe
 ## Step 7 (Optional): Test Launch new Environment
 Do the following steps if you would like to launch your new environment type, and assuming your new envType is named `sagemakerExample`
 
-Follow instructions in [Get access token Step](../swb-reference/README.md#get-access-token) and [POSTMAN Setup Step](../swb-reference/README.md#postman-setup) to make API requests to SWBv2 using postman.
+Follow instructions in [Get access token Step](../swb-reference/README.md#get-access-token) and [POSTMAN Setup Step](../swb-reference/README.md#postman-setup) to make API requests to RSW using postman.
 
 1. Follow instructions in [Setup EnvironmentTypeConfig Step](../swb-reference/README.md#setup-environmenttypeconfig) to create an Environment Type Config and take note of the `ENV_TYPE_ID` and `ENV_TYPE_CONFIG_ID` values.
 
 1. Follow these steps to launch an environment using the new environment type created.
 
-    - In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
+    - In **RSW Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
     - In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](../swb-reference/README.md#setup-project).
 

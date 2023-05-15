@@ -19,13 +19,13 @@ This release includes:
 * Improved performance on workspace page with pagination
 
 
-# Setup Instructions for SWBv2
+# Setup Instructions for RWB
 
-Follow the instructions below to deploy SWBv2 with Sagemaker Notebook lifecycle support. You'll be able to 
+Follow the instructions below to deploy RWB with Sagemaker Notebook lifecycle support. You'll be able to 
 launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 
 ## Prerequisite
-* An AWS account for deploying SWBv2 API. This account will be called the `Main Account`.
+* An AWS account for deploying RWB API. This account will be called the `Main Account`.
    * On the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `Main Account` as the `default` profile 
 * An AWS account for hosting environments. This account will be called the `Hosting Account`.
 * Software
@@ -41,7 +41,7 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Navigate to `solutions/swb-reference`.
 1. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
-1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
+1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region RWB is deployed in.
 1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<stage>/rootUser/email`.
 1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserEmailParamStorePath` and the value as the main account user's email address.
 1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
@@ -166,12 +166,12 @@ Your environment should have four variables. Name the first one `API_URL` and th
 
 Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
 
-Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+Import [RSW Postman Collection](./RWB.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 
 ## Setup Account Resources
 ### Onboard hosting account
-In **SWBv2 Official** Postman Collection under **hosting account** folder choose **Create Hosting Account** API to onboard a hosting account. 
+In **RSW Official** Postman Collection under **hosting account** folder choose **Create Hosting Account** API to onboard a hosting account. 
 Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
@@ -210,7 +210,7 @@ Take note of the `id` that was returned. We'll need it for the next step. We'll 
 
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status is listed as `CURRENT`.
 
-To monitor the account status, in **SWBv2 Official** Postman Collection under **hosting account** folder choose **Get Hosting Account** API.
+To monitor the account status, in **RSW Official** Postman Collection under **hosting account** folder choose **Get Hosting Account** API.
 
 In the params tab set accountId parameter to the `ACCOUNT_ID` value from previous step and send request.
 
@@ -227,7 +227,7 @@ A response with the status property will be displayed
 You can also find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
 ### Setup Cost Center
-In **SWBv2 Official** Postman Collection under **costCenters** folder choose **Create Cost Center** API. 
+In **RSW Official** Postman Collection under **costCenters** folder choose **Create Cost Center** API. 
 
 In the body tab set `accountId` parameter to the `ACCOUNT_ID` value from [Onboard hosting account step](#onboard-hosting-account).
 
@@ -244,7 +244,7 @@ POST `{{API_URL}}/costCenters/`
 Take note of the `id` from the **Create Cost Center** response. We'll need it for the next step. We'll refer to this value as `COST_CENTER_ID`.
 
 ### Setup Project
-In **SWBv2 Official** Postman Collection under **projects** folder choose **Create project** API. 
+In **RSW Official** Postman Collection under **projects** folder choose **Create project** API. 
 
 In the body tab set `costCenterId` parameter to the `COST_CENTER_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -262,7 +262,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 
 ## Setup EnvironmentTypeConfig
 ### Retrieve Environment Type Id
-In **SWBv2 Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
+In **RSW Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
 If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
 
 Running the **List envTypes** request in postman should return a json with the following format
@@ -348,7 +348,7 @@ Running the **List envTypes** request in postman should return a json with the f
 In the response take note of the `id` of the environment type you are looking for, the `name` will have the format `<product name>-<provisioning artifact name>`, e.g. `sageMakerNotebook-v1`. We'll need it for the next step. We'll refer to this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
-In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environment type.
+In **RSW Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environment type.
 
 In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -362,7 +362,7 @@ PATCH `{{API_URL}}/environmentTypes/:id`
 ```
 
 ### Create Environment Type Config
-In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **Create envTypeConfig** API.
+In **RSW Official** Postman Collection under **envTypeConfig** folder choose **Create envTypeConfig** API.
 
 In the params tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -400,7 +400,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
 
 ### Associate Project to Environment Type Configuration
-In **SWBv2 Official** Postman Collection under **project** folder choose **Associate project with EnvTypeConfig** API.
+In **RSW Official** Postman Collection under **project** folder choose **Associate project with EnvTypeConfig** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -414,7 +414,7 @@ PUT `{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/
 
 
 ## Create new DataSets
-In **SWBv2 Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
+In **RSW Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -440,7 +440,7 @@ At this point you'll receive a JSON response. That response will have an `id` va
 Once registered a DataSet using this API, you could also upload files to its bucket folder directly so they're available at environment boot time.
 
 ## Launch Sagemaker Notebook Instance
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -467,7 +467,7 @@ POST `{{API_URL}}/projects/:projectId/environments`
 In the response take note of the `id` and `projectId` that were returned. We'll refer to the `id` value as `ENV_ID` and the `projectId` value as `ENV_PROJECT_ID`.
 
 ## Check Environment Status
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Get Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -483,7 +483,7 @@ In the response you'll see the status of the environment.
 `PENDING` means the environment is being provisioned. `COMPLETED` means the environment is ready to be used.
 
 ## Connect to Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Connection** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Get Connection** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -498,7 +498,7 @@ GET `{{API_URL}}/projects/:projectId/environments/:id/connections`
 In the response you'll find a `url`. Copy and paste that `url` into the browser to view your Sagemaker Notebook instance.
 
 ## Stop an Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Stop Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Stop Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -511,7 +511,7 @@ Send **Stop Environment** request.
 PUT `{{API_URL}}/projects/:projectId/environments/:id/stop`
 
 ## Start an Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Start Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Start Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -524,7 +524,7 @@ Send **Start Environment** request.
 PUT `{{API_URL}}/projects/:projectId/environments/:id/start`
 
 ## Terminate the Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Terminate Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Terminate Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -544,7 +544,7 @@ In order to create new Admins:
 1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the ITAdmin group.
 
 ## Create Users
-In **SWBv2 Official** Postman Collection under **users** folder choose **Create User** API.
+In **RSW Official** Postman Collection under **users** folder choose **Create User** API.
 
 Send **Create User** request.
 
@@ -562,7 +562,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 ## Assign Project to User
 Note: Only `Researchers` and `ProjectAdmin` require project association.
 
-In **SWBv2 Official** Postman Collection under **projects** folder choose **Add User To Project** API.
+In **RSW Official** Postman Collection under **projects** folder choose **Add User To Project** API.
 
 In the params tab set `userId` parameter to the `USER_ID` value from [Create User step](#create-user).
 
@@ -619,14 +619,14 @@ Note: `setupIntegTestEnv.sh` script also creates the `Config file for integratio
 1. For `envTypeId` and `envType`, follow instructions in [Retrieve environment type id step](#retrieve-environment-type-id) and choose the Environment Type that integration test will use as default when creating any Environment, copy the values from properties `id` and `type` from request and assign `id` value to `envTypeId` property and `type` value to `envType` property in `./integration-tests/config/<STAGE>.yaml` file
 
 1. Follow these steps to assign a value to the `envTypeConfigId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **List envTypeConfigs** API.
+    1. In **RSW Official** Postman Collection under **envTypeConfig** folder choose **List envTypeConfigs** API.
     1. In the params tab set `envTypeId` parameter to the `envTypeId` value from your `./integration-tests/config/<STAGE>.yaml`.
     1. Send **List envTypeConfigs** request. If there are no environment type configs displayed please follow instructions in [Setup Environment Type Config step](#setup-environmenttypeconfig) to create a new environment type config for selected environment type.
     1. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
     1. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
 
 1. Follow these steps to assign a value to `projectId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. In **SWBv2 Official** Postman Collection under **projects** folder choose **List projects** API.
+    1. In **RSW Official** Postman Collection under **projects** folder choose **List projects** API.
     1. Send **List projects** request. If there are no projects displayed please follow instructions in [Setup Project step](#setup-project) to create a new project.
     1. Choose the Project that integration test will use as default when creating any Environment and testing project functionality and copy the `id` value from the response.
     1. In `./integration-tests/config` directory assign `id` to `projectId` in `<STAGE>.yaml` file 
@@ -699,7 +699,7 @@ Note: `setupIntegTestEnv.sh` script also creates the `Config file for integratio
 
 ### Implement Integreation tests
 
-To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
+To use the framework for calling the RSW API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
 
 Example code for creating new user
 

@@ -1,11 +1,11 @@
-# SWBv2 Solutions Deployment
+# RWB Solutions Deployment
 
 ## Deploy Solutions Implementation CloudFormation template
-- Navigate here <TODO: Enter valid URL> to the SWBv2 Solutions Implementation page and download the Cloudformation template.
+- Navigate here <TODO: Enter valid URL> to the RWB Solutions Implementation page and download the Cloudformation template.
 - Log into your AWS account as an Administrator where you want to deploy this stack. This role will help deploying the application and performing post-deployment steps.
 - Create a new CloudFormation stack providing this template and the necessary input parameters.
   - Note: Please make sure CDK [bootsrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) has been performed for this account and region
-- You have now deployed SWBv2 successfully in your main account.
+- You have now deployed RWB successfully in your main account.
 
 Note: An Application Load Balancer has been created in your main account with access logging disabled by default for Solutions deployment. If you'd like to enable it please follow these [instructions](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html).
 
@@ -55,7 +55,7 @@ You can now deploy a workspace by running this command in your terminal:
 . ./scripts/solutions-implementation/createEnvironment.sh
 ```
 ----
-## Explore SWBv2
+## Explore RWB
 Feel free to take a look inside the `solutions/swb-reference/scripts/solutions-implementation` folder for scripts you just ran to create more of those resources. 
 <br/>
-For the entire API collection, take a look at the `solutions/swb-reference/SWBv2.postman_collection.json` file.
+For the entire API collection, take a look at the `solutions/swb-reference/RWB.postman_collection.json` file.
