@@ -10,6 +10,7 @@ interface Setting {
   envTypeId: string;
   envTypeConfigId: string;
   envType: string;
+  projectId: string;
   runId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
@@ -21,6 +22,7 @@ interface Setting {
   projectAdmin2PasswordParamStorePath: string;
   costCenterId: string;
   projectName: string;
+  failedEnvId: string;
 
   // Main CFN template outputs
   cognitoUserPoolClientId: string;
