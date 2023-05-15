@@ -18,16 +18,6 @@ jobs:
           poll-interval-seconds: 10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  deploy-example-app:
-    needs: [pre-deployment-check]
-    uses: ./.github/workflows/deploy-integration-example-app.yml
-    with:
-      environment: release
-    secrets:
-      aws-region: ${{ secrets.AWS_RELEASE_REGION }}
-      role-to-assume: ${{ secrets.RELEASE_ASSUME_ROLE }}
-      aws-account-region: ${{ secrets.AWS_EXAMPLE_APP_RELEASE_ACCOUNT_REGION }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
   deploy-swb-reference:
     needs: [pre-deployment-check]
     uses: ./.github/workflows/deploy-integration-swb-reference.yml
