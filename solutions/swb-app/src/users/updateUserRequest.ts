@@ -8,9 +8,9 @@ import { z, invalidEmailMessage } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateUserRequestParser = z
   .object({
-    userId: z.string().required(),
-    firstName: z.string().swbName().optional(),
-    lastName: z.string().swbName().optional(),
+    userId: z.string().userId().required(),
+    firstName: z.string().personName().optional(),
+    lastName: z.string().personName().optional(),
     email: z.string().email(invalidEmailMessage).optional(),
     status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
     roles: z.array(z.string().max(55)).optional()

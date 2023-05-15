@@ -20,6 +20,10 @@ const swbNameMessage: string = 'must contain only letters, numbers, hyphens, und
 const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
 const swbNameMaxLength: number = 112;
 
+const personNameMessage: string = 'must contain only letters, spaces, numbers, hyphens, and periods';
+const personNameRegExpAsString: string = '^[A-Za-z0-9-. ]+$';
+const personNameMaxLength: number = 50;
+
 const swbDescriptionMessage: string =
   'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
 const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
@@ -42,6 +46,7 @@ const awsRegionRegExpAsString: string = '^(us|ap|ca|cn|eu|sa)-(central|(north|so
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
+const validSshKeyUuidRegExpAsString: string = '[0-9a-f]{64}';
 
 const envTypeIdRegExpString: string = `^${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}$`;
 const envTypeConfigIdRegExpString: string = `^${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}$`;
@@ -49,6 +54,8 @@ const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-
 const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
 const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
 const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
+const sshKeyIdRegExpString: string = `^${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}$`;
+const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -70,6 +77,11 @@ function nonHtmlRegExp(): RegExp {
 function swbNameRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(swbNameRegExpAsString);
+}
+
+function personNameRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(personNameRegExpAsString);
 }
 
 function swbDescriptionRegExp(): RegExp {
@@ -117,14 +129,17 @@ function awsAccountIdRegExp(): RegExp {
   return new RegExp(awsAccountIdRegExpAsString);
 }
 
-function userIdRegExp(): RegExp {
+function sshKeyIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(uuidRegExpAsString);
+  return new RegExp(sshKeyIdRegExpString);
+}
+
+function userIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(userIdRegExpString);
 }
 
 const validRolesRegExpAsString: string = '(ProjectAdmin|Researcher)';
-
-const validSshKeyUuidRegExpAsString: string = '^[0-9a-f]{64}$';
 
 export {
   uuidWithLowercasePrefix,
@@ -135,6 +150,9 @@ export {
   swbNameMessage,
   swbNameRegExp,
   swbNameMaxLength,
+  personNameMessage,
+  personNameRegExp,
+  personNameMaxLength,
   swbDescriptionMessage,
   swbDescriptionRegExp,
   swbDescriptionMaxLength,
@@ -156,11 +174,12 @@ export {
   envIdRegex,
   costCenterIdRegex,
   accountIdRegex,
-  userIdRegExp,
   nonEmptyMessage,
   invalidIdMessage,
   invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
-  lengthValidationMessage
+  lengthValidationMessage,
+  sshKeyIdRegex,
+  userIdRegex
 };

@@ -537,3 +537,65 @@ describe('zod.optionalNonEmpty', () => {
     });
   });
 });
+
+describe('tests for zod.sshKeyId', () => {
+  const zodParser = z.object({
+    id: z.string().sshKeyId()
+  });
+  type SshKeyIdType = z.infer<typeof zodParser>;
+  const randomUuid = '1234567812345678123456781234567812345678123456781234567812345678';
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: `sshkey-${randomUuid}` }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<SshKeyIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when contains invalid char', () => {
+      const invalidObjects: SshKeyIdType[] = [
+        { id: `invalid-${randomUuid}` }, //invalid prefix
+        { id: 'sshkey-invalid-uuid' }, //invalid uuid format
+        { id: `sshkey-${randomUuid}#ProjAdmin` }, //invalid uuid format
+        { id: '' } //empty value
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<SshKeyIdType>(zodParser, invalidObject)).toThrowError(
+          `${invalidIdMessage}`
+        );
+      });
+    });
+  });
+});
+
+describe('tests for zod.userId', () => {
+  const zodParser = z.object({
+    id: z.string().userId()
+  });
+  type UserIdType = z.infer<typeof zodParser>;
+  const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
+
+  describe('when input is valid', () => {
+    const validObjects = [{ id: randomUuid }];
+    test.each(validObjects)('returns valid Id', (validObject) => {
+      expect(validateAndParse<UserIdType>(zodParser, validObject)).toEqual(validObject);
+    });
+  });
+
+  describe('when input is not valid', () => {
+    describe('when contains invalid char', () => {
+      const invalidObjects: UserIdType[] = [
+        { id: `invalid-${randomUuid}` }, //invalid prefix
+        { id: 'sshkey-invalid-uuid' }, //invalid uuid format
+        { id: `${randomUuid}-0000` }, //invalid uuid format
+        { id: '' } //empty value
+      ];
+      test.each(invalidObjects)('returns required message', (invalidObject) => {
+        expect(() => validateAndParse<UserIdType>(zodParser, invalidObject)).toThrowError(
+          `${invalidIdMessage}`
+        );
+      });
+    });
+  });
+});
