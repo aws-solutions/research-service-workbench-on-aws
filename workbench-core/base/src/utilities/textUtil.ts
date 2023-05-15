@@ -34,6 +34,7 @@ const invalidIdMessage: string = 'Invalid ID';
 const invalidEmailMessage: string = 'Invalid Email';
 const requiredMessage: string = 'Required';
 const urlFilterMaxLength: number = 128;
+const betweenFilterMessage: string = 'value1 must be less than or equal to value2';
 
 const groupIDRegExpAsString: string = '\\S{1,128}';
 
@@ -185,6 +186,7 @@ export {
   invalidEmailMessage,
   requiredMessage,
   urlFilterMaxLength,
+  betweenFilterMessage,
   lengthValidationMessage,
   sshKeyIdRegex,
   userIdRegex,
