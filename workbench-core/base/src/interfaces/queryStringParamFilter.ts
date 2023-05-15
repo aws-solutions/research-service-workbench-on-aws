@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { lengthValidationMessage, urlFilterMaxLength } from '../utilities/textUtil';
+import { lengthValidationMessage, urlFilterMaxLength, betweenFilterMessage } from '../utilities/textUtil';
 import { z } from '../utilities/validatorHelper';
 
 /************
@@ -26,6 +26,9 @@ export const QueryStringParamFilterParser = z
       .object({
         value1: parameterFilterParser.required(),
         value2: parameterFilterParser.required()
+      })
+      .refine((data) => data.value1 <= data.value2, {
+        message: betweenFilterMessage
       })
       .optional(),
     begins: parameterFilterParser.optionalNonEmpty()
