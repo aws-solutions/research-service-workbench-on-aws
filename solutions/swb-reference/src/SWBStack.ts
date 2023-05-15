@@ -277,11 +277,6 @@ export class SWBStack extends Stack {
     // Add DynamicAuth DynamoDB Table name to lambda environment variable
     _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
       lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
-      // TODO: Remove the line below. Only needed for running lambda locally
-      lambda.addEnvironment(
-        'DYNAMIC_AUTH_DDB_TABLE_NAME',
-        'swb-dev-oh-swbdevohdynamicauth49565C05-1PHHL23AE4V9K'
-      );
     });
 
     const apiGwUrl = this._createRestApi(apiLambda);
