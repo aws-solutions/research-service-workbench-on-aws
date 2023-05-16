@@ -44,7 +44,6 @@ describe('environment start negative tests', () => {
           .environment(failedEnvId)
           .start();
       } catch (e) {
-        console.log('e', e);
         checkHttpError(
           e,
           new HttpError(409, {

@@ -146,7 +146,7 @@ export function setUpProjectEnvRoutes(
       const envType = environment.ETC!.type;
       if (environment.status === 'STOPPING') {
         throw Boom.conflict('Cannot start environment while environment is currently being stopped');
-      } else if (['FAILED'].includes(environment.status)) {
+      } else if (environment.status === 'FAILED') {
         throw Boom.conflict('Cannot start environment that is currently in FAILED state');
       } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
         res.status(204).send();
