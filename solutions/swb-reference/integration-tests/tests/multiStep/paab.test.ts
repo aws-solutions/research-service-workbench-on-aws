@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import { ListDatasetsResponse } from '../../support/models/datasets';
