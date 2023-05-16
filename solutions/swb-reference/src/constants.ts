@@ -99,10 +99,10 @@ function getConstants(region?: string): Constants {
   // eslint-disable-next-line security/detect-object-injection
   const AWS_REGION_SHORT_NAME = config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this can fill it in
 
-  const STACK_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`;
-  const SC_PORTFOLIO_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
-  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
-  const USER_POOL_NAME = `swb-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const STACK_NAME = `rsw-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const SC_PORTFOLIO_NAME = `rsw-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
+  const USER_POOL_CLIENT_NAME = `rsw-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const USER_POOL_NAME = `rsw-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
@@ -138,9 +138,9 @@ function getConstants(region?: string): Constants {
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
-  const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
-  const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
-  const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
+  const VPC_ID_OUTPUT_KEY = 'RswVpcIdOutput';
+  const ECS_SUBNET_IDS_OUTPUT_KEY = 'RswEcsSubnetIdsOutput';
+  const ECS_SUBNET_AZS_OUTPUT_KEY = 'RswEcsAzsOutput';
   const USER_AGENT_STRING = customUserAgentString;
 
   return {

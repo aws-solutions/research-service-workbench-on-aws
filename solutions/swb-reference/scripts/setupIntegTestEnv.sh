@@ -76,10 +76,10 @@ function check(){
 
 function run() {
     check
-    envMgmtRoleArn="arn:aws:iam::$hostingAccountId:role/swb-$stage-$shortName-env-mgmt"
-    hostingAccountHandlerRoleArn="arn:aws:iam::$hostingAccountId:role/swb-$stage-$shortName-hosting-account-role"
-    cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-$stage-$shortName --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-    swbDomainName=$(aws cloudformation describe-stacks --stack-name swb-$stage-$shortName  --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
+    envMgmtRoleArn="arn:aws:iam::$hostingAccountId:role/rsw-$stage-$shortName-env-mgmt"
+    hostingAccountHandlerRoleArn="arn:aws:iam::$hostingAccountId:role/rsw-$stage-$shortName-hosting-account-role"
+    cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-$stage-$shortName --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+    swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-$stage-$shortName  --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
 
     echo -e "${CYAN}\nReset Cognito ITAdmin password"
     echo -e "------------------------------"

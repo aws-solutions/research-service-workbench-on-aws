@@ -18,18 +18,18 @@ import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
-export interface SWBVpcProps {
+export interface RSWVpcProps {
   vpcId: string;
   albSubnetIds: string[];
   ecsSubnetIds: string[];
 }
 
-export class SWBVpc extends Construct {
+export class RSWVpc extends Construct {
   public readonly vpc: IVpc;
   public readonly albSubnetSelection: SubnetSelection;
   public readonly ecsSubnetSelection: SubnetSelection;
 
-  public constructor(scope: Construct, id: string, props: SWBVpcProps) {
+  public constructor(scope: Construct, id: string, props: RSWVpcProps) {
     const { vpcId, albSubnetIds, ecsSubnetIds } = props;
     super(scope, id);
 
@@ -75,7 +75,7 @@ export class SWBVpc extends Construct {
     const subnets: ISubnet[] = [];
     let subnetCount = 1;
     subnetIds.forEach(function (subnetId: string) {
-      const subnet = Subnet.fromSubnetId(scope, `SWB${subnetPrefix}Subnet${subnetCount}`, subnetId);
+      const subnet = Subnet.fromSubnetId(scope, `RSW${subnetPrefix}Subnet${subnetCount}`, subnetId);
       subnets.push(subnet);
       subnetCount++;
     });

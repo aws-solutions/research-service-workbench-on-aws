@@ -296,7 +296,7 @@ export default class ServiceCatalogSetup {
     const portfolioToCreateParam = {
       DisplayName: portfolioName,
       ProviderName: '_system_',
-      Description: 'Portfolio for managing SWB environments'
+      Description: 'Portfolio for managing RSW environments'
     };
 
     const response = await this._aws.clients.serviceCatalog.createPortfolio(portfolioToCreateParam);

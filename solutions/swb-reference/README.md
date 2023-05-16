@@ -42,9 +42,9 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region RWB is deployed in.
-1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<stage>/rootUser/email`.
+1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/rsw/<stage>/rootUser/email`.
 1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserEmailParamStorePath` and the value as the main account user's email address.
-1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
+1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your RSW API, e.g. ['http://localhost:3000','http://localhost:3002'].
 1. Uncomment `cognitoDomain` and provide a **globally unique** string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. If your SWB instance is going to use a custom network, uncomment `vpcId` and `albSubnetIds` and provide their respective values from your network.
@@ -106,10 +106,10 @@ After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. 
 1. Upload the corresponding .yaml file from [templates](./src/templates) depending on your installation type. Default installation uses [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml), for more customizable network options, refer to [Hosting Account Templates](./src/templates/README.md)
-1. For the stack name, use the following value: `swb-<stage>-<awsRegionShortName>-hosting-account`, for example `swb-dev-va-hosting-account`
+1. For the stack name, use the following value: `rsw-<stage>-<awsRegionShortName>-hosting-account`, for example `rsw-dev-va-hosting-account`
 1. For the parameters provide the following values
 ```yaml
-Namespace: swb-<stage>-<awsRegionShortName>      # These values should be the same as in your config file
+Namespace: rsw-<stage>-<awsRegionShortName>      # These values should be the same as in your config file
 MainAccountId: <12 digit Account ID of Main Account>
 ExternalId: <externalIdValue>
 VpcCidr: 10.0.0.0/16
@@ -539,7 +539,7 @@ PUT `{{API_URL}}/projects/:projectId/environments/:id/terminate`
 # User Management
 In order to create new Admins:
 1. You must go to the Cognito console in your AWS Console.
-1. Under **User pools**, look for and click on `swb-userpool-<stage>-<abbreviation>`.
+1. Under **User pools**, look for and click on `rsw-userpool-<stage>-<abbreviation>`.
 1. Under the **Users tab**, choose **Create user**.
 1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the ITAdmin group.
 
@@ -733,7 +733,7 @@ const { data: response } = await adminSession.resources.users.get();
 ## Reset User Password
 1. Go to the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home) in your main account. If prompted, enter your AWS credentials.
 1. Choose **User Pools**.
-1. Choose your SWB user pool with name `swb-userpool-<STAGE>-<Region>`.
+1. Choose your SWB user pool with name `rsw-userpool-<STAGE>-<Region>`.
 1. Choose the **App integration** tab.
 1. Under **App client list** choose SWB app client with name `swb-client-<STAGE>-<Region>`.
 1. Under **Hosted UI** choose **View Hosted UI**.
@@ -765,9 +765,9 @@ If you have made changes to the `environment` package or the `swb-reference` pac
 
 ## Appendix
 ### Cloudwatch Logs
-* `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to SWB APIs. 
-* `swb-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
-* `swb-<stage>-<awsRegionShortName>-statusHandlerLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
+* `rsw-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to rsw APIs. 
+* `rsw-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
+* `rsw-<stage>-<awsRegionShortName>-statusHandlerLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
 * 
 ## FAQ
 

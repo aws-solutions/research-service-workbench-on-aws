@@ -83,7 +83,7 @@ Mappings:
     Data:
       ID: "SO0231"
       Version: "2.0.0"
-      AppRegistryApplicationName: 'SWBAppReg'
+      AppRegistryApplicationName: 'RSWAppReg'
       SolutionName: 'Research Service Workbench'
       ApplicationType: 'AWS-Solutions'
 
@@ -436,7 +436,7 @@ Resources:
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in RSWStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'

@@ -8,16 +8,16 @@ import { Template } from 'aws-cdk-lib/assertions';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { SWBApplicationLoadBalancer, SWBApplicationLoadBalancerProps } from './SWBApplicationLoadBalancer';
+import { RSWApplicationLoadBalancer, RSWApplicationLoadBalancerProps } from './RSWApplicationLoadBalancer';
 
-describe('SWBApplicationLoadBalancer tests', () => {
+describe('RSWApplicationLoadBalancer tests', () => {
   beforeAll(() => {
     jest.spyOn(ApplicationLoadBalancer.prototype, 'logAccessLogs').mockImplementation();
   });
 
   it('has the correct alb properties when given no subnets', () => {
     const stack = new Stack();
-    const swbApplicationLoadBalancerProps: SWBApplicationLoadBalancerProps = {
+    const rswApplicationLoadBalancerProps: RSWApplicationLoadBalancerProps = {
       vpc: new Vpc(stack, 'testVPC'),
       subnets: {},
       internetFacing: true,
@@ -25,7 +25,7 @@ describe('SWBApplicationLoadBalancer tests', () => {
         objectOwnership: ObjectOwnership.OBJECT_WRITER
       })
     };
-    new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
+    new RSWApplicationLoadBalancer(stack, 'TestRSWApplicationLoadBalancer', rswApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
 
     template.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
@@ -56,7 +56,7 @@ describe('SWBApplicationLoadBalancer tests', () => {
   it('has the correct alb properties when given public subnets', () => {
     const stack = new Stack();
     const vpc = new Vpc(stack, 'testVPC');
-    const swbApplicationLoadBalancerProps: SWBApplicationLoadBalancerProps = {
+    const rswApplicationLoadBalancerProps: RSWApplicationLoadBalancerProps = {
       vpc: vpc,
       subnets: vpc.selectSubnets({ subnetType: SubnetType.PUBLIC }),
       internetFacing: true,
@@ -64,7 +64,7 @@ describe('SWBApplicationLoadBalancer tests', () => {
         objectOwnership: ObjectOwnership.OBJECT_WRITER
       })
     };
-    new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
+    new RSWApplicationLoadBalancer(stack, 'TestRSWApplicationLoadBalancer', rswApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
 
     template.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
@@ -95,7 +95,7 @@ describe('SWBApplicationLoadBalancer tests', () => {
   it('has the correct alb properties when given private subnets and internetFacing as false', () => {
     const stack = new Stack();
     const vpc = new Vpc(stack, 'testVPC');
-    const swbApplicationLoadBalancerProps: SWBApplicationLoadBalancerProps = {
+    const rswApplicationLoadBalancerProps: RSWApplicationLoadBalancerProps = {
       vpc: vpc,
       subnets: vpc.selectSubnets({ subnetType: SubnetType.PRIVATE_WITH_NAT }),
       internetFacing: false,
@@ -103,7 +103,7 @@ describe('SWBApplicationLoadBalancer tests', () => {
         objectOwnership: ObjectOwnership.OBJECT_WRITER
       })
     };
-    new SWBApplicationLoadBalancer(stack, 'TestSWBApplicationLoadBalancer', swbApplicationLoadBalancerProps);
+    new RSWApplicationLoadBalancer(stack, 'TestRSWApplicationLoadBalancer', rswApplicationLoadBalancerProps);
     const template = Template.fromStack(stack);
 
     template.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
