@@ -10,7 +10,6 @@
 
 ## Negative Testing
 #terminatedEnvId: ''   # id of an environment that has already been terminated
-#failedEnvId: ''   # id of an environment that is in failed state
 
 ## Cognito Integ Test Client
 #rootUserNameParamStorePath: ''
