@@ -12,8 +12,7 @@ export const UpdateUserRequestParser = z
     firstName: z.string().personName().optional(),
     lastName: z.string().personName().optional(),
     email: z.string().email(invalidEmailMessage).optional(),
-    status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
-    roles: z.array(z.string().max(55)).optional()
+    status: z.enum(['ACTIVE', 'INACTIVE']).optional()
   })
   .strict();
 

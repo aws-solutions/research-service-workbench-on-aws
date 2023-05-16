@@ -83,24 +83,6 @@ describe('update user negative tests', () => {
     }
   });
 
-  it('should return a 400 error when the provided role is too long', async () => {
-    try {
-      const updateMockUserInput = {
-        roles: ['AReallyLongRoleNameThatDoesntMakeAnySenseButStillExistsForTestingPurposes']
-      };
-      const response = await adminSession.resources.users.user(mockUserId).update(updateMockUserInput, true);
-      console.log(JSON.stringify(response));
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message: 'roles.0: String must contain at most 55 character(s)'
-        })
-      );
-    }
-  });
-
   it('should return a 400 error when the provided status is unknown', async () => {
     try {
       const updateMockUserInput = { status: 'someInvalidStatus' };
