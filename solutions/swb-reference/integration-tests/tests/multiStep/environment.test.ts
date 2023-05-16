@@ -263,8 +263,6 @@ describe('multiStep environment test', () => {
 
     console.log(`Stopping Environment A: ${environmentA.id}`);
     await paSessionEnvironments.environment(environmentA.id).stop();
-    // console.log(`Stopping Environments B: ${environmentB.id}`);
-    // await adminSessionEnvironments.environment(environmentB.id).stop();
 
     //Wait for Environment A to stop
     await poll(
@@ -280,21 +278,6 @@ describe('multiStep environment test', () => {
       PROJ: expect.anything() // PROJ should be defined
     });
     console.log('Environment A Stopped');
-
-    //Wait for Environment B to stop
-    // await poll(
-    //   async () => adminSessionEnvironments.environment(environmentB.id).get(),
-    //   (env) => env?.data?.status !== 'STOPPING',
-    //   ENVIRONMENT_STOP_MAX_WAITING_SECONDS
-    // ); //wait for environmentB to stop
-    // const { data: environmentBStopped } = await adminSessionEnvironments.environment(environmentB.id).get();
-    // expect(environmentBStopped).toMatchObject({
-    //   id: expect.stringMatching(envUuidRegExp),
-    //   status: 'STOPPED',
-    //   ETC: expect.anything(), //ETC should be defined
-    //   PROJ: expect.anything() // PROJ should be defined
-    // });
-    // console.log('Environment B Stopped');
 
     //Terminate Environments A and B
     console.log('Terminating Environments A and B');

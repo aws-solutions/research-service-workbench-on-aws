@@ -4,9 +4,7 @@
  */
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
-// import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-// import Settings from '../../../support/utils/settings';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment start negative tests', () => {
@@ -34,26 +32,6 @@ describe('environment start negative tests', () => {
   });
 
   describe('ITAdmin tests', () => {
-    // test('environment in failed state', async () => {
-    //   const failedEnvId = settings.get('failedEnvId');
-    //   const defaultProjId = settings.get('projectId');
-    //   try {
-    //     await itAdminSession.resources.projects
-    //       .project(defaultProjId)
-    //       .environments()
-    //       .environment(failedEnvId)
-    //       .start();
-    //   } catch (e) {
-    //     checkHttpError(
-    //       e,
-    //       new HttpError(409, {
-    //         error: 'Conflict',
-    //         message: 'Cannot start environment that is currently in FAILED state'
-    //       })
-    //     );
-    //   }
-    // });
-
     test('environment does not exist', async () => {
       const fakeEnvId = getFakeEnvId();
       try {
