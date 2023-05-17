@@ -862,6 +862,24 @@ describe('authenticationMiddleware tests', () => {
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
     });
 
+    it('should return 200, the id token in the response body, and set the access token as a cookie when the refresh_token cookie is present and valid', async () => {
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken',
+          access_token: 'validToken'
+        }
+      } as Request;
+
+      await refreshAccessTokenRouteHandler(req, res);
+
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        maxAge: tokens.accessToken.expiresIn
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
+    });
+
     it('should set the access token as a session cookie when AuthenticationService IDP defines them as such', async () => {
       const req: Request = {
         cookies: {
