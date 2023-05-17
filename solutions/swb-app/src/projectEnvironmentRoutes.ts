@@ -116,7 +116,6 @@ export function setUpProjectEnvRoutes(
         throw Boom.conflict(
           'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
         );
-        // } else if (envStatus !== 'STOPPED') {
       } else if (!['STOPPED', 'FAILED'].includes(envStatus)) {
         throw Boom.badRequest(
           `Environment must be in state STOPPED or FAILED before beginning termination. ${environment.id} currently in state ${envStatus}.`

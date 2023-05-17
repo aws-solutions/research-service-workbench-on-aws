@@ -89,15 +89,12 @@ describe('multiStep environment test', () => {
       paSessionEnvironments
     );
 
-    console.log('environmentA', environmentA);
-
     console.log('Launch Environment B');
     const environmentB = await launchEnvironment(
       randomTextGenerator.getFakeText('environment-multistep-test-envB'),
       'EnvironmentB for multistep environment.test',
       paSessionEnvironments
     );
-    console.log('environmentB', environmentB);
 
     console.log('Verify Environment A was started and is available');
     await poll(
@@ -303,7 +300,7 @@ describe('multiStep environment test', () => {
       .project(projectId)
       .environments()
       .listProjectEnvironments();
-    console.log('allEnvironments', allEnvironments);
+
     expect(
       allEnvironments.data.filter((env) => env.id === environmentA.id || env.id === environmentB.id).length
     ).toEqual(0);

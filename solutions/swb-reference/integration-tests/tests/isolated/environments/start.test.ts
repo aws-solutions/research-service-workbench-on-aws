@@ -8,7 +8,6 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment start negative tests', () => {
-  // const settings: Settings = Setup.getSetup().getSettings();
   const paabHelper = new PaabHelper();
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
