@@ -46,7 +46,7 @@ jobs:
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-account-region }} -v
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy --ci 1> /dev/null
 
       - name: Example package integration test
         run: |

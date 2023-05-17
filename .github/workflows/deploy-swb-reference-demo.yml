@@ -55,7 +55,7 @@ jobs:
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk bootstrap
-          STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk-deploy --ci 1> /dev/null
           STAGE='demo' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
       - name: Slack Failure Notification
