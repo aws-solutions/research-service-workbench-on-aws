@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { DynamoDBService, buildDynamoDBPkSk } from '@aws/workbench-core-base';
 import jwtDecode from 'jwt-decode';
 import _ from 'lodash';
