@@ -11,6 +11,7 @@ import {
   CognitoAuthenticationPluginOptions,
   CognitoAuthenticationPlugin
 } from '@aws/workbench-core-authentication';
+import { TokenRevocationService } from '@aws/workbench-core-authentication/lib/tokenRevocationService';
 import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
@@ -50,11 +51,18 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(cookieParser());
   app.use(csurf('none'));
 
+  const tokenRevocationService: TokenRevocationService = new TokenRevocationService({
+    dynamoDBSettings: {
+      region: process.env.AWS_REGION!,
+      table: process.env.REVOKED_TOKENS_DDB_TABLE_NAME!
+    }
+  });
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     clientId: process.env.CLIENT_ID!,
-    clientSecret: process.env.CLIENT_SECRET!
+    clientSecret: process.env.CLIENT_SECRET!,
+    tokenRevocationService
   };
 
   const authenticationService = new AuthenticationService(

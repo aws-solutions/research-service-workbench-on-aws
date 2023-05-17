@@ -20,6 +20,8 @@ import { InvalidJWTError } from '../errors/invalidJwtError';
 import { InvalidTokenError } from '../errors/invalidTokenError';
 import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
+import { TokenRevocationServiceNotProvidedError } from '../errors/tokenRevocationServiceNotProvidedError';
+import { TokenRevocationService } from '../tokenRevocationService';
 import { Tokens } from '../tokens';
 import { getTimeInMS, TimeUnits } from '../utils';
 
@@ -49,6 +51,11 @@ export interface CognitoAuthenticationPluginOptions {
    * The Cognito app client secret.
    */
   clientSecret: string;
+
+  /**
+   * Provide a token revocation service for immediate revoking of access tokens
+   */
+  tokenRevocationService?: TokenRevocationService;
 }
 
 /**
@@ -60,6 +67,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _userPoolId: string;
   private _clientId: string;
   private _clientSecret: string;
+  private _tokenRevocationService?: TokenRevocationService;
 
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
@@ -78,13 +86,14 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     cognitoDomain,
     userPoolId,
     clientId,
-    clientSecret
+    clientSecret,
+    tokenRevocationService
   }: CognitoAuthenticationPluginOptions) {
     this._userPoolId = userPoolId;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
     this._baseUrl = cognitoDomain;
-
+    this._tokenRevocationService = tokenRevocationService;
     // eslint-disable-next-line security/detect-unsafe-regex
     const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
     if (!regionMatch) {
@@ -138,6 +147,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public async validateToken(token: string): Promise<CognitoAccessTokenPayload> {
     try {
+      if (await this._tokenRevocationService?.isRevoked({ token }))
+        throw new InvalidJWTError('token has been revoked');
       return await this._verifier.verify(token);
     } catch (error) {
       throw new InvalidJWTError('token is invalid');
@@ -186,7 +197,16 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       throw error;
     }
   }
-
+  /**
+   * Revokes the given access token.
+   *
+   * @param token - the access token to revoke
+   */
+  public async revokeAccessToken(accessToken: string): Promise<void> {
+    if (!this._tokenRevocationService)
+      throw new TokenRevocationServiceNotProvidedError('TokenRevocationService was not provided');
+    return this._tokenRevocationService.revokeToken({ token: accessToken });
+  }
   /**
    * Gets the Id of the user for whom the id or access token was issued.
    *

@@ -277,9 +277,22 @@ export class RSWStack extends Stack {
       createAccountHandler
     );
 
+    const revokedTokensDDBTableEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-revokedTokensDDBTableEncryptionKey`);
+    const revokedTokensDDBTable = this._createRevokedTokensDDBTable(
+      revokedTokensDDBTableEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
     // Add DynamicAuth DynamoDB Table name to lambda environment variable
     _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
       lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    });
+
+    _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
+      lambda.addEnvironment('REVOKED_TOKENS_DDB_TABLE_NAME', revokedTokensDDBTable.tableName);
     });
 
     const apiGwUrl = this._createRestApi(apiLambda);
@@ -1419,6 +1432,31 @@ export class RSWStack extends Stack {
     });
 
     return dynamicAuthDDBTable.table;
+  }
+
+  private _createRevokedTokensDDBTable(
+    encryptionKey: Key,
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
+    const revokedTokensDDBTable = new WorkbenchDynamodb(this, `${this.stackName}-revoked-tokens`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey,
+      lambdas: [apiLambda, statusHandler, createAccountHandler],
+      timeToLiveAttribute: 'ttl'
+    });
+
+    new CfnOutput(this, 'revokedTokensDDBTableArn', {
+      value: revokedTokensDDBTable.table.tableArn
+    });
+
+    new CfnOutput(this, 'revokedTokensDDBTableName', {
+      value: revokedTokensDDBTable.table.tableName
+    });
+
+    return revokedTokensDDBTable.table;
   }
 
   // Application DynamoDB Table
