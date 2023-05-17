@@ -42,8 +42,7 @@ describe('multiStep environment test', () => {
   });
 
   async function launchEnvironment(
-    name: string,
-    description: string,
+    prefix: string,
     paSessionEnvironments: Environments
   ): Promise<Environment> {
     const envABody = {
@@ -51,8 +50,8 @@ describe('multiStep environment test', () => {
       envTypeConfigId: settings.get('envTypeConfigId'),
       envType: settings.get('envType'),
       datasetIds: [],
-      name,
-      description
+      name: randomTextGenerator.getFakeText(`${prefix}-multistep-test`),
+      description: `${prefix} for multistep environment.test`
     };
 
     const { data: environmentA } = await paSessionEnvironments.create(envABody, false);
@@ -83,18 +82,10 @@ describe('multiStep environment test', () => {
       .environments();
 
     console.log('Launch Environment A');
-    const environmentA = await launchEnvironment(
-      randomTextGenerator.getFakeText('environment-multistep-test-envA'),
-      'EnvironmentA for multistep environment.test',
-      paSessionEnvironments
-    );
+    const environmentA = await launchEnvironment('EnvironmentA', paSessionEnvironments);
 
     console.log('Launch Environment B');
-    const environmentB = await launchEnvironment(
-      randomTextGenerator.getFakeText('environment-multistep-test-envB'),
-      'EnvironmentB for multistep environment.test',
-      paSessionEnvironments
-    );
+    const environmentB = await launchEnvironment('EnvironmentB', paSessionEnvironments);
 
     console.log('Verify Environment A was started and is available');
     await poll(
