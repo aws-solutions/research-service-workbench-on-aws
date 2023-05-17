@@ -659,6 +659,26 @@ describe('authenticationMiddleware tests', () => {
       });
     });
 
+    it('should return 200, clear cookies, and revoke access token when access_token cookie is present and valid', async () => {
+      const req: Request = {
+        cookies: {
+          access_token: 'validToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
+        }
+      } as Request;
+
+      await logoutUserRouteHandler(req, res);
+
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
+      });
+    });
+
     it('should return 200 and clear cookies when refresh_token cookie is missing', async () => {
       const req: Request = {
         cookies: {},
@@ -701,6 +721,26 @@ describe('authenticationMiddleware tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
+        }
+      } as Request;
+
+      await logoutUserRouteHandler(req, res);
+
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
+      });
+    });
+
+    it('should return 200 and clear cookies when access_token cookie is invalid', async () => {
+      const req: Request = {
+        cookies: {
+          access_token: 'invalidToken'
         },
         headers: {
           origin: 'https://www.fakewebsite.com'

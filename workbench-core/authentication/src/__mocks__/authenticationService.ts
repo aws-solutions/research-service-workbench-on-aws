@@ -48,6 +48,14 @@ export class AuthenticationService {
     throw new Error();
   }
 
+  public async revokeAccessToken(token: string): Promise<void> {
+    // eslint-disable-next-line security/detect-possible-timing-attacks
+    if (token === 'validToken') {
+      return;
+    }
+    throw new Error();
+  }
+
   public getUserIdFromToken(decodedToken: DecodedJWT): string {
     return 'id';
   }
