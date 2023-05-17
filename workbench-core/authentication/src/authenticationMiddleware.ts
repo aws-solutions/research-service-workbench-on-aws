@@ -304,11 +304,13 @@ export function refreshAccessToken(
   return async function (req: Request, res: Response) {
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
+    const oldAccessToken = req.cookies.access_token;
 
     if (typeof refreshToken === 'string') {
       try {
         const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
-
+        // Revoke previous session
+        if (typeof oldAccessToken === 'string') await authenticationService.revokeAccessToken(oldAccessToken);
         // set access cookie
         res.cookie('access_token', accessToken.token, {
           ...defaultCookieOptions,
