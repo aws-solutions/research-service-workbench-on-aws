@@ -13,6 +13,5 @@ export { RoleNotFoundError, isRoleNotFoundError } from './errors/roleNotFoundErr
 export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
 export { UserAlreadyExistsError, isUserAlreadyExistsError } from './errors/userAlreadyExistsError';
 export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundError';
-export { UserRolesExceedLimitError, isUserRolesExceedLimitError } from './errors/userRolesExceedLimitError';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
 export { UserManagementService } from './userManagementService';
