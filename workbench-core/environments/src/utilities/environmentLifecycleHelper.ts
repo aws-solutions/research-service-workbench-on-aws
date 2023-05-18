@@ -434,7 +434,7 @@ export default class EnvironmentLifecycleHelper {
     operation: string;
     envType: string;
   }): Promise<AwsService> {
-    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn} with externalId ${payload.externalId}`);
+    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn}.`);
     const params = {
       roleArn: payload.envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
