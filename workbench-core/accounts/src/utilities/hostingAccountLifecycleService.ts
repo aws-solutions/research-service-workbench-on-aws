@@ -345,7 +345,6 @@ export default class HostingAccountLifecycleService {
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
   ): Promise<void> {
-    console.log('Check and update hosting account status');
     // Check if hosting account stack has the latest CFN template
     console.log('s3ArtifactBucketName', s3ArtifactBucketName);
     const onboardAccountS3Response = await this._aws.clients.s3.getObject({
