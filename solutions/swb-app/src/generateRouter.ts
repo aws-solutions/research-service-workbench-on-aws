@@ -9,9 +9,9 @@ import {
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
-  CognitoAuthenticationPlugin
+  CognitoAuthenticationPlugin,
+  TokenRevocationService
 } from '@aws/workbench-core-authentication';
-import { TokenRevocationService } from '@aws/workbench-core-authentication/lib/tokenRevocationService';
 import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
