@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-user-management",
-      "comment": "add cognito group limit",
+      "comment": "revert-1062",
       "type": "patch"
     }
   ],
