@@ -13,21 +13,11 @@ lib
 .*/NOTICE
 
 # Test files
-#SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
-solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:190
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:250
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:293
 # email: 'sample.user@example.com' is not real email
-solutions/example-ui-app/src/models/User.ts:19
-# "email": "hello@cypress.io" is not real email
-solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
+#solutions/example-ui-app/src/models/User.ts:19
 # Fake emails for UserManagementService integ tests
-workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:30
-workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
+#workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:30
+#workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
 workbench-core/example/infrastructure/integration-tests/tests/users/updateUser.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
@@ -52,12 +42,7 @@ solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.t
 solutions/swb-reference/integration-tests/tests/isolated/users/updateUser.test.ts:31
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:82
-# Fake account ID used for workbenchAppRegistry tests
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:109
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:136
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:161
+
 # Fake emails for user to project integ tests
 solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:91
 solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:38
