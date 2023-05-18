@@ -3,7 +3,7 @@
     {
       "packageName": "@aws/swb-app",
       "comment": "chore: remove roles from update user API",
-      "type": "patch"
+      "type": "major"
     }
   ],
   "packageName": "@aws/swb-app"
