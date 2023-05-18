@@ -48,9 +48,6 @@ export async function handler(event: any) {
     return setupResponse(response, {}, 200, 'Health check passed', event.headers);
   }
 
-  // One more layer of logging incoming API calls
-  console.log(`Proxy handler called with: ${JSON.stringify(event)}`);
-
   let apiPath = event.path ? event.path.replace('api/', '') : '';
   if (apiPath[apiPath.length - 1] === '/') {
     // SWB APIs do not have trailing slash, but this gets added when UI passes down the path
@@ -190,14 +187,11 @@ export async function handler(event: any) {
     error.isBase64Encoded = false;
     error.headers = { 'Content-Type': 'application/json' };
 
-    console.error(`Application error encountered: ${JSON.stringify(error)}`);
+    console.error('Application error encountered', error);
 
     // The error object has to be returned like this for integration tests' backwards compatibility
     return error;
   }
-
-  // Logging what we returned for the given API call
-  console.log(`Responding with: ${JSON.stringify(response)}`);
 
   return response;
 }

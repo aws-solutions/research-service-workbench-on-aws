@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "update jest coverage",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}
