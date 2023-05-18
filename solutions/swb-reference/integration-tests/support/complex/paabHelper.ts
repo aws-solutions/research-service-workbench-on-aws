@@ -6,7 +6,6 @@ import {
   CreateDataSetRequest,
   CreateDataSetRequestParser
 } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getProjectAdminRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../clientSession';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
@@ -110,8 +109,6 @@ export class PaabHelper {
       path: dataSetName, // using same name to help potential troubleshooting
       name: dataSetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(projectId),
-      ownerType: 'GROUP',
       type: 'internal'
     });
   }
