@@ -30,8 +30,11 @@ import {
   lengthValidationMessage,
   accountIdRegex,
   costCenterIdRegex,
+  awsRegionRegex,
+  awsRegionMessage,
   sshKeyIdRegex,
-  userIdRegex
+  userIdRegex,
+  datasetIdRegex
 } from './textUtil';
 
 interface ZodPagination {
@@ -50,9 +53,11 @@ declare module 'zod' {
     etId: () => ZodString;
     etcId: () => ZodString;
     projId: () => ZodString;
+    datasetId: () => ZodString;
     envId: () => ZodString;
     costCenterId: () => ZodString;
     accountId: () => ZodString;
+    awsRegion: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
     sshKeyId: () => ZodString;
@@ -105,6 +110,10 @@ z.ZodString.prototype.projId = function (): ZodString {
   return this.regex(projIdRegex(), { message: invalidIdMessage });
 };
 
+z.ZodString.prototype.datasetId = function (): ZodString {
+  return this.regex(datasetIdRegex(), { message: invalidIdMessage });
+};
+
 z.ZodString.prototype.envId = function (): ZodString {
   return this.regex(envIdRegex(), { message: invalidIdMessage });
 };
@@ -135,6 +144,10 @@ z.ZodString.prototype.optionalNonEmpty = function (): ZodOptional<ZodString> {
 
 z.ZodString.prototype.awsAccountId = function (): ZodString {
   return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
+};
+
+z.ZodString.prototype.awsRegion = function (): ZodString {
+  return this.regex(awsRegionRegex(), { message: awsRegionMessage });
 };
 
 function getPaginationParser(minPageSize: number = 1, maxPageSize: number = 100): ZodPagination {
