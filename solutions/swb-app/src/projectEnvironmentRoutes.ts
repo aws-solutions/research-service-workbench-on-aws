@@ -75,7 +75,7 @@ export function setUpProjectEnvRoutes(
         }
 
         throw Boom.badImplementation(
-          `There was a problem creating environment type ${envType} for project ${req.body.projectId}`
+          `There was a problem creating environment of type ${envType} for project ${req.body.projectId}`
         );
       }
       try {
@@ -90,7 +90,10 @@ export function setUpProjectEnvRoutes(
           error: { type: 'LAUNCH', value: errorMessage },
           status: 'FAILED'
         });
-        throw e;
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+        throw Boom.badImplementation(e.message);
       }
     })
   );
