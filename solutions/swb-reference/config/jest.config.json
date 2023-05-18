@@ -6,7 +6,7 @@
   },
   "moduleFileExtensions": ["ts", "js"],
   "coveragePathIgnorePatterns": [
-    "<rootDir>/src/SWBStack.ts",
+    "<rootDir>/src/RSWStack.ts",
     "<rootDir>/src/backendAPI.ts",
     "<rootDir>/src/accountHandlerWrapper.ts",
     "<rootDir>/src/index.ts",
