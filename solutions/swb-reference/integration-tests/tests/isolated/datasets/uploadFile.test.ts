@@ -4,7 +4,6 @@
  */
 import { DataSet } from '@aws/workbench-core-datasets';
 import axios from 'axios';
-import { getProjectAdminRole } from '../../../../src/utils/roleUtils';
 import ClientSession from '../../../support/clientSession';
 import { DatasetHelper } from '../../../support/complex/datasetHelper';
 import { PaabHelper } from '../../../support/complex/paabHelper';
@@ -34,8 +33,6 @@ describe('datasets file upload tests', () => {
         storageName: settings.get('DataSetsBucketName'),
         awsAccountId: settings.get('mainAccountId'),
         region: settings.get('awsRegion'),
-        owner: getProjectAdminRole(project1Id),
-        ownerType: 'GROUP',
         type: 'internal'
       });
     dataSet = data;
@@ -112,6 +109,41 @@ describe('datasets file upload tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message: 'filenames: Invalid input'
+            })
+          );
+        }
+      });
+
+      it('returns a 400 error when an invalid file name is passed in', async () => {
+        try {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id)
+            .getFileUploadUrls('invalid?file*name');
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: 'filenames: must contain only letters, numbers, hyphens, underscores, and periods'
+            })
+          );
+        }
+      });
+
+      it('receives a 403 if dataSet does not exist', async () => {
+        try {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset('dataset-12345678-1234-1234-123f-1234567890ab')
+            .getFileUploadUrls('TestFile1');
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }
