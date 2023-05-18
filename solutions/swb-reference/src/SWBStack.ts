@@ -71,6 +71,7 @@ export class SWBStack extends Stack {
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_BUCKET_NAME: string;
     ACCT_HANDLER_ARN_OUTPUT_KEY: string;
     API_HANDLER_ARN_OUTPUT_KEY: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
@@ -195,6 +196,20 @@ export class SWBStack extends Stack {
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
     const MAIN_ACCT_ID = `${this.account}`;
+
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
+    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
+    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+
+    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
+    const datasetBucket = this._createS3DatasetsBuckets(
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      S3DatasetsEncryptionKey.key
+    );
+
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -203,6 +218,7 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_NAME: datasetBucket.bucketName,
       ACCT_HANDLER_ARN_OUTPUT_KEY,
       API_HANDLER_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
@@ -219,19 +235,6 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ID,
       USER_AGENT_STRING
     };
-
-    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
-    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
-    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
-    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
-    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
-
-    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
-      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
-    const datasetBucket = this._createS3DatasetsBuckets(
-      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
-      S3DatasetsEncryptionKey.key
-    );
 
     const S3ArtifactEncryptionKey: WorkbenchEncryptionKeyWithRotation =
       new WorkbenchEncryptionKeyWithRotation(this, S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY);

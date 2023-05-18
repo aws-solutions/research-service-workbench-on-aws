@@ -10,10 +10,12 @@ import {
   uuidWithLowercasePrefixRegExp
 } from '@aws/workbench-core-base';
 import {
-  DataSetNotFoundError,
   isDataSetHasEndpointError,
-  DataSetExistsError,
-  DataSetInvalidParameterError
+  isDataSetExistsError,
+  isDataSetInvalidParameterError,
+  isStorageNotFoundError,
+  isAccountNotFoundError,
+  isDataSetNotFoundError
 } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -65,10 +67,10 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         });
         res.status(201).send(dataSet);
       } catch (e) {
-        if (e instanceof DataSetExistsError) {
+        if (isDataSetExistsError(e)) {
           throw Boom.conflict(e.message);
         }
-        if (e instanceof DataSetInvalidParameterError) {
+        if (isDataSetInvalidParameterError(e) || isAccountNotFoundError(e) || isStorageNotFoundError(e)) {
           throw Boom.badRequest(e.message);
         }
         console.error(e);
@@ -158,7 +160,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         const response = await dataSetService.getDataSet(dataSetId, user);
         res.send(response);
       } catch (e) {
-        if (e instanceof DataSetNotFoundError) {
+        if (isDataSetNotFoundError(e)) {
           throw Boom.notFound(e.message);
         }
         console.error(e);
@@ -235,7 +237,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.conflict(e.message);
         }
 
-        if (e instanceof DataSetInvalidParameterError) {
+        if (isDataSetInvalidParameterError(e)) {
           throw Boom.badRequest(e.message);
         }
 

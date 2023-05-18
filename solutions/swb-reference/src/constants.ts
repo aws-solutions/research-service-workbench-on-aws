@@ -214,6 +214,7 @@ interface Config {
   rootUserEmailParamStorePath: string;
   allowedOrigins: string[];
   cognitoDomain: string;
+  DataSetsBucketName: string;
   userPoolId?: string;
   clientId?: string;
   clientSecret?: string;
