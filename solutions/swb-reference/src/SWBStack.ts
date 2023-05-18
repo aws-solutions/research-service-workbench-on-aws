@@ -274,8 +274,11 @@ export class SWBStack extends Stack {
       createAccountHandler
     );
 
+    // RevokedTokens DynamoDB Encryption Key
     const revokedTokensDDBTableEncryptionKey: WorkbenchEncryptionKeyWithRotation =
       new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-revokedTokensDDBTableEncryptionKey`);
+
+    // Create RevokedTokens DynamoDB Table
     const revokedTokensDDBTable = this._createRevokedTokensDDBTable(
       revokedTokensDDBTableEncryptionKey.key,
       apiLambda,
@@ -288,6 +291,7 @@ export class SWBStack extends Stack {
       lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
     });
 
+    // Add RevokedTokens DynamoDB table name to lambda environment variable
     _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
       lambda.addEnvironment('REVOKED_TOKENS_DDB_TABLE_NAME', revokedTokensDDBTable.tableName);
     });
@@ -313,6 +317,10 @@ export class SWBStack extends Stack {
           id: 'W92',
           reason:
             "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        },
+        {
+          id: 'W76',
+          reason: 'TODO: SPCM for IAM policy document is higher than 25'
         }
       ]
     });
