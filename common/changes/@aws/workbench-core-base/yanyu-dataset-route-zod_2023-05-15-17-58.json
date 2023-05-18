@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "add aws region and datasetId zod validation",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}
