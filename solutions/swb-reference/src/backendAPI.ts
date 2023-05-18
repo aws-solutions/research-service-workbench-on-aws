@@ -68,7 +68,8 @@ const cognitoUserManagementPlugin: CognitoUserManagementPlugin = new CognitoUser
   process.env.USER_POOL_ID!,
   aws,
   {
-    ddbService: dynamicAuthAws.helpers.ddb
+    ddbService: dynamicAuthAws.helpers.ddb,
+    ttl: 60 * 60
   }
 );
 const userManagementService: UserManagementService = new UserManagementService(cognitoUserManagementPlugin);
