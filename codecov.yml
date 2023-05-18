@@ -10,7 +10,7 @@ coverage:
         flags:
           - example-ui-app
       swb-app:
-        target: 70%
+        target: 78%
         flags:
           - swb-app
       swb-reference:
@@ -34,11 +34,11 @@ coverage:
         flags:
           - workbench-core-authentication
       workbench-core-authorization:
-        target: 97%
+        target: 99%
         flags:
           - workbench-core-authorization
       workbench-core-base:
-        target: 70%
+        target: 80%
         flags:
           - workbench-core-base
       workbench-core-datasets:
@@ -50,7 +50,7 @@ coverage:
         flags:
           - workbench-core-datasets-ui
       workbench-core-environments:
-        target: 70%
+        target: 75%
         flags:
           - workbench-core-environments
       workbench-core-environments-ui:
