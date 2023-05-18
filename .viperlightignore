@@ -13,6 +13,8 @@ lib
 .*/NOTICE
 
 # Test files
+# Note that emails need to end with @simulator.amazonses.com in order to work against Cognito
+# Other test fake data must come from https://alpha.www.docs.aws.a2z.com/awsstyleguide/latest/styleguide/safenames.html
 # Fake emails for UserManagementService integ tests
 workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:30
 workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
