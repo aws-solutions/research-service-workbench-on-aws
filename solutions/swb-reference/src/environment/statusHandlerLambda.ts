@@ -9,7 +9,7 @@ import _ from 'lodash';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
-  console.log(`StatusHandler processing event ${JSON.stringify(event)}`);
+  console.log(`StatusHandler processing event.`);
 
   // Various environment types indicate status in unique locations of their event detail
   // This is to standardize each of them
