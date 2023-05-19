@@ -10,15 +10,20 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('List Project negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession } = await paabHelper.createResources());
+    const paabResources = await paabHelper.createResources();
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
@@ -71,6 +76,61 @@ describe('List Project negative tests', () => {
             );
           }
         });
+      });
+    });
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.projects.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => paSession
+      },
+      {
+        username: 'researcher',
+        session: () => researcherSession
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      let session: ClientSession;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
       });
     });
   });

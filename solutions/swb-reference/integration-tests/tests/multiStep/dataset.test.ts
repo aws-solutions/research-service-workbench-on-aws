@@ -4,7 +4,6 @@
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
-import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
@@ -46,16 +45,7 @@ describe('multiStep dataset integration test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(project1Id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(project1Id),
-          identityType: 'GROUP',
-          accessLevel: 'read-write'
-        }
-      ]
+      type: 'internal'
     });
 
     console.log('CREATE');
