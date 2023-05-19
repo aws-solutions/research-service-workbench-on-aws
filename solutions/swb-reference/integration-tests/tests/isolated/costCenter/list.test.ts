@@ -46,4 +46,25 @@ describe('List Cost Center negative tests', () => {
       });
     });
   });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.costCenters.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+  });
 });

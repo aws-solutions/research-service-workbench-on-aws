@@ -4,14 +4,14 @@
  */
 
 // eslint-disable-next-line @rushstack/typedef-var
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 import { AuthenticatedUserParser } from '../users/authenticatedUser';
 import { getPaginationParser } from '../validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListDataSetAccessPermissionsRequestParser = z
   .object({
-    dataSetId: z.string(),
+    dataSetId: z.string().datasetId().required(),
     authenticatedUser: AuthenticatedUserParser,
     ...getPaginationParser()
   })

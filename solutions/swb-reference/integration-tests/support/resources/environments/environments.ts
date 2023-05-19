@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -49,11 +50,13 @@ export default class Environments extends CollectionResource {
     return super.create(body, applyDefault);
   }
 
-  public async listProjectEnvironments(): Promise<AxiosResponse> {
+  public async listProjectEnvironments(
+    queryParams: Record<string, JSONValue> | undefined = undefined
+  ): Promise<AxiosResponse> {
     if (!this._projectId) {
       throw new Error('ListProjectEnvironments requires a parent Project resource.');
     }
-    return super.get();
+    return super.get(queryParams);
   }
 }
 

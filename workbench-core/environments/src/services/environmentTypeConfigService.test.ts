@@ -152,7 +152,7 @@ describe('environmentTypeConfigService', () => {
           paginationToken: 'invalidPaginationToken',
           envTypeId
         })
-      ).rejects.toThrow('Invalid paginationToken');
+      ).rejects.toThrow('Invalid Pagination Token: invalidPaginationToken');
     });
   });
 
