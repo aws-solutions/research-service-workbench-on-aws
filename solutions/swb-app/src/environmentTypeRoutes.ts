@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import {
   EnvironmentTypeService,
   UpdateEnvironmentTypeRequest,
@@ -12,6 +13,7 @@ import {
   GetEnvironmentTypeRequest,
   GetEnvironmentTypeRequestParser
 } from '@aws/workbench-core-environments';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
@@ -37,8 +39,20 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         ListEnvironmentTypesRequestParser,
         req.query
       );
-      const envTypes = await environmentTypeService.listEnvironmentTypes(request);
-      res.status(200).send(envTypes);
+      try {
+        const envTypes = await environmentTypeService.listEnvironmentTypes(request);
+        res.status(200).send(envTypes);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing environment types`);
+      }
     })
   );
 

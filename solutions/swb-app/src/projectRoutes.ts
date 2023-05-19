@@ -20,7 +20,13 @@ import {
   ListUsersForRoleRequestParser
 } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import { validateAndParse, MetadataService, resourceTypeToKey, runInBatches } from '@aws/workbench-core-base';
+import {
+  validateAndParse,
+  MetadataService,
+  resourceTypeToKey,
+  runInBatches,
+  isInvalidPaginationTokenError
+} from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import {
   isUserNotFoundError,
@@ -71,7 +77,19 @@ export function setUpProjectRoutes(
         user: res.locals.user
       });
 
-      res.send(await projectService.listProjects(validatedRequest));
+      try {
+        res.send(await projectService.listProjects(validatedRequest));
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing projects`);
+      }
     })
   );
 

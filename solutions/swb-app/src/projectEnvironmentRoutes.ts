@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import { Environment } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
@@ -274,13 +275,26 @@ export function setUpProjectEnvRoutes(
         throw Boom.badRequest(
           'Invalid pagination token and/or page size. Please try again with valid inputs.'
         );
-      } else {
+      }
+      try {
         const response = await projectEnvironmentService.listProjectEnvs(
           projectId,
           pageSize ? Number(pageSize) : undefined,
           paginationToken
         );
         res.status(200).send(response);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing environments for project ${validatedRequest.projectId}`
+        );
       }
     })
   );
