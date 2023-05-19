@@ -4,6 +4,7 @@
  */
 import { lengthValidationMessage, urlFilterMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
@@ -11,6 +12,10 @@ import { checkHttpError, generateRandomAlphaNumericString } from '../../../suppo
 describe('list environment types', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  const paabHelper = new PaabHelper();
+  let itAdminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -18,6 +23,10 @@ describe('list environment types', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
@@ -102,5 +111,60 @@ describe('list environment types', () => {
         })
       );
     }
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await itAdminSession.resources.environmentTypes.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => paSession
+      },
+      {
+        username: 'researcher',
+        session: () => researcherSession
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      let session: ClientSession;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.environmentTypes.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
   });
 });
