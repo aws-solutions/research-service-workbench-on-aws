@@ -76,7 +76,7 @@ describe('WorkbenchAppRegistry Test', () => {
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
       appRegistryApplicationName: 'TestApp',
-      accountIds: ['012345678901']
+      accountIds: ['111122223333']
     });
 
     const template = Template.fromStack(stack);
@@ -88,7 +88,7 @@ describe('WorkbenchAppRegistry Test', () => {
       PermissionArns: [
         'arn:aws:ram::aws:permission/AWSRAMPermissionServiceCatalogAppRegistryAttributeGroupAllowAssociation'
       ],
-      Principals: ['012345678901'],
+      Principals: ['111122223333'],
       ResourceArns: [
         {
           'Fn::GetAtt': ['TestStackAttributeGroup7F76BDF8', 'Arn']
@@ -106,7 +106,7 @@ describe('WorkbenchAppRegistry Test', () => {
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
       appRegistryApplicationName: 'TestApp',
-      accountIds: ['012345678901'],
+      accountIds: ['111122223333'],
       destroy: true
     });
 
@@ -133,7 +133,7 @@ describe('WorkbenchAppRegistry Test', () => {
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
       appRegistryApplicationName: 'TestApp',
-      accountIds: ['012345678901'],
+      accountIds: ['111122223333'],
       appInsights: true
     });
 
@@ -158,7 +158,7 @@ describe('WorkbenchAppRegistry Test', () => {
       attributeGroupName: 'TestApp-Metadata',
       applicationType: 'Test',
       appRegistryApplicationName: 'TestApp',
-      accountIds: ['012345678901']
+      accountIds: ['111122223333']
     });
 
     testAppRegistry.applyAppRegistryToStacks([testStack2], false);
