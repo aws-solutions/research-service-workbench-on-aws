@@ -20,13 +20,20 @@ import {
   ListUsersForRoleRequestParser
 } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import { validateAndParse, MetadataService, resourceTypeToKey, runInBatches } from '@aws/workbench-core-base';
+import {
+  validateAndParse,
+  MetadataService,
+  resourceTypeToKey,
+  runInBatches,
+  isInvalidPaginationTokenError
+} from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import {
   isUserNotFoundError,
   UserManagementService,
   User,
-  isRoleNotFoundError
+  isRoleNotFoundError,
+  isUserRolesExceedLimitError
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -70,7 +77,19 @@ export function setUpProjectRoutes(
         user: res.locals.user
       });
 
-      res.send(await projectService.listProjects(validatedRequest));
+      try {
+        res.send(await projectService.listProjects(validatedRequest));
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing projects`);
+      }
     })
   );
 
@@ -215,6 +234,10 @@ export function setUpProjectRoutes(
       } catch (err) {
         if (isUserNotFoundError(err)) {
           throw Boom.notFound(`Could not find user ${validatedRequest.userId}`);
+        }
+
+        if (isUserRolesExceedLimitError(err)) {
+          throw Boom.badRequest(err.message);
         }
 
         if (Boom.isBoom(err)) {

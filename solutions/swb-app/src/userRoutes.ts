@@ -8,7 +8,6 @@ import {
   Status,
   UserManagementService,
   isUserNotFoundError,
-  isRoleNotFoundError,
   isInvalidParameterError,
   isUserAlreadyExistsError
 } from '@aws/workbench-core-user-management';
@@ -111,7 +110,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         userId: req.params.userId
       });
 
-      const { userId, status, roles, ...rest } = updateUserRequest;
+      const { userId, status, ...rest } = updateUserRequest;
       try {
         const existingUser = await userService.getUser(userId);
 
@@ -122,30 +121,11 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
             await userService.deactivateUser(userId);
         }
 
-        if (!_.isEmpty(roles) && !_.isEqual(existingUser.roles, roles)) {
-          const rolesToAdd = _.difference(roles, existingUser.roles);
-          await Promise.all(
-            _.map(rolesToAdd, async (role) => {
-              await userService.addUserToRole(userId, role);
-            })
-          );
-          const rolesToRemove = _.difference(existingUser.roles, roles ?? []);
-          await Promise.all(
-            _.map(rolesToRemove, async (role) => {
-              await userService.removeUserFromRole(userId, role);
-            })
-          );
-        }
-
         // Since updateUser() requires object of type User
         await userService.updateUser(userId, { ...existingUser, ...rest });
         res.status(204).send();
       } catch (err) {
         if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
-        if (isRoleNotFoundError(err))
-          throw Boom.notFound(
-            'Please make sure all specified roles exist as groups in the Cognito User Pool'
-          );
         if (isInvalidParameterError(err))
           throw Boom.notFound(
             'Please make sure specified email is in valid email format and not already in use in the Cognito User Pool'

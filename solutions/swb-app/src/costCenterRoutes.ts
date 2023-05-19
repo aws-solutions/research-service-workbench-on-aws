@@ -15,7 +15,7 @@ import {
   DeleteCostCenterRequestParser,
   ProjectService
 } from '@aws/workbench-core-accounts';
-import { validateAndParse } from '@aws/workbench-core-base';
+import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -83,7 +83,19 @@ export function setUpCostCenterRoutes(
         ListCostCentersRequestParser,
         req.query
       );
-      res.status(200).send(await costCenterService.listCostCenters(validatedRequest));
+      try {
+        res.status(200).send(await costCenterService.listCostCenters(validatedRequest));
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing cost centers`);
+      }
     })
   );
 }

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "chore: remove roles from update user API",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

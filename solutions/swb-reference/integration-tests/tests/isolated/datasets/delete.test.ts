@@ -3,7 +3,6 @@ import {
   CreateDataSetRequest,
   CreateDataSetRequestParser
 } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getResearcherRole } from '../../../../src/utils/roleUtils';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
@@ -30,7 +29,6 @@ describe('datasets delete negative tests', () => {
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
     pa1Session = paabResources.pa1Session;
-
     expect.hasAssertions();
   });
 
@@ -57,6 +55,25 @@ describe('datasets delete negative tests', () => {
     });
   });
 
+  describe('When the project does not exist', () => {
+    test('It returns a 403', async () => {
+      try {
+        await pa1Session.resources.projects
+          .project('proj-00000000-0000-0000-0000-000000000000')
+          .dataSets()
+          .dataset('dataset-00000000-0000-0000-0000-000000000000')
+          .delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
   describe('when the dataset is still associated with', () => {
     beforeEach(async () => {
       dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
@@ -67,14 +84,7 @@ describe('datasets delete negative tests', () => {
         path: dataSetName,
         name: dataSetName,
         region: settings.get('awsRegion'),
-        type: 'internal',
-        permissions: [
-          {
-            identity: getResearcherRole(project1Id),
-            identityType: 'GROUP',
-            accessLevel: 'read-only'
-          }
-        ]
+        type: 'internal'
       });
 
       const { data: newDataSet } = await pa1Session.resources.projects
