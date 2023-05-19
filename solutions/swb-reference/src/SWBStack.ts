@@ -47,11 +47,18 @@ import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { StackProps } from 'aws-cdk-lib/core/lib/stack';
 import _ from 'lodash';
 import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
 import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
 import { SWBVpc } from './infra/SWBVpc';
+
+export interface SWBStackProps extends StackProps {
+  solutionId: string;
+  solutionName: string;
+  solutionVersion: string;
+}
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -79,6 +86,7 @@ export class SWBStack extends Stack {
     S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
     MAIN_ACCT_ID: string;
+    USER_AGENT_STRING: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -87,7 +95,7 @@ export class SWBStack extends Stack {
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
   private _isSolutionsBuild: boolean = isSolutionsBuild();
 
-  public constructor(app: App) {
+  public constructor(app: App, props: SWBStackProps) {
     const {
       STAGE,
       AWS_REGION,
@@ -128,16 +136,21 @@ export class SWBStack extends Stack {
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
       ALB_INTERNET_FACING,
-      FIELDS_TO_MASK_WHEN_AUDITING
+      FIELDS_TO_MASK_WHEN_AUDITING,
+      USER_AGENT_STRING
       // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
     } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
-    super(app, STACK_NAME, {
+    const stackProps: SWBStackProps = {
+      description: `(${props.solutionId}) - ${props.solutionName} Deployment. Version: ${props.solutionVersion}`,
       env: {
         account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
-      }
-    });
+      },
+      ...props
+    };
+
+    super(app, STACK_NAME, stackProps);
 
     if (this._isSolutionsBuild) {
       new CfnParameter(this, 'RequiredStackName', {
@@ -209,7 +222,8 @@ export class SWBStack extends Stack {
       S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-      MAIN_ACCT_ID
+      MAIN_ACCT_ID,
+      USER_AGENT_STRING
     };
 
     this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
@@ -619,7 +633,7 @@ export class SWBStack extends Stack {
             'sagemaker:DeleteNotebookInstanceLifecycleConfig'
           ],
           resources: [
-            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/basicnotebookinstancelifecycleconfig-*'
+            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/?asic?otebook?nstance?ifecycle?onfig-*'
           ]
         }),
         new PolicyStatement({
@@ -631,7 +645,7 @@ export class SWBStack extends Stack {
             'sagemaker:StopNotebookInstance',
             'sagemaker:DeleteNotebookInstance'
           ],
-          resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
+          resources: ['arn:aws:sagemaker:*:*:notebook-instance/?asic?otebook?nstance-*']
         }),
         new PolicyStatement({
           actions: ['s3:GetObject', 's3:GetObjectVersion'],
@@ -717,6 +731,21 @@ export class SWBStack extends Stack {
         conditions: {
           StringEquals: {
             'aws:SourceAccount': this._isSolutionsBuild ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT
+          }
+        }
+      })
+    );
+
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          Bool: {
+            'aws:SecureTransport': 'false'
           }
         }
       })
@@ -1380,7 +1409,8 @@ export class SWBStack extends Stack {
           partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
-      ]
+      ],
+      timeToLiveAttribute: 'expirationTime'
     });
 
     new CfnOutput(this, 'dynamicAuthDDBTableArn', {

@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteEnvironmentTypeConfigRequestParser = z
   .object({
-    envTypeId: z.string(),
-    envTypeConfigId: z.string()
+    envTypeId: z.string().etId().required(),
+    envTypeConfigId: z.string().etcId().required()
   })
   .strict();
 

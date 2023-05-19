@@ -30,7 +30,14 @@ import {
   UsernameExistsException,
   UserNotFoundException
 } from '@aws-sdk/client-cognito-identity-provider';
-import { AwsService } from '@aws/workbench-core-base';
+import {
+  DynamoDBClient,
+  ServiceInputTypes as DDBServiceInputTypes,
+  ServiceOutputTypes as DDBServiceOutputTypes,
+  UpdateItemCommand,
+  QueryCommand
+} from '@aws-sdk/client-dynamodb';
+import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
   CognitoUserManagementPlugin,
@@ -42,13 +49,15 @@ import {
   TooManyRequestsError,
   User,
   UserAlreadyExistsError,
-  UserNotFoundError
+  UserNotFoundError,
+  UserRolesExceedLimitError
 } from '..';
 import { Status } from '../user';
 
 describe('CognitoUserManagementPlugin tests', () => {
   let userInfo: Omit<User, 'roles'>;
   let cognitoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
+  let ddbMock: AwsStub<DDBServiceInputTypes, DDBServiceOutputTypes>;
 
   let aws: AwsService;
   let plugin: CognitoUserManagementPlugin;
@@ -56,9 +65,11 @@ describe('CognitoUserManagementPlugin tests', () => {
 
   beforeAll(() => {
     cognitoMock = mockClient(CognitoIdentityProviderClient);
+    ddbMock = mockClient(DynamoDBClient);
   });
 
   beforeEach(() => {
+    ddbMock.reset();
     cognitoMock.reset();
     aws = new AwsService({
       region: 'us-east-1',
@@ -67,7 +78,9 @@ describe('CognitoUserManagementPlugin tests', () => {
         secretAccessKey: 'fakeSecret'
       }
     });
-    plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+    plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws, {
+      ddbService: new DynamoDBService({ region: 'region', table: 'fakeTable' })
+    });
     userInfo = {
       id: '123',
       firstName: 'John',
@@ -950,12 +963,29 @@ describe('CognitoUserManagementPlugin tests', () => {
   });
 
   describe('addUserToRole tests', () => {
+    beforeEach(() => {
+      ddbMock.on(UpdateItemCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+    });
+
+    describe('when user has reached role limit', () => {
+      beforeEach(() => {
+        roles = Array(plugin.userRoleLimit).fill('Role1');
+        cognitoMock
+          .on(AdminListGroupsForUserCommand)
+          .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+      });
+      it('should throw an error', async () => {
+        await expect(plugin.addUserToRole(userInfo.id, 'Role2')).rejects.toThrow(UserRolesExceedLimitError);
+      });
+    });
+
     it('should add the requested User to the group when the user id and group both exist', async () => {
       const addUserToRoleMock = cognitoMock.on(AdminAddUserToGroupCommand).resolves({});
 
       await plugin.addUserToRole(userInfo.id, roles[0]);
 
-      expect(addUserToRoleMock.calls().length).toBe(1);
+      expect(addUserToRoleMock.calls().length).toBe(2);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -1011,9 +1041,33 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       await expect(plugin.addUserToRole(userInfo.id, roles[0])).rejects.toThrow(Error);
     });
+
+    it('No settings configured for temp role access', async () => {
+      const plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+      const addUserToRoleMock = cognitoMock.on(AdminAddUserToGroupCommand).resolves({});
+
+      await plugin.addUserToRole(userInfo.id, roles[0]);
+
+      expect(addUserToRoleMock.calls().length).toBe(2);
+    });
+
+    it('Settings configured for long ttl on temp role access', async () => {
+      const plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws, {
+        ddbService: new DynamoDBService({ region: 'region', table: 'fakeTable' }),
+        ttl: 20 * 60 //20 minutes
+      });
+      const addUserToRoleMock = cognitoMock.on(AdminAddUserToGroupCommand).resolves({});
+
+      await plugin.addUserToRole(userInfo.id, roles[0]);
+
+      expect(addUserToRoleMock.calls().length).toBe(2);
+    });
   });
 
   describe('removeUserFromRole tests', () => {
+    beforeEach(() => {
+      ddbMock.on(UpdateItemCommand).resolves({});
+    });
     it('should remove the requested User from the group when the user id and group both exist', async () => {
       const removeUserFromRoleMock = cognitoMock.on(AdminRemoveUserFromGroupCommand).resolves({});
 
@@ -1078,6 +1132,15 @@ describe('CognitoUserManagementPlugin tests', () => {
       cognitoMock.on(AdminRemoveUserFromGroupCommand).rejects(new Error());
 
       await expect(plugin.removeUserFromRole(userInfo.id, roles[0])).rejects.toThrow(Error);
+    });
+
+    it('No settings configured for temp access', async () => {
+      const plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+      const removeUserFromRoleMock = cognitoMock.on(AdminRemoveUserFromGroupCommand).resolves({});
+
+      await plugin.removeUserFromRole(userInfo.id, roles[0]);
+
+      expect(removeUserFromRoleMock.calls().length).toBe(1);
     });
   });
 
@@ -1180,6 +1243,86 @@ describe('CognitoUserManagementPlugin tests', () => {
       cognitoMock.on(DeleteGroupCommand).rejects(new Error());
 
       await expect(plugin.deleteRole(roles[0])).rejects.toThrow(Error);
+    });
+  });
+
+  describe('validateUserRoles', () => {
+    let expiredTimeString: string;
+    beforeEach(() => {
+      expiredTimeString = (Math.round(Date.now() / 1000) + 15 * 60).toString();
+    });
+
+    it('No settings for temp role access should not modify roles', async () => {
+      const plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+      const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
+
+      expect(validatedRoles).toStrictEqual(roles);
+    });
+
+    it('Modify roles if user is temporarily revoked access', async () => {
+      ddbMock.on(QueryCommand).resolves({
+        Items: [
+          {
+            roleId: { S: 'Role1' },
+            access: { S: 'DENY' },
+            expirationTime: { N: expiredTimeString }
+          }
+        ]
+      });
+      const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
+
+      expect(validatedRoles).toStrictEqual(['Role2']);
+    });
+
+    it('Modify roles if user is temporarily allowed access', async () => {
+      ddbMock.on(QueryCommand).resolves({
+        Items: [
+          {
+            roleId: { S: 'Role3' },
+            access: { S: 'ALLOW' },
+            expirationTime: { N: expiredTimeString }
+          }
+        ]
+      });
+      const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
+
+      expect(validatedRoles).toStrictEqual([...roles, 'Role3']);
+    });
+
+    it('Modify roles if user is temporarily allowed and revoked access', async () => {
+      ddbMock.on(QueryCommand).resolves({
+        Items: [
+          {
+            roleId: { S: 'Role3' },
+            access: { S: 'ALLOW' },
+            expirationTime: { N: expiredTimeString }
+          },
+          {
+            roleId: { S: 'Role1' },
+            access: { S: 'DENY' },
+            expirationTime: { N: expiredTimeString }
+          }
+        ]
+      });
+      const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
+
+      expect(validatedRoles).toStrictEqual(['Role2', 'Role3']);
+    });
+
+    it('Do not modify roles if user is temporarily revoked access but has expired', async () => {
+      expiredTimeString = (Math.round(Date.now() / 1000) - 15 * 60).toString();
+      ddbMock.on(QueryCommand).resolves({
+        Items: [
+          {
+            roleId: { S: 'Role1' },
+            access: { S: 'DENY' },
+            expirationTime: { N: expiredTimeString }
+          }
+        ]
+      });
+      const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
+
+      expect(validatedRoles).toStrictEqual(roles);
     });
   });
 });

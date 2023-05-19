@@ -4,6 +4,7 @@
  */
 
 import {
+  ConflictError,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetExternalEndpointRequest,
@@ -58,7 +59,7 @@ describe('DataSetService', () => {
     mockDynamicAuthService = {} as DynamicAuthorizationService;
 
     mockUser = {
-      id: 'sampleId',
+      id: '12345678-1234-1234-1234-123456789012',
       roles: []
     };
     projectId = 'proj-projectId';
@@ -397,11 +398,18 @@ describe('DataSetService', () => {
         const permissionRequest: AddRemoveAccessPermissionRequest = {
           authenticatedUser: projectAddAccessRequest.authenticatedUser,
           dataSetId: projectAddAccessRequest.dataSetId,
-          permission: {
-            identity: 'projectId#ProjectAdmin',
-            identityType: 'GROUP',
-            accessLevel: projectAddAccessRequest.accessLevel!
-          }
+          permission: [
+            {
+              identity: 'projectId#ProjectAdmin',
+              identityType: 'GROUP',
+              accessLevel: projectAddAccessRequest.accessLevel!
+            },
+            {
+              identity: 'projectId#Researcher',
+              identityType: 'GROUP',
+              accessLevel: projectAddAccessRequest.accessLevel!
+            }
+          ]
         };
         expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
       });
@@ -512,6 +520,8 @@ describe('DataSetService', () => {
         };
 
         mockDataSetsAuthPlugin.removeAccessPermissions = jest.fn().mockReturnValueOnce(permissionsResponse);
+
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
       });
 
       describe('when a projectAdmin removes access', () => {
@@ -527,11 +537,13 @@ describe('DataSetService', () => {
               dataSetId,
               projectId
             };
+
+            mockDataSet.owner = getProjectAdminRole(projectId);
           });
 
           test('it throws an error', async () => {
             await expect(dataSetService.removeAccessForProject(projectRemoveAccessRequest)).rejects.toThrow(
-              new Error(
+              new ConflictError(
                 `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
               )
             );
@@ -674,7 +686,7 @@ describe('DataSetService', () => {
 
     test('it delegates to the workbench-core DataSetService method', async () => {
       const request = ListDataSetAccessPermissionsRequestParser.parse({
-        dataSetId: mockDataSet.id!,
+        dataSetId: 'dataset-12345678-1234-1234-1234-123456789012',
         authenticatedUser: mockUser,
         paginationToken: ''
       });

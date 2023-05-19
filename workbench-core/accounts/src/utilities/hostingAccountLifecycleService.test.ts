@@ -5,7 +5,6 @@
 
 import { Readable } from 'stream';
 
-import { PolicyDocument } from '@aws-cdk/aws-iam';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -41,6 +40,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import _ from 'lodash';
 import AccountService from '../services/accountService';
@@ -51,6 +51,7 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
+  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-1234abcd-1234-abcd-1234-abcd1234abcd`;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
   let accountMetadata = {};
 
@@ -83,7 +84,7 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     accountMetadata = {
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      id: mockAccountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -173,7 +174,7 @@ describe('HostingAccountLifecycleService', () => {
 
     await expect(
       hostingAccountLifecycleService.updateAccount({
-        id: 'abc-xyz',
+        id: mockAccountId,
         name: 'someName'
       })
     ).resolves.not.toThrowError();

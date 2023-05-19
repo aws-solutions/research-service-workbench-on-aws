@@ -28,7 +28,8 @@ describe('User Management Service', () => {
       addUserToRole: jest.fn().mockImplementation(() => {}),
       removeUserFromRole: jest.fn().mockImplementation(() => {}),
       createRole: jest.fn().mockImplementation(() => {}),
-      deleteRole: jest.fn().mockImplementation(() => {})
+      deleteRole: jest.fn().mockImplementation(() => {}),
+      validateUserRoles: jest.fn().mockImplementation(() => mockUser.roles)
     };
   });
 
@@ -111,5 +112,10 @@ describe('User Management Service', () => {
 
   test('deleteRole', async () => {
     await expect(userManagementService.deleteRole(mockUser.roles[0])).resolves.not.toThrow();
+  });
+
+  test('validateUserRoles', async () => {
+    const roles = await userManagementService.validateUserRoles(mockUser.id, mockUser.roles);
+    expect(roles).toStrictEqual(mockUser.roles);
   });
 });

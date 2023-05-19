@@ -354,13 +354,13 @@ Running the **List envTypes** request in postman should return a json with the f
             }
     }
     ]
-    
+
 }
 ```
 In the response take note of the `id` of the environment type you are looking for, the `name` will have the format `<product name>-<provisioning artifact name>`, e.g. `sageMakerNotebook-v1`. We'll need it for the next step. We'll refer to this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
-In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environemnt type.
+In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environment type.
 
 In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -603,6 +603,26 @@ Note: Integration tests will create resources in the environment they are execut
 
 Follow instructions [here](##installation) to setup installation of API and Postman collection.
 
+OR
+
+Complete the following sections and then run the automation script to setup the environment:
+1. [Setup Config File](#setup-config-file)
+1. [Setup CDK](#setup-cdk)
+1. [Deploy the code](#deploy-the-code)
+1. [Deploy to the Hosting Account](#deploy-to-the-hosting-account)
+1. Run the automation script:
+    ```bash
+    # Set the credentials for the main account and run the script
+    cd solutions/swb-reference/scripts
+    ./setupIntegTestEnv.sh -h [This will display the help screen along with an example on how to run this script]
+    ```
+1. Run the integration tests:
+    ```bash
+    cd solutions/swb-reference
+    `STAGE=<STAGE> rushx integration-tests`
+    ```
+
+Note: `setupIntegTestEnv.sh` script also creates the `Config file for integration test`, you can directly run the integration test after the successful completion of this script.
 
 ### Setup Integration Test Config File
 

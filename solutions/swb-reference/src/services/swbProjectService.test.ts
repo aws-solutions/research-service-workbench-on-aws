@@ -41,7 +41,7 @@ describe('SWBProjectService', () => {
     mockDynamicAuthZService = {} as DynamicAuthorizationService;
 
     mockUser = {
-      id: 'user-123',
+      id: '12345678-1234-1234-1234-123456789012',
       roles: [`${fakeProjectId}#ProjectAdmin`]
     };
 
@@ -296,7 +296,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
     });
   }
   // Project User Association permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE', 'READ', 'DELETE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -323,7 +323,17 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       }
     });
   }
-
+  // User permissions
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: paRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_USER
+    });
+  }
   return identityPermissions;
 }
 

@@ -4,7 +4,6 @@
  */
 
 import { Readable } from 'stream';
-import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
@@ -17,6 +16,7 @@ import {
 } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
+import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';

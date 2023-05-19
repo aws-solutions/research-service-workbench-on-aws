@@ -23,7 +23,7 @@ describe('SagemakerNotebookEnvironmentConnectionService', () => {
     iamMock.on(AssumeRoleCommand).resolvesOnce({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'sampleSessionToken',
         Expiration: new Date()
       }

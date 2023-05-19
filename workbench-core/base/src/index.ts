@@ -13,6 +13,7 @@ import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/h
 import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
+import { isInvalidPaginationTokenError } from './errors/invalidPaginationTokenError';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
@@ -50,9 +51,21 @@ import {
   provisionArtifactIdRegExpString,
   groupIDRegExpAsString,
   validRolesRegExpAsString,
-  validSshKeyUuidRegExpAsString
+  validSshKeyUuidRegExpAsString,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  invalidEmailMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
+  swbDescriptionMaxLength,
+  lengthValidationMessage,
+  betweenFilterMessage
 } from './utilities/textUtil';
-import { getPaginationParser, validateAndParse } from './utilities/validatorHelper';
+import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
 
 export {
   AwsService,
@@ -102,5 +115,19 @@ export {
   fromPaginationToken,
   runInBatches,
   validSshKeyUuidRegExpAsString,
-  getPaginationParser
+  getPaginationParser,
+  z,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  invalidEmailMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
+  swbDescriptionMaxLength,
+  lengthValidationMessage,
+  betweenFilterMessage,
+  isInvalidPaginationTokenError
 };

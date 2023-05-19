@@ -105,10 +105,14 @@ export class DynamicAuthorizationService {
     };
     try {
       const { roles, id } = authenticatedUser;
+      const { validGroupIds } = await this._groupManagementPlugin.validateUserGroups({
+        userId: id,
+        groupIds: roles
+      });
       const { subject, action } = dynamicOperation;
       const { subjectId, subjectType } = subject;
       //Create group identities
-      const identities: Identity[] = roles.map((groupId) => {
+      const identities: Identity[] = validGroupIds.map((groupId) => {
         return {
           identityType: 'GROUP',
           identityId: groupId

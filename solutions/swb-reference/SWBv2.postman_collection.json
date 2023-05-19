@@ -888,7 +888,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"status\": \"APPROVED\"\n}",
+              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"JupyterNotebook\",\n    \"status\": \"APPROVED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1900,7 +1900,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\",\n    \"roles\": [\"Admin\"]\n}",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2243,15 +2243,192 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:environmentId/sshKeys",
+              "raw": "{{API_URL}}/projects/:projectId/environments/:environmentId/sshKeys",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":environmentId", "sshKeys"],
+              "path": ["projects", ":projectId", "environments", ":environmentId", "sshKeys"],
               "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
                 {
                   "key": "environmentId",
                   "value": ""
                 }
               ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/login",
+              "host": ["{{API_URL}}"],
+              "path": ["login"],
+              "query": [
+                {
+                  "key": "stateVerifier",
+                  "value": "",
+                  "disabled": false
+                },
+                {
+                  "key": "codeChallenge",
+                  "value": "",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange Auth Code for Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"authCode\",\n    \"codeVerifier\": \"codeChallenge\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/token",
+              "host": ["{{API_URL}}"],
+              "path": ["token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/logout",
+              "host": ["{{API_URL}}"],
+              "path": ["logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/refresh",
+              "host": ["{{API_URL}}"],
+              "path": ["refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IsLoggedIn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/loggedIn",
+              "host": ["{{API_URL}}"],
+              "path": ["loggedIn"]
             }
           },
           "response": []

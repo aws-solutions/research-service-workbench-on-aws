@@ -31,7 +31,7 @@ describe('environmentTypeConfigService', () => {
   const envTypeMock = new EnvironmentTypeService(ddbServiceMock);
   const envTypeConfigService = new EnvironmentTypeConfigService(envTypeMock, ddbServiceMock);
   const ddbMock = mockClient(DynamoDBClient);
-  const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';
+  const envTypeId = 'et-prod-0123456789012,pa-0123456789012'; // example etId
   const envType: EnvironmentType = {
     status: 'APPROVED',
     createdAt: '2022-06-20T18:32:09.985Z',
@@ -46,7 +46,7 @@ describe('environmentTypeConfigService', () => {
   };
   const envTypeConfig: EnvironmentTypeConfig = {
     createdAt: '2022-06-17T16:28:40.360Z',
-    name: 'config 1',
+    name: 'config-1',
     params: [],
     updatedAt: '2022-06-17T21:25:24.333Z',
     description: 'Example config 1',
@@ -152,7 +152,7 @@ describe('environmentTypeConfigService', () => {
           paginationToken: 'invalidPaginationToken',
           envTypeId
         })
-      ).rejects.toThrow('Invalid paginationToken');
+      ).rejects.toThrow('Invalid Pagination Token: invalidPaginationToken');
     });
   });
 
@@ -213,7 +213,7 @@ describe('environmentTypeConfigService', () => {
 
   describe('createNewEnvironmentTypeConfig', () => {
     const createParams = {
-      name: 'config 1',
+      name: 'config-1',
       resourceType: 'envTypeConfig',
       provisioningArtifactId: 'pa-dewjn123',
       params: [],

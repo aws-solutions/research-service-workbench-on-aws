@@ -13,23 +13,12 @@ lib
 .*/NOTICE
 
 # Test files
-#SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
-solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:190
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:250
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:293
-# email: 'john@doe.com' is not real email
-workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
-# email: 'sample.user@amazon.com' is not real email
-solutions/example-ui-app/src/models/User.ts:19
-# "email": "hello@cypress.io" is not real email
-solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
+# Note that emails need to end with @simulator.amazonses.com in order to work against Cognito
+# Other test fake data must come from https://alpha.www.docs.aws.a2z.com/awsstyleguide/latest/styleguide/safenames.html
 # Fake emails for UserManagementService integ tests
 workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:22
 workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
+workbench-core/example/infrastructure/integration-tests/tests/users/updateUser.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
 workbench-core/example/infrastructure/integration-tests/tests/users/getUserRoles.test.ts:29
@@ -39,7 +28,7 @@ workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorizati
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:148
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:200
 workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:242
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/identityPermissions.test.ts:413
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/identityPermissions.test.ts:409
 # Fake email for DataSetsService integration tests
 workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/datasets/delete.test.ts:30
@@ -51,14 +40,10 @@ workbench-core/example/infrastructure/scripts/setupCognito.sh:44
 # Fake emails for UserManagementService integ tests
 solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivateUser.test.ts:31
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
-solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
-solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:82
-# Fake account ID used for workbenchAppRegistry tests
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:79
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:91
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:109
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:136
-workbench-core/infrastructure/src/workbenchAppRegistry.test.ts:161
+solutions/swb-reference/integration-tests/tests/isolated/users/updateUser.test.ts:31
+
 # Fake emails for user to project integ tests
-solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:105
-solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:51
+solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:91
+solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:38
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:48
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:86

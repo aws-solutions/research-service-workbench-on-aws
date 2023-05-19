@@ -36,8 +36,7 @@ import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
-const timeToLiveSeconds: number = 60 * 15; // 15 min
-
+const timeToLiveSeconds: number = 60 * 2; // 2 min
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
   private _dataSetsAuthService: DataSetsAuthorizationPlugin;
@@ -323,11 +322,18 @@ export class DataSetService implements DataSetPlugin {
     const permissionRequest: AddRemoveAccessPermissionRequest = {
       authenticatedUser: request.authenticatedUser,
       dataSetId: request.dataSetId,
-      permission: {
-        identity: projectAdmin,
-        identityType: 'GROUP',
-        accessLevel: request.accessLevel
-      }
+      permission: [
+        {
+          identity: projectAdmin,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        },
+        {
+          identity: projectResearcher,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        }
+      ]
     };
 
     const response = await this.addAccessPermission(permissionRequest);
@@ -366,11 +372,12 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
+    const reqDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
     const projectAdmin = getProjectAdminRole(request.projectId);
 
     //Make sure you're not removing the access for your project
-    if (request.authenticatedUser.roles.includes(projectAdmin)) {
-      throw new Error(
+    if (projectAdmin === reqDataset.owner) {
+      throw new ConflictError(
         `${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
       );
     }

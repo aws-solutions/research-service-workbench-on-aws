@@ -52,6 +52,26 @@ describe('create environment type configs', () => {
         );
       }
     });
+    test('fails when trying to create without description', async () => {
+      try {
+        await itAdminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+          {
+            type: 'typeTest',
+            name: 'name',
+            params: []
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: 'description: Required'
+          })
+        );
+      }
+    });
 
     test('fails when trying to create without type', async () => {
       try {
@@ -146,7 +166,7 @@ describe('create environment type configs', () => {
     test('fails when trying to create with invalid environment Type id format', async () => {
       try {
         await itAdminSession.resources.environmentTypes
-          .environmentType('wrong-foramt-env-type-id')
+          .environmentType('wrong-format-env-type-id')
           .configurations()
           .create(
             {
@@ -162,8 +182,7 @@ describe('create environment type configs', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message:
-              'Could not create environment type config because environment type wrong-foramt-env-type-id does not exist'
+            message: `envTypeId: Invalid ID`
           })
         );
       }

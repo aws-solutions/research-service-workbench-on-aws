@@ -2,10 +2,11 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { swbNameMaxLength, lengthValidationMessage, swbDescriptionMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('update environment types', () => {
   const setup: Setup = Setup.getSetup();
@@ -46,7 +47,7 @@ describe('update environment types', () => {
     try {
       await adminSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
         {
-          name: 'new Name',
+          name: 'new-Name',
           status: 'APPROVED'
         },
         true
@@ -66,16 +67,52 @@ describe('update environment types', () => {
     try {
       await adminSession.resources.environmentTypes.environmentType('wrong-format-id').update(
         {
-          name: 'new Name'
+          name: 'new_Name'
         },
         true
       );
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type wrong-format-id to update`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: 'envTypeId: Invalid ID'
+        })
+      );
+    }
+  });
+  test('fails when trying to update name surpassing length', async () => {
+    try {
+      await adminSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
+        {
+          name: generateRandomAlphaNumericString(swbNameMaxLength + 1)
+        },
+        true
+      );
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `name: ${lengthValidationMessage(swbNameMaxLength)}`
+        })
+      );
+    }
+  });
+  test('fails when trying to update description surpassing length', async () => {
+    try {
+      await adminSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
+        {
+          description: generateRandomAlphaNumericString(swbDescriptionMaxLength + 1)
+        },
+        true
+      );
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `description: ${lengthValidationMessage(swbDescriptionMaxLength)}`
         })
       );
     }
