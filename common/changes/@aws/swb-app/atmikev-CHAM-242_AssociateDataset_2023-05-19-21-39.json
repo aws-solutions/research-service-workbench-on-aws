@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "update project and dataset relationship management",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
