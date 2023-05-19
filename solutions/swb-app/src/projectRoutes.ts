@@ -32,7 +32,8 @@ import {
   isUserNotFoundError,
   UserManagementService,
   User,
-  isRoleNotFoundError
+  isRoleNotFoundError,
+  isUserRolesExceedLimitError
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -233,6 +234,10 @@ export function setUpProjectRoutes(
       } catch (err) {
         if (isUserNotFoundError(err)) {
           throw Boom.notFound(`Could not find user ${validatedRequest.userId}`);
+        }
+
+        if (isUserRolesExceedLimitError(err)) {
+          throw Boom.badRequest(err.message);
         }
 
         if (Boom.isBoom(err)) {
