@@ -34,6 +34,7 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
   AnyPrincipal,
+  CfnPolicy,
   Effect,
   Policy,
   PolicyDocument,
@@ -296,6 +297,25 @@ export class RSWStack extends Stack {
     });
 
     const apiGwUrl = this._createRestApi(apiLambda);
+
+    [apiLambda, statusHandler, createAccountHandler].forEach((lambda) => {
+      if (
+        !_.isUndefined(lambda.node.findChild('ServiceRole').node.tryFindChild('DefaultPolicy')) &&
+        !_.isUndefined(lambda.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node.defaultChild)
+      ) {
+        const cfnPolicy = lambda.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node
+          .defaultChild as CfnPolicy;
+        cfnPolicy.addMetadata('cfn_nag', {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          rules_to_suppress: [
+            {
+              id: 'W76',
+              reason: 'TODO: SPCM for IAM policy document is higher than 25'
+            }
+          ]
+        });
+      }
+    });
 
     const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node
       .defaultChild as CfnResource;
