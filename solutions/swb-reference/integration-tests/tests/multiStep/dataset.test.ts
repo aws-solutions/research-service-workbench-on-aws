@@ -132,10 +132,9 @@ describe('multiStep dataset integration test', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(400, {
-          error: 'Conflict Error',
-          message:
-            'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. type: Required'
+        new HttpError(409, {
+          error: 'Conflict',
+          message: `Project ${project2Id} is already associated with Dataset ${dataSet.id}`
         })
       );
     }
