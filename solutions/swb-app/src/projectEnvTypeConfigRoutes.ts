@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { validateAndParse } from '@aws/workbench-core-base';
+import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -110,6 +110,11 @@ export function setUpProjectEnvTypeConfigRoutes(
         if (Boom.isBoom(e)) {
           throw e;
         }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
         console.error(e);
         throw Boom.badImplementation(
           `There was a problem list ETCs associated with project ${req.body.projectId}`
@@ -138,8 +143,23 @@ export function setUpProjectEnvTypeConfigRoutes(
         ListEnvTypeConfigProjectsRequestParser,
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.query }
       );
-      const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
-      res.status(200).send(relationships);
+
+      try {
+        const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
+        res.status(200).send(relationships);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing projects for environment type configuration ${request.envTypeConfigId}`
+        );
+      }
     })
   );
 }
