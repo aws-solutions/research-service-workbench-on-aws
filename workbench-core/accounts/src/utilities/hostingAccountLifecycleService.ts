@@ -345,11 +345,18 @@ export default class HostingAccountLifecycleService {
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
   ): Promise<void> {
-    console.log('Check and update hosting account status');
     // Check if hosting account stack has the latest CFN template
-    const getObjResponse = await this._aws.clients.s3.getObject({
+    const onboardAccountS3Response = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
       Key: 'onboard-account.cfn.yaml'
+    });
+    const onboardAccountByonResponse = await this._aws.clients.s3.getObject({
+      Bucket: s3ArtifactBucketName,
+      Key: 'onboard-account-byon.cfn.yaml'
+    });
+    const onboardAccountTgwResponse = await this._aws.clients.s3.getObject({
+      Bucket: s3ArtifactBucketName,
+      Key: 'onboard-account-tgw.cfn.yaml'
     });
     const streamToString = (stream: Readable): Promise<string> =>
       new Promise((resolve, reject) => {
@@ -358,7 +365,11 @@ export default class HostingAccountLifecycleService {
         stream.on('error', reject);
         stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
       });
-    const expectedTemplate: string = await streamToString(getObjResponse.Body! as Readable);
+    const expectedTemplates: string[] = await Promise.all([
+      streamToString(onboardAccountS3Response.Body! as Readable),
+      streamToString(onboardAccountByonResponse.Body! as Readable),
+      streamToString(onboardAccountTgwResponse.Body! as Readable)
+    ]);
     const actualTemplate = (
       await hostingAccountAwsService.clients.cloudformation.getTemplate({
         StackName: hostingAccountStackName
@@ -385,7 +396,12 @@ export default class HostingAccountLifecycleService {
         return output.OutputKey === 'EncryptionKeyArn';
       })!.OutputValue;
 
-      if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
+      const expectedTemplatesWithoutCommentsAndSpaces = expectedTemplates.map((template) => {
+        return removeCommentsAndSpaces(template);
+      });
+
+      // If the actual template matches one of the expected template then the account is current
+      if (expectedTemplatesWithoutCommentsAndSpaces.includes(removeCommentsAndSpaces(actualTemplate))) {
         await this._writeAccountStatusToDDB({
           ddbAccountId,
           status: 'CURRENT',
