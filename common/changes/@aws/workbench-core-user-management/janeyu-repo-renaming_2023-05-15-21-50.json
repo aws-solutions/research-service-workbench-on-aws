@@ -2,11 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-user-management",
-<<<<<<<< HEAD:common/changes/@aws/workbench-core-user-management/janeyu-repo-renaming_2023-05-15-21-50.json
       "comment": "solution renaming",
-========
-      "comment": "add cognito group limit",
->>>>>>>> release/4debe38e-5796-47b6-96ec-881a87e0df21:common/changes/@aws/workbench-core-user-management/janeyu-cognitoLimit_2023-05-12-23-46.json
       "type": "patch"
     }
   ],
