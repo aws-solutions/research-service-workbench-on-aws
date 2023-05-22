@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import { Environment } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
@@ -119,9 +120,9 @@ export function setUpProjectEnvRoutes(
         throw Boom.conflict(
           'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
         );
-      } else if (envStatus !== 'STOPPED') {
+      } else if (!['STOPPED', 'FAILED'].includes(envStatus)) {
         throw Boom.badRequest(
-          `Environment must be STOPPED before beginning termination. ${environment.id} currently in state ${environment.status}.`
+          `Environment must be in state STOPPED or FAILED before beginning termination. ${environment.id} currently in state ${envStatus}.`
         );
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -147,8 +148,8 @@ export function setUpProjectEnvRoutes(
 
       const environment = await projectEnvironmentService.getEnvironment(projectId, environmentId, true);
       const envType = environment.ETC!.type;
-      if (environment.status === 'STOPPING') {
-        throw Boom.conflict('Cannot start environment while environment is currently being stopped');
+      if (['STOPPING', 'FAILED'].includes(environment.status)) {
+        throw Boom.conflict(`Cannot start environment while environment is in ${environment.status} state`);
       } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
@@ -175,8 +176,8 @@ export function setUpProjectEnvRoutes(
       const environment = await projectEnvironmentService.getEnvironment(projectId, environmentId, true);
       const envType = environment.ETC!.type;
 
-      if (['PENDING', 'STARTING'].includes(environment.status)) {
-        throw Boom.conflict('Cannot stop environment while environment is currently being started');
+      if (['PENDING', 'STARTING', 'FAILED'].includes(environment.status)) {
+        throw Boom.conflict(`Cannot stop environment while environment is in ${environment.status} state`);
       } else if (['STOPPING', 'STOPPED'].includes(environment.status)) {
         res.status(204).send();
       } else if (supportedEnvs.includes(envType)) {
@@ -214,7 +215,7 @@ export function setUpProjectEnvRoutes(
 
       if (environment.status !== 'COMPLETED') {
         throw Boom.conflict(
-          `Environment is in ${environment.status} status. Please wait until environment is in 'COMPLETED' status before trying to connect to the environment.`
+          `Environment is in ${environment.status} state. Please wait until environment is in 'COMPLETED' state before trying to connect to the environment.`
         );
       }
       if (supportedEnvs.includes(envType)) {
@@ -274,13 +275,26 @@ export function setUpProjectEnvRoutes(
         throw Boom.badRequest(
           'Invalid pagination token and/or page size. Please try again with valid inputs.'
         );
-      } else {
+      }
+      try {
         const response = await projectEnvironmentService.listProjectEnvs(
           projectId,
           pageSize ? Number(pageSize) : undefined,
           paginationToken
         );
         res.status(200).send(response);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing environments for project ${validatedRequest.projectId}`
+        );
       }
     })
   );

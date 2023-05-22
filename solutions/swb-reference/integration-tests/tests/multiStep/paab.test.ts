@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import { ListDatasetsResponse } from '../../support/models/datasets';
@@ -157,16 +156,7 @@ describe('multiStep environment test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(project1Id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(project1Id),
-          identityType: 'GROUP',
-          accessLevel: 'read-write'
-        }
-      ]
+      type: 'internal'
     });
     const { data: ds1 } = await pa1Session.resources.projects
       .project(project1Id)

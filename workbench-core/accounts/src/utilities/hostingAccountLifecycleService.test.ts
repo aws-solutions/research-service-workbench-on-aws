@@ -319,18 +319,46 @@ describe('HostingAccountLifecycleService', () => {
     scMock.on(AcceptPortfolioShareCommand).resolves({});
 
     //Mock comparing hosting account template
-    const readableStream = new Readable({
+    const readableStreamWithIncorrectTemplateBody = new Readable({
       read() {}
     });
 
-    readableStream.push('ABC');
-    readableStream.push(null);
+    readableStreamWithIncorrectTemplateBody.push('XYZ');
+    readableStreamWithIncorrectTemplateBody.push(null);
+
+    const readableStreamWithCorrectTemplateBody = new Readable({
+      read() {}
+    });
+
+    readableStreamWithCorrectTemplateBody.push('ABC');
+    readableStreamWithCorrectTemplateBody.push(null);
 
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
-    s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream as SdkStream<Readable>
-    });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
+      });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account-byon.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithCorrectTemplateBody as SdkStream<Readable>
+      });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account-tgw.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
+      });
 
     // Mocking actual template pulled from CFN Stack
     cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });

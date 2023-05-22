@@ -8,6 +8,7 @@ ignores: [
     'npm-package-json-lint-config-default',
     '@types/node',
     'ts-node',
+    'ts-jest',
     '@types/aws-lambda'
 ]
 ignore-patterns: [
