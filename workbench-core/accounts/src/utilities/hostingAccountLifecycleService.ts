@@ -396,13 +396,12 @@ export default class HostingAccountLifecycleService {
         return output.OutputKey === 'EncryptionKeyArn';
       })!.OutputValue;
 
-      if (
-        expectedTemplates
-          .map((template) => {
-            return removeCommentsAndSpaces(template);
-          })
-          .includes(removeCommentsAndSpaces(actualTemplate))
-      ) {
+      const expectedTemplatesWithoutCommentsAndSpaces = expectedTemplates.map((template) => {
+        return removeCommentsAndSpaces(template);
+      });
+
+      // If the actual template matches one of the expected template then the account is current
+      if (expectedTemplatesWithoutCommentsAndSpaces.includes(removeCommentsAndSpaces(actualTemplate))) {
         await this._writeAccountStatusToDDB({
           ddbAccountId,
           status: 'CURRENT',
