@@ -218,7 +218,7 @@ describe('metadata service', () => {
       expect(actualResponse).toEqual({ pk: 'pk', sk: 'sk', id: 'id' });
     });
 
-    test('returns undefined when item is not found', async () => {
+    test('throws exception when item is not found', async () => {
       ddbService.getItem = jest.fn().mockReturnValueOnce(undefined);
 
       await expect(
@@ -229,7 +229,7 @@ describe('metadata service', () => {
           'dependencyId',
           RelationshipDDBItemParser
         )
-      ).resolves.toEqual(undefined);
+      ).rejects.toThrow('Resource not found');
     });
   });
 });

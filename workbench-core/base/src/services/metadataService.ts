@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import * as Boom from '@hapi/boom';
 import { ZodTypeAny } from 'zod';
 import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
-import PaginatedResponse from '../interfaces/paginatedResponse';
 import QueryParams from '../interfaces/queryParams';
 import JSONValue from '../types/json';
 import { addPaginationToken, DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE } from '../utilities/paginationHelper';
@@ -67,7 +67,7 @@ export class MetadataService {
    * @param dependencyResourceType - dependency resource type
    * @param parser - Zod parser for metadata object
    * @param queryParams - parameters to query metadata. Supported page size and pagination token.
-   * @returns object containing list of metadata objects and continuation token.
+   * @returns object containind list of metadata objects and continuation token.
    */
   public async listDependentMetadata<DependencyMetadata extends { pk: string; sk: string; id: string }>(
     mainEntityResourceType: string,
@@ -78,7 +78,7 @@ export class MetadataService {
       pageSize?: number;
       paginationToken?: string;
     }
-  ): Promise<PaginatedResponse<DependencyMetadata>> {
+  ): Promise<{ data: DependencyMetadata[]; paginationToken: string | undefined }> {
     let params: QueryParams = {
       key: { name: 'pk', value: `${mainEntityResourceType}#${mainEntityId}` },
       sortKey: 'sk',
@@ -197,18 +197,18 @@ export class MetadataService {
     dependencyResourceType: string,
     dependencyId: string,
     parser: ZodTypeAny
-  ): Promise<DependencyMetadata | undefined> {
+  ): Promise<DependencyMetadata> {
     const item = await this._ddbService.getItem({
       key: {
         pk: `${mainEntityResourceType}#${mainEntityId}`,
         sk: `${dependencyResourceType}#${dependencyId}`
       }
     });
-
     if (item === undefined) {
-      return undefined;
+      throw Boom.notFound('Resource not found');
+    } else {
+      const resource: DependencyMetadata = parser.parse(item);
+      return Promise.resolve(resource);
     }
-    const resource: DependencyMetadata = parser.parse(item);
-    return Promise.resolve(resource);
   }
 }
