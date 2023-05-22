@@ -155,23 +155,16 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     };
   }
 
-  public async getEnvTypeConfig(
-    request: GetProjectEnvTypeConfigRequest
-  ): Promise<EnvironmentTypeConfig | undefined> {
+  public async getEnvTypeConfig(request: GetProjectEnvTypeConfigRequest): Promise<EnvironmentTypeConfig> {
     const { projectId, envTypeId, envTypeConfigId } = request;
     const composedType = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}`;
-    const relationshipItem = await this._metadataService.getMetadataItem<RelationshipDDBItem>(
+    await this._metadataService.getMetadataItem<RelationshipDDBItem>(
       resourceTypeToKey.project,
       projectId,
       composedType,
       envTypeConfigId,
       RelationshipDDBItemParser
     );
-
-    if (!relationshipItem) {
-      return undefined;
-    }
-
     return await this._envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
   }
 

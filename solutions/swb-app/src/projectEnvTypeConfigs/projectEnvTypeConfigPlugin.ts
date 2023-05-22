@@ -44,7 +44,7 @@ export interface ProjectEnvTypeConfigPlugin {
    * @param request - Request Object to get Environment Type Config
    *
    */
-  getEnvTypeConfig(request: GetProjectEnvTypeConfigRequest): Promise<EnvironmentTypeConfig | undefined>;
+  getEnvTypeConfig(request: GetProjectEnvTypeConfigRequest): Promise<EnvironmentTypeConfig>;
 
   /**
    * List Projects associated with Environment Type Config
