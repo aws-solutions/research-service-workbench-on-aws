@@ -175,9 +175,18 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         accessLevel: req.body.accessLevel
       });
 
-      await dataSetService.addAccessForProject(validatedRequest);
+      try {
+        await dataSetService.addAccessForProject(validatedRequest);
+        res.status(204).send();
+      } catch (e) {
+        console.error(e);
 
-      res.status(204).send();
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem associating the project and dataset.`);
+      }
     })
   );
 
