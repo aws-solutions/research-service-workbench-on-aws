@@ -10,7 +10,7 @@ import { AuthenticatedUserParser } from '../users/authenticatedUser';
 export const RemoveDataSetRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
-    dataSetId: z.string()
+    dataSetId: z.string().datasetId().required()
   })
   .strict();
 

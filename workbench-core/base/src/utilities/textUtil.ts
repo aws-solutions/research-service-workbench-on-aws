@@ -41,6 +41,9 @@ const groupIDRegExpAsString: string = '\\S{1,128}';
 const awsAccountIdMessage: string = 'must be a 12 digit number';
 const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
 
+const awsRegionMessage: string = 'must be valid AWS region';
+const awsRegionRegExpAsString: string = '^(us|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\\d$';
+
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
@@ -52,6 +55,7 @@ const projIdRegExpString: string = `^${resourceTypeToKey.project.toLowerCase()}-
 const envIdRegExpString: string = `^${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}$`;
 const costCenterIdRegExpString: string = `^${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}$`;
 const accountIdRegExpString: string = `^${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}$`;
+const datasetIdRegExpString: string = `^${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}$`;
 const sshKeyIdRegExpString: string = `^${resourceTypeToKey.sshKey.toLowerCase()}-${validSshKeyUuidRegExpAsString}$`;
 const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 
@@ -102,6 +106,11 @@ function projIdRegex(): RegExp {
   return new RegExp(projIdRegExpString);
 }
 
+function datasetIdRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(datasetIdRegExpString);
+}
+
 function envIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(envIdRegExpString);
@@ -115,6 +124,11 @@ function costCenterIdRegex(): RegExp {
 function accountIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(accountIdRegExpString);
+}
+
+function awsRegionRegex(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(awsRegionRegExpAsString);
 }
 
 function awsAccountIdRegExp(): RegExp {
@@ -160,6 +174,8 @@ export {
   etIdRegex,
   awsAccountIdMessage,
   awsAccountIdRegExp,
+  awsRegionMessage,
+  awsRegionRegex,
   etcIdRegex,
   projIdRegex,
   envIdRegex,
@@ -173,5 +189,6 @@ export {
   betweenFilterMessage,
   lengthValidationMessage,
   sshKeyIdRegex,
-  userIdRegex
+  userIdRegex,
+  datasetIdRegex
 };
