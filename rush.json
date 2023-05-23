@@ -14,7 +14,7 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git",
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git",
     "defaultBranch": "develop"
   },
   "eventHooks": {

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "solution renaming",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

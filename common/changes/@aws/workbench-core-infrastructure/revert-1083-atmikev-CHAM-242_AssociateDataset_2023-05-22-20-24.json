@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "revert",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

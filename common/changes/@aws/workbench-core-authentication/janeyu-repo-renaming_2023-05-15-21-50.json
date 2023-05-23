@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "solution renaming",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

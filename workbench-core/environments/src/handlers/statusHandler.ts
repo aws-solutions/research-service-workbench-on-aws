@@ -36,7 +36,7 @@ export default class StatusHandler {
     const envStackName = `SC-${event.metadata.account}-${
       event.metadata.detail.ProvisionedProductId || envDetails.provisionedProductId
     }`;
-    const appRegistryName = `${process.env.STACK_NAME}-hosting-account-SWBAppReg-${event.metadata.account}`;
+    const appRegistryName = `${process.env.STACK_NAME}-hosting-account-RSWAppReg-${event.metadata.account}`;
 
     // Check if status already applied, or if this is an outdated event, or if instanceId has not been updated for the env.
     // We need to wait for "Launch" event to propagate `instanceId` value in DDB before environment status can be updated
