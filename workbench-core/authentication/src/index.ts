@@ -22,7 +22,6 @@ export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavaila
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
 export { getTimeInMS, TimeUnits } from './utils';
-export { TokenRevocationService } from './tokenRevocationService';
 export {
   csurf,
   getAuthorizationCodeUrl,
