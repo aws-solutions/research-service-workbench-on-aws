@@ -93,6 +93,7 @@ export class RSWStack extends Stack {
   private _swbDomainNameOutputKey: string;
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
   private _isSolutionsBuild: boolean = isSolutionsBuild();
+  private _API_LIMIT: number = 200;
 
   public constructor(app: App, props: RSWStackProps) {
     const {
@@ -449,6 +450,7 @@ export class RSWStack extends Stack {
       handler: 'proxyHandlerLambda.handler',
       code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: this._API_LIMIT,
       environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -873,6 +875,7 @@ export class RSWStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: 100,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -961,6 +964,7 @@ export class RSWStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: 1,
       environment: this.lambdaEnvVars,
       memorySize: 256,
       timeout: Duration.minutes(4)
@@ -1111,6 +1115,7 @@ export class RSWStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: this._API_LIMIT,
       environment: {
         ...this.lambdaEnvVars,
         FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
@@ -1288,6 +1293,8 @@ export class RSWStack extends Stack {
       deployOptions: {
         stageName: 'dev',
         accessLogDestination: new LogGroupLogDestination(logGroup),
+        throttlingRateLimit: this._API_LIMIT,
+        throttlingBurstLimit: this._API_LIMIT,
         accessLogFormat: AccessLogFormat.custom(
           JSON.stringify({
             stage: '$context.stage',
