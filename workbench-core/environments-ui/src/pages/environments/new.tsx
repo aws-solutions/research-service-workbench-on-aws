@@ -51,7 +51,7 @@ const NewEnvironmentPage: NextPage = () => {
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
-      text: 'Service Workbench',
+      text: 'Research Service Workbench',
       href: '/'
     },
     {

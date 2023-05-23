@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "25fa19b0-59e4-464e-99cc-1798a7327954",
-    "name": "SWBv2 Official",
+    "name": "RSW Official",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -1900,7 +1900,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\",\n    \"roles\": [\"Admin\"]\n}",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

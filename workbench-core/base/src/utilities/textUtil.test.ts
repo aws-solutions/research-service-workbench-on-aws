@@ -22,6 +22,7 @@ import {
   uuidWithLowercasePrefixRegExp,
   costCenterIdRegex,
   accountIdRegex,
+  awsRegionRegex,
   sshKeyIdRegex,
   userIdRegex
 } from './textUtil';
@@ -123,6 +124,18 @@ describe('textUtil', () => {
       expect(`123`.match(awsAccountIdRegExp())).toEqual(null);
       expect(`1`.repeat(13).match(awsAccountIdRegExp())).toEqual(null);
       expect(`1`.repeat(11).match(awsAccountIdRegExp())).toEqual(null);
+    });
+  });
+
+  describe('awsRegionRegex', () => {
+    test('valid supported regions', () => {
+      expect('us-east-1'.match(awsRegionRegex())).toEqual(expect.arrayContaining([`us-east-1`]));
+      expect('ap-southeast-1'.match(awsRegionRegex())).toEqual(expect.arrayContaining([`ap-southeast-1`]));
+    });
+
+    test('invalid or unsupported regions', () => {
+      expect(`us-gov-east-1`.match(awsAccountIdRegExp())).toEqual(null);
+      expect(`123us-west-2`.match(awsAccountIdRegExp())).toEqual(null);
     });
   });
 

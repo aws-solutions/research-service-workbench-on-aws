@@ -6,17 +6,17 @@
 import { Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { Subnet, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { SWBVpc, SWBVpcProps } from './SWBVpc';
+import { RSWVpc, RSWVpcProps } from './RSWVpc';
 
 describe('SWBvpc tests', () => {
   it('has the correct vpc properties when given no arguments', () => {
-    const swbVpcPropsProps: SWBVpcProps = {
+    const rswVpcPropsProps: RSWVpcProps = {
       vpcId: '',
       albSubnetIds: [],
       ecsSubnetIds: []
     };
     const stack = new Stack();
-    new SWBVpc(stack, 'TestSWBVpc', swbVpcPropsProps);
+    new RSWVpc(stack, 'TestRSWVpc', rswVpcPropsProps);
     const template = Template.fromStack(stack);
 
     template.resourceCountIs('AWS::EC2::VPC', 1);
@@ -37,7 +37,7 @@ describe('SWBvpc tests', () => {
       Tags: [
         {
           Key: 'Name',
-          Value: 'Default/TestSWBVpc/MainVPC'
+          Value: 'Default/TestRSWVpc/MainVPC'
         }
       ]
     });
@@ -49,7 +49,7 @@ describe('SWBvpc tests', () => {
       Tags: [
         {
           Key: 'Name',
-          Value: 'Default/TestSWBVpc/MainVPC'
+          Value: 'Default/TestRSWVpc/MainVPC'
         }
       ]
     });
@@ -70,15 +70,15 @@ describe('SWBvpc tests', () => {
     jest.spyOn(Vpc, 'fromLookup').mockReturnValue(mockVpc);
     jest.spyOn(Subnet, 'fromSubnetId').mockReturnValue(mockSubnet);
 
-    const swbVpcPropsProps: SWBVpcProps = {
+    const rswVpcPropsProps: RSWVpcProps = {
       vpcId: mockVpc.vpcId,
       albSubnetIds: [mockSubnet.subnetId],
       ecsSubnetIds: []
     };
-    const swbVpc = new SWBVpc(stack, 'TestSWBVpc', swbVpcPropsProps);
+    const rswVpc = new RSWVpc(stack, 'TestRSWVpc', rswVpcPropsProps);
 
-    expect(swbVpc.vpc.vpcId).toEqual(mockVpc.vpcId);
-    expect(swbVpc.albSubnetSelection.subnets).toEqual([mockSubnet]);
+    expect(rswVpc.vpc.vpcId).toEqual(mockVpc.vpcId);
+    expect(rswVpc.albSubnetSelection.subnets).toEqual([mockSubnet]);
 
     // No VPCs or Subnets should be in the template because we are taking existing resources
     template.resourceCountIs('AWS::EC2::VPC', 0);

@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-accounts",
   "version": "0.0.1",
   "description": "Access and management of resources helping in connecting to AWS hosting accounts.",
-  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {

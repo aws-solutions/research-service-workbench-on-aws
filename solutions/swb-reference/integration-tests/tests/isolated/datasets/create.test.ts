@@ -31,8 +31,8 @@ describe('datasets create negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  describe('missing parameters', () => {
-    test('returns an error specifying the missing parameters', async () => {
+  describe('Validation error', () => {
+    test('Missing parameters', async () => {
       try {
         await pa1Session.resources.projects.project(project1Id).dataSets().create({}, false);
       } catch (e) {
@@ -41,7 +41,56 @@ describe('datasets create negative tests', () => {
           new HttpError(400, {
             error: 'Bad Request',
             message:
-              'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. type: Required'
+              'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. ' +
+              'type: Invalid literal value, expected "internal"'
+          })
+        );
+      }
+    });
+
+    test('Extra parameters', async () => {
+      try {
+        const createRequest = paabHelper.createDatasetRequest(project1Id);
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .create({ ...createRequest, ownerType: 'GROUP' }, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: ": Unrecognized key(s) in object: 'ownerType'"
+          })
+        );
+      }
+    });
+
+    test('Syntax error in parameters', async () => {
+      try {
+        await pa1Session.resources.projects.project(project1Id).dataSets().create(
+          {
+            storageName: 'illegal?bucket?name',
+            awsAccountId: '1234',
+            path: 'illegal?path', // using same name to help potential troubleshooting
+            name: 'illegal?name',
+            region: 'us-test-1',
+            type: 'external'
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message:
+              'name: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'storageName: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'path: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'awsAccountId: must be a 12 digit number. ' +
+              'region: must be valid AWS region. ' +
+              'type: Invalid literal value, expected "internal"'
           })
         );
       }

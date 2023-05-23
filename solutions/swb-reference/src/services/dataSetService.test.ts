@@ -686,7 +686,7 @@ describe('DataSetService', () => {
 
     test('it delegates to the workbench-core DataSetService method', async () => {
       const request = ListDataSetAccessPermissionsRequestParser.parse({
-        dataSetId: mockDataSet.id!,
+        dataSetId: 'dataset-12345678-1234-1234-1234-123456789012',
         authenticatedUser: mockUser,
         paginationToken: ''
       });

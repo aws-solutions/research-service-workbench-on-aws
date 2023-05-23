@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "SWBv2 Official",
+    "title": "RSW Official",
     "version": "1.0.0",
     "contact": {}
   },
@@ -2445,14 +2445,6 @@
                     "type": "string",
                     "example": "Doe"
                   },
-                  "roles": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "example": "Admin"
-                    },
-                    "example": ["Admin"]
-                  },
                   "status": {
                     "type": "string",
                     "example": "ACTIVE"
@@ -2463,7 +2455,6 @@
                 "email": "john.doe@example.com",
                 "firstName": "John",
                 "lastName": "Doe",
-                "roles": ["Admin"],
                 "status": "ACTIVE"
               }
             }

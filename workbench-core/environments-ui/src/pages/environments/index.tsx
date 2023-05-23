@@ -99,7 +99,7 @@ const EnvironmentsPage: NextPage = () => {
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
-      text: 'Service Workbench',
+      text: 'Research Service Workbench',
       href: '/'
     },
     {

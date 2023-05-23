@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-environments",
   "version": "0.1.2",
   "description": "Implementation of environment APIs and resources.",
-  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {

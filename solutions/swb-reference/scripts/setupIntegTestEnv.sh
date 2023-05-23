@@ -63,7 +63,7 @@ Usage: `basename $0`
     -k [EncryptionKeyArn FROM HOSTING ACCOUNT DEPLOYMENT]
 
 Example:
-    `basename $0` -m '<email@example.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:XXXXXXXX:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX'
+    `basename $0` -m '<johndoe@example.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:XXXXXXXX:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX'
           ${NC}"
 }
 
@@ -76,10 +76,10 @@ function check(){
 
 function run() {
     check
-    envMgmtRoleArn="arn:aws:iam::$hostingAccountId:role/swb-$stage-$shortName-env-mgmt"
-    hostingAccountHandlerRoleArn="arn:aws:iam::$hostingAccountId:role/swb-$stage-$shortName-hosting-account-role"
-    cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-$stage-$shortName --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-    swbDomainName=$(aws cloudformation describe-stacks --stack-name swb-$stage-$shortName  --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
+    envMgmtRoleArn="arn:aws:iam::$hostingAccountId:role/rsw-$stage-$shortName-env-mgmt"
+    hostingAccountHandlerRoleArn="arn:aws:iam::$hostingAccountId:role/rsw-$stage-$shortName-hosting-account-role"
+    cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-$stage-$shortName --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+    swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-$stage-$shortName  --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
 
     echo -e "${CYAN}\nReset Cognito ITAdmin password"
     echo -e "------------------------------"
@@ -204,7 +204,7 @@ function run() {
 
     echo -e "${CYAN}\nCreate ProjectAdmin1 user"
     echo -e "-------------------------"
-    PA1_EMAIL="pa1_test@fakeemail.com"
+    PA1_EMAIL="johndoe@example.com"
     $(curl --location --request POST "https://$swbDomainName/api/users" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
     --data "{
         \"firstName\": \"PA1F\",
@@ -222,7 +222,7 @@ function run() {
 
     echo -e "${BLUE}\nCreate ProjectAdmin2 user"
     echo -e "-------------------------"
-    PA2_EMAIL="pa2_test@fakeemail.com"
+    PA2_EMAIL="janedoe@example.com"
     $(curl --location --request POST "https://$swbDomainName/api/users" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
     --data "{
         \"firstName\": \"PA2F\",
@@ -240,7 +240,7 @@ function run() {
 
     echo -e "${CYAN}\nCreate Researcher1 user"
     echo -e "-------------------------"
-    RE1_EMAIL="re1_test@fakeemail.com"
+    RE1_EMAIL="johnstiles@example.com"
     $(curl --location --request POST "https://$swbDomainName/api/users" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
     --data "{
         \"firstName\": \"RE1F\",
