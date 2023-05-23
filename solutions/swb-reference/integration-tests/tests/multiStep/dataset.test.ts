@@ -8,10 +8,11 @@ import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
 import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../support/utils/constants';
+import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { dsUuidRegExp } from '../../support/utils/regExpressions';
 import Settings from '../../support/utils/settings';
-import { poll } from '../../support/utils/utilities';
+import { checkHttpError, poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
   const paabHelper: PaabHelper = new PaabHelper();
@@ -109,6 +110,24 @@ describe('multiStep dataset integration test', () => {
       .dataSets()
       .dataset(dataSet.id)
       .associateWithProject(project2Id, 'read-only');
+
+    console.log('ENSURE DUPLICATE ASSOCIATION WITH PROJECT THROWS');
+
+    try {
+      await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .dataset(dataSet.id)
+        .associateWithProject(project2Id, 'read-only');
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(409, {
+          error: 'Conflict',
+          message: `Project ${project2Id} is already associated with Dataset ${dataSet.id}`
+        })
+      );
+    }
 
     console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
     const { data: responseData } = await pa1Session.resources.projects
