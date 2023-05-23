@@ -17,6 +17,8 @@ import {
   GetAccountRequest,
   GetAccountRequestParser
 } from '@aws/workbench-core-accounts';
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
@@ -26,7 +28,19 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListAccountRequest>(ListAccountsRequestParser, req.query);
-      res.send(await hostingAccountService.list(validatedRequest));
+      try {
+        res.send(await hostingAccountService.list(validatedRequest));
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing accounts`);
+      }
     })
   );
 

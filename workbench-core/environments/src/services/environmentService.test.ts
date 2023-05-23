@@ -839,7 +839,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(envService.listEnvironments({ pageSize: limit, paginationToken })).rejects.toThrow(
-        'Invalid paginationToken'
+        'Invalid Pagination Token: eaJzayI6IkVOViNhM2VmZjdjZC1kNTM5LTRlZWMtODdiYy05MTcwMGJiZjZkZDIiLCJyZXNvdXJjZVR5cGUiOiJlbnZpcm9ubWVudCIsInBrIjoiRU5WI2EzZWZmN2NkLWQ1MzktNGVlYy04N2JjLTkxNzAwYmJmNmRkMiIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMDFUMTg6NTI6MTguMTkyWiJ9'
       );
     });
   });

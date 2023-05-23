@@ -74,7 +74,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
@@ -96,7 +96,7 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           branch:  ${{ inputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}

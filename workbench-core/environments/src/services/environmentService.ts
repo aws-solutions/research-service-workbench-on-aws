@@ -382,7 +382,6 @@ export class EnvironmentService {
         addPutItems: items
       });
     } catch (e) {
-      console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
       console.error('Failed to create environment', e);
       throw Boom.internal('Failed to create environment');
     }
