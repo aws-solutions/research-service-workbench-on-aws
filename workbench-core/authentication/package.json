@@ -28,17 +28,14 @@
   },
   "dependencies": {
     "@aws/workbench-core-authorization": "workspace:*",
-    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1",
     "csurf": "^1.11.0",
-    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
-    "@aws-sdk/client-dynamodb": "^3.212.0",
     "@aws-sdk/client-s3": "^3.212.0",
     "@aws-sdk/types": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

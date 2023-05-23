@@ -56,13 +56,6 @@ describe('AuthenticationService tests', () => {
     expect(revokeSpy).lastCalledWith('valid token');
   });
 
-  it('revokeAccessToken should successfully call the plugins revokeAccessToken() method', async () => {
-    const revokeAccessTokenSpy = jest.spyOn(mockPlugin, 'revokeAccessToken');
-    await service.revokeAccessToken('valid token');
-
-    expect(revokeAccessTokenSpy).lastCalledWith('valid token');
-  });
-
   it('getUserIdFromToken should return the tokens user id', () => {
     const result = service.getUserIdFromToken({});
 
