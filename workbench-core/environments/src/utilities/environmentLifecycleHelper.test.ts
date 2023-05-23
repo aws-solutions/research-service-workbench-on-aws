@@ -187,7 +187,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -247,7 +247,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -290,7 +290,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }

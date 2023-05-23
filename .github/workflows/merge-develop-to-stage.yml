@@ -11,7 +11,7 @@ on:
 
 jobs:
   readme-commit:
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/readme-commit.yml@develop
     with:
       branch: develop
     secrets:
@@ -36,7 +36,7 @@ jobs:
 
   deploy-swb-reference:
     needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
     with:
       stage: testEnv
       environment: dev
@@ -52,7 +52,7 @@ jobs:
 
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
     with:
       stage: swbv2-private
       environment: dev
@@ -76,7 +76,7 @@ jobs:
 
   deploy-swb-demo:
     needs: [deploy-swb-reference]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     with:
       environment: dev    
     secrets:
@@ -104,7 +104,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -114,7 +114,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           allow_merge_commit: true
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -143,7 +143,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           allow_merge_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -154,7 +154,7 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

@@ -25,7 +25,7 @@ jobs:
         with:
           route: GET /repos/{owner}/{repo}/pulls/{pull_number}
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           pull_number: ${{ inputs.pr_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           allow_merge_commit: true
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
         with:
           route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           pull_number: ${{ inputs.pr_number }}
           merge_method: 'merge'
         env:
@@ -59,7 +59,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           allow_merge_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
