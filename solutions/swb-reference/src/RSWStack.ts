@@ -51,16 +51,16 @@ import { StackProps } from 'aws-cdk-lib/core/lib/stack';
 import _ from 'lodash';
 import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
-import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
-import { SWBVpc } from './infra/SWBVpc';
+import { RSWApplicationLoadBalancer } from './infra/RSWApplicationLoadBalancer';
+import { RSWVpc } from './infra/RSWVpc';
 
-export interface SWBStackProps extends StackProps {
+export interface RSWStackProps extends StackProps {
   solutionId: string;
   solutionName: string;
   solutionVersion: string;
 }
 
-export class SWBStack extends Stack {
+export class RSWStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
   // Note: AWS_REGION cannot be set since it's a reserved env variable
   public lambdaEnvVars: {
@@ -95,7 +95,7 @@ export class SWBStack extends Stack {
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
   private _isSolutionsBuild: boolean = isSolutionsBuild();
 
-  public constructor(app: App, props: SWBStackProps) {
+  public constructor(app: App, props: RSWStackProps) {
     const {
       STAGE,
       AWS_REGION,
@@ -140,7 +140,7 @@ export class SWBStack extends Stack {
       // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
     } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
-    const stackProps: SWBStackProps = {
+    const stackProps: RSWStackProps = {
       description: `(${props.solutionId}) - ${props.solutionName} Deployment. Version: ${props.solutionVersion}`,
       env: {
         account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
@@ -310,12 +310,12 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+    const rswVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
     new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
-      value: swbVpc.vpc.vpcId
+      value: rswVpc.vpc.vpcId
     });
 
-    let childMetadataNode = swbVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
+    let childMetadataNode = rswVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
     childMetadataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
@@ -327,10 +327,10 @@ export class SWBStack extends Stack {
     });
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -344,10 +344,10 @@ export class SWBStack extends Stack {
     }
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -361,10 +361,10 @@ export class SWBStack extends Stack {
     }
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -378,11 +378,11 @@ export class SWBStack extends Stack {
     }
 
     new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
-      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+      value: (rswVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
     });
 
     new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
-      value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
+      value: (rswVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
     const hostedZoneId = this._isSolutionsBuild
@@ -403,7 +403,7 @@ export class SWBStack extends Stack {
       : DOMAIN_NAME;
 
     this._createLoadBalancer(
-      swbVpc,
+      rswVpc,
       apiGwUrl,
       domainName,
       hostedZoneId,
@@ -412,27 +412,27 @@ export class SWBStack extends Stack {
     );
   }
 
-  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
-    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): RSWVpc {
+    const rswVpc = new RSWVpc(this, 'RSWVpc', {
       vpcId,
       albSubnetIds,
       ecsSubnetIds
     });
 
-    return swbVpc;
+    return rswVpc;
   }
 
   private _createLoadBalancer(
-    swbVpc: SWBVpc,
+    rswVpc: RSWVpc,
     apiGwUrl: string,
     domainName: string,
     hostedZoneId: string,
     internetFacing: boolean,
     accessLogsBucket: Bucket
   ): void {
-    const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
-      vpc: swbVpc.vpc,
-      subnets: swbVpc.albSubnetSelection,
+    const alb = new RSWApplicationLoadBalancer(this, 'RSWApplicationLoadBalancer', {
+      vpc: rswVpc.vpc,
+      subnets: rswVpc.albSubnetSelection,
       internetFacing,
       accessLogsBucket
     });

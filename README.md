@@ -3,14 +3,14 @@
 
 # Codecov
 ## `main branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
 ## `develop branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
 # Workflow Status
-[![Merge-develop-to-stage](https://github.com/aws-solutions/solution-spark-on-aws/actions/workflows/merge-develop-to-stage.yml/badge.svg?branch=develop)](https://github.com/aws-solutions/solution-spark-on-aws/actions/workflows/merge-develop-to-stage.yml)
-[![Release integration tests](https://github.com/aws-solutions/solution-spark-on-aws/actions/workflows/integration-tests-release.yml/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/actions/workflows/integration-tests-release.yml)
+[![Merge-develop-to-stage](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/merge-develop-to-stage.yml/badge.svg?branch=develop)](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/merge-develop-to-stage.yml)
+[![Release integration tests](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/integration-tests-release.yml/badge.svg)](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/integration-tests-release.yml)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 # Contributing Guidelines
@@ -21,7 +21,7 @@ Please read through this document before submitting any issues or pull requests 
 
 ## Code development and testing
 
-In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#solution-spark-on-aws-development-instructions)
+In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#research-service-workbench-on-aws-development-instructions)
 
 <!-- GENERATED PROJECT SUMMARY START -->
 
