@@ -19,6 +19,10 @@ import {
   isPluginConfigurationError,
   PluginConfigurationError
 } from '../';
+import {
+  isTokenRevocationServiceNotProvidedError,
+  TokenRevocationServiceNotProvidedError
+} from './tokenRevocationServiceNotProvidedError';
 
 describe('custom error tests', () => {
   describe('IdpUnavailableError tests', () => {
@@ -114,6 +118,20 @@ describe('custom error tests', () => {
 
     it('should be an instance of Error', () => {
       const error = new PluginConfigurationError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+  });
+
+  describe('TokenRevocationServiceNotProvidedError', () => {
+    it('should be an instance of itself', () => {
+      const error = new TokenRevocationServiceNotProvidedError();
+
+      expect(isTokenRevocationServiceNotProvidedError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new TokenRevocationServiceNotProvidedError();
 
       expect(error instanceof Error).toBe(true);
     });
