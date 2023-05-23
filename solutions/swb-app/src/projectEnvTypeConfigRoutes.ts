@@ -132,6 +132,11 @@ export function setUpProjectEnvTypeConfigRoutes(
         envTypeConfigId: req.params.envTypeConfigId
       });
       const relationship = await projectEnvTypeConfigService.getEnvTypeConfig(request);
+
+      if (!relationship) {
+        throw Boom.notFound('Resource not found');
+      }
+
       res.status(200).send(relationship);
     })
   );
