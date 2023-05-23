@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/swb-app",
-      "comment": "add tokenRevocationService",
+      "comment": "revert",
       "type": "patch"
     }
   ],
