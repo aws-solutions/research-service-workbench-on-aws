@@ -11,13 +11,11 @@ import {
   DescribeUserPoolClientCommandOutput,
   NotAuthorizedException,
   ResourceNotFoundException,
-  ServiceInputTypes,
-  ServiceOutputTypes,
   TimeUnitsType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { mockClient } from 'aws-sdk-client-mock';
 import axios from 'axios';
 import {
   CognitoAuthenticationPlugin,
@@ -30,69 +28,59 @@ import {
   InvalidTokenTypeError,
   PluginConfigurationError
 } from '..';
-import { TokenRevocationServiceNotProvidedError } from '../errors/tokenRevocationServiceNotProvidedError';
-import { TokenRevocationService } from '../tokenRevocationService';
+
+const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
+  cognitoDomain: 'fake-domain',
+  userPoolId: 'us-west-2_fakeId',
+  clientId: 'fake-client-id',
+  clientSecret: 'fake-client-secret'
+} as const;
+
+const baseUrl = cognitoPluginOptions.cognitoDomain;
+
+const websiteUrl = 'https://www.fakewebsite.com';
+const validToken = 'validToken';
+const invalidToken = 'invalidToken';
+
+const encodedClientId = Buffer.from(
+  `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
+).toString('base64');
+
+const baseDecodedAccessToken: CognitoAccessTokenPayload = {
+  token_use: 'access',
+  client_id: 'client_id',
+  version: 1,
+  username: 'username',
+  scope: 'scope',
+  sub: 'sub',
+  iss: 'iss',
+  exp: 3600,
+  iat: 123,
+  auth_time: 456,
+  jti: 'jti',
+  origin_jti: 'origin_jti'
+};
+
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
+const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
+  UserPoolClient: {
+    TokenValidityUnits: {
+      IdToken: TimeUnitsType.HOURS,
+      AccessToken: TimeUnitsType.MINUTES,
+      RefreshToken: TimeUnitsType.DAYS
+    },
+    RefreshTokenValidity: 1,
+    IdTokenValidity: 1,
+    AccessTokenValidity: 1
+  }
+} as const;
 
 describe('CognitoAuthenticationPlugin tests', () => {
   let plugin: CognitoAuthenticationPlugin;
-  let cognitoPluginOptions: CognitoAuthenticationPluginOptions;
 
-  let baseUrl: string;
-
-  let websiteUrl: string;
-  let validToken: string;
-  let invalidToken: string;
-
-  let encodedClientId: string;
-
-  let baseDecodedAccessToken: CognitoAccessTokenPayload;
-
-  let cognitoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
-
-  let userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput>;
-
-  let tokenRevocationService: TokenRevocationService;
   beforeEach(() => {
-    cognitoPluginOptions = {
-      cognitoDomain: 'fake-domain',
-      userPoolId: 'us-west-2_fakeId',
-      clientId: 'fake-client-id',
-      clientSecret: 'fake-client-secret'
-    };
-    baseUrl = cognitoPluginOptions.cognitoDomain;
-    websiteUrl = 'https://www.fakewebsite.com';
-    validToken = 'validToken';
-    invalidToken = 'invalidToken';
-    encodedClientId = Buffer.from(
-      `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
-    ).toString('base64');
-    baseDecodedAccessToken = {
-      token_use: 'access',
-      client_id: 'client_id',
-      version: 1,
-      username: 'username',
-      scope: 'scope',
-      sub: 'sub',
-      iss: 'iss',
-      exp: 3600,
-      iat: 123,
-      auth_time: 456,
-      jti: 'jti',
-      origin_jti: 'origin_jti'
-    };
-    cognitoMock = mockClient(CognitoIdentityProviderClient);
-    userPoolClientInfo = {
-      UserPoolClient: {
-        TokenValidityUnits: {
-          IdToken: TimeUnitsType.HOURS,
-          AccessToken: TimeUnitsType.MINUTES,
-          RefreshToken: TimeUnitsType.DAYS
-        },
-        RefreshTokenValidity: 1,
-        IdTokenValidity: 1,
-        AccessTokenValidity: 1
-      }
-    };
+    cognitoMock.reset();
     plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
   });
 
@@ -169,26 +157,6 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new InvalidJWTError('token is invalid')
       );
       expect(verifierSpy).toHaveBeenCalledWith(invalidToken);
-    });
-    describe('validateToken with tokenRevocationService', () => {
-      beforeEach(() => {
-        tokenRevocationService = new TokenRevocationService({
-          dynamoDBSettings: {
-            region: 'us-east-1',
-            table: 'sampleTableName'
-          }
-        });
-        plugin = new CognitoAuthenticationPlugin({
-          ...cognitoPluginOptions,
-          tokenRevocationService
-        });
-      });
-      it('invalidate if token has been revoked', async () => {
-        jest.spyOn(tokenRevocationService, 'isRevoked').mockResolvedValue(true);
-        await expect(plugin.validateToken(invalidToken)).rejects.toThrow(
-          new InvalidJWTError('token is invalid')
-        );
-      });
     });
   });
 
@@ -304,32 +272,6 @@ describe('CognitoAuthenticationPlugin tests', () => {
           }
         }
       );
-    });
-  });
-
-  describe('revokeAccessToken', () => {
-    it('should return throw TokenRevocationServiceNotProvidedError without tokenRevocationService', async () => {
-      await expect(plugin.revokeAccessToken('validAccessToken')).rejects.toThrow(
-        TokenRevocationServiceNotProvidedError
-      );
-    });
-    it('should call tokenRevocationService revoketoken when it is provided', async () => {
-      tokenRevocationService = new TokenRevocationService({
-        dynamoDBSettings: {
-          region: 'us-east-1',
-          table: 'sampleTableName'
-        }
-      });
-      plugin = new CognitoAuthenticationPlugin({
-        ...cognitoPluginOptions,
-        tokenRevocationService
-      });
-      const revokeTokenSpy = jest.spyOn(tokenRevocationService, 'revokeToken').mockResolvedValue();
-      const accessToken = 'validAccessToken';
-      await plugin.revokeAccessToken(accessToken);
-      expect(revokeTokenSpy).toBeCalledWith({
-        token: accessToken
-      });
     });
   });
 
