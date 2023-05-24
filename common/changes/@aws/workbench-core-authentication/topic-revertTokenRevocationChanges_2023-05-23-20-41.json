@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-authentication",
-      "comment": "implement tokenRevocationService",
-      "type": "minor"
+      "comment": "revert",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-authentication"

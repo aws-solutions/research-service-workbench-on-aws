@@ -27,6 +27,8 @@ export { DataSetExistsError, isDataSetExistsError } from './errors/dataSetExists
 export { EndpointNotFoundError, isEndpointNotFoundError } from './errors/endpointNotFoundError';
 export { InvalidArnError, isInvalidArnError } from './errors/invalidArnError';
 export { InvalidEndpointError, isInvalidEndpointError } from './errors/invalidEndpointError';
+export { AccountNotFoundError, isAccountNotFoundError } from './errors/accountNotFoundError';
+export { StorageNotFoundError, isStorageNotFoundError } from './errors/storageNotFoundError';
 
 // models
 export {

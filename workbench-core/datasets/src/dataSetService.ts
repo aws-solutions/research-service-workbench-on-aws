@@ -10,11 +10,13 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
+import { AccountNotFoundError } from './errors/accountNotFoundError';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
+import { StorageNotFoundError } from './errors/storageNotFoundError';
 import {
   AddDataSetExternalEndpointBaseRequest,
   AddDataSetExternalEndpointForGroupRequest,
@@ -82,6 +84,16 @@ export class DataSetService {
     try {
       if (dataSet.owner && !dataSet.ownerType) {
         throw new DataSetInvalidParameterError("'ownerType' is required when 'owner' is provided.");
+      }
+
+      if (dataSet.storageName !== process.env.S3_DATASETS_BUCKET_NAME) {
+        throw new StorageNotFoundError(
+          "Please use data set S3 bucket name from main account for 'storageName'."
+        );
+      }
+
+      if (dataSet.awsAccountId !== process.env.MAIN_ACCT_ID) {
+        throw new AccountNotFoundError("Please use main account ID for 'awsAccountId'.");
       }
 
       await storageProvider.createStorage(dataSet.storageName, dataSet.path);
