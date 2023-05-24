@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AccountNotFoundError, isAccountNotFoundError } from './accountNotFoundError';
 import { DataSetExistsError, isDataSetExistsError } from './dataSetExistsError';
 import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
 import { DataSetInvalidParameterError, isDataSetInvalidParameterError } from './dataSetInvalidParameterError';
@@ -15,6 +16,7 @@ import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleErro
 import { InvalidPermissionError, isInvalidPermissionError } from './invalidPermissionError';
 import { isNotAuthorizedError, NotAuthorizedError } from './notAuthorizedError';
 import { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './roleExistsOnEndpointError';
+import { StorageNotFoundError, isStorageNotFoundError } from './storageNotFoundError';
 
 const error = new Error();
 
@@ -126,5 +128,23 @@ describe('custom error tests', () => {
   });
   test('not DataSetInvalidParameterError', () => {
     expect(isDataSetInvalidParameterError(error)).toBe(false);
+  });
+
+  test('StorageNotFoundError', () => {
+    const storageNotFoundError = new StorageNotFoundError();
+
+    expect(isStorageNotFoundError(storageNotFoundError)).toBe(true);
+  });
+  test('not StorageNotFoundError', () => {
+    expect(isStorageNotFoundError(error)).toBe(false);
+  });
+
+  test('AccountNotFoundError', () => {
+    const accountNotFoundError = new AccountNotFoundError();
+
+    expect(isAccountNotFoundError(accountNotFoundError)).toBe(true);
+  });
+  test('not AccountNotFoundError', () => {
+    expect(isAccountNotFoundError(error)).toBe(false);
   });
 });

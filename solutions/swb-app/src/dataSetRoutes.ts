@@ -10,7 +10,14 @@ import {
   uuidWithLowercasePrefixRegExp,
   isInvalidPaginationTokenError
 } from '@aws/workbench-core-base';
-import { DataSetNotFoundError, isDataSetHasEndpointError } from '@aws/workbench-core-datasets';
+import {
+  isDataSetHasEndpointError,
+  isDataSetExistsError,
+  isDataSetInvalidParameterError,
+  isStorageNotFoundError,
+  isAccountNotFoundError,
+  isDataSetNotFoundError
+} from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
@@ -48,18 +55,30 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
-      const dataSet = await dataSetService.provisionDataSet(req.params.projectId, {
-        name: validatedRequest.name,
-        storageName: validatedRequest.storageName,
-        path: validatedRequest.path,
-        awsAccountId: validatedRequest.awsAccountId,
-        region: validatedRequest.region,
-        storageProvider: dataSetService.storagePlugin,
-        type: validatedRequest.type,
-        authenticatedUser: res.locals.user
-      });
-
-      res.status(201).send(dataSet);
+      try {
+        const dataSet = await dataSetService.provisionDataSet(req.params.projectId, {
+          name: validatedRequest.name,
+          storageName: validatedRequest.storageName,
+          path: validatedRequest.path,
+          awsAccountId: validatedRequest.awsAccountId,
+          region: validatedRequest.region,
+          storageProvider: dataSetService.storagePlugin,
+          type: validatedRequest.type,
+          authenticatedUser: res.locals.user
+        });
+        res.status(201).send(dataSet);
+      } catch (e) {
+        if (isDataSetExistsError(e)) {
+          throw Boom.conflict(e.message);
+        }
+        if (isDataSetInvalidParameterError(e) || isAccountNotFoundError(e) || isStorageNotFoundError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        console.error(e);
+        throw Boom.badImplementation(
+          `There was a problem creating new dataset for request ${validatedRequest}`
+        );
+      }
     })
   );
 
@@ -156,8 +175,8 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         const response = await dataSetService.getDataSet(dataSetId, user);
         res.send(response);
       } catch (e) {
-        if (e instanceof DataSetNotFoundError) {
-          throw Boom.notFound(`Could not find dataset ${dataSetId}`);
+        if (isDataSetNotFoundError(e)) {
+          throw Boom.notFound(e.message);
         }
         console.error(e);
         throw Boom.badImplementation(`There was a problem getting dataset ${dataSetId}`);
@@ -175,9 +194,18 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         accessLevel: req.body.accessLevel
       });
 
-      await dataSetService.addAccessForProject(validatedRequest);
+      try {
+        await dataSetService.addAccessForProject(validatedRequest);
+        res.status(204).send();
+      } catch (e) {
+        console.error(e);
 
-      res.status(204).send();
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem associating the project and dataset.`);
+      }
     })
   );
 
@@ -243,12 +271,12 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       } catch (e) {
         console.error(e);
 
-        if (isConflictError(e)) {
+        if (isConflictError(e) || isDataSetHasEndpointError(e)) {
           throw Boom.conflict(e.message);
         }
 
-        if (isDataSetHasEndpointError(e)) {
-          throw Boom.conflict(e.message);
+        if (isDataSetInvalidParameterError(e)) {
+          throw Boom.badRequest(e.message);
         }
 
         throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
