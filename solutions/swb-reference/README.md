@@ -631,14 +631,6 @@ Note: `setupIntegTestEnv.sh` script also creates the `Config file for integratio
     1. Choose the Project that integration test will use as default when creating any Environment and testing project functionality and copy the `id` value from the response.
     1. In `./integration-tests/config` directory assign `id` to `projectId` in `<STAGE>.yaml` file 
 
-1. Follow these steps to assign a value to `terminatedEnvId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Follow instructions in [Launch Sagemaker Notebook Environment](#launch-sagemaker-notebook-instance) to create a new Sagemaker environment and wait for COMPLETED status.
-    1. Copy the `id` value from the response
-    1. Use the `id` of the new environment to [Stop the environment](#stop-an-environment) and wait for STOPPED status.
-    1. Use the `id` of the new environment to [Terminate the environment](#terminate-the-environment).
-    1. Use new instance information to [Terminate](#terminate-the-environment)
-    1. In `./integration-tests/config` directory assign the `id` of the new environment to the `terminatedEnvId` in `<STAGE>.yaml` file  
-
 1. Follow these steps to assign a value to `rootUserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
     1. Uncomment `rootUserNameParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<STAGE>/rootUser/email`.
     1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserNameParamStorePath` and the value as the main account user's email address.
@@ -677,21 +669,9 @@ Note: `setupIntegTestEnv.sh` script also creates the `Config file for integratio
     1. Follow instructions in [Reset User Password Step](#reset-user-password) to assign a password to the Researcher assigned to `researcher1UserNameParamStorePath`.
     1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `researcher1PasswordParamStorePath` and the value as the Researcher's new password.
 
-1. Follow these steps to assign a value to `hostAwsAccountIdParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `researcher1PasswordParamStorePath` and provide a name for a SSM parameter that will contain the 12 Digit Hosting Account Id, e.g. `/swb/<STAGE>/accountsTest/awsAccountId`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostAwsAccountIdParamStorePath` and the value as the the 12 Digit Hosting Account Id.
-
-1. Follow these steps to assign a value to `hostingAccountHandlerRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `hostingAccountHandlerRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account handler role ARN, e.g. `/swb/<STAGE>/accountsTest/hostingAccountHandlerRoleArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostingAccountHandlerRoleArnParamStorePath` and the value as the `HostingAccountHandlerRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
-
-1. Follow these steps to assign a value to `envMgmtRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `envMgmtRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account event management role ARN, e.g. `/swb/<STAGE>/accountsTest/envMgmtRoleArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `envMgmtRoleArnParamStorePath` and the value as the `EnvMgmtRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
-
-1. Follow these steps to assign a value to `encryptionKeyArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `encryptionKeyArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account encryption key ARN, e.g. `/swb/<STAGE>/accountsTest/encryptionKeyArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `encryptionKeyArnParamStorePath` and the value as the `EncryptionKeyArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
+1. Follow these steps to assign a value to `awsAccountIdParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file. This value is necessary to run teh AWS Accounts multi-step integration test. If the value remains commented out, this test will not run.
+    1. Uncomment `awsAccountIdParamStorePath` and provide a name for a SSM parameter that will contain the 12 Digit Account Id of an AWS Account you own that is not the main nor hosting account ID, e.g. `/swb/<STAGE>/accountsTest/awsAccountId`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `awsAccountIdParamStorePath` and the value as the the 12 Digit Hosting Account Id.
 
 1. Uncomment `defaultHostingAccountId` and in `./integration-tests/config/<STAGE>.yaml` file and assign value `ACCOUNT_ID` from [Onboard Hosting Account Step](#onboard-hosting-account).
 
