@@ -1,8 +1,10 @@
-# Change Log
+# Changelog
 
-This is a sample changelog file. Please check out changelog files of individual packages contained for version history.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+## [2.0.0] - 2023-06-09
 
-## 0.1.0
-Wed, 10 Feb 2023 05:48:12 GMT
+### Changelog for Packages in This project
 
-Create sample changelog
+Please click the links belows for more details on the changelog of each package.
+* Package `swb-reference` [CHANGELOG](./solutions/swb-reference/CHANGELOG.md)
+* Package `swb-app` [CHANGELOG](./solutions/swb-app/CHANGELOG.md)
