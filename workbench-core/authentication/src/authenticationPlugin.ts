@@ -45,6 +45,13 @@ export interface AuthenticationPlugin {
   revokeToken(token: string): Promise<void>;
 
   /**
+   * Revokes the given access token.
+   *
+   * @param token - the access token to revoke
+   */
+  revokeAccessToken(accessToken: string): Promise<void>;
+
+  /**
    * Gets the Id of the user for whom the token was issued.
    *
    * @param decodedToken - a decoded Id or access token from which to extract the user Id
