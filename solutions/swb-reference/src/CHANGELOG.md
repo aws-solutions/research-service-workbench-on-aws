@@ -6,7 +6,7 @@ Research Service Workbench (RSW) on AWS is a backend API designed to empower AWS
 
 For additional details please refer to the implementation guide [here](https://docs.aws.amazon.com/solutions/latest/research-service-workbench-on-aws/overview.html)
 
-`rsw-reference` is tne entry point to Research Service Workbench. Customers can configure and deploy RSW with the provided CDK constructs and modules. 
+`rsw-reference` is the entry point to Research Service Workbench. Customers can configure and deploy RSW with the provided CDK constructs and modules. 
 
 ### Feature
 * RSW infrastructure as CDK constructs and modules
