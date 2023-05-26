@@ -24,22 +24,100 @@ describe('list users negative tests', () => {
     await setup.cleanup();
   });
 
-  describe('with invalid paginationToken', () => {
-    const pagToken = '1';
-    const queryParams = { paginationToken: pagToken };
+  describe('with invalid parameters', () => {
+    describe('--non encoded pagination token', () => {
+      const paginationToken = '1';
+      const queryParams = { paginationToken };
 
-    test('it throws 400 error', async () => {
-      try {
-        await adminSession.resources.users.get(queryParams);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(400, {
-            error: 'Bad Request',
-            message: `Invalid Pagination Token: ${queryParams.paginationToken}`
-          })
-        );
-      }
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.users.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    describe('--non string pagination token', () => {
+      const paginationToken = 1;
+      const queryParams = { paginationToken };
+
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.users.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    describe('--non number page size', () => {
+      const pageSize = 'one';
+      const queryParams = { pageSize };
+
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.users.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `pageSize: Must be a number`
+            })
+          );
+        }
+      });
+    });
+
+    describe('--page size too small', () => {
+      const pageSize = '0';
+      const queryParams = { pageSize };
+
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.users.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `pageSize: Must be Between 1 and 100`
+            })
+          );
+        }
+      });
+    });
+
+    describe('--page size too large', () => {
+      const pageSize = '110';
+      const queryParams = { pageSize };
+
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.users.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `pageSize: Must be Between 1 and 100`
+            })
+          );
+        }
+      });
     });
   });
 });
