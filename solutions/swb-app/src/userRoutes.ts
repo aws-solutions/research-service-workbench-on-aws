@@ -3,13 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { validateAndParse } from '@aws/workbench-core-base';
+import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import {
   Status,
   UserManagementService,
   isUserNotFoundError,
   isInvalidParameterError,
-  isUserAlreadyExistsError
+  isUserAlreadyExistsError,
+  ListUsersRequest,
+  ListUsersRequestParser
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -52,8 +54,23 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const users = await userService.listUsers();
-      res.status(200).json({ users });
+      const validatedRequest = validateAndParse<ListUsersRequest>(ListUsersRequestParser, {
+        ...req.query
+      });
+      try {
+        const users = await userService.listUsers(validatedRequest);
+        res.status(200).json({ users });
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing users.`);
+      }
     })
   );
 

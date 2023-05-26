@@ -1814,7 +1814,19 @@
             "url": {
               "raw": "{{API_URL}}/users",
               "host": ["{{API_URL}}"],
-              "path": ["users"]
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []

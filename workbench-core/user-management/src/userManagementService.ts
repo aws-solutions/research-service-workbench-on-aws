@@ -15,6 +15,8 @@ import { UserNotFoundError } from './errors/userNotFoundError';
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
+import { ListUsersRequest } from './users/listUsersRequest';
+import { ListUsersResponse } from './users/listUsersResponse';
 /**
  *
  */
@@ -124,14 +126,15 @@ export class UserManagementService {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array of {@link User}s
+   * @param request - the request object according to {@link ListUsersRequest}
+   * @returns a {@link ListUsersResponse} object
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
-  public async listUsers(): Promise<User[]> {
-    return this._userManagementPlugin.listUsers();
+  public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
+    return this._userManagementPlugin.listUsers(request);
   }
 
   /**

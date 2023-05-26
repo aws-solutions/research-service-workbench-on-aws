@@ -14,6 +14,8 @@ import { UserAlreadyExistsError } from './errors/userAlreadyExistsError';
 import { UserNotFoundError } from './errors/userNotFoundError';
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
+import { ListUsersRequest } from './users/listUsersRequest';
+import { ListUsersResponse } from './users/listUsersResponse';
 
 /**
  * Implement the `UserManagementPlugin` interface to connect the UserRoleService
@@ -109,13 +111,14 @@ export interface UserManagementPlugin {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array of {@link User}s
+   * @param request - the request object according to {@link ListUsersRequest}
+   * @returns a {@link ListUsersResponse} object
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
-  listUsers(): Promise<User[]>;
+  listUsers(request: ListUsersRequest): Promise<ListUsersResponse>;
 
   /**
    * List the user IDs assoicated with a given role.
