@@ -354,9 +354,6 @@ export default class ProjectService {
   ): Promise<PaginatedResponse<Project>> {
     if (paginationToken) {
       const manualExclusiveStartKey = fromPaginationToken(paginationToken);
-      if (typeof manualExclusiveStartKey === 'string') {
-        throw new InvalidPaginationTokenError('Pagination token is invalid.');
-      }
       const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
       const exclusiveStartProject = projectsOnPage.find((project) => project.id === exclusiveStartProjectId);
       if (exclusiveStartProject === undefined) {

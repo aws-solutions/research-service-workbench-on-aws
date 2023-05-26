@@ -399,6 +399,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
+   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
   public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
     try {

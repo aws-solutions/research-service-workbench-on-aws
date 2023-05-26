@@ -132,6 +132,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link TooManyRequestsError} - the request was rate limited
+   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
   public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
     return this._userManagementPlugin.listUsers(request);

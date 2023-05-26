@@ -38,6 +38,7 @@ import {
   QueryCommand
 } from '@aws-sdk/client-dynamodb';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
+import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
   CognitoUserManagementPlugin,
@@ -898,6 +899,12 @@ describe('CognitoUserManagementPlugin tests', () => {
       cognitoMock.on(ListUsersCommand).rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
 
       await expect(plugin.listUsers({})).rejects.toThrow(TooManyRequestsError);
+    });
+
+    it('should throw InvalidPaginationTokenError when the invalid pagination token is passed in request', async () => {
+      cognitoMock.on(ListUsersCommand).rejects(new InvalidParameterException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.listUsers({})).rejects.toThrow(InvalidPaginationTokenError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
