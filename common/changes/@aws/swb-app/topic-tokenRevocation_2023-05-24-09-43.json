@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "add token revocation",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
