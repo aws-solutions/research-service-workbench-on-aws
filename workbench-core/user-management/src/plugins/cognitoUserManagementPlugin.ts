@@ -452,7 +452,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         throw new TooManyRequestsError(error.message);
       }
       if (error.name === 'InvalidParameterException') {
-        throw new InvalidPaginationTokenError(error.message);
+        throw new InvalidPaginationTokenError('Invalid Pagination Token');
       }
       throw error;
     }

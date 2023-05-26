@@ -38,8 +38,7 @@ describe('list users negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message:
-                "1 validation error detected: Value 'CAISqAII]{\t-\t����\t �Y%��=Ma\\�5����ݱe��@��A\\����)��錬�,�����)��$�%�\t�hɱ�eaI���������\\��eaI����Y�1\r)�ia��L�X�%���EU\tEU\tEUQ�\t5EYE��ai]I�e�\tET�\t�UU8�Y�\t]hő-Ma��,�YI9T�!YQ9��Qi���9iY��Y�e��i8ű�IQ99���Q��Y��U��Y=U��]�I9���aMQ9AH���P��5Y�Ņ�i��X�P�I95T��AP��1\r)�e]������\\��IYݑ��=�%�%�\t�iai���Y�U�Y�]Y�I��]U�=��=U�5Q��5�E�5X��\r�`���Q�E���I]��9-�ܬ�E�T��)������]@���D��' at 'paginationToken' failed to satisfy constraint: Member must satisfy regular expression pattern: [\\S]+"
+              message: 'Invalid Pagination Token'
             })
           );
         }
