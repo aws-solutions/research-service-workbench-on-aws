@@ -4,13 +4,8 @@
  */
 
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
-import {
-  AwsService,
-  DynamoDBService,
-  buildDynamoDbKey,
-  toPaginationToken,
-  fromPaginationToken
-} from '@aws/workbench-core-base';
+import { AwsService, DynamoDBService, buildDynamoDbKey } from '@aws/workbench-core-base';
+import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -406,15 +401,13 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
-    let parsedPaginationToken;
-    if (request.paginationToken) {
-      parsedPaginationToken = fromPaginationToken(request.paginationToken);
-    }
     try {
       const response = await this._aws.clients.cognito.listUsers({
         UserPoolId: this._userPoolId,
         Limit: request.pageSize,
-        PaginationToken: typeof parsedPaginationToken === 'string' ? parsedPaginationToken : undefined
+        PaginationToken: request.paginationToken
+          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
+          : undefined
       });
 
       if (!response.Users) {
@@ -442,7 +435,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         return { data };
       }
 
-      return { data, paginationToken: toPaginationToken(response.PaginationToken) };
+      return { data, paginationToken: Buffer.from(response.PaginationToken).toString('base64') };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -456,6 +449,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);
+      }
+      if (error.name === 'InvalidParameterException') {
+        throw new InvalidPaginationTokenError(error.message);
       }
       throw error;
     }
