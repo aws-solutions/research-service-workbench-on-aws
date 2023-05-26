@@ -82,7 +82,7 @@ describe('User Management Service', () => {
   });
 
   test('listUsers', async () => {
-    const users = await userManagementService.listUsers();
+    const users = await userManagementService.listUsers({});
     expect(users).toEqual([mockUser.id]);
   });
 
