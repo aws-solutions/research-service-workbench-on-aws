@@ -6,17 +6,11 @@ Research Service Workbench (RSW) on AWS is a backend API designed to empower AWS
 
 For additional details please refer to the implementation guide [here](https://docs.aws.amazon.com/solutions/latest/research-service-workbench-on-aws/overview.html)
 
-`rsw-app` sets up the routes for Research Service Workbench. 
+`rsw-reference` is the entry point to Research Service Workbench. Customers can configure and deploy RSW with the provided CDK constructs and modules. 
 
 ### Feature
-* API routes for the following entities
-   * Cost Centers
-   * Datasets
-   * Environments
-   * Environment Types
-   * Environment Type Configs
-   * Projects
-   * Users
-   * Hosting Accounts
-   * SSH Keys
-   * Auth
+* RSW infrastructure as CDK constructs and modules
+* Launching SageMaker environments
+* Mounting internal datasets on SageMaker environments
+* Managing resources (environments, environment type config, datasets, SSH Keys, user management) by projects
+* Integration with ServiceCatalog AppRegistry to centrally manage the solution's resources
