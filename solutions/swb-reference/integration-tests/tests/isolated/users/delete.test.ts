@@ -43,7 +43,7 @@ describe('delete user negative tests', () => {
     let userId = '';
     try {
       const users = await adminSession.resources.users.get();
-      const user: User = users.data.users.find((user: User) => user.status === Status.ACTIVE);
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
 
       expect(user).toBeDefined();
 
