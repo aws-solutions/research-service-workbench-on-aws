@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "map dataset input error to 400",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

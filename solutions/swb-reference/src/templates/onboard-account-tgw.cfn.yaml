@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: This stack provisions resources necessary to use this AWS account with Service Workbench.
+Description: This stack provisions resources necessary to use this AWS account with Research Service Workbench.
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -137,8 +137,8 @@ Mappings:
     Data:
       ID: "SO0231"
       Version: "2.0.0"
-      AppRegistryApplicationName: 'SWBAppReg'
-      SolutionName: 'Service Workbench on AWS v2'
+      AppRegistryApplicationName: 'RSWAppReg'
+      SolutionName: 'Research Service Workbench'
       ApplicationType: 'AWS-Solutions'
 
 Resources:
@@ -490,7 +490,7 @@ Resources:
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in RSWStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'

@@ -5,13 +5,7 @@
 
 import { useNotifications, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import {
-  Box,
-  BreadcrumbGroupProps,
-  Header,
-  SpaceBetween,
-  Table
-} from '@cloudscape-design/components';
+import { Box, BreadcrumbGroupProps, Header, SpaceBetween, Table } from '@cloudscape-design/components';
 import { FlashbarProps } from '@cloudscape-design/components/flashbar';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -48,7 +42,7 @@ export const DatasetsPage: NextPage = () => {
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
-      text: 'Service Workbench',
+      text: 'Research Service Workbench',
       href: '/'
     },
     {
@@ -66,14 +60,12 @@ export const DatasetsPage: NextPage = () => {
         <Table
           loading={areDatasetsLoading}
           selectionType="multi"
-          
           header={
             <>
               <Header
                 actions={
                   <Box float="right">
-                    <SpaceBetween direction="horizontal" size="xs">
-                    </SpaceBetween>
+                    <SpaceBetween direction="horizontal" size="xs"></SpaceBetween>
                   </Box>
                 }
               >
@@ -83,7 +75,6 @@ export const DatasetsPage: NextPage = () => {
           }
           columnDefinitions={columnDefinitions}
           loadingText="Loading datasets"
-          
           items={items}
         />
       </Box>

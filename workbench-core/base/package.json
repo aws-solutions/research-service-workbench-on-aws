@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-base",
   "version": "0.1.2",
   "description": "Package to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires",
-  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {

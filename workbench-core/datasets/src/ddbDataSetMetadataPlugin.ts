@@ -234,7 +234,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (response.Items?.length) {
       throw new DataSetExistsError(
-        `Cannot create the DataSet. A DataSet must have a unique 'name', and  '${dataSet.name}' already exists.`
+        `Cannot create the DataSet. A DataSet must have a unique 'name', and the requested name already exists.`
       );
     }
   }

@@ -34,6 +34,7 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
   AnyPrincipal,
+  CfnPolicy,
   Effect,
   Policy,
   PolicyDocument,
@@ -51,16 +52,16 @@ import { StackProps } from 'aws-cdk-lib/core/lib/stack';
 import _ from 'lodash';
 import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
-import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
-import { SWBVpc } from './infra/SWBVpc';
+import { RSWApplicationLoadBalancer } from './infra/RSWApplicationLoadBalancer';
+import { RSWVpc } from './infra/RSWVpc';
 
-export interface SWBStackProps extends StackProps {
+export interface RSWStackProps extends StackProps {
   solutionId: string;
   solutionName: string;
   solutionVersion: string;
 }
 
-export class SWBStack extends Stack {
+export class RSWStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
   // Note: AWS_REGION cannot be set since it's a reserved env variable
   public lambdaEnvVars: {
@@ -71,6 +72,7 @@ export class SWBStack extends Stack {
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_BUCKET_NAME: string;
     ACCT_HANDLER_ARN_OUTPUT_KEY: string;
     API_HANDLER_ARN_OUTPUT_KEY: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
@@ -93,8 +95,9 @@ export class SWBStack extends Stack {
   private _swbDomainNameOutputKey: string;
   private _mainAccountLoadBalancerListenerArnOutputKey: string;
   private _isSolutionsBuild: boolean = isSolutionsBuild();
+  private _API_LIMIT: number = 200;
 
-  public constructor(app: App, props: SWBStackProps) {
+  public constructor(app: App, props: RSWStackProps) {
     const {
       STAGE,
       AWS_REGION,
@@ -139,7 +142,7 @@ export class SWBStack extends Stack {
       // In solutions pipeline build, resolve region and account to token value to be resolved on CF deployment
     } = getConstants(isSolutionsBuild() ? Aws.REGION : undefined);
 
-    const stackProps: SWBStackProps = {
+    const stackProps: RSWStackProps = {
       description: `(${props.solutionId}) - ${props.solutionName} Deployment. Version: ${props.solutionVersion}`,
       env: {
         account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
@@ -195,6 +198,20 @@ export class SWBStack extends Stack {
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
     const MAIN_ACCT_ID = `${this.account}`;
+
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
+    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
+    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+
+    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
+    const datasetBucket = this._createS3DatasetsBuckets(
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      S3DatasetsEncryptionKey.key
+    );
+
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -203,6 +220,7 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_NAME: datasetBucket.bucketName,
       ACCT_HANDLER_ARN_OUTPUT_KEY,
       API_HANDLER_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
@@ -219,19 +237,6 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ID,
       USER_AGENT_STRING
     };
-
-    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME);
-    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
-    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
-    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
-    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
-
-    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
-      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
-    const datasetBucket = this._createS3DatasetsBuckets(
-      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
-      S3DatasetsEncryptionKey.key
-    );
 
     const S3ArtifactEncryptionKey: WorkbenchEncryptionKeyWithRotation =
       new WorkbenchEncryptionKeyWithRotation(this, S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
@@ -274,12 +279,45 @@ export class SWBStack extends Stack {
       createAccountHandler
     );
 
+    const revokedTokensDDBTableEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-revokedTokensDDBTableEncryptionKey`);
+    const revokedTokensDDBTable = this._createRevokedTokensDDBTable(
+      revokedTokensDDBTableEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
     // Add DynamicAuth DynamoDB Table name to lambda environment variable
     _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
       lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
     });
 
+    _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
+      lambda.addEnvironment('REVOKED_TOKENS_DDB_TABLE_NAME', revokedTokensDDBTable.tableName);
+    });
+
     const apiGwUrl = this._createRestApi(apiLambda);
+
+    [apiLambda, statusHandler, createAccountHandler].forEach((lambda) => {
+      if (
+        !_.isUndefined(lambda.node.findChild('ServiceRole').node.tryFindChild('DefaultPolicy')) &&
+        !_.isUndefined(lambda.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node.defaultChild)
+      ) {
+        const cfnPolicy = lambda.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node
+          .defaultChild as CfnPolicy;
+        cfnPolicy.addMetadata('cfn_nag', {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          rules_to_suppress: [
+            {
+              id: 'W76',
+              reason:
+                'Reviewed the autogenerated default policy. SPCM complexity greater then 25 is appropriate for this policy'
+            }
+          ]
+        });
+      }
+    });
 
     const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node
       .defaultChild as CfnResource;
@@ -307,12 +345,12 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+    const rswVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
     new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
-      value: swbVpc.vpc.vpcId
+      value: rswVpc.vpc.vpcId
     });
 
-    let childMetadataNode = swbVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
+    let childMetadataNode = rswVpc.node.findChild('VpcFlowLogGroup').node.defaultChild as CfnResource;
     childMetadataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
@@ -324,10 +362,10 @@ export class SWBStack extends Stack {
     });
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet1')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet1').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -341,10 +379,10 @@ export class SWBStack extends Stack {
     }
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet2')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet2').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -358,10 +396,10 @@ export class SWBStack extends Stack {
     }
 
     if (
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
-      !_.isUndefined(swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.tryFindChild('PublicSubnet3')) &&
+      !_.isUndefined(rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node.defaultChild)
     ) {
-      childMetadataNode = swbVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
+      childMetadataNode = rswVpc.node.findChild('MainVPC').node.findChild('PublicSubnet3').node
         .defaultChild as CfnResource;
       childMetadataNode.addMetadata('cfn_nag', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -375,11 +413,11 @@ export class SWBStack extends Stack {
     }
 
     new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
-      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+      value: (rswVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
     });
 
     new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
-      value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
+      value: (rswVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
     });
 
     const hostedZoneId = this._isSolutionsBuild
@@ -400,7 +438,7 @@ export class SWBStack extends Stack {
       : DOMAIN_NAME;
 
     this._createLoadBalancer(
-      swbVpc,
+      rswVpc,
       apiGwUrl,
       domainName,
       hostedZoneId,
@@ -409,27 +447,27 @@ export class SWBStack extends Stack {
     );
   }
 
-  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
-    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): RSWVpc {
+    const rswVpc = new RSWVpc(this, 'RSWVpc', {
       vpcId,
       albSubnetIds,
       ecsSubnetIds
     });
 
-    return swbVpc;
+    return rswVpc;
   }
 
   private _createLoadBalancer(
-    swbVpc: SWBVpc,
+    rswVpc: RSWVpc,
     apiGwUrl: string,
     domainName: string,
     hostedZoneId: string,
     internetFacing: boolean,
     accessLogsBucket: Bucket
   ): void {
-    const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
-      vpc: swbVpc.vpc,
-      subnets: swbVpc.albSubnetSelection,
+    const alb = new RSWApplicationLoadBalancer(this, 'RSWApplicationLoadBalancer', {
+      vpc: rswVpc.vpc,
+      subnets: rswVpc.albSubnetSelection,
       internetFacing,
       accessLogsBucket
     });
@@ -449,6 +487,7 @@ export class SWBStack extends Stack {
       handler: 'proxyHandlerLambda.handler',
       code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: this._API_LIMIT,
       environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -873,6 +912,7 @@ export class SWBStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: 100,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60),
       memorySize: 256
@@ -961,6 +1001,7 @@ export class SWBStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: 1,
       environment: this.lambdaEnvVars,
       memorySize: 256,
       timeout: Duration.minutes(4)
@@ -1111,6 +1152,7 @@ export class SWBStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_18_X,
+      reservedConcurrentExecutions: this._API_LIMIT,
       environment: {
         ...this.lambdaEnvVars,
         FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
@@ -1288,6 +1330,8 @@ export class SWBStack extends Stack {
       deployOptions: {
         stageName: 'dev',
         accessLogDestination: new LogGroupLogDestination(logGroup),
+        throttlingRateLimit: this._API_LIMIT,
+        throttlingBurstLimit: this._API_LIMIT,
         accessLogFormat: AccessLogFormat.custom(
           JSON.stringify({
             stage: '$context.stage',
@@ -1416,6 +1460,31 @@ export class SWBStack extends Stack {
     });
 
     return dynamicAuthDDBTable.table;
+  }
+
+  private _createRevokedTokensDDBTable(
+    encryptionKey: Key,
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
+    const revokedTokensDDBTable = new WorkbenchDynamodb(this, `${this.stackName}-revoked-tokens`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey,
+      lambdas: [apiLambda, statusHandler, createAccountHandler],
+      timeToLiveAttribute: 'ttl'
+    });
+
+    new CfnOutput(this, 'revokedTokensDDBTableArn', {
+      value: revokedTokensDDBTable.table.tableArn
+    });
+
+    new CfnOutput(this, 'revokedTokensDDBTableName', {
+      value: revokedTokensDDBTable.table.tableName
+    });
+
+    return revokedTokensDDBTable.table;
   }
 
   // Application DynamoDB Table

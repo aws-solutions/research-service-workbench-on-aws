@@ -10,17 +10,17 @@ import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { isSolutionsBuild } from '../constants';
 
-export interface SWBApplicationLoadBalancerProps {
+export interface RSWApplicationLoadBalancerProps {
   vpc: IVpc;
   subnets: SubnetSelection;
   internetFacing: boolean;
   accessLogsBucket: Bucket;
 }
 
-export class SWBApplicationLoadBalancer extends Construct {
+export class RSWApplicationLoadBalancer extends Construct {
   public readonly applicationLoadBalancer: ApplicationLoadBalancer;
 
-  public constructor(scope: Construct, id: string, props: SWBApplicationLoadBalancerProps) {
+  public constructor(scope: Construct, id: string, props: RSWApplicationLoadBalancerProps) {
     const { vpc, subnets, internetFacing, accessLogsBucket } = props;
     super(scope, id);
 

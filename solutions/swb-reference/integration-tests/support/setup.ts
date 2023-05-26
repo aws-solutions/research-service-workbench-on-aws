@@ -120,7 +120,7 @@ export default class Setup {
   }
 
   public getStackName(): string {
-    return `swb-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
+    return `rsw-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
   }
 
   public getMainAwsClient(): AwsService {
