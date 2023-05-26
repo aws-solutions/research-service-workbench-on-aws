@@ -154,6 +154,9 @@ export default class Setup {
   }
 
   private async _loadSecrets(secretsService: SecretsService): Promise<void> {
+    if (this._settings.optional('awsAccountIdParamStorePath', undefined) === undefined) {
+      return;
+    }
     const [awsAccountId] = await Promise.all([
       secretsService.getSecret(this._settings.get('awsAccountIdParamStorePath'))
     ]);
