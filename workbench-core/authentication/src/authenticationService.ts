@@ -59,6 +59,14 @@ export class AuthenticationService {
   }
 
   /**
+   * Revokes the given access token.
+   * @param token - the access token to revoke
+   */
+  public async revokeAccessToken(accessToken: string): Promise<void> {
+    await this._authenticationPlugin.revokeAccessToken(accessToken);
+  }
+
+  /**
    * Gets the Id of the user for whom the token was issued.
    *
    * @param decodedToken - a decoded Id or access token from which to extract the user Id
