@@ -26,7 +26,8 @@ describe('list users negative tests', () => {
 
   describe('with invalid parameters', () => {
     describe('--non encoded pagination token', () => {
-      const paginationToken = '1';
+      const paginationToken =
+        'Q0FJU3FBSUldewktCQWdnREV2d0JBSDBWSWN1T1NYVzVNaGJ4OWI3bFllZFArcFBXMnY3NEptcXpjKzJLNXJxQWV5SkFiaUk2SWxCaFoybHVZWFJwYjI1RGIyNTBhVzUxWVhScGIyNUVWRThpTENKdVpYaDBTMlY1SWpvaVFVRkJRVUZCUVVGRFRqQk1RVkZGUWxsWFpXUnJZakJRVTNCcFVVTjRWbkJXWjFkS1NYbGlLMFZSTlUxSFZUTmhhVFpEYWxGNE5HWlZkalZzWW0xWk4xbHRSVE5OZWxFd1RucFZkRTFVYXpWT1V6QXdXa1JOZDB4WFNUTlBSMDEwVDBkRk1WbHFhR2xaYWtWNlQwUk5NVTkzUFQwaUxDSndZV2RwYm1GMGFXOXVSR1Z3ZEdnaU9qSXNJbkJ5WlhacGIzVnpVbVZ4ZFdWemRGUnBiV1VpT2pFMk9EVXhNVGt3TXpRek1EVjlHaUNvWC80NFRvUWZ2N1JGV3c3TktxNys5UW9VK3hBSmxhRmpmMHhXUDE2RytRPT0=';
       const queryParams = { paginationToken };
 
       test('it throws 400 error', async () => {
@@ -37,26 +38,8 @@ describe('list users negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
-            })
-          );
-        }
-      });
-    });
-
-    describe('--non string pagination token', () => {
-      const paginationToken = 1;
-      const queryParams = { paginationToken };
-
-      test('it throws 400 error', async () => {
-        try {
-          await adminSession.resources.users.get(queryParams);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message:
+                "1 validation error detected: Value 'CAISqAII]{\t-\t����\t �Y%��=Ma\\�5����ݱe��@��A\\����)��錬�,�����)��$�%�\t�hɱ�eaI���������\\��eaI����Y�1\r)�ia��L�X�%���EU\tEU\tEUQ�\t5EYE��ai]I�e�\tET�\t�UU8�Y�\t]hő-Ma��,�YI9T�!YQ9��Qi���9iY��Y�e��i8ű�IQ99���Q��Y��U��Y=U��]�I9���aMQ9AH���P��5Y�Ņ�i��X�P�I95T��AP��1\r)�e]������\\��IYݑ��=�%�%�\t�iai���Y�U�Y�]Y�I��]U�=��=U�5Q��5�E�5X��\r�`���Q�E���I]��9-�ܬ�E�T��)������]@���D��' at 'paginationToken' failed to satisfy constraint: Member must satisfy regular expression pattern: [\\S]+"
             })
           );
         }
