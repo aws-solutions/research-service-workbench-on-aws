@@ -81,8 +81,8 @@ export class AccountHelper {
   }
 
   public async removeAccountFromKeyPolicy(awsAccountId: string): Promise<void> {
-    const mainAcctS3ArtifactEncryptionArn = this._settings.get('MainAccountS3ArtifactEncryptionKeyOutput');
-    const mainAcctS3DatasetsEncryptionArn = this._settings.get('MainAccountS3DatasetsEncryptionKeyOutput');
+    const mainAcctS3ArtifactEncryptionArn = this._settings.get('S3ArtifactEncryptionKeyOutputCC25B0CD');
+    const mainAcctS3DatasetsEncryptionArn = this._settings.get('S3DatasetsEncryptionKeyOutput05C7794D');
     const mainAcctEncryptionArnList = [mainAcctS3ArtifactEncryptionArn, mainAcctS3DatasetsEncryptionArn];
     await Promise.all(
       _.map(mainAcctEncryptionArnList, async (mainAcctEncryptionArn) => {
@@ -141,7 +141,7 @@ export class AccountHelper {
   }
 
   public async deOnboardAccount(awsAccountId: string): Promise<void> {
-    // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
+    // Undo all operations that happen in: hostingAccountLifecycleService.createAccount()
 
     // Update main account default event bus to remove hosting account state change events
     await this.removeBusPermissions(awsAccountId);

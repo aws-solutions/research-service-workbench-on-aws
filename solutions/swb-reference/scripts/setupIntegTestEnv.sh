@@ -9,7 +9,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 function main(){
-    while getopts :m:p:s:r:i:e:k: opts; do
+    while getopts :m:p:s:r:i:e:k:a: opts; do
         case $opts in
             m) EMAIL=$OPTARG;;
             p) newPassword=$OPTARG;;
@@ -18,6 +18,7 @@ function main(){
             i) hostingAccountId=$OPTARG;;
             e) externalId=$OPTARG;;
             k) encryptionKeyArn=$OPTARG;;
+            a) awsAccountId=$OPTARG;;
             \?) help; exit 0;;
         esac
     done
@@ -61,14 +62,15 @@ Usage: `basename $0`
     -i [HOSTING ACCOUNT ID]
     -e [EXTERNAL ID USED FOR HOSTING ACCOUNT DEPLOYMENT]
     -k [EncryptionKeyArn FROM HOSTING ACCOUNT DEPLOYMENT]
+    -a [AWS ACCOUNT ID for ACCOUNT INTEG TEST]
 
 Example:
-    `basename $0` -m '<johndoe@example.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:XXXXXXXX:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX'
+    `basename $0` -m '<johndoe@example.com>' -p 'xxxxxxxxxxx' -s 'dev' -r 'va' -i 'XXXXXXXXXXXX' -e '<externalId>' -k 'arn:aws:kms:XXXXXXXX:XXXXXXXXXXXX:key/XXXXXXXXXXXXXXXXXXXXX' -a 'YYYYYYYYYYYY'
           ${NC}"
 }
 
 function check(){
-    if [[ -z $EMAIL || -z $newPassword || -z $stage || -z $shortName || -z $hostingAccountId || -z $externalId || -z $encryptionKeyArn ]]; then
+    if [[ -z $EMAIL || -z $newPassword || -z $stage || -z $shortName || -z $hostingAccountId || -z $externalId || -z $encryptionKeyArn || -z $awsAccountId ]]; then
         echo -e "${RED}ERROR: email, newPassword, stage, regionShortName, externalId and EncryptionKeyArn are mandatory arguments. \nPlease see the help screen: `basename $0` -h${NC}"
         exit 1
     fi
@@ -278,17 +280,9 @@ function run() {
     researcher1PasswordParamStorePath="/swb/$stage/researcher1/password"
     aws ssm put-parameter --name $researcher1PasswordParamStorePath --value "$newPassword" --type 'SecureString' --overwrite > /dev/null
 
-    hostAwsAccountIdParamStorePath="/swb/$stage/accountsTest/awsAccountId"
-    aws ssm put-parameter --name $hostAwsAccountIdParamStorePath --value $hostingAccountId --type 'String' --overwrite > /dev/null
+    awsAccountIdParamStorePath="/swb/$stage/accountsTest/awsAccountId"
+    aws ssm put-parameter --name $awsAccountIdParamStorePath --value $awsAccountId --type 'String' --overwrite > /dev/null
 
-    hostingAccountHandlerRoleArnParamStorePath="/swb/$stage/accountsTest/hostingAccountHandlerRoleArn"
-    aws ssm put-parameter --name $hostingAccountHandlerRoleArnParamStorePath --value $hostingAccountHandlerRoleArn --type 'String' --overwrite > /dev/null
-
-    envMgmtRoleArnParamStorePath="/swb/$stage/accountsTest/envMgmtRoleArn"
-    aws ssm put-parameter --name $envMgmtRoleArnParamStorePath --value $envMgmtRoleArn --type 'String' --overwrite > /dev/null
-
-    encryptionKeyArnParamStorePath="/swb/$stage/accountsTest/encryptionKeyArn"
-    aws ssm put-parameter --name $encryptionKeyArnParamStorePath --value $encryptionKeyArn --type 'String' --overwrite > /dev/null
     echo -e "${YELLOW}\nSSM Params Updated !"
 
     ROOT_DIR=`git rev-parse --show-toplevel`
@@ -319,11 +313,9 @@ researcher1PasswordParamStorePath: '$researcher1PasswordParamStorePath'
 ## Default Hosting Account
 defaultHostingAccountId: '$accountId'
 
-## Hosting account used for Account Creation tests
-hostAwsAccountIdParamStorePath: '$hostAwsAccountIdParamStorePath'
-hostingAccountHandlerRoleArnParamStorePath: '$hostingAccountHandlerRoleArnParamStorePath'
-envMgmtRoleArnParamStorePath: '$envMgmtRoleArnParamStorePath'
-encryptionKeyArnParamStorePath: '$encryptionKeyArnParamStorePath'
+## Pre-requisite for running aws-accounts integration test
+## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
+awsAccountIdParamStorePath: '$awsAccountIdParamStorePath'
 " | tee -a ${INTEGRATION_TEST_CONFIG_FILE} && echo -e "\nIntegration Test Config File: ${INTEGRATION_TEST_CONFIG_FILE} ${NC}"
 }
 
