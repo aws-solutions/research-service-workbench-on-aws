@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "new error message",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}
