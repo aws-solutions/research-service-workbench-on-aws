@@ -5,7 +5,9 @@
     "<rootDir>/src/aws/awsService.ts",
     "<rootDir>/src/aws/clients/*",
     "<rootDir>/src/types/relationshipDDBItem",
-    "<rootDir>/src/services/secretsService.ts"
+    "<rootDir>/src/services/secretsService.ts",
+    "<rootDir>/src/interfaces/listUsersForRoleRequest.ts",
+    "<rootDir>/src/index.ts"
   ],
   "coverageThreshold": {
     "global": {

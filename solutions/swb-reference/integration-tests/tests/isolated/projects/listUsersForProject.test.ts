@@ -12,6 +12,7 @@ describe('list users for project tests', () => {
   const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
+  let pa2Session: ClientSession;
   let project1Id: string;
 
   beforeEach(() => {
@@ -19,7 +20,7 @@ describe('list users for project tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, project1Id, pa2Session } = await paabHelper.createResources());
   });
 
   afterAll(async () => {
@@ -55,25 +56,110 @@ describe('list users for project tests', () => {
         );
       }
     });
+
+    test('cannot have page size less than 1', async () => {
+      try {
+        await adminSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin', 0);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `pageSize: Must be Between 1 and 100`
+          })
+        );
+      }
+    });
+
+    test('cannot have page size greater than 100', async () => {
+      try {
+        await adminSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin', 101);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `pageSize: Must be Between 1 and 100`
+          })
+        );
+      }
+    });
+
+    test('cannot have invalid pagination token', async () => {
+      try {
+        await adminSession.resources.projects
+          .project(project1Id)
+          .listUsersForProject('ProjectAdmin', 1, 'invalidToken123');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `Invalid Pagination Token`
+          })
+        );
+      }
+    });
   });
 
   describe('basic tests', () => {
-    // test IT Admin
-    test.each(['ProjectAdmin', 'Researcher'])('ITAdmin list users for role: %p', async (role: string) => {
-      const response = await adminSession.resources.projects.project(project1Id).listUsersForProject(role);
+    let pageSize: number;
+    let userIds: string[];
 
-      expect(response.status).toBe(200);
-      expect(response.data.users).toBeInstanceOf(Array);
-      expect(response.data.users.length).toBeGreaterThanOrEqual(0);
+    // test IT Admin
+    describe.each(['ProjectAdmin', 'Researcher'])('ITAdmin list users for role: %p', (role: string) => {
+      beforeEach(async () => {
+        pageSize = 1;
+
+        await adminSession.resources.projects
+          .project(project1Id)
+          .assignUserToProject(pa2Session.getUserId()!, { role });
+
+        userIds = [];
+        userIds.push(pa1Session.getUserId()!);
+        userIds.push(pa2Session.getUserId()!);
+      });
+
+      afterEach(async () => {
+        await adminSession.resources.projects
+          .project(project1Id)
+          .removeUserFromProject(pa2Session.getUserId()!);
+      });
+
+      test('ITAdmin lists users for Role', async () => {
+        let response = await adminSession.resources.projects.project(project1Id).listUsersForProject(role, 1);
+        expect(response.status).toBe(200);
+
+        let paginatedResponse = response.data;
+        expect(paginatedResponse.data).toBeInstanceOf(Array);
+        expect(paginatedResponse.data.length).toEqual(pageSize);
+        expect(userIds.includes(paginatedResponse.data[0]));
+
+        const paginationToken = response.data.paginationToken;
+        expect(paginationToken.length).toBeGreaterThan(0);
+
+        response = await adminSession.resources.projects
+          .project(project1Id)
+          .listUsersForProject(role, 1, paginationToken);
+        expect(response.status).toBe(200);
+
+        paginatedResponse = response.data;
+        expect(paginatedResponse.data).toBeInstanceOf(Array);
+        expect(paginatedResponse.data.length).toEqual(pageSize);
+        expect(paginatedResponse.paginationToken).toBeUndefined();
+        expect(userIds.includes(paginatedResponse.data[0]));
+      });
     });
 
     // test Project Admin
     test.each(['ProjectAdmin', 'Researcher'])('PA list users for role: %p', async (role: string) => {
-      const response = await pa1Session.resources.projects.project(project1Id).listUsersForProject(role);
-
+      const response = await pa1Session.resources.projects.project(project1Id).listUsersForProject(role, 1);
       expect(response.status).toBe(200);
-      expect(response.data.users).toBeInstanceOf(Array);
-      expect(response.data.users.length).toBeGreaterThanOrEqual(0);
+
+      const paginatedResponse = response.data;
+      expect(paginatedResponse.data).toBeInstanceOf(Array);
+      expect(paginatedResponse.data.length).toEqual(pageSize);
+      expect(userIds.includes(paginatedResponse.data[0]));
     });
   });
 });

@@ -15,6 +15,7 @@ import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { isInvalidPaginationTokenError } from './errors/invalidPaginationTokenError';
 import { FilterRequest } from './interfaces/filterRequest';
+import { ListUsersForRoleRequest, ListUsersForRoleRequestParser } from './interfaces/listUsersForRoleRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
 import { QueryParameterFilter } from './interfaces/queryParameterFilter';
@@ -129,5 +130,7 @@ export {
   swbDescriptionMaxLength,
   lengthValidationMessage,
   betweenFilterMessage,
-  isInvalidPaginationTokenError
+  isInvalidPaginationTokenError,
+  ListUsersForRoleRequestParser,
+  ListUsersForRoleRequest
 };

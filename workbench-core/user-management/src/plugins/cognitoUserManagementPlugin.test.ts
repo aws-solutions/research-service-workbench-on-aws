@@ -2,7 +2,6 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
@@ -37,7 +36,12 @@ import {
   UpdateItemCommand,
   QueryCommand
 } from '@aws-sdk/client-dynamodb';
-import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  DynamoDBService,
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from '@aws/workbench-core-base';
 import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
@@ -90,7 +94,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       email: 'Sample-email-address',
       status: Status.ACTIVE
     };
-    roles = ['Role1', 'Role2'];
+    roles = ['Researcher', 'ProjectAdmin'];
     paginationToken =
       'IkNBSVNxQUlJQVJLQkFnZ0RFdndCQUgwVkljdU9TWFc1TWhieDliN2xZZWRQK3BQVzJ2NzRKbXF6YysySzVycUFleUpBYmlJNklsQmhaMmx1WVhScGIyNURiMjUwYVc1MVlYUnBiMjVFVkU4aUxDSnVaWGgwUzJWNUlqb2lRVUZCUVVGQlFVRkRUakJNUVZGRlFsbFhaV1JyWWpCUVUzQnBVVU40Vm5CV1oxZEtTWGxpSzBWUk5VMUhWVE5oYVRaRGFsRjROR1pWZGpWc1ltMVpOMDVVU1RCT2VsVjZUMGRGZEUxVVFtdFplVEF3VDFSRk0weFVaekZPVkZWMFRVZEthazlYU20xWlYxSnFUMGRLYTA5M1BUMGlMQ0p3WVdkcGJtRjBhVzl1UkdWd2RHZ2lPakVzSW5CeVpYWnBiM1Z6VW1WeGRXVnpkRlJwYldVaU9qRTJPRFV3TnpReE5qSXdOelI5R2lDRnpmNlU4OExHVFlSVU9wdWxCRFQ4Qlh6ZGkyVk55MDVObFVPY2Irci9qQT09Ig==';
   });
@@ -915,10 +919,19 @@ describe('CognitoUserManagementPlugin tests', () => {
   });
 
   describe('listUsersForRole tests', () => {
+    let request: ListUsersForRoleRequest;
+
+    beforeEach(() => {
+      request = ListUsersForRoleRequestParser.parse({
+        role: roles[0],
+        projectId: 'fakeProjectId'
+      });
+    });
+
     it('should return a list of Users in the given group', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({ Users: [{ Username: userInfo.id }] });
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(1);
       expect(users).toMatchObject<string[]>([userInfo.id]);
@@ -927,7 +940,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should return an empty array when no users are in group', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({});
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
       expect(users).toMatchObject<string[]>([]);
@@ -936,7 +949,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should return an empty array when the users dont have user ids', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({ Users: [{}] });
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
       expect(users).toMatchObject<string[]>([]);
@@ -947,7 +960,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(IdpUnavailableError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -955,7 +968,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -963,7 +976,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
@@ -971,7 +984,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: 'Group not found.' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(RoleNotFoundError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
@@ -979,13 +992,13 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(TooManyRequestsError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(ListUsersInGroupCommand).rejects(new Error());
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(Error);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(Error);
     });
   });
 
@@ -1058,13 +1071,15 @@ describe('CognitoUserManagementPlugin tests', () => {
 
     describe('when user has reached role limit', () => {
       beforeEach(() => {
-        roles = Array(plugin.userRoleLimit).fill('Role1');
+        roles = Array(plugin.userRoleLimit).fill('Researcher');
         cognitoMock
           .on(AdminListGroupsForUserCommand)
           .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
       });
       it('should throw an error', async () => {
-        await expect(plugin.addUserToRole(userInfo.id, 'Role2')).rejects.toThrow(UserRolesExceedLimitError);
+        await expect(plugin.addUserToRole(userInfo.id, 'ProjectAdmin')).rejects.toThrow(
+          UserRolesExceedLimitError
+        );
       });
     });
 
@@ -1351,7 +1366,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       ddbMock.on(QueryCommand).resolves({
         Items: [
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }
@@ -1359,7 +1374,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
       const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
 
-      expect(validatedRoles).toStrictEqual(['Role2']);
+      expect(validatedRoles).toStrictEqual(['ProjectAdmin']);
     });
 
     it('Modify roles if user is temporarily allowed access', async () => {
@@ -1386,7 +1401,7 @@ describe('CognitoUserManagementPlugin tests', () => {
             expirationTime: { N: expiredTimeString }
           },
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }
@@ -1394,7 +1409,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
       const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
 
-      expect(validatedRoles).toStrictEqual(['Role2', 'Role3']);
+      expect(validatedRoles).toStrictEqual(['ProjectAdmin', 'Role3']);
     });
 
     it('Do not modify roles if user is temporarily revoked access but has expired', async () => {
@@ -1402,7 +1417,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       ddbMock.on(QueryCommand).resolves({
         Items: [
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }
