@@ -39,7 +39,6 @@
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.342.0",
     "@aws-sdk/client-dynamodb": "^3.342.0",
-    "@aws-sdk/client-s3": "^3.342.0",
     "@aws-sdk/types": "^3.342.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.2.0",
