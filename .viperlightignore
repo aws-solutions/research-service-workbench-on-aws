@@ -11,6 +11,8 @@ lib
 
 # NOTICE files
 .*/NOTICE
+# THIRD_PARTY_LICENSE files
+.*/THIRD_PARTY_LICENSE
 
 # Test files
 # Note that emails need to end with @simulator.amazonses.com in order to work against Cognito
