@@ -10,9 +10,9 @@ import fs from 'fs';
 
 import { join, basename } from 'path';
 import { Readable } from 'stream';
+import { AwsService } from '@aws/workbench-core-base';
 import { _Object } from '@aws-sdk/client-s3';
 import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
-import { AwsService } from '@aws/workbench-core-base';
 
 import md5File from 'md5-file';
 

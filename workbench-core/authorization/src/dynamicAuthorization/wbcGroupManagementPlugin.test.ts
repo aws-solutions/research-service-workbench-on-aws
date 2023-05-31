@@ -3,6 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DynamoDBService } from '@aws/workbench-core-base';
+import {
+  UserManagementService,
+  UserManagementPlugin,
+  PluginConfigurationError,
+  IdpUnavailableError,
+  RoleAlreadyExistsError,
+  TooManyRequestsError,
+  UserNotFoundError,
+  RoleNotFoundError
+} from '@aws/workbench-core-user-management';
 import {
   ConditionalCheckFailedException,
   DeleteItemCommand,
@@ -15,17 +26,6 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { DynamoDBService } from '@aws/workbench-core-base';
-import {
-  UserManagementService,
-  UserManagementPlugin,
-  PluginConfigurationError,
-  IdpUnavailableError,
-  RoleAlreadyExistsError,
-  TooManyRequestsError,
-  UserNotFoundError,
-  RoleNotFoundError
-} from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';

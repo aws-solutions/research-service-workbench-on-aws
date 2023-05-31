@@ -6,6 +6,8 @@
 const uuid = '40b01529-0c7f-4609-a1e2-715068da5f0e';
 const envTypeConfigId = `etc-${uuid}`;
 jest.mock('uuid', () => ({ v4: () => uuid }));
+import { resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -15,8 +17,6 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
 import { EnvironmentTypeConfigStatus } from '../constants/environmentTypeConfigStatus';
 import { EnvironmentTypeConfig } from '../models/environmentTypeConfigs/environmentTypeConfig';

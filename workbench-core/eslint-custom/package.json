@@ -27,17 +27,17 @@
     "test": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^3.0.0",
-    "@typescript-eslint/parser": "^5.43.0",
+    "@rushstack/eslint-config": "^3.2.0",
+    "@typescript-eslint/parser": "^5.59.8",
     "eslint": "^8.7.0",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-security": "^1.4.0"
   },
   "devDependencies": {
-    "@rushstack/heft": "^0.47.5",
-    "@rushstack/heft-jest-plugin": "^0.3.28",
-    "@rushstack/heft-node-rig": "^1.10.5",
+    "@rushstack/heft": "^0.50.5",
+    "@rushstack/heft-jest-plugin": "^0.5.11",
+    "@rushstack/heft-node-rig": "^1.12.11",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^18.15.11",
     "depcheck": "^1.4.3",

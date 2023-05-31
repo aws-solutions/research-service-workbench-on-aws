@@ -5,7 +5,6 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
   QueryParams,
@@ -21,6 +20,7 @@ import {
   PaginatedResponse,
   DynamoDBService
 } from '@aws/workbench-core-base';
+import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';

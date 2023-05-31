@@ -6,6 +6,7 @@
 const rndUuid = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 const envId = `env-${rndUuid}`;
 jest.mock('uuid', () => ({ v4: () => rndUuid }));
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import {
   BatchGetItemCommand,
   BatchGetItemCommandOutput,
@@ -18,7 +19,6 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Environment, EnvironmentParser } from '../models/environments/environment';
