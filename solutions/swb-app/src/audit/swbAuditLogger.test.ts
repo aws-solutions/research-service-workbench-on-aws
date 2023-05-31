@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Writer } from '@aws/workbench-core-audit';
+import Writer from './plugins/writer';
 import SwbAuditLogger from './swbAuditLogger';
 
 describe('SwbAuditLogger', () => {

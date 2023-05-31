@@ -3,7 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditEntry, Writer } from '@aws/workbench-core-audit';
+import AuditEntry from './auditEntry';
+import Writer from './plugins/writer';
 
 export default class SwbAuditLogger implements Writer {
   public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {

@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditEntry, BaseAuditPlugin, Metadata } from '@aws/workbench-core-audit';
 import { getCurrentInvoke } from '@vendia/serverless-express';
+import AuditEntry from './auditEntry';
+import Metadata from './metadata';
+import BaseAuditPlugin from './plugins/baseAuditPlugin';
 
 export default class SwbAuditPlugin extends BaseAuditPlugin {
   /**

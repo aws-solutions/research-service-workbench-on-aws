@@ -20,6 +20,10 @@ importers:
 
   ../../solutions/swb-app:
     specifiers:
+      '@aws-sdk/client-dynamodb': ^3.212.0
+      '@aws-sdk/client-s3': ^3.212.0
+      '@aws-sdk/types': ^3.212.0
+      '@aws-sdk/util-dynamodb': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-accounts': workspace:*
       '@aws/workbench-core-audit': workspace:*
@@ -30,6 +34,7 @@ importers:
       '@aws/workbench-core-environments': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@aws/workbench-core-user-management': workspace:*
+      '@casl/ability': ^5.4.3
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -43,12 +48,15 @@ importers:
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
       '@vendia/serverless-express': ^4.5.4
+      aws-sdk-client-mock: ^0.6.2
       cookie-parser: ^1.4.6
       cors: ^2.8.5
       depcheck: ^1.4.3
       eslint: ^8.7.0
       express: ^4.17.3
+      fast-check: ^2.24.0
       jest: ^27.5.1
+      jest-fast-check: ^1.0.2
       jsonschema: ^1.4.1
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
@@ -56,6 +64,8 @@ importers:
       nodemon: ^2.0.19
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
+      radix3: ^1.0.0
+      rate-limiter-flexible: ~2.4.1
       sort-package-json: ^1.57.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
@@ -70,6 +80,7 @@ importers:
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@aws/workbench-core-user-management': link:../../workbench-core/user-management
+      '@casl/ability': 5.4.4
       '@hapi/boom': 10.0.0
       '@vendia/serverless-express': 4.8.0
       cookie-parser: 1.4.6
@@ -77,8 +88,14 @@ importers:
       express: 4.18.1
       jsonschema: 1.4.1
       lodash: 4.17.21
+      radix3: 1.0.0
+      rate-limiter-flexible: 2.4.1
       zod: 3.19.1
     devDependencies:
+      '@aws-sdk/client-dynamodb': 3.226.0
+      '@aws-sdk/client-s3': 3.226.0
+      '@aws-sdk/types': 3.272.0
+      '@aws-sdk/util-dynamodb': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -91,9 +108,12 @@ importers:
       '@types/jest': 27.5.2
       '@types/lodash': 4.14.182
       '@types/node': 18.15.11
+      aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       depcheck: 1.4.3
       eslint: 8.16.0
+      fast-check: 2.25.0
       jest: 27.5.1
+      jest-fast-check: 1.0.2_6qeitamrczupn3g7m7cnu6ougi
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
       nodemon: 2.0.19
@@ -7676,7 +7696,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001488
+      caniuse-lite: 1.0.30001492
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -7789,8 +7809,8 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  /caniuse-lite/1.0.30001488:
-    resolution: {integrity: sha512-NORIQuuL4xGpIy6iCCQGN4iFjlBXtfKWIenlUuyZJumLRIindLb7wXM+GO8erEhb7vXfcnf4BAg2PrSDN5TNLQ==}
+  /caniuse-lite/1.0.30001492:
+    resolution: {integrity: sha512-2efF8SAZwgAX1FJr87KWhvuJxnGJKOnctQa8xLOskAXNXq8oiuqgl6u1kk3fFpsp3GgvzlRjiK1sl63hNtFADw==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -11651,7 +11671,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001488
+      caniuse-lite: 1.0.30001492
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2

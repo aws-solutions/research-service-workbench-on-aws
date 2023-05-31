@@ -7,7 +7,10 @@ jest.mock('@vendia/serverless-express', () => ({
   ...jest.requireActual('@vendia/serverless-express'),
   getCurrentInvoke: jest.fn().mockReturnValue({ context: { awsRequestId: 'randomAwsRequestId' } })
 }));
-import { AuditEntry, AuditPlugin, Metadata, Writer } from '@aws/workbench-core-audit';
+import AuditEntry from './auditEntry';
+import AuditPlugin from './auditPlugin';
+import Metadata from './metadata';
+import Writer from './plugins/writer';
 import SwbAuditPlugin from './swbAuditPlugin';
 
 describe('SwbAuditPlugin', () => {

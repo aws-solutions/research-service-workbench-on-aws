@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { BaseExtractor, Extractor, Metadata } from '@aws/workbench-core-audit';
 import { Request, Response } from 'express';
+import { BaseExtractor } from './baseExtractor';
+import { Extractor } from './extractor';
+import Metadata from './metadata';
 
 export default class SwbAuditExtractor implements Extractor {
   public getMetadata(req: Request, res: Response): Metadata {

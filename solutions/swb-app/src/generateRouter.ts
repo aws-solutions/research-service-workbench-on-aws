@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin, WithAudit, Writer } from '@aws/workbench-core-audit';
 import {
   csurf,
   verifyToken,
@@ -19,6 +18,10 @@ import cors from 'cors';
 import express, { Router, Express, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRouteConfig } from './apiRouteConfig';
+import { WithAudit } from './audit/auditMiddleware';
+import AuditService from './audit/auditService';
+import BaseAuditPlugin from './audit/plugins/baseAuditPlugin';
+import Writer from './audit/plugins/writer';
 import SwbAuditExtractor from './audit/swbAuditExtractor';
 import SwbAuditLogger from './audit/swbAuditLogger';
 import SwbAuditPlugin from './audit/swbAuditPlugin';
