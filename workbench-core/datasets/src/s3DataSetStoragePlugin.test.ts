@@ -9,6 +9,7 @@ jest.mock('@aws-sdk/s3-request-presigner', () => ({
   })
 }));
 
+import { AwsService } from '@aws/workbench-core-base';
 import { GetKeyPolicyCommand, KMSClient, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetBucketPolicyCommand,
@@ -22,7 +23,6 @@ import {
   PutAccessPointPolicyCommand,
   S3ControlClient
 } from '@aws-sdk/client-s3-control';
-import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { EndpointExistsError } from './errors/endpointExistsError';

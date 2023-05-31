@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
   PaginatedResponse,
@@ -12,6 +11,7 @@ import {
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';

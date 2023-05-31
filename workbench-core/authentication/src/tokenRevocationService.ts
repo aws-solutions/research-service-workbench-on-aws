@@ -71,7 +71,7 @@ export class TokenRevocationService {
       const key = buildDynamoDBPkSk(signature, this._tokenRevocationType);
 
       const item = {
-        ttl: _.get(payload, 'exp', 0)
+        ttl: _.get(payload, 'exp', 0).toString()
       };
       return {
         key,

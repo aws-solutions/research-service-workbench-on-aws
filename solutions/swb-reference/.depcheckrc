@@ -9,7 +9,10 @@ ignores: [
     '@types/node',
     'ts-node',
     'ts-jest',
-    '@types/aws-lambda'
+    '@types/aws-lambda',
+    '@aws-sdk/types',
+    'fast-check',
+    'jest-fast-check'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored

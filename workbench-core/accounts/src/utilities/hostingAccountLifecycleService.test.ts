@@ -5,6 +5,8 @@
 
 import { Readable } from 'stream';
 
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -37,8 +39,6 @@ import {
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { SdkStream } from '@aws-sdk/types';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
-import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
 import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';

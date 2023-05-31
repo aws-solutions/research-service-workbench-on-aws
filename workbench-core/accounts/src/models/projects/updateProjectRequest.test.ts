@@ -32,6 +32,7 @@ describe('UpdateProjectRequestParser', () => {
           const expectedIssues = [
             {
               code: 'too_small',
+              exact: false,
               minimum: 1,
               type: 'string',
               inclusive: true,
@@ -97,6 +98,7 @@ describe('UpdateProjectRequestParser', () => {
           const expectedIssues = [
             {
               code: 'too_small',
+              exact: false,
               minimum: 1,
               type: 'string',
               inclusive: true,

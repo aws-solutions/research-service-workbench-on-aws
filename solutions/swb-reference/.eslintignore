@@ -6,3 +6,5 @@ cdk.out
 build
 buildLambda.js
 jest.config.js
+generateCodeChallenge.js
+generateCognitoTokens.js

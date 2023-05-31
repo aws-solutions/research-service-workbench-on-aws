@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
@@ -13,6 +12,7 @@ import {
   TooManyRequestsError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';

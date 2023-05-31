@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   addPaginationToken,
   AwsService,
@@ -14,6 +13,7 @@ import {
   toPaginationToken,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetExistsError } from './errors/dataSetExistsError';
 import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';

@@ -89,7 +89,8 @@
      * PNPM documentation: https://pnpm.io/package_json#pnpmoverrides
      */
     "globalOverrides": {
-      "trim-newlines": ">=3.0.1",
+      "@typescript-eslint/parser": ">=5.59.8",
+      "trim-newlines": "=3.0.1",
       "got": ">=11.8.5",
       "jsonwebtoken": ">=9.0.0",
       "json5": ">=2.2.2",

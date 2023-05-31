@@ -5,7 +5,6 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   QueryParams,
@@ -22,6 +21,7 @@ import {
   getFilterQueryParams,
   PaginatedResponse
 } from '@aws/workbench-core-base';
+import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
