@@ -30,7 +30,7 @@ export default class Project extends Resource {
 
   public async listUsersForProject(
     role: string,
-    pageSize: number = 1,
+    pageSize: number = 50,
     paginationToken?: string
   ): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/users`, { params: { role, pageSize, paginationToken } });
