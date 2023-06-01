@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "add params, validation, and error catching for pagination for list users",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

@@ -16,3 +16,4 @@ export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundErr
 export { UserRolesExceedLimitError, isUserRolesExceedLimitError } from './errors/userRolesExceedLimitError';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
 export { UserManagementService } from './userManagementService';
+export { ListUsersRequest, ListUsersRequestParser } from './users/listUsersRequest';

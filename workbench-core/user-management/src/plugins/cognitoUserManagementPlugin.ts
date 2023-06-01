@@ -5,6 +5,7 @@
 
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
 import { AwsService, DynamoDBService, buildDynamoDbKey } from '@aws/workbench-core-base';
+import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -16,6 +17,8 @@ import { UserNotFoundError } from '../errors/userNotFoundError';
 import { UserRolesExceedLimitError } from '../errors/userRolesExceedLimitError';
 import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
+import { ListUsersRequest } from '../users/listUsersRequest';
+import { ListUsersResponse } from '../users/listUsersResponse';
 import { AccessType, TempRoleAccessEntry, TempRoleAccessEntryParser } from './tempRoleAccessEntry';
 
 /**
@@ -389,21 +392,27 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the users within the user pool.
    *
-   * @returns an array of {@link User}s
+   * @param request - the request object according to {@link ListUsersRequest}
+   * @returns a {@link ListUsersResponse} object
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
+   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
-  public async listUsers(): Promise<User[]> {
+  public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
     try {
       const response = await this._aws.clients.cognito.listUsers({
-        UserPoolId: this._userPoolId
+        UserPoolId: this._userPoolId,
+        Limit: request.pageSize,
+        PaginationToken: request.paginationToken
+          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
+          : undefined
       });
 
       if (!response.Users) {
-        return [];
+        return { data: [] };
       }
 
       const users = await Promise.all(
@@ -421,7 +430,13 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         })
       );
 
-      return users.filter((user) => user.id);
+      const data = users.filter((user) => user.id);
+
+      if (!response.PaginationToken) {
+        return { data };
+      }
+
+      return { data, paginationToken: Buffer.from(response.PaginationToken).toString('base64') };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -435,6 +450,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);
+      }
+      if (error.name === 'InvalidParameterException') {
+        throw new InvalidPaginationTokenError('Invalid Pagination Token');
       }
       throw error;
     }

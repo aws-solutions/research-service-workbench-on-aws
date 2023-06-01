@@ -2300,6 +2300,22 @@
         "operationId": "listUsers",
         "parameters": [
           {
+            "name": "paginationToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "50"
+            }
+          },
+          {
             "name": "Cookie",
             "in": "header",
             "schema": {
