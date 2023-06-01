@@ -26,8 +26,7 @@ describe('list users negative tests', () => {
 
   describe('with invalid parameters', () => {
     describe('--non encoded pagination token', () => {
-      const paginationToken =
-        'Q0FJU3FBSUldewktCQWdnREV2d0JBSDBWSWN1T1NYVzVNaGJ4OWI3bFllZFArcFBXMnY3NEptcXpjKzJLNXJxQWV5SkFiaUk2SWxCaFoybHVZWFJwYjI1RGIyNTBhVzUxWVhScGIyNUVWRThpTENKdVpYaDBTMlY1SWpvaVFVRkJRVUZCUVVGRFRqQk1RVkZGUWxsWFpXUnJZakJRVTNCcFVVTjRWbkJXWjFkS1NYbGlLMFZSTlUxSFZUTmhhVFpEYWxGNE5HWlZkalZzWW0xWk4xbHRSVE5OZWxFd1RucFZkRTFVYXpWT1V6QXdXa1JOZDB4WFNUTlBSMDEwVDBkRk1WbHFhR2xaYWtWNlQwUk5NVTkzUFQwaUxDSndZV2RwYm1GMGFXOXVSR1Z3ZEdnaU9qSXNJbkJ5WlhacGIzVnpVbVZ4ZFdWemRGUnBiV1VpT2pFMk9EVXhNVGt3TXpRek1EVjlHaUNvWC80NFRvUWZ2N1JGV3c3TktxNys5UW9VK3hBSmxhRmpmMHhXUDE2RytRPT0=';
+      const paginationToken = 'invalidPaginationToken123';
       const queryParams = { paginationToken };
 
       test('it throws 400 error', async () => {
@@ -38,7 +37,7 @@ describe('list users negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: 'Invalid Pagination Token'
+              message: 'Invalid parameter'
             })
           );
         }

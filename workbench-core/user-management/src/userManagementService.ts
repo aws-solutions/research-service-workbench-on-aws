@@ -5,6 +5,7 @@
 
 // disabling because the tsdoc links need the imports to work
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ListUsersForRoleRequest, PaginatedResponse } from '@aws/workbench-core-base';
 import { IdpUnavailableError } from './errors/idpUnavailableError';
 import { InvalidParameterError } from './errors/invalidParameterError';
 import { PluginConfigurationError } from './errors/pluginConfigurationError';
@@ -140,7 +141,7 @@ export class UserManagementService {
 
   /**
    * List the user IDs associated with a given role.
-   * @param role - the role for which the users should be listed.
+   * @param request - a ListUsersForRoleRequest object
    * @returns an array containing the user ids that are associated with the role
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -148,8 +149,8 @@ export class UserManagementService {
    * @throws {@link RoleNotFoundError} - role could not be found
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
-  public async listUsersForRole(role: string): Promise<string[]> {
-    return this._userManagementPlugin.listUsersForRole(role);
+  public async listUsersForRole(request: ListUsersForRoleRequest): Promise<PaginatedResponse<string>> {
+    return this._userManagementPlugin.listUsersForRole(request);
   }
 
   /**

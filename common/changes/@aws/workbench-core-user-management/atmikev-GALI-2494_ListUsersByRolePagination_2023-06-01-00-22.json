@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "add pagination to listUsersForRole",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}

@@ -4,7 +4,7 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
+import { buildDynamoDBPkSk, ListUsersForRoleRequestParser } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
@@ -105,11 +105,15 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     const { groupId } = request;
 
+    const projectId = groupId.split('#')[0];
+    const role = groupId.split('#')[1];
+    const listRequest = ListUsersForRoleRequestParser.parse({ role, projectId });
+
     try {
-      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      const response = await this._userManagementService.listUsersForRole(listRequest);
       return {
         data: {
-          userIds
+          userIds: response.data
         }
       };
     } catch (error) {

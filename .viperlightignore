@@ -48,4 +48,4 @@ solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:58
 solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:91
 solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:38
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:48
-solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:86
+solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:88

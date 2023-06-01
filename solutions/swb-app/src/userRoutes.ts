@@ -65,7 +65,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
           throw e;
         }
 
-        if (isInvalidPaginationTokenError(e)) {
+        if (isInvalidPaginationTokenError(e) || isInvalidParameterError(e)) {
           throw Boom.badRequest(e.message);
         }
 
