@@ -37,7 +37,7 @@ describe('list users negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: 'Invalid Pagination Token'
+              message: 'Invalid parameter'
             })
           );
         }

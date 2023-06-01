@@ -11,7 +11,6 @@ import {
   ListUsersForRoleRequest,
   PaginatedResponse
 } from '@aws/workbench-core-base';
-import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -458,7 +457,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         throw new TooManyRequestsError(error.message);
       }
       if (error.name === 'InvalidParameterException') {
-        throw new InvalidPaginationTokenError('Invalid Pagination Token');
+        throw new InvalidParameterError('Invalid parameter');
       }
       throw error;
     }
@@ -524,7 +523,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'InvalidParameterException') {
-        throw new InvalidPaginationTokenError('Invalid Pagination Token');
+        throw new InvalidParameterError('Invalid parameter');
       }
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);

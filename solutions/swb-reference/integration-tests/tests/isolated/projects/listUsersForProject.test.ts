@@ -65,21 +65,21 @@ describe('list users for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `pageSize: Must be Between 1 and 100`
+            message: `pageSize: Must be Between 1 and 60`
           })
         );
       }
     });
 
-    test('cannot have page size greater than 100', async () => {
+    test('cannot have page size greater than 60', async () => {
       try {
-        await adminSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin', 101);
+        await adminSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin', 61);
       } catch (e) {
         checkHttpError(
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `pageSize: Must be Between 1 and 100`
+            message: `pageSize: Must be Between 1 and 60`
           })
         );
       }
@@ -95,7 +95,7 @@ describe('list users for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Invalid Pagination Token`
+            message: `Invalid parameter`
           })
         );
       }
