@@ -163,7 +163,8 @@ export default class ServiceCatalogSetup {
       const putObjectParam = {
         Bucket: s3Bucket,
         Key: `${prefix}${fileName}`,
-        Body: fileContent
+        Body: fileContent,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       };
 
       await this._aws.clients.s3.putObject(putObjectParam);
@@ -180,7 +181,8 @@ export default class ServiceCatalogSetup {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/interfaces/listobjectscommandinput.html#maxkeys
     const listS3ObjectsParam = {
       Bucket: s3Bucket,
-      Prefix: prefix
+      Prefix: prefix,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     const listObjectOutput = await this._aws.clients.s3.listObjects(listS3ObjectsParam);
@@ -190,7 +192,11 @@ export default class ServiceCatalogSetup {
         // eslint-disable-next-line security/detect-object-injection
         const content: _Object = listObjectOutput.Contents[i];
         if (content.Key) {
-          const getObjResponse = await this._aws.clients.s3.getObject({ Bucket: s3Bucket, Key: content.Key });
+          const getObjResponse = await this._aws.clients.s3.getObject({
+            Bucket: s3Bucket,
+            Key: content.Key,
+            ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+          });
           const streamToString = (stream: Readable): Promise<string> =>
             new Promise((resolve, reject) => {
               const chunks: Uint8Array[] = [];

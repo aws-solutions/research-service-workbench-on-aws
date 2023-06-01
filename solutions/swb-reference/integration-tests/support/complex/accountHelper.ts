@@ -114,7 +114,8 @@ export class AccountHelper {
   public async removeAccountFromBucketPolicy(awsAccountId: string): Promise<void> {
     const bucketName = this._settings.get('S3BucketArtifactsArnOutput').split(':').pop();
     const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._awsSdk.clients.s3.getBucketPolicy({
-      Bucket: bucketName
+      Bucket: bucketName,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     let bucketPolicy;
     bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
@@ -133,7 +134,8 @@ export class AccountHelper {
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
+      Policy: JSON.stringify(bucketPolicy.toJSON()),
+      AccountId: process.env.MAIN_ACCT_ID
     };
 
     // Update bucket policy

@@ -180,7 +180,8 @@ export default class HostingAccountLifecycleService {
     let bucketPolicy: PolicyDocument = new PolicyDocument();
     try {
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
-        Bucket: bucketName
+        Bucket: bucketName,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       });
       bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
     } catch (e) {
@@ -197,7 +198,8 @@ export default class HostingAccountLifecycleService {
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
+      Policy: JSON.stringify(bucketPolicy.toJSON()),
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     // Update bucket policy
@@ -348,15 +350,18 @@ export default class HostingAccountLifecycleService {
     // Check if hosting account stack has the latest CFN template
     const onboardAccountS3Response = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account.cfn.yaml'
+      Key: 'onboard-account.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const onboardAccountByonResponse = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account-byon.cfn.yaml'
+      Key: 'onboard-account-byon.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const onboardAccountTgwResponse = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account-tgw.cfn.yaml'
+      Key: 'onboard-account-tgw.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const streamToString = (stream: Readable): Promise<string> =>
       new Promise((resolve, reject) => {
