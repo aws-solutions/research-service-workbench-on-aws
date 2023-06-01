@@ -8,7 +8,7 @@ import { getPaginationParser } from '../utilities/validatorHelper';
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListUsersForRoleRequestParser = z
   .object({
-    ...getPaginationParser(),
+    ...getPaginationParser(1, 60),
     role: z.enum(['ProjectAdmin', 'Researcher']),
     projectId: z.string()
   })
