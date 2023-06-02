@@ -56,11 +56,11 @@ describe('multiStep user to project integration test', () => {
 
       // list users by role
       console.log(`ITAdmin listing user ${mockUserId} to project ${project1Id}...`);
-      const { data: usersByITAdmin } = await adminSession.resources.projects
+      const usersByITAdminResponse = await adminSession.resources.projects
         .project(project1Id)
         .listUsersForProject(role);
 
-      expect(usersByITAdmin.users).toContainEqual(expect.objectContaining({ id: mockUserId }));
+      expect(usersByITAdminResponse.data.data).toContainEqual(expect.objectContaining({ id: mockUserId }));
 
       // remove mock user from project
       console.log(`Removing user ${mockUserId} from project ${project1Id}...`);
@@ -68,11 +68,13 @@ describe('multiStep user to project integration test', () => {
 
       // list users by role
       console.log(`retrieving user ${mockUserId} from project ${project1Id} should not return user`);
-      const { data: updatedUsersByITAdmin } = await adminSession.resources.projects
+      const updatedUsersByITAdminResponse = await adminSession.resources.projects
         .project(project1Id)
         .listUsersForProject(role);
 
-      expect(updatedUsersByITAdmin.users).not.toContainEqual(expect.objectContaining({ id: mockUserId }));
+      expect(updatedUsersByITAdminResponse.data.data).not.toContainEqual(
+        expect.objectContaining({ id: mockUserId })
+      );
     });
   });
 
@@ -94,26 +96,28 @@ describe('multiStep user to project integration test', () => {
 
       // list users by role
       console.log(`Project Admin listing user ${mockUserId} to project ${project1Id}...`);
-      const { data: usersByPA } = await pa1Session.resources.projects
+      const usersByPAResponse = await pa1Session.resources.projects
         .project(project1Id)
         .listUsersForProject(role);
-      const { data: usersByITAdmin } = await adminSession.resources.projects
+      const usersByITAdminResponse = await adminSession.resources.projects
         .project(project1Id)
         .listUsersForProject(role);
 
-      expect(usersByPA).toEqual(usersByITAdmin);
-      expect(usersByPA.users).toContainEqual(expect.objectContaining({ id: mockUserId }));
+      expect(usersByPAResponse.data.data).toEqual(usersByITAdminResponse.data.data);
+      expect(usersByPAResponse.data.data).toContainEqual(expect.objectContaining({ id: mockUserId }));
 
       // remove users from project
       console.log(`Project Admin removing user ${mockUserId} from project ${project1Id}...`);
       await pa1Session.resources.projects.project(project1Id).removeUserFromProject(mockUserId);
 
       // list users by role
-      const { data: updatedUsersByPA } = await pa1Session.resources.projects
+      const updatedUsersByPAResponse = await pa1Session.resources.projects
         .project(project1Id)
         .listUsersForProject(role);
 
-      expect(updatedUsersByPA.users).not.toContainEqual(expect.objectContaining({ id: mockUserId }));
+      expect(updatedUsersByPAResponse.data.data).not.toContainEqual(
+        expect.objectContaining({ id: mockUserId })
+      );
     });
   });
 

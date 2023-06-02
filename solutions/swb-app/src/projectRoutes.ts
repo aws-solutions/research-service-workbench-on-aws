@@ -15,9 +15,7 @@ import {
   DeleteProjectRequest,
   DeleteProjectRequestParser,
   AssignUserToProjectRequestParser,
-  AssignUserToProjectRequest,
-  ListUsersForRoleRequest,
-  ListUsersForRoleRequestParser
+  AssignUserToProjectRequest
 } from '@aws/workbench-core-accounts';
 import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import {
@@ -25,7 +23,9 @@ import {
   MetadataService,
   resourceTypeToKey,
   runInBatches,
-  isInvalidPaginationTokenError
+  isInvalidPaginationTokenError,
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
 } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import {
@@ -33,7 +33,8 @@ import {
   UserManagementService,
   User,
   isRoleNotFoundError,
-  isUserRolesExceedLimitError
+  isUserRolesExceedLimitError,
+  isInvalidParameterError
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -196,7 +197,7 @@ export function setUpProjectRoutes(
       try {
         const existingUser = await userService.getUser(validatedRequest.userId);
 
-        const isITAdmin = existingUser.roles.some((role) => role === 'ITAdmin');
+        const isITAdmin = existingUser.roles.some((role: string) => role === 'ITAdmin');
         if (isITAdmin) {
           throw Boom.badRequest(
             `IT Admin ${validatedRequest.userId} cannot be assigned to the project ${validatedRequest.projectId}`
@@ -293,12 +294,10 @@ export function setUpProjectRoutes(
     '/projects/:projectId/users',
     wrapAsync(async (req: Request, res: Response) => {
       const projectId = req.params.projectId;
-      const validatedRequest = validateAndParse<ListUsersForRoleRequest>(
-        ListUsersForRoleRequestParser,
-        req.query
-      );
-      const { role } = validatedRequest;
-      const groupId = `${projectId}#${role}`;
+      const validatedRequest = validateAndParse<ListUsersForRoleRequest>(ListUsersForRoleRequestParser, {
+        projectId,
+        ...req.query
+      });
 
       try {
         const project = await projectService.getProject({ projectId });
@@ -308,25 +307,36 @@ export function setUpProjectRoutes(
         }
 
         try {
-          const userIds = await userService.listUsersForRole(groupId);
-          const userPromises = userIds.map((userId) => userService.getUser(userId));
+          const response = await userService.listUsersForRole(validatedRequest);
+          const userPromises = response.data.map((userId: string) => userService.getUser(userId));
 
           const users = await runInBatches<User>(userPromises, 10);
-          res.send({ users });
+          res.send({
+            data: users,
+            paginationToken: response.paginationToken
+          });
         } catch (err) {
+          console.error(err);
           if (isRoleNotFoundError(err)) {
-            res.send({ users: [] });
+            res.send({ data: [] });
             return;
           }
 
           throw err;
         }
       } catch (err) {
+        console.error(err);
+
+        if (isInvalidPaginationTokenError(err) || isInvalidParameterError(err)) {
+          throw Boom.badRequest(err.message);
+        }
+
         if (Boom.isBoom(err)) {
           throw err;
         }
 
-        throw Boom.badImplementation(`Could not list users for role ${role} for the project ${projectId}`);
+        const groupId = `${projectId}#${validatedRequest.role}`;
+        throw Boom.badImplementation(`Could not list users for role ${groupId} for the project ${projectId}`);
       }
     })
   );
