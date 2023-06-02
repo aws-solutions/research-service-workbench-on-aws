@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "add expected bucket owner to S3 call",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}
