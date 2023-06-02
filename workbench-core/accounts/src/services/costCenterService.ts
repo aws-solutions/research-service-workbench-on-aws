@@ -118,15 +118,13 @@ export default class CostCenterService {
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const validatedCostCenterId = z.string().costCenterId().parse(13);
-
     const response = (await this._dynamoDbService
-      .get(buildDynamoDBPkSk(validatedCostCenterId, resourceTypeToKey.costCenter))
+      .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .strong()
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
-      throw Boom.notFound(`Could not find cost center ${validatedCostCenterId}`);
+      throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
     return this._mapDDBItemToCostCenter(response.Item);
