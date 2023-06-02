@@ -6,9 +6,9 @@ import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateExternalEndpointRequestParser = z.object({
-  externalEndpointName: z.string(),
+  externalEndpointName: z.string().swbName(),
   groupId: z.string(),
-  externalRoleName: z.string().optional(),
+  externalRoleName: z.string().swbName().optional(),
   kmsKeyArn: z.string().optional(),
   vpcId: z.string().optional()
 });

@@ -17,6 +17,7 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
+import { z } from 'zod';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
@@ -117,13 +118,15 @@ export default class CostCenterService {
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
+    const validatedCostCenterId = z.string().costCenterId().parse(13);
+
     const response = (await this._dynamoDbService
-      .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
+      .get(buildDynamoDBPkSk(validatedCostCenterId, resourceTypeToKey.costCenter))
       .strong()
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
-      throw Boom.notFound(`Could not find cost center ${costCenterId}`);
+      throw Boom.notFound(`Could not find cost center ${validatedCostCenterId}`);
     }
 
     return this._mapDDBItemToCostCenter(response.Item);
