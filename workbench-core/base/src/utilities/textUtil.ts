@@ -41,6 +41,13 @@ const groupIDRegExpAsString: string = '\\S{1,128}';
 const awsAccountIdMessage: string = 'must be a 12 digit number';
 const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
 
+const envMgmtRoleArnMessage: string = 'must be a valid envMgmtRoleArn';
+const envMgmtRoleArnRegExpAsString: string = '^arn:aws:iam::[0-9]{12}:role\\/[\\w-]+-env-mgmt$';
+
+const hostingAccountHandlerRoleArnMessage: string = 'must be a valid hostingAccountHandlerRoleArn';
+const hostingAccountHandlerRoleArnRegExpAsString: string =
+  '^arn:aws:iam::[0-9]{12}:role\\/[\\w-]+hosting-account-role$';
+
 const awsRegionMessage: string = 'must be valid AWS region';
 const awsRegionRegExpAsString: string = '^(us|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\\d$';
 
@@ -136,6 +143,16 @@ function awsAccountIdRegExp(): RegExp {
   return new RegExp(awsAccountIdRegExpAsString);
 }
 
+function envMgmtRoleArnRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(envMgmtRoleArnRegExpAsString);
+}
+
+function hostingAccountHandlerRoleArnRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(hostingAccountHandlerRoleArnRegExpAsString);
+}
+
 function sshKeyIdRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(sshKeyIdRegExpString);
@@ -190,5 +207,9 @@ export {
   lengthValidationMessage,
   sshKeyIdRegex,
   userIdRegex,
-  datasetIdRegex
+  datasetIdRegex,
+  envMgmtRoleArnRegExp,
+  envMgmtRoleArnMessage,
+  hostingAccountHandlerRoleArnMessage,
+  hostingAccountHandlerRoleArnRegExp
 };
