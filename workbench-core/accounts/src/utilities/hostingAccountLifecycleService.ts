@@ -173,13 +173,7 @@ export default class HostingAccountLifecycleService {
     };
 
     // Update key policy
-    try {
-      await this._aws.clients.kms.putKeyPolicy(putPolicyParams);
-    } catch (e) {
-      if (e instanceof MalformedPolicyDocumentException) {
-        throw e;
-      }
-    }
+    await this._aws.clients.kms.putKeyPolicy(putPolicyParams);
   }
 
   /**
