@@ -6,7 +6,6 @@
 import { Readable } from 'stream';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import { MalformedPolicyDocumentException } from '@aws-sdk/client-kms';
 import {
   GetBucketPolicyCommandOutput,
   PutBucketPolicyCommandInput,

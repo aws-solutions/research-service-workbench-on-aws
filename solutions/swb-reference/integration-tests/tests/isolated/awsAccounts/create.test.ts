@@ -28,9 +28,13 @@ describe('awsAccounts create negative tests', () => {
   });
 
   const validLaunchParameters = {
-    awsAccountId: randomTextGenerator.getFakeText('fakeAccount'),
-    envMgmtRoleArn: randomTextGenerator.getFakeText('fakeEnvMgmtRoleArn'),
-    hostingAccountHandlerRoleArn: randomTextGenerator.getFakeText('fakeHostingAccountHandlerRoleArn'),
+    awsAccountId: '123456789012',
+    envMgmtRoleArn: `arn:aws:iam::123456789012:role/${randomTextGenerator.getFakeText(
+      'fakeEnvMgmtRoleArn'
+    )}-env-mgmt`,
+    hostingAccountHandlerRoleArn: `arn:aws:iam::123456789012:role/${randomTextGenerator.getFakeText(
+      'fakeHostingAccountHandlerRoleArn'
+    )}-hosting-account-role`,
     name: randomTextGenerator.getFakeText('fakeName'),
     externalId: randomTextGenerator.getFakeText('fakeExternalId')
   };
@@ -59,6 +63,7 @@ describe('awsAccounts create negative tests', () => {
         const existingAccounts = await accountHelper.listOnboardedAccounts();
 
         invalidParam.awsAccountId = _.first(existingAccounts)!.awsAccountId;
+
         try {
           await adminSession.resources.accounts.create(invalidParam, false);
         } catch (e) {
