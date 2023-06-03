@@ -40,6 +40,9 @@ describe('awsAccounts create negative tests', () => {
   };
 
   describe('when creating an account', () => {
+    //TODO: Add the following tests
+    // 1. Incorrect envMgmtRole Arn and hostingAccountHandlerRoleArn
+    // 2. AccountId that does not exist
     describe('and the creation params are invalid', () => {
       test('it throws a validation error', async () => {
         try {

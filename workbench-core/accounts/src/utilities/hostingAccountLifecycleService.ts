@@ -212,10 +212,9 @@ export default class HostingAccountLifecycleService {
     try {
       await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
     } catch (e) {
-      const detailErrorMessage = `"AWS" : "arn:aws:iam::${awsAccountId}:root"`;
       if (
-        e.Detail === detailErrorMessage &&
         e.name === 'MalformedPolicy' &&
+        e.Detail === `"AWS" : "arn:aws:iam::${awsAccountId}:root"` &&
         e instanceof S3ServiceException
       ) {
         throw new InvalidAwsAccountIdError("Please provide a valid 'awsAccountId' for the hosting account");
