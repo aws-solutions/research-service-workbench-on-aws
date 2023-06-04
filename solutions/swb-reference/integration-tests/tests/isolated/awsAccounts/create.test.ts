@@ -40,11 +40,8 @@ describe('awsAccounts create negative tests', () => {
   };
 
   describe('when creating an account', () => {
-    //TODO: Add the following tests
-    // 1. Incorrect envMgmtRole Arn and hostingAccountHandlerRoleArn
-    // 2. AccountId that does not exist
     describe('and the creation params are invalid', () => {
-      test('it throws a validation error', async () => {
+      test('with empty body it throws a validation error', async () => {
         try {
           await adminSession.resources.accounts.create({}, false);
         } catch (e) {
@@ -54,6 +51,53 @@ describe('awsAccounts create negative tests', () => {
               error: 'Bad Request',
               message:
                 'name: Required. awsAccountId: Required. envMgmtRoleArn: Required. hostingAccountHandlerRoleArn: Required. externalId: Required'
+            })
+          );
+        }
+      });
+      test('with accountId that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.awsAccountId = '123456789012345';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: 'awsAccountId: must be a 12 digit number'
+            })
+          );
+        }
+      });
+      test('with accountId of account that does not exist it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.awsAccountId = '123456789012';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: "Please provide a valid 'awsAccountId' for the hosting account"
+            })
+          );
+        }
+      });
+      test('with incorrect envMgtmRoleArn and hostingAccountHandlerRoleArn it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.envMgmtRoleArn = 'fakeValue';
+          body.hostingAccountHandlerRoleArn = 'fakeValue';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message:
+                'envMgmtRoleArn: must be a valid envMgmtRoleArn. hostingAccountHandlerRoleArn: must be a valid hostingAccountHandlerRoleArn'
             })
           );
         }
