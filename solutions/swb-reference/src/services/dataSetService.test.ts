@@ -397,6 +397,7 @@ describe('DataSetService', () => {
           }
         };
 
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
         mockDataSetsAuthPlugin.addAccessPermission = jest.fn().mockReturnValueOnce(permissionsResponse);
       });
 
@@ -561,7 +562,16 @@ describe('DataSetService', () => {
 
         mockDataSetsAuthPlugin.removeAccessPermissions = jest.fn().mockReturnValueOnce(permissionsResponse);
 
-        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
+        mockDataSet = DataSetParser.parse({
+          id: 'dataSetId',
+          owner: `${projectId}#ProjectAdmin`,
+          name: 'mockDataSet',
+          path: 'path',
+          storageName: 'storageName',
+          storageType: 'storageType',
+          createdAt: '2023-02-14T19:18:46'
+        });
+        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValue(mockDataSet);
         mockDatabaseService.listAssociations = jest.fn().mockReturnValue({ data: [] });
       });
 
@@ -592,11 +602,18 @@ describe('DataSetService', () => {
         });
 
         describe('to a project they do not administer', () => {
+          const otherProjectId = 'proj-otherProjectId';
           beforeEach(async () => {
+            projectRemoveAccessRequest = {
+              authenticatedUser: mockUser,
+              dataSetId,
+              projectId: otherProjectId
+            };
+
             const projectAddAccessRequest: ProjectAddAccessRequest = {
               authenticatedUser: mockUser,
               dataSetId,
-              projectId,
+              projectId: otherProjectId,
               accessLevel: 'read-only'
             };
 
@@ -623,12 +640,12 @@ describe('DataSetService', () => {
               dataSetId: projectRemoveAccessRequest.dataSetId,
               permission: [
                 {
-                  identity: 'projectId#ProjectAdmin',
+                  identity: `${otherProjectId}#ProjectAdmin`,
                   identityType: 'GROUP',
                   accessLevel: 'read-write'
                 },
                 {
-                  identity: 'projectId#Researcher',
+                  identity: `${otherProjectId}#Researcher`,
                   identityType: 'GROUP',
                   accessLevel: 'read-write'
                 }
@@ -641,7 +658,7 @@ describe('DataSetService', () => {
             beforeEach(async () => {
               const projectAssociations = await mockDatabaseService.getAssociations(
                 resourceTypeToKey.project,
-                projectId
+                otherProjectId
               );
 
               expect(projectAssociations.length).toEqual(1);
@@ -659,7 +676,7 @@ describe('DataSetService', () => {
 
               const associations = await mockDatabaseService.getAssociations(
                 resourceTypeToKey.project,
-                projectId
+                otherProjectId
               );
 
               expect(associations).toEqual([]);
@@ -686,18 +703,18 @@ describe('DataSetService', () => {
                   {
                     action: 'READ',
                     effect: 'ALLOW',
-                    identityId: 'projectId#ProjectAdmin',
+                    identityId: `${otherProjectId}#ProjectAdmin`,
                     identityType: 'GROUP',
                     subjectId: 'dataSetId',
-                    subjectType: SwbAuthZSubject.SWB_DATASET
+                    subjectType: SwbAuthZSubject.SWB_DATASET_UPLOAD
                   },
                   {
                     action: 'READ',
                     effect: 'ALLOW',
-                    identityId: 'projectId#Researcher',
+                    identityId: `${otherProjectId}#Researcher`,
                     identityType: 'GROUP',
                     subjectId: 'dataSetId',
-                    subjectType: SwbAuthZSubject.SWB_DATASET
+                    subjectType: SwbAuthZSubject.SWB_DATASET_UPLOAD
                   }
                 ]
               });
