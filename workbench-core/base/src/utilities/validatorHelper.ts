@@ -37,8 +37,12 @@ import {
   datasetIdRegex,
   envMgmtRoleArnRegExp,
   envMgmtRoleArnMessage,
+  envMgmtRoleArnMaxLength,
   hostingAccountHandlerRoleArnMessage,
-  hostingAccountHandlerRoleArnRegExp
+  hostingAccountHandlerRoleArnRegExp,
+  externalIdMessage,
+  externalIdRegExp,
+  hostingAccountHandlerRoleArnMaxLength
 } from './textUtil';
 
 interface ZodPagination {
@@ -61,6 +65,7 @@ declare module 'zod' {
     envId: () => ZodString;
     costCenterId: () => ZodString;
     accountId: () => ZodString;
+    externalId: () => ZodString;
     awsRegion: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
@@ -132,6 +137,10 @@ z.ZodString.prototype.accountId = function (): ZodString {
   return this.regex(accountIdRegex(), { message: invalidIdMessage });
 };
 
+z.ZodString.prototype.externalId = function (): ZodString {
+  return this.regex(externalIdRegExp(), { message: externalIdMessage });
+};
+
 z.ZodString.prototype.sshKeyId = function (): ZodString {
   return this.regex(sshKeyIdRegex(), { message: invalidIdMessage });
 };
@@ -153,11 +162,15 @@ z.ZodString.prototype.awsAccountId = function (): ZodString {
 };
 
 z.ZodString.prototype.envMgmtRoleArn = function (): ZodString {
-  return this.regex(envMgmtRoleArnRegExp(), { message: envMgmtRoleArnMessage });
+  return this.max(envMgmtRoleArnMaxLength, {
+    message: lengthValidationMessage(envMgmtRoleArnMaxLength)
+  }).regex(envMgmtRoleArnRegExp(), { message: envMgmtRoleArnMessage });
 };
 
 z.ZodString.prototype.hostingAccountHandlerRoleArn = function (): ZodString {
-  return this.regex(hostingAccountHandlerRoleArnRegExp(), { message: hostingAccountHandlerRoleArnMessage });
+  return this.max(hostingAccountHandlerRoleArnMaxLength, {
+    message: lengthValidationMessage(hostingAccountHandlerRoleArnMaxLength)
+  }).regex(hostingAccountHandlerRoleArnRegExp(), { message: hostingAccountHandlerRoleArnMessage });
 };
 
 z.ZodString.prototype.awsRegion = function (): ZodString {

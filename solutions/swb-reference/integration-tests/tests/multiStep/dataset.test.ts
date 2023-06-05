@@ -106,7 +106,6 @@ describe('multiStep dataset integration test', () => {
     });
 
     console.log('ASSOCIATE WITH PROJECT');
-
     await pa1Session.resources.projects
       .project(project1Id)
       .dataSets()
@@ -130,6 +129,23 @@ describe('multiStep dataset integration test', () => {
       );
     }
 
+    console.log('ASSOCIATE WITH OWNING PROJECT THROWS');
+    try {
+      await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .dataset(dataSet.id)
+        .associateWithProject(project1Id, 'read-only');
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(409, {
+          error: 'Conflict',
+          message: `${project1Id} already owns this dataset`
+        })
+      );
+    }
+
     console.log('DELETING A DATASET STILL ASSOCIATED WITH A PROJECT FAILS');
     try {
       await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
@@ -139,6 +155,23 @@ describe('multiStep dataset integration test', () => {
         new HttpError(409, {
           error: 'Conflict',
           message: `DataSet ${dataSet.id} cannot be removed because it is still associated with roles in the provided project(s)`
+        })
+      );
+    }
+
+    console.log('DISASSOCIATING WITH OWNING PROJECT THROWS');
+    try {
+      await pa1Session.resources.projects
+        .project(project1Id)
+        .dataSets()
+        .dataset(dataSet.id)
+        .disassociateFromProject(project1Id);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(409, {
+          error: 'Conflict',
+          message: `${project1Id} cannot remove access from ${dataSet.id} for the ProjectAdmin because it owns that dataset.`
         })
       );
     }

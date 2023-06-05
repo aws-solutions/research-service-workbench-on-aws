@@ -266,7 +266,7 @@ describe('tests for zod.swbName', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          `id: Input must be less than ${swbNameMaxLength} characters`
+          `id: Input must be ${swbNameMaxLength} characters or less`
         );
       });
     });
@@ -308,7 +308,7 @@ describe('tests for zod.swbDescription', () => {
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
         expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          `id: Input must be less than ${swbDescriptionMaxLength} characters`
+          `id: Input must be ${swbDescriptionMaxLength} characters or less`
         );
       });
     });
