@@ -29,6 +29,10 @@ const swbDescriptionMessage: string =
 const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
 const swbDescriptionMaxLength: number = 400;
 
+const externalIdMessage: string =
+  'must contain only letters, numbers, hyphens, underscores, plus, equal, comma, period, at (@), colon (:), and forward slash (/). String length must be between 2 and 400 characters inclusively';
+const externalIdRegExpAsString: string = '^[A-Za-z0-9-_+=,.@:\\/]{2,400}$';
+
 const nonEmptyMessage: string = 'optional, but cannot be empty if included';
 const invalidIdMessage: string = 'Invalid ID';
 const invalidEmailMessage: string = 'Invalid Email';
@@ -40,6 +44,15 @@ const groupIDRegExpAsString: string = '\\S{1,128}';
 
 const awsAccountIdMessage: string = 'must be a 12 digit number';
 const awsAccountIdRegExpAsString: string = '^[0-9]{12}$';
+
+const envMgmtRoleArnMessage: string = 'must be a valid envMgmtRoleArn';
+const envMgmtRoleArnRegExpAsString: string = '^arn:aws:iam::[0-9]{12}:role\\/[\\w-]+-env-mgmt$';
+const envMgmtRoleArnMaxLength: number = 400;
+
+const hostingAccountHandlerRoleArnMessage: string = 'must be a valid hostingAccountHandlerRoleArn';
+const hostingAccountHandlerRoleArnRegExpAsString: string =
+  '^arn:aws:iam::[0-9]{12}:role\\/[\\w-]+hosting-account-role$';
+const hostingAccountHandlerRoleArnMaxLength: number = 400;
 
 const awsRegionMessage: string = 'must be valid AWS region';
 const awsRegionRegExpAsString: string = '^(us|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\\d$';
@@ -63,7 +76,7 @@ const userIdRegExpString: string = `^${uuidRegExpAsString}$`;
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
 
 function lengthValidationMessage(length: number): string {
-  return `Input must be less than ${length} characters`;
+  return `Input must be ${length} characters or less`;
 }
 
 function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
@@ -126,6 +139,11 @@ function accountIdRegex(): RegExp {
   return new RegExp(accountIdRegExpString);
 }
 
+function externalIdRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(externalIdRegExpAsString);
+}
+
 function awsRegionRegex(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(awsRegionRegExpAsString);
@@ -134,6 +152,16 @@ function awsRegionRegex(): RegExp {
 function awsAccountIdRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(awsAccountIdRegExpAsString);
+}
+
+function envMgmtRoleArnRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(envMgmtRoleArnRegExpAsString);
+}
+
+function hostingAccountHandlerRoleArnRegExp(): RegExp {
+  // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+  return new RegExp(hostingAccountHandlerRoleArnRegExpAsString);
 }
 
 function sshKeyIdRegex(): RegExp {
@@ -190,5 +218,13 @@ export {
   lengthValidationMessage,
   sshKeyIdRegex,
   userIdRegex,
-  datasetIdRegex
+  datasetIdRegex,
+  envMgmtRoleArnRegExp,
+  envMgmtRoleArnMessage,
+  envMgmtRoleArnMaxLength,
+  hostingAccountHandlerRoleArnMessage,
+  hostingAccountHandlerRoleArnRegExp,
+  hostingAccountHandlerRoleArnMaxLength,
+  externalIdMessage,
+  externalIdRegExp
 };

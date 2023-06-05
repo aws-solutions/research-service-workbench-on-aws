@@ -34,7 +34,15 @@ import {
   awsRegionMessage,
   sshKeyIdRegex,
   userIdRegex,
-  datasetIdRegex
+  datasetIdRegex,
+  envMgmtRoleArnRegExp,
+  envMgmtRoleArnMessage,
+  envMgmtRoleArnMaxLength,
+  hostingAccountHandlerRoleArnMessage,
+  hostingAccountHandlerRoleArnRegExp,
+  externalIdMessage,
+  externalIdRegExp,
+  hostingAccountHandlerRoleArnMaxLength
 } from './textUtil';
 
 interface ZodPagination {
@@ -57,9 +65,12 @@ declare module 'zod' {
     envId: () => ZodString;
     costCenterId: () => ZodString;
     accountId: () => ZodString;
+    externalId: () => ZodString;
     awsRegion: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
+    envMgmtRoleArn: () => ZodString;
+    hostingAccountHandlerRoleArn: () => ZodString;
     sshKeyId: () => ZodString;
     userId: () => ZodString;
   }
@@ -126,6 +137,10 @@ z.ZodString.prototype.accountId = function (): ZodString {
   return this.regex(accountIdRegex(), { message: invalidIdMessage });
 };
 
+z.ZodString.prototype.externalId = function (): ZodString {
+  return this.regex(externalIdRegExp(), { message: externalIdMessage });
+};
+
 z.ZodString.prototype.sshKeyId = function (): ZodString {
   return this.regex(sshKeyIdRegex(), { message: invalidIdMessage });
 };
@@ -144,6 +159,18 @@ z.ZodString.prototype.optionalNonEmpty = function (): ZodOptional<ZodString> {
 
 z.ZodString.prototype.awsAccountId = function (): ZodString {
   return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
+};
+
+z.ZodString.prototype.envMgmtRoleArn = function (): ZodString {
+  return this.max(envMgmtRoleArnMaxLength, {
+    message: lengthValidationMessage(envMgmtRoleArnMaxLength)
+  }).regex(envMgmtRoleArnRegExp(), { message: envMgmtRoleArnMessage });
+};
+
+z.ZodString.prototype.hostingAccountHandlerRoleArn = function (): ZodString {
+  return this.max(hostingAccountHandlerRoleArnMaxLength, {
+    message: lengthValidationMessage(hostingAccountHandlerRoleArnMaxLength)
+  }).regex(hostingAccountHandlerRoleArnRegExp(), { message: hostingAccountHandlerRoleArnMessage });
 };
 
 z.ZodString.prototype.awsRegion = function (): ZodString {
