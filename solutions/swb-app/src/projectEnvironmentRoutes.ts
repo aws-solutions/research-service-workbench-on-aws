@@ -65,12 +65,12 @@ export function setUpProjectEnvRoutes(
         );
       }
 
-      const unauthorizedDataset = await datasetService.verifyProjectAccessForDatasets({
+      const authorizedDatasets = await datasetService.isProjectAuthorizedForDatasets({
         authenticatedUser: res.locals.user,
         datasetIds: environmentRequest.datasetIds,
         projectId: req.params.projectId
       });
-      if (unauthorizedDataset) {
+      if (!authorizedDatasets) {
         throw Boom.forbidden(
           `${environmentRequest.projectId} does not have access to the provided dataset(s)`
         );

@@ -230,7 +230,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.conflict(e.message);
         }
 
-        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+        throw Boom.badImplementation(`There was a problem removing access to ${req.params.datasetId}`);
       }
 
       res.status(204).send();

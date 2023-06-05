@@ -7,7 +7,7 @@ import { z } from '@aws/workbench-core-base';
 import { AuthenticatedUserParser } from '../users/authenticatedUser';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const VerifyProjectAccessForDatasetsParser = z
+export const IsProjectAuthorizedForDatasetsParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
     datasetIds: z.array(z.string()),
@@ -15,4 +15,4 @@ export const VerifyProjectAccessForDatasetsParser = z
   })
   .strict();
 
-export type VerifyProjectAccessForDatasetsRequest = z.infer<typeof VerifyProjectAccessForDatasetsParser>;
+export type IsProjectAuthorizedForDatasetsRequest = z.infer<typeof IsProjectAuthorizedForDatasetsParser>;

@@ -11,9 +11,9 @@ import {
   DataSetPlugin,
   DataSetStoragePlugin,
   GetAccessPermissionRequest,
+  IsProjectAuthorizedForDatasetsRequest,
   PermissionsResponse,
-  PermissionsResponseParser,
-  VerifyProjectAccessForDatasetsRequest
+  PermissionsResponseParser
 } from '@aws/swb-app';
 import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
@@ -461,10 +461,10 @@ export class DataSetService implements DataSetPlugin {
     return response;
   }
 
-  public async verifyProjectAccessForDatasets(
-    request: VerifyProjectAccessForDatasetsRequest
+  public async isProjectAuthorizedForDatasets(
+    request: IsProjectAuthorizedForDatasetsRequest
   ): Promise<boolean> {
-    let unauthorizedDataset = false;
+    let authorizedDataset = true;
     await Promise.all(
       request.datasetIds.map(async (datasetId: string): Promise<void> => {
         // Using Researcher role to verify project has access to dataset because Researcher and PA permissions
@@ -475,11 +475,11 @@ export class DataSetService implements DataSetPlugin {
           identityType: 'GROUP'
         });
         if (accessPermissions.data.permissions.length === 0) {
-          unauthorizedDataset = true;
+          authorizedDataset = false;
         }
       })
     );
-    return unauthorizedDataset;
+    return authorizedDataset;
   }
 
   private async _addAuthZPermissionsForDataset(
