@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { lengthValidationMessage } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
 import { AccountHelper } from '../../../support/complex/accountHelper';
@@ -66,6 +67,71 @@ describe('awsAccounts create negative tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message: 'awsAccountId: must be a 12 digit number'
+            })
+          );
+        }
+      });
+      test('with hostingAccountHandlerRoleArn that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.hostingAccountHandlerRoleArn =
+            'arn:aws:iam::123456789012:role/message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-abcde-hosting-account-role';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `hostingAccountHandlerRoleArn: ${lengthValidationMessage(400)}`
+            })
+          );
+        }
+      });
+      test('with envMgmtRoleArn that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.envMgmtRoleArn =
+            'arn:aws:iam::123456789012:role/message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-abcdefghijklmnopq-env-mgmt';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `envMgmtRoleArn: ${lengthValidationMessage(400)}`
+            })
+          );
+        }
+      });
+      test('with name that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.name =
+            'string-longer-than-112-characters-string-longer-than-112-characters-string-longer-than-112-characters-abcdefghijk';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `name: ${lengthValidationMessage(112)}`
+            })
+          );
+        }
+      });
+      test('with externalId that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.externalId =
+            'message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-message-that-is-longer-than-400-characters-abcdefghijklmn';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message:
+                'externalId: must contain only letters, numbers, hyphens, underscores, plus, equal, comma, period, at (@), colon (:), and forward slash (/). String length must be between 2 and 400 characters inclusively'
             })
           );
         }
