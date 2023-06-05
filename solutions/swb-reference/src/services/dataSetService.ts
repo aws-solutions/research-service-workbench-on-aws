@@ -312,6 +312,10 @@ export class DataSetService implements DataSetPlugin {
   public async addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse> {
     const projectAdmin = getProjectAdminRole(request.projectId);
     const projectResearcher = getResearcherRole(request.projectId);
+    const requestedDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
+    if (requestedDataset.owner === projectAdmin) {
+      throw new ConflictError(`${request.projectId} already owns this dataset`);
+    }
 
     const dataset: Associable = {
       type: resourceTypeToKey.dataset,
