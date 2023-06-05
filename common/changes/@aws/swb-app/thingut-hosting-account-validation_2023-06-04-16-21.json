@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "account creation validation updates",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
