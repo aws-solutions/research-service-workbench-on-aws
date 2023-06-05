@@ -3,18 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { validateAndParse } from '@aws/workbench-core-base';
-import {
-  Status,
-  UserManagementService,
-  isUserNotFoundError,
-  isInvalidParameterError,
-  isUserAlreadyExistsError
-} from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import _ from 'lodash';
+import { validateAndParse } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
+import { isInvalidParameterError } from './userManagement/errors/invalidParameterError';
+import { isUserAlreadyExistsError } from './userManagement/errors/userAlreadyExistsError';
+import { isUserNotFoundError } from './userManagement/errors/userNotFoundError';
+import { Status } from './userManagement/user';
+import { UserManagementService } from './userManagement/userManagementService';
 import { CreateUserRequest, CreateUserRequestParser } from './users/createUserRequest';
 import { DeleteUserRequest, DeleteUserRequestParser } from './users/deleteUserRequest';
 import { GetUserRequest, GetUserRequestParser } from './users/getUserRequest';

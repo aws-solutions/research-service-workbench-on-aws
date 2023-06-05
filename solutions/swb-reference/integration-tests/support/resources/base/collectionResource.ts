@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import JSONValue from '@aws/workbench-core-base/lib/types/json';
+import { JSONValue } from '@aws/swb-app';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';

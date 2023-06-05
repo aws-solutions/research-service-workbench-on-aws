@@ -3,9 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvironmentPlugin, ListEnvironmentsRequest, EnvironmentItem } from '@aws/swb-app';
-import { PaginatedResponse } from '@aws/workbench-core-base';
-import { EnvironmentService, ListEnvironmentsServiceRequestParser } from '@aws/workbench-core-environments';
+import {
+  EnvironmentPlugin,
+  ListEnvironmentsRequest,
+  EnvironmentItem,
+  EnvironmentService,
+  ListEnvironmentsServiceRequestParser,
+  PaginatedResponse
+} from '@aws/swb-app';
 
 export class SWBEnvironmentService implements EnvironmentPlugin {
   private _environmentService: EnvironmentService;

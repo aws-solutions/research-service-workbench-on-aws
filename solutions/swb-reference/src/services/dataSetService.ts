@@ -12,26 +12,22 @@ import {
   DataSetStoragePlugin,
   GetAccessPermissionRequest,
   PermissionsResponse,
-  PermissionsResponseParser
-} from '@aws/swb-app';
-import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
-import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
-import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
-import {
+  PermissionsResponseParser,
+  DatasetServiceAddRemoveAccessPermissionRequest as AddRemoveAccessPermissionRequest,
+  DatasetServiceCreateProvisionDatasetRequest as CreateProvisionDatasetRequest,
+  DataSetsAuthorizationPlugin,
+  DataSetService as WorkbenchDataSetService,
   Action,
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
   DynamicAuthorizationService,
   IdentityPermission,
-  IdentityPermissionParser
-} from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
-import {
-  AddRemoveAccessPermissionRequest,
-  CreateProvisionDatasetRequest,
-  DataSetsAuthorizationPlugin,
-  DataSetService as WorkbenchDataSetService
-} from '@aws/workbench-core-datasets';
+  IdentityPermissionParser,
+  PaginatedResponse
+} from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequest } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
+import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
+import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';

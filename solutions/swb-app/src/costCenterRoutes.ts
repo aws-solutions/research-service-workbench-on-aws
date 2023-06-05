@@ -3,21 +3,28 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CostCenterService,
-  CreateCostCenterRequest,
-  CreateCostCenterRequestParser,
-  ListCostCentersRequest,
-  ListCostCentersRequestParser,
-  UpdateCostCenterRequest,
-  UpdateCostCenterRequestParser,
-  DeleteCostCenterRequest,
-  DeleteCostCenterRequestParser,
-  ProjectService
-} from '@aws/workbench-core-accounts';
-import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import {
+  CreateCostCenterRequest,
+  CreateCostCenterRequestParser
+} from './accounts/models/costCenters/createCostCenterRequest';
+import {
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser
+} from './accounts/models/costCenters/deleteCostCenterRequest';
+import {
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
+} from './accounts/models/costCenters/listCostCentersRequest';
+import {
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
+} from './accounts/models/costCenters/updateCostCenterRequest';
+import CostCenterService from './accounts/services/costCenterService';
+import ProjectService from './accounts/services/projectService';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
+import { validateAndParse } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpCostCenterRoutes(

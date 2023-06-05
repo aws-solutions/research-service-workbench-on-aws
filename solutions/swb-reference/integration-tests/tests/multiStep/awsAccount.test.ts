@@ -3,10 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AccountService, CreateAccountRequest } from '@aws/workbench-core-accounts';
-import { Account } from '@aws/workbench-core-accounts/lib/models/accounts/account';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import {
+  AccountService,
+  CreateAccountRequest,
+  Account,
+  DynamoDBService,
+  resourceTypeToKey
+} from '@aws/swb-app';
 import ClientSession from '../../support/clientSession';
 import { AccountHelper } from '../../support/complex/accountHelper';
 import Setup from '../../support/setup';

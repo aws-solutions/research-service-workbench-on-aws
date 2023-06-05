@@ -10,7 +10,7 @@ import {
   IdentityPermission,
   AuthenticatedUser,
   isIdentityPermissionCreationError
-} from '@aws/workbench-core-authorization';
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 
 export default class AuthorizationSetup {

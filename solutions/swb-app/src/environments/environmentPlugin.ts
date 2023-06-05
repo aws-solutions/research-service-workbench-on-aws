@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PaginatedResponse } from '@aws/workbench-core-base';
+import PaginatedResponse from '../base/interfaces/paginatedResponse';
 import { EnvironmentItem } from './environmentItem';
 import { ListEnvironmentsRequest } from './listEnvironmentsRequest';
 

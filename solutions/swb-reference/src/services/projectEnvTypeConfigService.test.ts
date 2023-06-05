@@ -2,15 +2,17 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { ConflictError, ProjectDeletedError } from '@aws/swb-app';
-import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
-import { MetadataService } from '@aws/workbench-core-base';
 import {
+  ConflictError,
+  ProjectDeletedError,
   EnvironmentService,
   EnvironmentTypeConfigService,
-  EnvironmentTypeService
-} from '@aws/workbench-core-environments';
+  EnvironmentTypeService,
+  DynamicAuthorizationService,
+  ProjectService,
+  ProjectStatus,
+  MetadataService
+} from '@aws/swb-app';
 import { ProjectEnvTypeConfigService } from './projectEnvTypeConfigService';
 
 describe('projectEnvTypeConfigService', () => {

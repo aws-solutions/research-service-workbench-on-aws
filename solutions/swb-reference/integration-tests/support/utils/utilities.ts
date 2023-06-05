@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/swb-app';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_POLLING_INTERVAL_SECONDS, DEFAULT_POLLING_MAX_WAITING_SECONDS } from './constants';
 import HttpError from './HttpError';

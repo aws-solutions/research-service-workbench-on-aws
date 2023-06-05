@@ -9,12 +9,11 @@ import {
   DataSet,
   DataSetExternalEndpointRequest,
   DataSetStoragePlugin,
-  PermissionsResponse
-} from '@aws/swb-app';
-import { ListDataSetAccessPermissionsRequestParser } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
-import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
-import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
-import {
+  PermissionsResponse,
+  DatasetServiceAddRemoveAccessPermissionRequest as AddRemoveAccessPermissionRequest,
+  DataSetParser,
+  DataSetsAuthorizationPlugin,
+  DataSetService as WorkbenchDataSetService,
   Action,
   AuthenticatedUser,
   CreateIdentityPermissionsRequest,
@@ -26,13 +25,10 @@ import {
   GetIdentityPermissionsBySubjectResponse,
   IdentityPermission,
   IdentityType
-} from '@aws/workbench-core-authorization';
-import {
-  AddRemoveAccessPermissionRequest,
-  DataSetParser,
-  DataSetsAuthorizationPlugin,
-  DataSetService as WorkbenchDataSetService
-} from '@aws/workbench-core-datasets';
+} from '@aws/swb-app';
+import { ListDataSetAccessPermissionsRequestParser } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
+import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
+import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
 import { SwbAuthZSubject } from '../constants';
 import { MockDatabaseService } from '../mocks/mockDatabaseService';
 import { getProjectAdminRole } from '../utils/roleUtils';

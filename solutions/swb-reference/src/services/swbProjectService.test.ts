@@ -11,16 +11,14 @@ import {
   Project,
   ProjectService,
   ProjectStatus,
-  UpdateProjectRequest
-} from '@aws/workbench-core-accounts';
-import {
+  UpdateProjectRequest,
   Action,
   AuthenticatedUser,
   DynamicAuthorizationService,
   Effect,
   IdentityPermission,
   IdentityType
-} from '@aws/workbench-core-authorization';
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import { SWBProjectService } from './swbProjectService';
 

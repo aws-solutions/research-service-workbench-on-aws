@@ -3,9 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { LoggingService } from '@aws/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
+import AuditService from '../../audit/auditService';
+import BaseAuditPlugin from '../../audit/plugins/baseAuditPlugin';
+import { LoggingService } from '../../logging/loggingService';
 import AuthorizationPlugin from '../authorizationPlugin';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { AuthenticatedUser } from '../models/authenticatedUser';

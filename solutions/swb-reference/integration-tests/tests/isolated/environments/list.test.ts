@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import {
-  lengthValidationMessage,
-  urlFilterMaxLength,
   JSONValue,
+  betweenFilterMessage,
+  lengthValidationMessage,
   nonEmptyMessage,
-  betweenFilterMessage
-} from '@aws/workbench-core-base';
+  urlFilterMaxLength
+} from '@aws/swb-app';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';

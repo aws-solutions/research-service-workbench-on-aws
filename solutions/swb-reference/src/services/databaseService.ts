@@ -9,7 +9,7 @@ import {
   MetadataService,
   PaginatedResponse,
   RelationshipDDBItemParser
-} from '@aws/workbench-core-base';
+} from '@aws/swb-app';
 
 export interface DatabaseServicePlugin {
   getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined>;

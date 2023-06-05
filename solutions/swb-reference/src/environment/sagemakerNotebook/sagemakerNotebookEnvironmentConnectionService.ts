@@ -3,11 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
-import {
-  EnvironmentConnectionService,
-  EnvironmentConnectionLinkPlaceholder
-} from '@aws/workbench-core-environments';
+import { AwsService, EnvironmentConnectionLinkPlaceholder, EnvironmentConnectionService } from '@aws/swb-app';
 
 export default class SagemakerNotebookEnvironmentConnectionService implements EnvironmentConnectionService {
   /**

@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { isForbiddenError } from '@aws/workbench-core-authorization';
-import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { isForbiddenError } from './authorization/errors/forbiddenError';
+import { validateAndParse } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
 import { isAwsServiceError } from './errors/awsServiceError';
 import { isConflictError } from './errors/conflictError';

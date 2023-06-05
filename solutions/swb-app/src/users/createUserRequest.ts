@@ -3,7 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z, invalidEmailMessage } from '@aws/workbench-core-base';
+import { invalidEmailMessage } from '../base/utilities/textUtil';
+import { z } from '../base/utilities/validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateUserRequestParser = z

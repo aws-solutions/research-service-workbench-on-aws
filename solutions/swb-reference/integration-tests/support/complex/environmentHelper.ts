@@ -1,5 +1,4 @@
-import { AwsService } from '@aws/workbench-core-base';
-import { EnvironmentService } from '@aws/workbench-core-environments';
+import { AwsService, EnvironmentService } from '@aws/swb-app';
 import Setup from '../setup';
 
 export class EnvironmentHelper {

@@ -1,4 +1,4 @@
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
+import { ProjectStatus } from '@aws/swb-app';
 
 export interface ProjectItemResponse {
   id: string;

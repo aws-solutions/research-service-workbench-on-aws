@@ -2,8 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, z } from '@aws/workbench-core-base';
+import { AuthenticatedUserParser } from '../authorization/models/authenticatedUser';
+import resourceTypeToKey from '../base/constants/resourceTypeToKey';
+import { z } from '../base/utilities/validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const GetDataSetByProjectRequestParser = z.object({

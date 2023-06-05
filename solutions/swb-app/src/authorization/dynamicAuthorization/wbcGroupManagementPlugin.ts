@@ -3,16 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import {
-  isRoleAlreadyExistsError,
-  isRoleNotFoundError,
-  PluginConfigurationError,
-  TooManyRequestsError,
-  UserManagementService
-} from '@aws/workbench-core-user-management';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { buildDynamoDBPkSk } from '../../base/aws/helpers/dynamoDB/ddbUtil';
+import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
+import { PluginConfigurationError } from '../../userManagement/errors/pluginConfigurationError';
+import { isRoleAlreadyExistsError } from '../../userManagement/errors/roleAlreadyExistsError';
+import { isRoleNotFoundError } from '../../userManagement/errors/roleNotFoundError';
+import { TooManyRequestsError } from '../../userManagement/errors/tooManyRequestsError';
+import { UserManagementService } from '../../userManagement/userManagementService';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';

@@ -2,9 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { EnvironmentTypeConfig } from '@aws/workbench-core-environments';
+import { AccountsProject as Project, EnvironmentTypeConfig, resourceTypeToKey } from '@aws/swb-app';
 import ClientSession from '../../support/clientSession';
 import { EnvironmentTypeHelper } from '../../support/complex/environmentTypeHelper';
 import { PaabHelper } from '../../support/complex/paabHelper';

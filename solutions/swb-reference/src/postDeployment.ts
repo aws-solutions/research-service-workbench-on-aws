@@ -6,17 +6,22 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import fs from 'fs';
 import { join } from 'path';
-import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
+  AuditService,
+  BaseAuditPlugin,
+  AuditLogger,
   WBCGroupManagementPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
-  CASLAuthorizationPlugin
-} from '@aws/workbench-core-authorization';
-import { AwsService } from '@aws/workbench-core-base';
-import { CognitoSetup, ServiceCatalogSetup, EnvironmentTypeSetup } from '@aws/workbench-core-environments';
-import { LoggingService } from '@aws/workbench-core-logging';
-import { UserManagementService, CognitoUserManagementPlugin } from '@aws/workbench-core-user-management';
+  CASLAuthorizationPlugin,
+  CognitoSetup,
+  ServiceCatalogSetup,
+  EnvironmentTypeSetup,
+  LoggingService,
+  UserManagementService,
+  CognitoUserManagementPlugin,
+  AwsService
+} from '@aws/swb-app';
 import { authorizationGroupPrefix, getConstants, getConstantsWithSecrets } from './constants';
 import AuthorizationSetup from './postDeployment/authorizationSetup';
 

@@ -1,5 +1,4 @@
-import { AwsService } from '@aws/workbench-core-base';
-import { EnvironmentTypeService, EnvironmentType } from '@aws/workbench-core-environments';
+import { EnvironmentTypeService, EnvironmentType, AwsService } from '@aws/swb-app';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
 import Settings from '../utils/settings';

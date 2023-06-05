@@ -21,535 +21,6 @@ importers:
 
   ../../solutions/swb-app:
     specifiers:
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws-sdk/util-dynamodb': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-accounts': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-authentication': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-environments': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@casl/ability': ^5.4.3
-      '@hapi/boom': ^10.0.0
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/cookie-parser': ^1.4.3
-      '@types/cors': ^2.8.12
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      '@vendia/serverless-express': ^4.5.4
-      aws-sdk-client-mock: ^2.1.1
-      cookie-parser: ^1.4.6
-      cors: ^2.8.5
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      express: ^4.17.3
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      jsonschema: ^1.4.1
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      nodemon: ^2.0.19
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      radix3: ^1.0.0
-      rate-limiter-flexible: ~2.4.1
-      sort-package-json: ^1.57.0
-      ts-jest: ^29.1.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws/workbench-core-accounts': link:../../workbench-core/accounts
-      '@aws/workbench-core-audit': link:../../workbench-core/audit
-      '@aws/workbench-core-authentication': link:../../workbench-core/authentication
-      '@aws/workbench-core-authorization': link:../../workbench-core/authorization
-      '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
-      '@aws/workbench-core-environments': link:../../workbench-core/environments
-      '@aws/workbench-core-logging': link:../../workbench-core/logging
-      '@aws/workbench-core-user-management': link:../../workbench-core/user-management
-      '@casl/ability': 5.4.4
-      '@hapi/boom': 10.0.1
-      '@vendia/serverless-express': 4.10.4
-      cookie-parser: 1.4.6
-      cors: 2.8.5
-      express: 4.18.2
-      jsonschema: 1.4.1
-      lodash: 4.17.21
-      radix3: 1.0.1
-      rate-limiter-flexible: 2.4.1
-      zod: 3.21.4
-    devDependencies:
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws-sdk/util-dynamodb': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/cookie-parser': 1.4.3
-      '@types/cors': 2.8.13
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/jest': 27.5.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      aws-sdk-client-mock: 2.1.1
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      fast-check: 3.10.0
-      jest: 29.5.0_@types+node@18.16.16
-      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      nodemon: 2.0.22
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      ts-jest: 29.1.0_doipufordlnvh5g4adbwayvyvy
-      typescript: 4.9.5
-
-  ../../solutions/swb-reference:
-    specifiers:
-      '@aws-sdk/client-ec2': ^3.342.0
-      '@aws-sdk/client-ec2-instance-connect': ^3.342.0
-      '@aws-sdk/client-s3-control': ^3.342.0
-      '@aws-sdk/client-sagemaker': ^3.342.0
-      '@aws-sdk/client-sts': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/swb-app': workspace:*
-      '@aws/workbench-core-accounts': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-environments': workspace:*
-      '@aws/workbench-core-infrastructure': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/aws-lambda': ^8.10.114
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/js-yaml': ^4.0.5
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      '@types/qs': ^6.9.7
-      '@types/uuid': ^8.3.4
-      '@vendia/serverless-express': ^4.5.4
-      aws-cdk: ^2.72.1
-      aws-cdk-lib: ^2.72.1
-      aws-sdk-client-mock: ^2.1.1
-      axios: ^0.27.1
-      constructs: ^10.0.0
-      csrf: ^3.1.0
-      depcheck: ^1.4.3
-      esbuild: ^0.14.21
-      eslint: ^8.7.0
-      express: ^4.17.3
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      js-yaml: ^4.1.0
-      jwt-decode: ^3.1.2
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      pkce-challenge: ^3.0.0
-      qs: ^6.11.0
-      sort-package-json: ^1.57.0
-      ts-jest: ^29.1.0
-      ts-node: ^10.4.0
-      typescript: ^4.5.2
-      uuid: ^8.3.2
-    dependencies:
-      '@aws-sdk/client-ec2': 3.342.0
-      '@aws-sdk/client-ec2-instance-connect': 3.342.0
-      '@aws-sdk/client-s3-control': 3.342.0
-      '@aws-sdk/client-sts': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws/swb-app': link:../swb-app
-      '@aws/workbench-core-accounts': link:../../workbench-core/accounts
-      '@aws/workbench-core-audit': link:../../workbench-core/audit
-      '@aws/workbench-core-authorization': link:../../workbench-core/authorization
-      '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
-      '@aws/workbench-core-environments': link:../../workbench-core/environments
-      '@aws/workbench-core-infrastructure': link:../../workbench-core/infrastructure
-      '@aws/workbench-core-logging': link:../../workbench-core/logging
-      '@aws/workbench-core-user-management': link:../../workbench-core/user-management
-      '@vendia/serverless-express': 4.10.4
-      axios: 0.27.2
-      csrf: 3.1.0
-      express: 4.18.2
-      js-yaml: 4.1.0
-      lodash: 4.17.21
-      pkce-challenge: 3.1.0
-      qs: 6.11.2
-      uuid: 8.3.2
-    devDependencies:
-      '@aws-sdk/client-sagemaker': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_oestsxj4cstrpd7jdztjmgik3q
-      '@rushstack/heft-node-rig': 1.13.1_oestsxj4cstrpd7jdztjmgik3q
-      '@types/aws-lambda': 8.10.115
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/js-yaml': 4.0.5
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      '@types/qs': 6.9.7
-      '@types/uuid': 8.3.4
-      aws-cdk: 2.81.0
-      aws-cdk-lib: 2.81.0_constructs@10.2.38
-      aws-sdk-client-mock: 2.1.1
-      constructs: 10.2.38
-      depcheck: 1.4.3
-      esbuild: 0.14.54
-      eslint: 8.41.0
-      fast-check: 3.10.0
-      jest: 29.5.0_u3tjahz4lx2ow4rgesw7wigoy4
-      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
-      jwt-decode: 3.1.2
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      ts-jest: 29.1.0_aqfcypuiijljhoxpscl5uunq2u
-      ts-node: 10.9.1_gbfmtwj2t57hq5iibp7xw5qwjq
-      typescript: 4.9.5
-
-  ../../workbench-core/accounts:
-    specifiers:
-      '@aws-sdk/client-cloudformation': ^3.342.0
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/client-ec2': ^3.342.0
-      '@aws-sdk/client-eventbridge': ^3.342.0
-      '@aws-sdk/client-kms': ^3.342.0
-      '@aws-sdk/client-s3': ^3.342.0
-      '@aws-sdk/client-service-catalog': ^3.342.0
-      '@aws-sdk/client-ssm': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws-sdk/util-dynamodb': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@hapi/boom': ^10.0.0
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      aws-cdk-lib: ^2.72.1
-      aws-sdk-client-mock: ^2.1.1
-      constructs: ^10.0.0
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      jest: ^29.5.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      ts-jest: ^29.1.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws-sdk/client-cloudformation': 3.342.0
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/client-ec2': 3.342.0
-      '@aws-sdk/client-eventbridge': 3.342.0
-      '@aws-sdk/client-kms': 3.342.0
-      '@aws-sdk/client-s3': 3.342.0
-      '@aws-sdk/client-service-catalog': 3.342.0
-      '@aws-sdk/client-ssm': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws-sdk/util-dynamodb': 3.342.0
-      '@aws/workbench-core-authorization': link:../authorization
-      '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../datasets
-      '@hapi/boom': 10.0.1
-      lodash: 4.17.21
-      zod: 3.21.4
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      aws-cdk-lib: 2.81.0_constructs@10.2.38
-      aws-sdk-client-mock: 2.1.1
-      constructs: 10.2.38
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      jest: 29.5.0_@types+node@18.16.16
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      ts-jest: 29.1.0_doipufordlnvh5g4adbwayvyvy
-      typescript: 4.9.5
-
-  ../../workbench-core/accounts-ui:
-    specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-swb-common-ui': workspace:*
-      '@next/eslint-plugin-next': ^13.0.3
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/node': ^18.15.11
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      eslint-plugin-react: ^7.31.10
-      eslint-plugin-react-hooks: ^4.6.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      react: 17.0.2
-      sort-package-json: ^1.57.0
-      swr: ^1.3.0
-      typescript: ^4.5.2
-    dependencies:
-      '@aws/workbench-core-swb-common-ui': link:../swb-common-ui
-      react: 17.0.2
-      swr: 1.3.0_react@17.0.2
-      typescript: 4.9.5
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@next/eslint-plugin-next': 13.4.4
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/node': 18.16.16
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      eslint-plugin-react: 7.32.2_eslint@8.41.0
-      eslint-plugin-react-hooks: 4.6.0_eslint@8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-
-  ../../workbench-core/audit:
-    specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws/workbench-core-logging': link:../logging
-      lodash: 4.17.21
-      zod: 3.21.4
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/authentication:
-    specifiers:
-      '@aws-sdk/client-cognito-identity-provider': ^3.342.0
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/csurf': ^1.11.2
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      aws-jwt-verify: ^3.0.0
-      aws-sdk-client-mock: ^2.1.1
-      axios: ^0.27.1
-      csurf: ^1.11.0
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      jwt-decode: ^3.1.2
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      typescript: ^4.5.2
-    dependencies:
-      '@aws/workbench-core-authorization': link:../authorization
-      '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-logging': link:../logging
-      aws-jwt-verify: 3.4.0
-      axios: 0.27.2
-      csurf: 1.11.0
-      jwt-decode: 3.1.2
-      lodash: 4.17.21
-    devDependencies:
-      '@aws-sdk/client-cognito-identity-provider': 3.342.0
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/csurf': 1.11.2
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      aws-sdk-client-mock: 2.1.1
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/authorization:
-    specifiers:
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws-sdk/util-dynamodb': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@casl/ability': ^5.4.3
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      aws-sdk-client-mock: ^2.1.1
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      radix3: ^1.0.0
-      rate-limiter-flexible: ~2.4.1
-      sort-package-json: ^1.57.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws/workbench-core-audit': link:../audit
-      '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-logging': link:../logging
-      '@aws/workbench-core-user-management': link:../user-management
-      '@casl/ability': 5.4.4
-      lodash: 4.17.21
-      radix3: 1.0.1
-      rate-limiter-flexible: 2.4.1
-      zod: 3.21.4
-    devDependencies:
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws-sdk/util-dynamodb': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      aws-sdk-client-mock: 2.1.1
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      fast-check: 3.10.0
-      jest: 29.5.0_@types+node@18.16.16
-      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/base:
-    specifiers:
       '@aws-sdk/client-cloudformation': ^3.342.0
       '@aws-sdk/client-cognito-identity-provider': ^3.342.0
       '@aws-sdk/client-dynamodb': ^3.342.0
@@ -571,32 +42,58 @@ importers:
       '@aws-sdk/types': ^3.342.0
       '@aws-sdk/util-dynamodb': ^3.342.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@casl/ability': ^5.4.3
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.2.0
       '@rushstack/heft': ^0.50.5
       '@rushstack/heft-jest-plugin': ^0.5.11
       '@rushstack/heft-node-rig': ^1.12.11
+      '@types/cookie-parser': ^1.4.3
+      '@types/cors': ^2.8.12
+      '@types/csurf': ^1.11.2
+      '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
+      '@types/triple-beam': ^1.3.2
       '@types/uuid': ^8.3.4
+      '@vendia/serverless-express': ^4.5.4
+      aws-cdk-lib: ^2.72.1
+      aws-jwt-verify: ^3.0.0
       aws-sdk-client-mock: ^2.1.1
+      axios: ^0.27.1
+      constructs: ^10.0.0
+      cookie-parser: ^1.4.6
+      cors: ^2.8.5
+      csurf: ^1.11.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
+      express: ^4.17.3
+      fast-check: ^3.10.0
+      generate-password: ^1.7.0
       jest: ^29.5.0
+      jest-fast-check: ^2.0.0
       js-yaml: ^4.1.0
       jsonschema: ^1.4.1
+      jwt-decode: ^3.1.2
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
+      md5-file: ^5.0.0
+      nodemon: ^2.0.19
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
+      radix3: ^1.0.0
+      rate-limiter-flexible: ~2.4.1
       sort-package-json: ^1.57.0
+      triple-beam: ^1.3.0
       ts-jest: ^29.1.0
       typescript: ^4.5.2
       uuid: ^8.3.2
+      winston: ^3.6.0
+      winston-transport: ^4.5.0
       yaml-cfn: ^0.3.1
       zod: ^3.19.1
     dependencies:
@@ -620,100 +117,47 @@ importers:
       '@aws-sdk/s3-request-presigner': 3.342.0
       '@aws-sdk/types': 3.342.0
       '@aws-sdk/util-dynamodb': 3.342.0
+      '@casl/ability': 5.4.4
       '@hapi/boom': 10.0.1
+      '@types/triple-beam': 1.3.2
+      '@vendia/serverless-express': 4.10.4
+      aws-jwt-verify: 3.4.0
       aws-sdk-client-mock: 2.1.1
+      axios: 0.27.2
+      cookie-parser: 1.4.6
+      cors: 2.8.5
+      csurf: 1.11.0
+      express: 4.18.2
+      generate-password: 1.7.0
       js-yaml: 4.1.0
       jsonschema: 1.4.1
+      jwt-decode: 3.1.2
       lodash: 4.17.21
+      md5-file: 5.0.0
+      radix3: 1.0.1
+      rate-limiter-flexible: 2.4.1
+      triple-beam: 1.3.0
       uuid: 8.3.2
+      winston: 3.9.0
+      winston-transport: 4.5.0
       zod: 3.21.4
     devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
       '@rushstack/heft': 0.50.7_@types+node@18.16.16
       '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
       '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
+      '@types/cookie-parser': 1.4.3
+      '@types/cors': 2.8.13
+      '@types/csurf': 1.11.2
+      '@types/express': 4.17.17
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.5.2
       '@types/js-yaml': 4.0.5
       '@types/lodash': 4.14.195
       '@types/node': 18.16.16
       '@types/uuid': 8.3.4
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      jest: 29.5.0_@types+node@18.16.16
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      ts-jest: 29.1.0_doipufordlnvh5g4adbwayvyvy
-      typescript: 4.9.5
-      yaml-cfn: 0.3.2
-
-  ../../workbench-core/datasets:
-    specifiers:
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/client-kms': ^3.342.0
-      '@aws-sdk/client-s3': ^3.342.0
-      '@aws-sdk/client-s3-control': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      aws-cdk-lib: ^2.72.1
-      aws-sdk-client-mock: ^2.1.1
-      constructs: ^10.0.0
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      jsonschema: ^1.4.1
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      ts-jest: ^29.1.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/client-kms': 3.342.0
-      '@aws-sdk/client-s3': 3.342.0
-      '@aws-sdk/client-s3-control': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws/workbench-core-audit': link:../audit
-      '@aws/workbench-core-authorization': link:../authorization
-      '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-logging': link:../logging
-      jsonschema: 1.4.1
-      lodash: 4.17.21
-      zod: 3.21.4
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@aws/workbench-core-user-management': link:../user-management
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
       aws-cdk-lib: 2.81.0_constructs@10.2.38
-      aws-sdk-client-mock: 2.1.1
       constructs: 10.2.38
       depcheck: 1.4.3
       eslint: 8.41.0
@@ -722,222 +166,118 @@ importers:
       jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
+      nodemon: 2.0.22
       npm-package-json-lint: 6.4.0
       npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
       sort-package-json: 1.57.0
       ts-jest: 29.1.0_doipufordlnvh5g4adbwayvyvy
       typescript: 4.9.5
+      yaml-cfn: 0.3.2
 
-  ../../workbench-core/datasets-ui:
+  ../../solutions/swb-reference:
     specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-swb-common-ui': workspace:*
-      '@cloudscape-design/collection-hooks': ^1.0.3
-      '@cloudscape-design/components': ^3.0.27
-      '@next/eslint-plugin-next': ^13.0.3
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/node': ^18.15.11
-      '@types/react': 17.0.38
-      '@types/react-dom': ^18.0.6
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      eslint-plugin-react: ^7.31.10
-      eslint-plugin-react-hooks: ^4.6.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      next: ^12.1.5
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      react: 17.0.2
-      react-dom: 17.0.2
-      sass: ^1.49.8
-      sort-package-json: ^1.57.0
-      swr: ^1.3.0
-      typescript: ^4.5.2
-    dependencies:
-      '@aws/workbench-core-swb-common-ui': link:../swb-common-ui
-      next: 12.3.4_ifhodgkigu5opxzqe5c3iloc7i
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      swr: 1.3.0_react@17.0.2
-      typescript: 4.9.5
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@cloudscape-design/collection-hooks': 1.0.21_react@17.0.2
-      '@cloudscape-design/components': 3.0.294_wnecvl2xit6hykxlpfa3byfhr4
-      '@next/eslint-plugin-next': 13.4.4
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/node': 18.16.16
-      '@types/react': 17.0.38
-      '@types/react-dom': 18.2.4
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      eslint-plugin-react: 7.32.2_eslint@8.41.0
-      eslint-plugin-react-hooks: 4.6.0_eslint@8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sass: 1.62.1
-      sort-package-json: 1.57.0
-
-  ../../workbench-core/environments:
-    specifiers:
-      '@aws-sdk/client-cloudformation': ^3.342.0
-      '@aws-sdk/client-cognito-identity-provider': ^3.342.0
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/client-s3': ^3.342.0
-      '@aws-sdk/client-service-catalog': ^3.342.0
-      '@aws-sdk/client-ssm': ^3.342.0
+      '@aws-cdk/aws-servicecatalogappregistry-alpha': ^2.61.0-alpha.0
+      '@aws-sdk/client-ec2': ^3.342.0
+      '@aws-sdk/client-ec2-instance-connect': ^3.342.0
+      '@aws-sdk/client-s3-control': ^3.342.0
+      '@aws-sdk/client-sagemaker': ^3.342.0
       '@aws-sdk/client-sts': ^3.342.0
       '@aws-sdk/types': ^3.342.0
-      '@aws-sdk/util-dynamodb': ^3.342.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@hapi/boom': ^10.0.0
+      '@aws/swb-app': workspace:*
       '@rushstack/eslint-config': ^3.2.0
       '@rushstack/heft': ^0.50.5
       '@rushstack/heft-jest-plugin': ^0.5.11
       '@rushstack/heft-node-rig': ^1.12.11
+      '@types/aws-lambda': ^8.10.114
+      '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
+      '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^18.15.11
+      '@types/qs': ^6.9.7
+      '@types/uuid': ^8.3.4
+      '@vendia/serverless-express': ^4.5.4
+      aws-cdk: ^2.72.1
+      aws-cdk-lib: ^2.72.1
       aws-sdk-client-mock: ^2.1.1
+      axios: ^0.27.1
+      constructs: ^10.0.0
+      csrf: ^3.1.0
       depcheck: ^1.4.3
+      esbuild: ^0.14.21
       eslint: ^8.7.0
-      generate-password: ^1.7.0
+      eslint-plugin-security: ^1.4.0
+      express: ^4.17.3
+      fast-check: ^3.10.0
       jest: ^29.5.0
+      jest-fast-check: ^2.0.0
+      js-yaml: ^4.1.0
+      jwt-decode: ^3.1.2
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
-      md5-file: ^5.0.0
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
+      pkce-challenge: ^3.0.0
+      qs: ^6.11.0
       sort-package-json: ^1.57.0
       ts-jest: ^29.1.0
+      ts-node: ^10.4.0
       typescript: ^4.5.2
-      zod: ^3.19.1
+      uuid: ^8.3.2
     dependencies:
-      '@aws-sdk/client-cloudformation': 3.342.0
-      '@aws-sdk/client-cognito-identity-provider': 3.342.0
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/client-s3': 3.342.0
-      '@aws-sdk/client-service-catalog': 3.342.0
-      '@aws-sdk/client-ssm': 3.342.0
+      '@aws-cdk/aws-servicecatalogappregistry-alpha': 2.61.0-alpha.0_i4d3sq6o3bswed3sqnlssaqkyy
+      '@aws-sdk/client-ec2': 3.342.0
+      '@aws-sdk/client-ec2-instance-connect': 3.342.0
+      '@aws-sdk/client-s3-control': 3.342.0
       '@aws-sdk/client-sts': 3.342.0
-      '@aws-sdk/util-dynamodb': 3.342.0
-      '@aws/workbench-core-audit': link:../audit
-      '@aws/workbench-core-authorization': link:../authorization
-      '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../datasets
-      '@aws/workbench-core-logging': link:../logging
-      '@aws/workbench-core-user-management': link:../user-management
-      '@hapi/boom': 10.0.1
-      generate-password: 1.7.0
-      lodash: 4.17.21
-      md5-file: 5.0.0
-      zod: 3.21.4
-    devDependencies:
       '@aws-sdk/types': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/swb-app': link:../swb-app
+      '@vendia/serverless-express': 4.10.4
+      aws-cdk-lib: 2.81.0_constructs@10.2.38
+      axios: 0.27.2
+      constructs: 10.2.38
+      csrf: 3.1.0
+      express: 4.18.2
+      js-yaml: 4.1.0
+      lodash: 4.17.21
+      pkce-challenge: 3.1.0
+      qs: 6.11.2
+      uuid: 8.3.2
+    devDependencies:
+      '@aws-sdk/client-sagemaker': 3.342.0
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
       '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
+      '@rushstack/heft-jest-plugin': 0.5.13_oestsxj4cstrpd7jdztjmgik3q
+      '@rushstack/heft-node-rig': 1.13.1_oestsxj4cstrpd7jdztjmgik3q
+      '@types/aws-lambda': 8.10.115
+      '@types/express': 4.17.17
       '@types/heft-jest': 1.0.2
-      '@types/jest': 27.5.2
+      '@types/js-yaml': 4.0.5
       '@types/lodash': 4.14.195
       '@types/node': 18.16.16
+      '@types/qs': 6.9.7
+      '@types/uuid': 8.3.4
+      aws-cdk: 2.81.0
       aws-sdk-client-mock: 2.1.1
       depcheck: 1.4.3
+      esbuild: 0.14.54
       eslint: 8.41.0
-      jest: 29.5.0_@types+node@18.16.16
+      eslint-plugin-security: 1.7.1
+      fast-check: 3.10.0
+      jest: 29.5.0_u3tjahz4lx2ow4rgesw7wigoy4
+      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
+      jwt-decode: 3.1.2
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.4.0
       npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
       sort-package-json: 1.57.0
-      ts-jest: 29.1.0_doipufordlnvh5g4adbwayvyvy
+      ts-jest: 29.1.0_aqfcypuiijljhoxpscl5uunq2u
+      ts-node: 10.9.1_gbfmtwj2t57hq5iibp7xw5qwjq
       typescript: 4.9.5
-
-  ../../workbench-core/environments-ui:
-    specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-accounts-ui': workspace:*
-      '@aws/workbench-core-datasets-ui': workspace:*
-      '@aws/workbench-core-environments': workspace:*
-      '@aws/workbench-core-swb-common-ui': workspace:*
-      '@cloudscape-design/collection-hooks': ^1.0.3
-      '@cloudscape-design/components': ^3.0.27
-      '@next/eslint-plugin-next': ^13.0.3
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/node': ^18.15.11
-      '@types/react': 17.0.38
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      eslint-plugin-react: ^7.31.10
-      eslint-plugin-react-hooks: ^4.6.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      next: ^12.1.5
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      react: 17.0.2
-      react-dom: 17.0.2
-      sass: ^1.49.8
-      sort-package-json: ^1.57.0
-      swr: ^1.3.0
-      typescript: ^4.5.2
-    dependencies:
-      '@aws/workbench-core-accounts-ui': link:../accounts-ui
-      '@aws/workbench-core-datasets-ui': link:../datasets-ui
-      '@aws/workbench-core-environments': link:../environments
-      '@aws/workbench-core-swb-common-ui': link:../swb-common-ui
-      next: 12.3.4_ifhodgkigu5opxzqe5c3iloc7i
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      swr: 1.3.0_react@17.0.2
-      typescript: 4.9.5
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@cloudscape-design/collection-hooks': 1.0.21_react@17.0.2
-      '@cloudscape-design/components': 3.0.294_wnecvl2xit6hykxlpfa3byfhr4
-      '@next/eslint-plugin-next': 13.4.4
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/node': 18.16.16
-      '@types/react': 17.0.38
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      eslint-plugin-react: 7.32.2_eslint@8.41.0
-      eslint-plugin-react-hooks: 4.6.0_eslint@8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sass: 1.62.1
-      sort-package-json: 1.57.0
 
   ../../workbench-core/eslint-custom:
     specifiers:
@@ -973,176 +313,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 18.16.16
       depcheck: 1.4.3
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/example/app:
-    specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-audit': workspace:*
-      '@aws/workbench-core-authentication': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-logging': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@hapi/boom': ^10.0.0
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/cookie-parser': ^1.4.3
-      '@types/cors': ^2.8.12
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      cookie-parser: ^1.4.6
-      cors: ^2.8.5
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      eslint-plugin-security: ^1.4.0
-      express: ^4.17.3
-      express-rate-limit: ^6.6.0
-      jsonschema: ^1.4.1
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws/workbench-core-audit': link:../../audit
-      '@aws/workbench-core-authentication': link:../../authentication
-      '@aws/workbench-core-authorization': link:../../authorization
-      '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../datasets
-      '@aws/workbench-core-logging': link:../../logging
-      '@aws/workbench-core-user-management': link:../../user-management
-      '@hapi/boom': 10.0.1
-      cookie-parser: 1.4.6
-      cors: 2.8.5
-      express-rate-limit: 6.7.0_express@4.18.2
-      jsonschema: 1.4.1
-      lodash: 4.17.21
-      zod: 3.21.4
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/cookie-parser': 1.4.3
-      '@types/cors': 2.8.13
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      eslint-plugin-security: 1.7.1
-      express: 4.18.2
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/example/infrastructure:
-    specifiers:
-      '@aws-sdk/client-s3-control': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@aws/workbench-core-datasets': workspace:*
-      '@aws/workbench-core-example-app': workspace:*
-      '@aws/workbench-core-infrastructure': workspace:*
-      '@aws/workbench-core-user-management': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/aws-lambda': ^8.10.114
-      '@types/csrf': ^3.1.0
-      '@types/express': ^4.17.13
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': ^4.14.181
-      '@types/node': ^18.15.11
-      '@types/uuid': ^8.3.4
-      '@vendia/serverless-express': ^4.5.4
-      aws-cdk: ^2.72.1
-      aws-cdk-lib: ^2.72.1
-      axios: ^0.27.1
-      cdk-nag: ^2.12.25
-      constructs: ^10.0.0
-      csrf: ^3.1.0
-      depcheck: ^1.4.3
-      dotenv: ^16.0.3
-      esbuild: ^0.14.21
-      eslint: ^8.7.0
-      eslint-plugin-security: ^1.4.0
-      express: ^4.17.3
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      js-yaml: ^4.1.0
-      jwt-decode: ^3.1.2
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      lodash: ^4.17.21
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      source-map-support: ^0.5.16
-      typescript: ^4.5.2
-    dependencies:
-      '@aws-sdk/client-s3-control': 3.342.0
-      '@aws/workbench-core-authorization': link:../../authorization
-      '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../datasets
-      '@aws/workbench-core-example-app': link:../app
-      '@aws/workbench-core-infrastructure': link:../../infrastructure
-      '@aws/workbench-core-user-management': link:../../user-management
-      '@vendia/serverless-express': 4.10.4
-      aws-cdk-lib: 2.81.0_constructs@10.2.38
-      constructs: 10.2.38
-      csrf: 3.1.0
-      dotenv: 16.1.1
-      express: 4.18.2
-      js-yaml: 4.1.0
-      lodash: 4.17.21
-      source-map-support: 0.5.21
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/aws-lambda': 8.10.115
-      '@types/csrf': 3.1.0
-      '@types/express': 4.17.17
-      '@types/heft-jest': 1.0.2
-      '@types/lodash': 4.14.195
-      '@types/node': 18.16.16
-      '@types/uuid': 8.3.4
-      aws-cdk: 2.81.0
-      axios: 0.27.2
-      cdk-nag: 2.27.23_i4d3sq6o3bswed3sqnlssaqkyy
-      depcheck: 1.4.3
-      esbuild: 0.14.54
-      eslint: 8.41.0
-      eslint-plugin-security: 1.7.1
-      fast-check: 3.10.0
-      jest: 29.5.0_@types+node@18.16.16
-      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
-      jwt-decode: 3.1.2
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.4.0
@@ -1190,55 +360,6 @@ importers:
       depcheck: 1.4.3
       eslint: 8.41.0
       eslint-plugin-security: 1.7.1
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
-
-  ../../workbench-core/logging:
-    specifiers:
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/node': ^18.15.11
-      '@types/triple-beam': ^1.3.2
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      fast-check: ^3.10.0
-      jest: ^29.5.0
-      jest-fast-check: ^2.0.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      triple-beam: ^1.3.0
-      typescript: ^4.5.2
-      winston: ^3.6.0
-      winston-transport: ^4.5.0
-    dependencies:
-      '@types/triple-beam': 1.3.2
-      triple-beam: 1.3.0
-      winston: 3.9.0
-      winston-transport: 4.5.0
-    devDependencies:
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/node': 18.16.16
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      fast-check: 3.10.0
-      jest: 29.5.0_@types+node@18.16.16
-      jest-fast-check: 2.0.0_beteva4dzuauj66ylbcxwutab4
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.4.0
@@ -1359,53 +480,6 @@ importers:
       npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
       sass: 1.62.1
       sort-package-json: 1.57.0
-
-  ../../workbench-core/user-management:
-    specifiers:
-      '@aws-sdk/client-cognito-identity-provider': ^3.342.0
-      '@aws-sdk/client-dynamodb': ^3.342.0
-      '@aws-sdk/types': ^3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-base': workspace:*
-      '@rushstack/eslint-config': ^3.2.0
-      '@rushstack/heft': ^0.50.5
-      '@rushstack/heft-jest-plugin': ^0.5.11
-      '@rushstack/heft-node-rig': ^1.12.11
-      '@types/heft-jest': 1.0.2
-      '@types/node': ^18.15.11
-      aws-sdk-client-mock: ^2.1.1
-      depcheck: ^1.4.3
-      eslint: ^8.7.0
-      license-check-and-add: ^4.0.5
-      license-checker: ^25.0.1
-      npm-package-json-lint: ^6.3.0
-      npm-package-json-lint-config-default: ^5.0.0
-      sort-package-json: ^1.57.0
-      typescript: ^4.5.2
-      zod: ^3.19.1
-    dependencies:
-      '@aws/workbench-core-base': link:../base
-      zod: 3.21.4
-    devDependencies:
-      '@aws-sdk/client-cognito-identity-provider': 3.342.0
-      '@aws-sdk/client-dynamodb': 3.342.0
-      '@aws-sdk/types': 3.342.0
-      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 3.3.0_5ujgynla27k2qkzlnkldjwsutm
-      '@rushstack/heft': 0.50.7_@types+node@18.16.16
-      '@rushstack/heft-jest-plugin': 0.5.13_nsuwzq7y66i36s6rp55enumary
-      '@rushstack/heft-node-rig': 1.13.1_nsuwzq7y66i36s6rp55enumary
-      '@types/heft-jest': 1.0.2
-      '@types/node': 18.16.16
-      aws-sdk-client-mock: 2.1.1
-      depcheck: 1.4.3
-      eslint: 8.41.0
-      license-check-and-add: 4.0.5
-      license-checker: 25.0.1
-      npm-package-json-lint: 6.4.0
-      npm-package-json-lint-config-default: 5.0.0_ogc4gh2psjwvuyt5uwb7bwur54
-      sort-package-json: 1.57.0
-      typescript: 4.9.5
 
 packages:
 
@@ -1602,6 +676,7 @@ packages:
       tslib: 2.5.2
     transitivePeerDependencies:
       - aws-crt
+    dev: false
 
   /@aws-sdk/client-dynamodb/3.342.0:
     resolution: {integrity: sha512-FBHfMi+445VK9Zhi06eNHO34itftHpkWLIquoq1S39ufus+sPofT7y/KNGH0k06V0b4gqhaCE7z0sCPo/wmqkQ==}
@@ -1648,6 +723,7 @@ packages:
       uuid: 8.3.2
     transitivePeerDependencies:
       - aws-crt
+    dev: false
 
   /@aws-sdk/client-ec2-instance-connect/3.342.0:
     resolution: {integrity: sha512-JDho+rSjUk7KzQZ9BkDrcnzqlIQ8Yj1Ar9q1JTvHqvxN+zOIQvw72p1COdj9jdhfwj0XwmOn0Kfhh0/q1bdItA==}
@@ -2486,6 +1562,7 @@ packages:
     dependencies:
       mnemonist: 0.38.3
       tslib: 2.5.2
+    dev: false
 
   /@aws-sdk/eventstream-codec/3.342.0:
     resolution: {integrity: sha512-IwtvSuplioMyiu/pQgpazKkGWDM5M5BOx85zmsB0uNxt6rmje8+WqPmGmuPdmJv4bLC5dJPLovcCp/fuH8XWhA==}
@@ -2622,6 +1699,7 @@ packages:
       '@aws-sdk/protocol-http': 3.342.0
       '@aws-sdk/types': 3.342.0
       tslib: 2.5.2
+    dev: false
 
   /@aws-sdk/middleware-endpoint/3.342.0:
     resolution: {integrity: sha512-/rE+3a2EbNQoylc7vyN+O6GFfcLitboZ8f/Kdkld3Ijcp9whPHdfjiqujlwyiUTgBVP3BqgyB3r7AZDloc7B0g==}
@@ -2979,6 +2057,7 @@ packages:
     engines: {node: '>=14.0.0'}
     dependencies:
       tslib: 2.5.2
+    dev: false
 
   /@aws-sdk/util-endpoints/3.342.0:
     resolution: {integrity: sha512-ZsYF413hkVwSOjvZG6U0SshRtzSg6MtwzO+j90AjpaqgoHAxE5LjO5eVYFfPXTC2U8NhU7xkzASY6++e5bRRnw==}
@@ -5029,13 +4108,6 @@ packages:
       '@types/node': 18.16.16
     dev: true
 
-  /@types/csrf/3.1.0:
-    resolution: {integrity: sha512-QawgCDN1oWa6qYvDWBW7CDlp5Gtay22DJCJAXMAhdOpWh75sXyzZ1pvMJ+EZsFpwXdLHC/Jk50Xxahf/mP/b9Q==}
-    deprecated: This is a stub types definition. csrf provides its own type definitions, so you do not need this installed.
-    dependencies:
-      csrf: 3.1.0
-    dev: true
-
   /@types/csurf/1.11.2:
     resolution: {integrity: sha512-9bc98EnwmC1S0aSJiA8rWwXtgXtXHHOQOsGHptImxFgqm6CeH+mIOunHRg6+/eg2tlmDMX3tY7XrWxo2M/nUNQ==}
     dependencies:
@@ -5172,12 +4244,6 @@ packages:
 
   /@types/range-parser/1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
-    dev: true
-
-  /@types/react-dom/18.2.4:
-    resolution: {integrity: sha512-G2mHoTMTL4yoydITgOGwWdWMVd8sNgyEP85xVmMKAPUBwQWm9wBPQUmvbeF4V3WBY1P7mmL4BkjQ0SqUpf1snw==}
-    dependencies:
-      '@types/react': 17.0.38
     dev: true
 
   /@types/react/17.0.38:
@@ -5481,6 +4547,7 @@ packages:
     dependencies:
       mime-types: 2.1.35
       negotiator: 0.6.3
+    dev: false
 
   /ace-builds/1.22.0:
     resolution: {integrity: sha512-7IlgBtb/A1qljFLB9Xz+Cuv3vILYHLpxE+9gpujoCzI1G0RpCPc1TKzoCbJ+IWIWtdtbJ0BdXKg3AsO3ZUJosw==}
@@ -5614,6 +4681,7 @@ packages:
 
   /array-flatten/1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
+    dev: false
 
   /array-includes/3.1.6:
     resolution: {integrity: sha512-sgTbLvL6cNnw24FnbaDyjmvddQ2ML8arZsgaJhoABMoplz/4QRhtrYS+alr1BUM1Bwp6dhx8vVCBSLG+StwOFw==}
@@ -5679,6 +4747,7 @@ packages:
 
   /asynckit/0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+    dev: false
 
   /available-typed-arrays/1.0.5:
     resolution: {integrity: sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==}
@@ -5743,6 +4812,7 @@ packages:
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
+    dev: false
 
   /babel-jest/29.5.0_@babel+core@7.22.1:
     resolution: {integrity: sha512-mA4eCDh5mSo2EcA9xQjVTpmbbNk32Zb3Q3QFQsNhaK56Q+yoXowzFodLux30HRgyOho5rsQ6B0P9QpMkvvnJ0Q==}
@@ -5865,6 +4935,7 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /bowser/2.11.0:
     resolution: {integrity: sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==}
@@ -5907,7 +4978,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001492
+      caniuse-lite: 1.0.30001494
       electron-to-chromium: 1.4.414
       node-releases: 2.0.12
       update-browserslist-db: 1.0.11_browserslist@4.21.7
@@ -5932,6 +5003,7 @@ packages:
 
   /buffer-from/1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+    dev: true
 
   /buffer/5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
@@ -5965,6 +5037,7 @@ packages:
   /bytes/3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /cacheable-lookup/7.0.0:
     resolution: {integrity: sha512-+qJyx4xiKra8mZrcwhjMRMUhD5NR1R8esPkzIYxX96JiecFoxAXFuz/GpR3+ev4PE1WamHip78wV0vcmPQtp8w==}
@@ -6026,22 +5099,12 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  /caniuse-lite/1.0.30001492:
-    resolution: {integrity: sha512-2efF8SAZwgAX1FJr87KWhvuJxnGJKOnctQa8xLOskAXNXq8oiuqgl6u1kk3fFpsp3GgvzlRjiK1sl63hNtFADw==}
+  /caniuse-lite/1.0.30001494:
+    resolution: {integrity: sha512-sY2B5Qyl46ZzfYDegrl8GBCzdawSLT4ThM9b9F+aDYUrAG2zCOyMbd2Tq34mS1g4ZKBfjRlzOohQMxx28x6wJg==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
     engines: {node: '>= 0.8.0'}
-
-  /cdk-nag/2.27.23_i4d3sq6o3bswed3sqnlssaqkyy:
-    resolution: {integrity: sha512-WVQmr8dFlEpasDOfvgj6BCN1ZHBcbCZCHCJ/WItrb9NjFE+OgRzachwz3aVxh5VjKnJ8c3EPhCc7Ifohrxp0QQ==}
-    peerDependencies:
-      aws-cdk-lib: ^2.78.0
-      constructs: ^10.0.5
-    dependencies:
-      aws-cdk-lib: 2.81.0_constructs@10.2.38
-      constructs: 10.2.38
-    dev: true
 
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -6242,6 +5305,7 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
+    dev: false
 
   /commander/9.5.0:
     resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
@@ -6250,7 +5314,7 @@ packages:
     optional: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /configstore/5.0.1:
     resolution: {integrity: sha512-aMKprgk5YhBNyH25hj8wGt2+D52Sw1DRRIzqBwLp2Ya9mFmY8KPvvtvmna8SxVR9JMZ4kzMD68N22vlaRpkeFA==}
@@ -6273,10 +5337,12 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       safe-buffer: 5.2.1
+    dev: false
 
   /content-type/1.0.5:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /convert-source-map/1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
@@ -6295,7 +5361,8 @@ packages:
     dev: false
 
   /cookie-signature/1.0.6:
-    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+    resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
+    dev: false
 
   /cookie/0.4.0:
     resolution: {integrity: sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==}
@@ -6310,6 +5377,7 @@ packages:
   /cookie/0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -6371,6 +5439,7 @@ packages:
       rndm: 1.2.0
       tsscmp: 1.0.6
       uid-safe: 2.1.5
+    dev: false
 
   /css-selector-tokenizer/0.8.0:
     resolution: {integrity: sha512-Jd6Ig3/pe62/qe5SBPTN8h8LeUg/pT4lLgtavPf7updwwHpvFzxvOQBHYj2LZDMjUnBzgvIUSjRcf6oT5HzHFg==}
@@ -6531,6 +5600,7 @@ packages:
   /delayed-stream/1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
+    dev: false
 
   /depcheck/1.4.3:
     resolution: {integrity: sha512-vy8xe1tlLFu7t4jFyoirMmOR7x7N601ubU9Gkifyr9z8rjBFtEdWHDBMqXyk6OkK+94NXutzddVXJuo0JlUQKQ==}
@@ -6571,6 +5641,7 @@ packages:
   /depd/2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /dependency-path/9.2.8:
     resolution: {integrity: sha512-S0OhIK7sIyAsph8hVH/LMCTDL3jozKtlrPx3dMQrlE2nAlXTquTT+AcOufphDMTQqLkfn4acvfiem9I1IWZ4jQ==}
@@ -6588,6 +5659,7 @@ packages:
   /destroy/1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
+    dev: false
 
   /detect-indent/6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
@@ -6659,11 +5731,6 @@ packages:
       is-obj: 2.0.0
     dev: false
 
-  /dotenv/16.1.1:
-    resolution: {integrity: sha512-UGmzIqXU/4b6Vb3R1Vrfd/4vGgVlB+mO+vEixOdfRhLeppkyW2BMhuK7TL8d0el+q9c4lW9qK2wZYhNLFhXYLA==}
-    engines: {node: '>=12'}
-    dev: false
-
   /ecdsa-sig-formatter/1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
     dependencies:
@@ -6672,6 +5739,7 @@ packages:
 
   /ee-first/1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+    dev: false
 
   /electron-to-chromium/1.4.414:
     resolution: {integrity: sha512-RRuCvP6ekngVh2SAJaOKT/hxqc9JAsK+Pe0hP5tGQIfonU2Zy9gMGdJ+mBdyl/vNucMG6gkXYtuM4H/1giws5w==}
@@ -6703,6 +5771,7 @@ packages:
   /encodeurl/1.0.2:
     resolution: {integrity: sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /enhanced-resolve/5.14.1:
     resolution: {integrity: sha512-Vklwq2vDKtl0y/vtwjSesgJ5MYS7Etuk5txS8VdKL4AOS1aUlD96zqIfsOSLQsdv3xgMRbtkWM8eG9XDfKUPow==}
@@ -6997,6 +6066,7 @@ packages:
 
   /escape-html/1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
+    dev: false
 
   /escape-string-regexp/1.0.5:
     resolution: {integrity: sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==}
@@ -7324,6 +6394,7 @@ packages:
   /etag/1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /events/3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
@@ -7375,15 +6446,6 @@ packages:
       jest-util: 29.5.0
     dev: true
 
-  /express-rate-limit/6.7.0_express@4.18.2:
-    resolution: {integrity: sha512-vhwIdRoqcYB/72TK3tRZI+0ttS8Ytrk24GfmsxDXK9o9IhHNO5bXRiXQSExPQ4GbaE5tvIS7j1SGrxsuWs+sGA==}
-    engines: {node: '>= 12.9.0'}
-    peerDependencies:
-      express: ^4 || ^5
-    dependencies:
-      express: 4.18.2
-    dev: false
-
   /express/4.18.2:
     resolution: {integrity: sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==}
     engines: {node: '>= 0.10.0'}
@@ -7421,6 +6483,7 @@ packages:
       vary: 1.1.2
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /external-editor/3.1.0:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
@@ -7514,6 +6577,7 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /find-up/3.0.0:
     resolution: {integrity: sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==}
@@ -7572,6 +6636,7 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+    dev: false
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -7599,14 +6664,17 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+    dev: false
 
   /forwarded/0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /fresh/0.5.2:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /fs-extra/11.1.1:
     resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
@@ -8001,6 +7069,7 @@ packages:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
+    dev: false
 
   /http-proxy-agent/5.0.0:
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
@@ -8045,6 +7114,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       safer-buffer: 2.1.2
+    dev: false
 
   /ieee754/1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -8171,6 +7241,7 @@ packages:
   /ipaddr.js/1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
+    dev: false
 
   /irregular-plurals/3.5.0:
     resolution: {integrity: sha512-1ANGLZ+Nkv1ptFb2pa8oG8Lem4krflKuX/gINiHJHjJUKaJHk/SXk5x6K3J+39/p0h1RQ2saROclJJ+QLvETCQ==}
@@ -9365,6 +8436,7 @@ packages:
   /media-typer/0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /mem/8.1.1:
     resolution: {integrity: sha512-qFCFUDs7U3b8mBDPyz5EToEKoAkgCzqquIgi9nkkR9bixxOVOre+09lbuH7+9Kn2NFpm56M3GUWVbU2hQgdACA==}
@@ -9393,6 +8465,7 @@ packages:
 
   /merge-descriptors/1.0.1:
     resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
+    dev: false
 
   /merge-stream/2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
@@ -9404,6 +8477,7 @@ packages:
   /methods/1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /micromatch/4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
@@ -9415,17 +8489,20 @@ packages:
   /mime-db/1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /mime-types/2.1.35:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
     dependencies:
       mime-db: 1.52.0
+    dev: false
 
   /mime/1.6.0:
     resolution: {integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==}
     engines: {node: '>=4'}
     hasBin: true
+    dev: false
 
   /mimic-fn/2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
@@ -9508,6 +8585,7 @@ packages:
     resolution: {integrity: sha512-2K9QYubXx/NAjv4VLq1d1Ly8pWNC5L3BrixtdkyTegXWJIqY+zLNDhhX/A+ZwWt70tB1S8H4BE8FLYEFyNoOBw==}
     dependencies:
       obliterator: 1.6.1
+    dev: false
 
   /mnth/2.0.0:
     resolution: {integrity: sha512-3ZH4UWBGpAwCKdfjynLQpUDVZWMe6vRHwarIpMdGLUp89CVR9hjzgyWERtMyqx+fPEqQ/PsAxFwvwPxLFxW40A==}
@@ -9521,6 +8599,7 @@ packages:
 
   /ms/2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+    dev: false
 
   /multimatch/5.0.0:
     resolution: {integrity: sha512-ypMKuglUrZUD99Tk2bUQ+xNQj43lPEfAeX2o9cTteAmShXy2VHDJpuwu1o0xqoKCt9jLVAvwyFKdLTPXKAfJyA==}
@@ -9558,6 +8637,7 @@ packages:
   /negotiator/0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /next/12.3.4_ifhodgkigu5opxzqe5c3iloc7i:
     resolution: {integrity: sha512-VcyMJUtLZBGzLKo3oMxrEF0stxh8HwuW976pAzlHhI3t8qJ4SROjCrSh1T24bhrbjw55wfZXAbXPGwPt5FLRfQ==}
@@ -9579,7 +8659,7 @@ packages:
     dependencies:
       '@next/env': 12.3.4
       '@swc/helpers': 0.4.11
-      caniuse-lite: 1.0.30001492
+      caniuse-lite: 1.0.30001494
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -9863,12 +8943,14 @@ packages:
 
   /obliterator/1.6.1:
     resolution: {integrity: sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==}
+    dev: false
 
   /on-finished/2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
     engines: {node: '>= 0.8'}
     dependencies:
       ee-first: 1.1.1
+    dev: false
 
   /once/1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
@@ -10043,6 +9125,7 @@ packages:
   /parseurl/1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /path-exists/3.0.0:
     resolution: {integrity: sha512-bpC7GYwiDYQ4wYLe+FA8lhRjhQCMcQGuSgGGqDkg/QerRWw9CmGRT0iSOVRSZJ29NMLZgIzqaljJ63oaL4NIJQ==}
@@ -10071,6 +9154,7 @@ packages:
 
   /path-to-regexp/0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
+    dev: false
 
   /path-to-regexp/1.8.0:
     resolution: {integrity: sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==}
@@ -10226,6 +9310,7 @@ packages:
     dependencies:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
+    dev: false
 
   /psl/1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
@@ -10255,6 +9340,7 @@ packages:
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
+    dev: false
 
   /qs/6.11.2:
     resolution: {integrity: sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==}
@@ -10296,10 +9382,12 @@ packages:
   /random-bytes/1.0.0:
     resolution: {integrity: sha512-iv7LhNVO047HzYR3InF6pUcUsPQiHTM1Qal51DcGSuZFBil1aBBWG5eHPNek7bvILMaYJ/8RU1e8w1AMdHmLQQ==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /range-parser/1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
+    dev: false
 
   /rate-limiter-flexible/2.4.1:
     resolution: {integrity: sha512-dgH4T44TzKVO9CLArNto62hJOwlWJMLUjVVr/ii0uUzZXEXthDNr7/yefW5z/1vvHAfycc1tnuiYyNJ8CTRB3g==}
@@ -10313,6 +9401,7 @@ packages:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+    dev: false
 
   /rc-config-loader/4.1.2:
     resolution: {integrity: sha512-qKTnVWFl9OQYKATPzdfaZIbTxcHziQl92zYSxYC6umhOqyAsoj8H8Gq/+aFjAso68sBdjTz3A7omqeAkkF1MWg==}
@@ -10662,6 +9751,7 @@ packages:
 
   /rndm/1.2.0:
     resolution: {integrity: sha512-fJhQQI5tLrQvYIYFpOnFinzv9dwmR7hRnUz1XqP3OJ1jIweTNOd6aTO4jwQSgcBSFUB+/KHJxuGneime+FdzOw==}
+    dev: false
 
   /run-applescript/5.0.0:
     resolution: {integrity: sha512-XcT5rBksx1QdIhlFOCtgZkB99ZEouFZ1E2Kc2LHqNW13U3/74YGdkQRmThTwxy4QIyookibDKYZOPqX//6BlAg==}
@@ -10693,6 +9783,7 @@ packages:
 
   /safe-buffer/5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
+    dev: false
 
   /safe-regex-test/1.0.0:
     resolution: {integrity: sha512-JBUUzyOgEwXQY1NuPtvcj/qcBDbDmEvWufhlnXZIm75DEHp+afM1r1ujJpJsV/gSM4t59tpDyPi1sd6ZaPFfsA==}
@@ -10713,6 +9804,7 @@ packages:
 
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+    dev: false
 
   /sass/1.62.1:
     resolution: {integrity: sha512-NHpxIzN29MXvWiuswfc1W3I0N8SXBd8UR26WntmDlRYf0bSADnwnOjsyMZ3lMezSlArD33Vs3YFhp7dWvL770A==}
@@ -10796,6 +9888,7 @@ packages:
       statuses: 2.0.1
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /serve-static/1.15.0:
     resolution: {integrity: sha512-XGuRDNjXUijsUL0vl6nSD7cwURuzEgglbOaFuZM9g3kwDXOWVTck0jLzjPzGD+TazWbboZYu52/9/XPdUgne9g==}
@@ -10807,6 +9900,7 @@ packages:
       send: 0.18.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /set-blocking/2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
@@ -10822,6 +9916,7 @@ packages:
 
   /setprototypeof/1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
+    dev: false
 
   /shebang-command/2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
@@ -10925,16 +10020,10 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /source-map-support/0.5.21:
-    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
-    dependencies:
-      buffer-from: 1.1.2
-      source-map: 0.6.1
-    dev: false
-
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+    dev: true
 
   /spdx-compare/1.0.0:
     resolution: {integrity: sha512-C1mDZOX0hnu0ep9dfmuoi03+eOdDoz2yvK79RxbcrVEG1NO1Ph35yW102DHWKN4pk80nwCgeMmSY5L25VE4D9A==}
@@ -11007,6 +10096,7 @@ packages:
   /statuses/2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /stoppable/1.1.0:
     resolution: {integrity: sha512-KXDYZ9dszj6bzvnEMRYvxgeTHU74QBFL54XKtP3nyMuJ81CFYtABZ3bAzL2EdFUaEwJOBOgENyFj3R7oTzDyyw==}
@@ -11300,6 +10390,7 @@ packages:
   /toidentifier/1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
+    dev: false
 
   /touch/3.1.0:
     resolution: {integrity: sha512-WBx8Uy5TLtOSRtIq+M03/sKDrXCLHxwDcquSP2c43Le03/9serjQBIztjRz6FkJez9D/hleyAXTBGLwwZUw9lA==}
@@ -11454,6 +10545,7 @@ packages:
   /tsscmp/1.0.6:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
+    dev: false
 
   /tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
@@ -11510,6 +10602,7 @@ packages:
     dependencies:
       media-typer: 0.3.0
       mime-types: 2.1.35
+    dev: false
 
   /typed-array-length/1.0.4:
     resolution: {integrity: sha512-KjZypGq+I/H7HI5HlOoGHkWUUGq+Q0TPhQurLbyrVrvnKTBgzLhIJ7j6J/XTQOi0d1RjyZ0wdas8bKs2p0x3Ng==}
@@ -11540,6 +10633,7 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       random-bytes: 1.0.0
+    dev: false
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
@@ -11576,6 +10670,7 @@ packages:
   /unpipe/1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /untildify/4.0.0:
     resolution: {integrity: sha512-KK8xQ1mkzZeg9inewmFVDNkg3l5LUhoq9kN6iWYB/CC9YMG8HA+c1Q8HwDe6dEX7kErrEVNVBO3fWsVq5iDgtw==}
@@ -11675,6 +10770,7 @@ packages:
   /utils-merge/1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+    dev: false
 
   /uuid/8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -11723,6 +10819,7 @@ packages:
   /vary/1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+    dev: false
 
   /walker/1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}

@@ -1,4 +1,4 @@
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/swb-app';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';

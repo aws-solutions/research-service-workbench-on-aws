@@ -4,9 +4,9 @@
  */
 
 /* eslint-disable no-new */
-import { WorkbenchAppRegistry } from '@aws/workbench-core-infrastructure';
 import * as cdk from 'aws-cdk-lib';
 import { ApplicationType, SolutionId, SolutionName, SolutionVersion } from './constants';
+import { WorkbenchAppRegistry } from './infra/workbenchAppRegistry';
 import { RSWStack } from './RSWStack';
 
 const app: cdk.App = new cdk.App();

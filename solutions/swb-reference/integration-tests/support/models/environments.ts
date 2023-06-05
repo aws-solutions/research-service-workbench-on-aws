@@ -1,4 +1,4 @@
-import { EnvironmentStatus } from '@aws/workbench-core-environments';
+import { EnvironmentStatus } from '@aws/swb-app';
 
 export interface EnvironmentItemResponse {
   id: string;

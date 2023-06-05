@@ -4,17 +4,18 @@
  */
 
 // Auth management
+
+import { Router } from 'express';
 import {
-  AuthenticationService,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
   isUserLoggedIn,
   logoutUser,
   refreshAccessToken
-} from '@aws/workbench-core-authentication';
-import { LoggingService } from '@aws/workbench-core-logging';
-import { Router } from 'express';
+} from './authentication/authenticationMiddleware';
+import { AuthenticationService } from './authentication/authenticationService';
 import { wrapAsync } from './errorHandlers';
+import { LoggingService } from './logging/loggingService';
 
 export function setUpAuthRoutes(router: Router, auth: AuthenticationService, logger: LoggingService): void {
   // Get auth provider's login URL with temporary state and PKCE strings

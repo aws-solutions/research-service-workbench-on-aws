@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PaginatedResponse } from '@aws/workbench-core-base';
+import { PaginatedResponse } from '@aws/swb-app';
 import { Associable, DatabaseServicePlugin } from '../services/databaseService';
 
 export class MockDatabaseService implements DatabaseServicePlugin {

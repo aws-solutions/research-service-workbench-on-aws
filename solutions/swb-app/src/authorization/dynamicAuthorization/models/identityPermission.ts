@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { JSONValue } from '@aws/workbench-core-base';
 import { z } from 'zod';
+import JSONValue from '../../../base/types/json';
 import { ActionParser } from '../../models/action';
 import { EffectParser } from '../../models/effect';
 

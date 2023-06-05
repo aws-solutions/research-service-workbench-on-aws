@@ -4,22 +4,28 @@
  */
 
 // AWS Account management
-import {
-  AwsAccountTemplateUrlsRequest,
-  AwsAccountTemplateUrlsRequestParser,
-  HostingAccountService,
-  CreateAccountRequestParser,
-  ListAccountRequest,
-  ListAccountsRequestParser,
-  CreateAccountRequest,
-  UpdateAccountRequest,
-  UpdateAccountRequestParser,
-  GetAccountRequest,
-  GetAccountRequestParser
-} from '@aws/workbench-core-accounts';
-import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+
+import {
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser
+} from './accounts/models/accounts/awsAccountTemplateUrlsRequest';
+import {
+  CreateAccountRequest,
+  CreateAccountRequestParser
+} from './accounts/models/accounts/createAccountRequest';
+import { GetAccountRequest, GetAccountRequestParser } from './accounts/models/accounts/getAccountRequest';
+import {
+  ListAccountRequest,
+  ListAccountsRequestParser
+} from './accounts/models/accounts/listAccountsRequest';
+import {
+  UpdateAccountRequest,
+  UpdateAccountRequestParser
+} from './accounts/models/accounts/updateAccountRequest';
+import HostingAccountService from './accounts/services/hostingAccountService';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 

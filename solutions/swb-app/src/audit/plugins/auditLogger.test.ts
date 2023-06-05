@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggingService } from '@aws/workbench-core-logging';
+import { LoggingService } from '../../logging/loggingService';
 import AuditLogger from './auditLogger';
 
 describe('Audit Logger', () => {

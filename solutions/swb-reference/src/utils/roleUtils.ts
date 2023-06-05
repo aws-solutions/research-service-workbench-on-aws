@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/swb-app';
 import { InvalidArgumentError } from '../errors';
 
 const IT_ADMIN: string = 'ITAdmin';

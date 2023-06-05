@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import _ from 'lodash';
+import AuditService from '../../audit/auditService';
+import Metadata from '../../audit/metadata';
 import AuthorizationPlugin from '../authorizationPlugin';
 import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';
 import { ParamNotFoundError } from '../errors/paramNotFoundError';

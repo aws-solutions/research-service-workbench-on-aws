@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { DataSet } from '@aws/workbench-core-datasets';
+import { DataSet } from '@aws/swb-app';
 import axios from 'axios';
 import ClientSession from '../../../support/clientSession';
 import { DatasetHelper } from '../../../support/complex/datasetHelper';

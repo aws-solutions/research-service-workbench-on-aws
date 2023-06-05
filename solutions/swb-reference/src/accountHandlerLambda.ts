@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AccountHandler, AccountService, HostingAccountLifecycleService } from '@aws/workbench-core-accounts';
-import { AwsService } from '@aws/workbench-core-base';
+import { AccountHandler, AccountService, AwsService, HostingAccountLifecycleService } from '@aws/swb-app';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {

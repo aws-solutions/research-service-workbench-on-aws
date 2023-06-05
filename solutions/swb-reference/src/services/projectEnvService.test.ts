@@ -2,19 +2,20 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { ProjectDeletedError } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
 import {
+  ProjectDeletedError,
   Action,
   AuthenticatedUser,
   DynamicAuthorizationService,
   Effect,
   IdentityPermission,
-  IdentityType
-} from '@aws/workbench-core-authorization';
-import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
+  IdentityType,
+  WBCEnvironment as Environment,
+  EnvironmentService,
+  AccountsProject as Project,
+  ProjectStatus,
+  ProjectService
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import { ProjectEnvService } from './projectEnvService';
 

@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PaginatedResponse } from '@aws/workbench-core-base';
-import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-datasets';
+import PaginatedResponse from '../base/interfaces/paginatedResponse';
 import { AuthenticatedUser } from '../users/authenticatedUser';
 import { CreateProvisionDatasetRequest } from './createProvisionDatasetRequest';
 import { DataSet } from './dataSet';
 import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpointResponseParser';
 import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest';
+import { AddRemoveAccessPermissionRequest } from './datasetService/models/addRemoveAccessPermissionRequest';
+import { GetAccessPermissionRequest } from './datasetService/models/getAccessPermissionRequest';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
-import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
 import { ListDataSetAccessPermissionsRequest } from './listDataSetAccessPermissionsRequestParser';
 import { PermissionsResponse } from './permissionsResponseParser';
 import { ProjectAddAccessRequest } from './projectAddAccessRequestParser';

@@ -3,15 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import {
   AuthorizationPlugin,
   DynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
   GroupManagementPlugin,
   GroupAlreadyExistsError,
-  IdentityPermissionCreationError
-} from '@aws/workbench-core-authorization';
+  IdentityPermissionCreationError,
+  AuditService,
+  BaseAuditPlugin
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import AuthorizationSetup from './authorizationSetup';
 

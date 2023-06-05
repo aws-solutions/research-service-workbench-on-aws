@@ -7,12 +7,6 @@
 /* eslint-disable no-new */
 
 import { join } from 'path';
-import {
-  WorkbenchCognito,
-  WorkbenchCognitoProps,
-  WorkbenchDynamodb,
-  WorkbenchEncryptionKeyWithRotation
-} from '@aws/workbench-core-infrastructure';
 
 import { App, Aws, CfnOutput, CfnParameter, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
@@ -54,6 +48,9 @@ import { getConstants, isSolutionsBuild } from './constants';
 import Workflow from './environment/workflow';
 import { RSWApplicationLoadBalancer } from './infra/RSWApplicationLoadBalancer';
 import { RSWVpc } from './infra/RSWVpc';
+import { WorkbenchCognito, WorkbenchCognitoProps } from './infra/workbenchCognito';
+import { WorkbenchDynamodb } from './infra/workbenchDynamodb';
+import { WorkbenchEncryptionKeyWithRotation } from './infra/workbenchEncryptionKeyWithRotation';
 
 export interface RSWStackProps extends StackProps {
   solutionId: string;

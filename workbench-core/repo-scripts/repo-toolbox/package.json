@@ -22,6 +22,7 @@
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
+    "movepackage": "node ./lib/start.js movepackage",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "readme": "node ./lib/start.js readme",
     "sort-package-json": "sort-package-json package.json",

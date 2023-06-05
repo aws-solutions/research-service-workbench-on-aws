@@ -11,16 +11,13 @@ import {
   UpdateEnvironmentTypeConfigRequest,
   DeleteEnvironmentTypeConfigRequest,
   EnvironmentTypeConfig,
-  ConflictError
-} from '@aws/swb-app';
-import {
+  ConflictError,
+  EnvironmentTypeConfigService,
   MetadataService,
+  resourceTypeToKey,
   RelationshipDDBItem,
-  RelationshipDDBItemParser,
-  resourceTypeToKey
-} from '@aws/workbench-core-base';
-
-import { EnvironmentTypeConfigService } from '@aws/workbench-core-environments';
+  RelationshipDDBItemParser
+} from '@aws/swb-app';
 
 export class EnvTypeConfigService implements EnvTypeConfigPlugin {
   private _envTypeConfigService: EnvironmentTypeConfigService;

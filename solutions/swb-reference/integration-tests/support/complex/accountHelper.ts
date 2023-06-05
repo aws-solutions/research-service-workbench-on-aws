@@ -1,5 +1,4 @@
-import { AwsService } from '@aws/workbench-core-base';
-import { IamHelper } from '@aws/workbench-core-datasets';
+import { AwsService, IamHelper } from '@aws/swb-app';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
 import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';

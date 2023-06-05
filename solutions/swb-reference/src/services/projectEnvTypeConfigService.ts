@@ -13,29 +13,24 @@ import {
   ListEnvTypeConfigProjectsRequest,
   Project,
   ProjectDeletedError,
-  EnvironmentItem
-} from '@aws/swb-app';
-import { ProjectService, ProjectStatus } from '@aws/workbench-core-accounts';
-import {
+  EnvironmentItem,
+  ProjectService,
+  ProjectStatus,
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
   DeleteIdentityPermissionsRequestParser,
   DynamicAuthorizationService,
-  IdentityPermission
-} from '@aws/workbench-core-authorization';
-import {
+  IdentityPermission,
+  EnvironmentTypeConfigService,
+  EnvironmentTypeService,
+  EnvironmentTypeConfig,
+  EnvironmentService,
   MetadataService,
   resourceTypeToKey,
   RelationshipDDBItem,
   RelationshipDDBItemParser,
   PaginatedResponse
-} from '@aws/workbench-core-base';
-import {
-  EnvironmentTypeConfigService,
-  EnvironmentTypeService,
-  EnvironmentTypeConfig,
-  EnvironmentService
-} from '@aws/workbench-core-environments';
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 

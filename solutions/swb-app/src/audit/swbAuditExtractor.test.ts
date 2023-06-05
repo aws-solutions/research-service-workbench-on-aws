@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { Request, Response } from 'express';
+import { AuthenticatedUser } from '../authorization/models/authenticatedUser';
 import { Extractor } from './extractor';
 import SwbAuditExtractor from './swbAuditExtractor';
 

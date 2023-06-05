@@ -3,18 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProjectPlugin } from '@aws/swb-app';
 import {
+  ProjectPlugin,
   CreateProjectRequest,
   DeleteProjectRequest,
   GetProjectRequest,
   GetProjectsRequest,
   ListProjectsRequest,
-  Project,
+  AccountsProject as Project,
   ProjectService,
-  UpdateProjectRequest
-} from '@aws/workbench-core-accounts';
-import {
+  UpdateProjectRequest,
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
   DeleteGroupRequest,
@@ -22,9 +20,9 @@ import {
   DynamicAuthorizationService,
   GroupNotFoundError,
   IdentityPermission,
-  IdentityPermissionParser
-} from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
+  IdentityPermissionParser,
+  PaginatedResponse
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 

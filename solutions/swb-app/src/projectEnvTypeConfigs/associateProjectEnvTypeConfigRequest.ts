@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { z } from '@aws/workbench-core-base';
+import { AuthenticatedUserParser } from '../authorization/models/authenticatedUser';
+import { z } from '../base/utilities/validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AssociateProjectEnvTypeConfigRequestParser = z

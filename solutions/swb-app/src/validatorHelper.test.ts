@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { z } from 'zod';
+import JSONValue from './base/types/json';
 import { getPaginationParser, validateAndParse } from './validatorHelper';
 
 describe('getPaginationProperties', () => {

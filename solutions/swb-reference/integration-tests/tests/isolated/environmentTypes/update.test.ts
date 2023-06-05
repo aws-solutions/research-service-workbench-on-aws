@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { swbNameMaxLength, lengthValidationMessage, swbDescriptionMaxLength } from '@aws/workbench-core-base';
+import { lengthValidationMessage, swbDescriptionMaxLength, swbNameMaxLength } from '@aws/swb-app';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';

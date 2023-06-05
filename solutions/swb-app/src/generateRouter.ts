@@ -3,16 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  csurf,
-  verifyToken,
-  AuthenticationService,
-  CognitoAuthenticationPluginOptions,
-  CognitoAuthenticationPlugin,
-  TokenRevocationService
-} from '@aws/workbench-core-authentication';
-import { withDynamicAuth } from '@aws/workbench-core-authorization';
-import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express, json } from 'express';
@@ -25,6 +15,14 @@ import Writer from './audit/plugins/writer';
 import SwbAuditExtractor from './audit/swbAuditExtractor';
 import SwbAuditLogger from './audit/swbAuditLogger';
 import SwbAuditPlugin from './audit/swbAuditPlugin';
+import { csurf, verifyToken } from './authentication/authenticationMiddleware';
+import { AuthenticationService } from './authentication/authenticationService';
+import {
+  CognitoAuthenticationPlugin,
+  CognitoAuthenticationPluginOptions
+} from './authentication/plugins/cognitoAuthenticationPlugin';
+import { TokenRevocationService } from './authentication/tokenRevocationService';
+import withDynamicAuth from './authorization/dynamicAuthorization/dynamicAuthorizationMiddleware';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
 import { setUpDSRoutes } from './dataSetRoutes';
@@ -32,6 +30,7 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { LoggingService } from './logging/loggingService';
 import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
 import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';

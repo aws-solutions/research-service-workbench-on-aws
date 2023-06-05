@@ -3,40 +3,40 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CreateProjectRequest,
-  CreateProjectRequestParser,
-  ListProjectsRequest,
-  ListProjectsRequestParser,
-  UpdateProjectRequest,
-  UpdateProjectRequestParser,
-  GetProjectRequest,
-  GetProjectRequestParser,
-  DeleteProjectRequest,
-  DeleteProjectRequestParser,
-  AssignUserToProjectRequestParser,
-  AssignUserToProjectRequest,
-  ListUsersForRoleRequest,
-  ListUsersForRoleRequestParser
-} from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import {
-  validateAndParse,
-  MetadataService,
-  resourceTypeToKey,
-  runInBatches,
-  isInvalidPaginationTokenError
-} from '@aws/workbench-core-base';
-import { EnvironmentService } from '@aws/workbench-core-environments';
-import {
-  isUserNotFoundError,
-  UserManagementService,
-  User,
-  isRoleNotFoundError,
-  isUserRolesExceedLimitError
-} from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { ProjectStatus } from './accounts/constants/projectStatus';
+import {
+  AssignUserToProjectRequest,
+  AssignUserToProjectRequestParser
+} from './accounts/models/projects/assignUserToProjectRequest';
+import {
+  CreateProjectRequest,
+  CreateProjectRequestParser
+} from './accounts/models/projects/createProjectRequest';
+import {
+  DeleteProjectRequest,
+  DeleteProjectRequestParser
+} from './accounts/models/projects/deleteProjectRequest';
+import { GetProjectRequest, GetProjectRequestParser } from './accounts/models/projects/getProjectRequest';
+import {
+  ListProjectsRequest,
+  ListProjectsRequestParser
+} from './accounts/models/projects/listProjectsRequest';
+import {
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from './accounts/models/projects/listUsersForRoleRequest';
+import {
+  UpdateProjectRequest,
+  UpdateProjectRequestParser
+} from './accounts/models/projects/updateProjectRequest';
+import resourceTypeToKey from './base/constants/resourceTypeToKey';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
+import { MetadataService } from './base/services/metadataService';
+import { runInBatches } from './base/utilities/promiseUtils';
+import { validateAndParse } from './base/utilities/validatorHelper';
+import { EnvironmentService } from './environments/services/environmentService';
 import { wrapAsync } from './errorHandlers';
 import {
   DisassociateUserFromProjectRequest,
@@ -49,6 +49,11 @@ import {
   ProjectEnvTypeConfigMetadata,
   ProjectEnvTypeConfigMetadataParser
 } from './schemas/projects/projectMetadataParser';
+import { isRoleNotFoundError } from './userManagement/errors/roleNotFoundError';
+import { isUserNotFoundError } from './userManagement/errors/userNotFoundError';
+import { isUserRolesExceedLimitError } from './userManagement/errors/userRolesExceedLimitError';
+import { User } from './userManagement/user';
+import { UserManagementService } from './userManagement/userManagementService';
 
 export function setUpProjectRoutes(
   router: Router,

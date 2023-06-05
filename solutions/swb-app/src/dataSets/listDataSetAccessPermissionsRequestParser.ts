@@ -4,7 +4,7 @@
  */
 
 // eslint-disable-next-line @rushstack/typedef-var
-import { z } from '@aws/workbench-core-base';
+import { z } from '../base/utilities/validatorHelper';
 import { AuthenticatedUserParser } from '../users/authenticatedUser';
 import { getPaginationParser } from '../validatorHelper';
 

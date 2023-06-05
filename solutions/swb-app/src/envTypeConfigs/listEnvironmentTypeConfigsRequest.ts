@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from '../base/utilities/validatorHelper';
 import { getPaginationParser } from '../validatorHelper';
 
 // eslint-disable-next-line @rushstack/typedef-var

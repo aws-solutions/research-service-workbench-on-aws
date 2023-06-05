@@ -3,29 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser, AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import {
-  DEFAULT_API_PAGE_SIZE,
-  resourceTypeToKey,
-  uuidWithLowercasePrefixRegExp,
-  isInvalidPaginationTokenError
-} from '@aws/workbench-core-base';
-import {
-  isDataSetHasEndpointError,
-  isDataSetExistsError,
-  isDataSetInvalidParameterError,
-  isStorageNotFoundError,
-  isAccountNotFoundError,
-  isDataSetNotFoundError
-} from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { AuthenticatedUser, AuthenticatedUserParser } from './authorization/models/authenticatedUser';
+import resourceTypeToKey from './base/constants/resourceTypeToKey';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
+import { DEFAULT_API_PAGE_SIZE } from './base/utilities/paginationHelper';
+import { uuidWithLowercasePrefixRegExp } from './base/utilities/textUtil';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
   DataSetFileUploadRequest,
   DataSetFileUploadRequestParser
 } from './dataSets/DataSetFileUploadRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
+import { isAccountNotFoundError } from './dataSets/datasetService/errors/accountNotFoundError';
+import { isDataSetExistsError } from './dataSets/datasetService/errors/dataSetExistsError';
+import { isDataSetHasEndpointError } from './dataSets/datasetService/errors/dataSetHasEndpointError';
+import { isDataSetInvalidParameterError } from './dataSets/datasetService/errors/dataSetInvalidParameterError';
+import { isDataSetNotFoundError } from './dataSets/datasetService/errors/dataSetNotFoundError';
+import { isStorageNotFoundError } from './dataSets/datasetService/errors/storageNotFoundError';
 import {
   GetDataSetByProjectRequest,
   GetDataSetByProjectRequestParser
@@ -118,7 +114,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       }
 
       const urls = await Promise.all(
-        validatedRequest.filenames.map((filename) =>
+        validatedRequest.filenames.map((filename: string) =>
           dataSetService.getSinglePartFileUploadUrl(validatedRequest.dataSetId, filename, authenticatedUser)
         )
       );

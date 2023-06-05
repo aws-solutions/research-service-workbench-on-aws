@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService } from '@aws/swb-app';
 import yaml from 'js-yaml';
 
 interface Constants {

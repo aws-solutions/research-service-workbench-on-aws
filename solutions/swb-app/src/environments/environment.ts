@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvironmentStatus } from '@aws/workbench-core-environments';
+import { EnvironmentStatus } from './constants/environmentStatus';
 
 export interface Environment {
   id: string;

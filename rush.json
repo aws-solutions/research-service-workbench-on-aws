@@ -35,31 +35,13 @@
       "packageName": "@aws/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@aws/workbench-core-environments",
-      "projectFolder": "workbench-core/environments",
-      "reviewCategory": "production",
       "shouldPublish": true
     },
     {
       "packageName": "@aws/workbench-core-swb-common-ui",
       "projectFolder": "workbench-core/swb-common-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-logging",
-      "projectFolder": "workbench-core/logging",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-base",
-      "projectFolder": "workbench-core/base",
-      "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/eslint-config-workbench-core-eslint-custom",
@@ -68,69 +50,21 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@aws/workbench-core-authorization",
-      "projectFolder": "workbench-core/authorization",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-authentication",
-      "projectFolder": "workbench-core/authentication",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-user-management",
-      "projectFolder": "workbench-core/user-management",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-audit",
-      "projectFolder": "workbench-core/audit",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-datasets",
-      "projectFolder": "workbench-core/datasets",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-accounts",
-      "projectFolder": "workbench-core/accounts",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
       "packageName": "@aws/workbench-core-datasets-ui",
       "projectFolder": "workbench-core/datasets-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-environments-ui",
       "projectFolder": "workbench-core/environments-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-accounts-ui",
       "projectFolder": "workbench-core/accounts-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/workbench-core-example-app",
-      "projectFolder": "workbench-core/example/app",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@aws/workbench-core-example-infrastructure",
-      "projectFolder": "workbench-core/example/infrastructure",
-      "reviewCategory": "prototypes",
       "shouldPublish": false
     },
     {
@@ -138,12 +72,6 @@
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
       "shouldPublish": false
-    },
-    {
-      "packageName": "@aws/workbench-core-infrastructure",
-      "projectFolder": "workbench-core/infrastructure",
-      "reviewCategory": "production",
-      "shouldPublish": true
     }
   ]
 }

@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggingService } from '@aws/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
+import { LoggingService } from '../../logging/loggingService';
 import { AuthenticatedUserParser } from '../models/authenticatedUser';
 import { HTTPMethodParser } from '../models/routesMap';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';

@@ -3,9 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { JSONValue } from '@aws/workbench-core-base';
-import { UserNotFoundError } from '@aws/workbench-core-user-management';
+import AuditService from '../../audit/auditService';
+import BaseAuditPlugin from '../../audit/plugins/baseAuditPlugin';
+import JSONValue from '../../base/types/json';
+import { UserNotFoundError } from '../../userManagement/errors/userNotFoundError';
 import AuthorizationPlugin from '../authorizationPlugin';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';

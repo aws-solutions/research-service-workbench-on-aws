@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamicRoutesMap, RoutesIgnored } from '@aws/workbench-core-authorization';
+import { DynamicRoutesMap, RoutesIgnored } from '@aws/swb-app';
 import { SwbAuthZSubject } from './constants';
 
 export const dynamicRoutesMap: DynamicRoutesMap = {

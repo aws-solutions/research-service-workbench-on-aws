@@ -3,17 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CreateProjectRequest,
-  DeleteProjectRequest,
-  GetProjectRequest,
-  GetProjectsRequest,
-  ListProjectsRequest,
-  Project,
-  UpdateProjectRequest
-} from '@aws/workbench-core-accounts';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
+import { CreateProjectRequest } from '../accounts/models/projects/createProjectRequest';
+import { DeleteProjectRequest } from '../accounts/models/projects/deleteProjectRequest';
+import { GetProjectRequest } from '../accounts/models/projects/getProjectRequest';
+import { GetProjectsRequest } from '../accounts/models/projects/getProjectsRequest';
+import { ListProjectsRequest } from '../accounts/models/projects/listProjectsRequest';
+import { Project } from '../accounts/models/projects/project';
+import { UpdateProjectRequest } from '../accounts/models/projects/updateProjectRequest';
+import { AuthenticatedUser } from '../authorization/models/authenticatedUser';
+import PaginatedResponse from '../base/interfaces/paginatedResponse';
 
 export interface ProjectPlugin {
   /**

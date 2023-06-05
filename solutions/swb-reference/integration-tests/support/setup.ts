@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
+import { AwsService, CognitoTokenService, SecretsService } from '@aws/swb-app';
 import jwt_decode from 'jwt-decode';
 import _ from 'lodash';
 import ClientSession from './clientSession';

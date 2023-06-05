@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggingService } from '@aws/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
+import { LoggingService } from '../logging/loggingService';
 import { RouteNotSecuredError } from './errors/routeNotSecuredError';
 import { AuthenticatedUser } from './models/authenticatedUser';
 import Operation from './models/operation';

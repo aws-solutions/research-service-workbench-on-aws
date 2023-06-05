@@ -23,13 +23,14 @@ import {
   SshKey,
   SshKeyPlugin,
   NoInstanceFoundError,
-  ConnectionInfoNotDefinedError
+  ConnectionInfoNotDefinedError,
+  ProjectService,
+  ForbiddenError,
+  EnvironmentService,
+  AwsService,
+  resourceTypeToKey
 } from '@aws/swb-app';
 import { CreateSshKeyResponseParser } from '@aws/swb-app/lib/sshKeys/createSshKeyResponse';
-import { ProjectService } from '@aws/workbench-core-accounts';
-import { ForbiddenError } from '@aws/workbench-core-authorization';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
-import { EnvironmentService } from '@aws/workbench-core-environments';
 import {
   DescribeKeyPairsCommandOutput,
   EC2,

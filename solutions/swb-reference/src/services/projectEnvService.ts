@@ -3,19 +3,22 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProjectEnvPlugin, ProjectDeletedError, EnvironmentItem } from '@aws/swb-app';
-import { ProjectService } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
 import {
+  ProjectEnvPlugin,
+  ProjectDeletedError,
+  EnvironmentItem,
   Action,
   AuthenticatedUser,
   CreateIdentityPermissionsRequestParser,
   DynamicAuthorizationService,
   IdentityPermission,
-  IdentityPermissionParser
-} from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
-import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
+  IdentityPermissionParser,
+  ProjectService,
+  ProjectStatus,
+  WBCEnvironment as Environment,
+  EnvironmentService,
+  PaginatedResponse
+} from '@aws/swb-app';
 import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 

@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/swb-app';
 import ClientSession from '../../../support/clientSession';
 import Account from '../../../support/resources/accounts/account';
 import Setup from '../../../support/setup';

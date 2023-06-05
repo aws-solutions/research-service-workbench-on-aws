@@ -3,9 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
+import { validateAndParse } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
 import { isConflictError } from './errors/conflictError';
 import { isProjectDeletedError } from './errors/projectDeletedError';

@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { EnvironmentStatus } from '@aws/workbench-core-environments';
+import { EnvironmentStatus } from '@aws/swb-app';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { ENVIRONMENT_START_MAX_WAITING_SECONDS, DEFLAKE_DELAY_IN_MILLISECONDS } from '../../utils/constants';

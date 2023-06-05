@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { LoggingService } from '@aws/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
+import { LoggingService } from '../logging/loggingService';
 import AuthorizationService from './authorizationService';
 import { AuthenticatedUserNotFoundError } from './errors/authenticatedUserNotFoundError';
 import { AuthenticatedUser } from './models/authenticatedUser';

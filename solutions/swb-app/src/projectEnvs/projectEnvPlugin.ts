@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
-import { Environment } from '@aws/workbench-core-environments';
+import { AuthenticatedUser } from '../authorization/models/authenticatedUser';
+import PaginatedResponse from '../base/interfaces/paginatedResponse';
 import { EnvironmentItem } from '../environments/environmentItem';
+import { Environment } from '../environments/models/environments/environment';
 
 export interface ProjectEnvPlugin {
   /**

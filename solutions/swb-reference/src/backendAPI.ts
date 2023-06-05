@@ -3,37 +3,36 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
 import {
-  AccountService,
   CostCenterService,
-  HostingAccountLifecycleService,
+  ProjectService,
   HostingAccountService,
-  ProjectService
-} from '@aws/workbench-core-accounts';
-import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import {
+  HostingAccountLifecycleService,
+  AccountService,
+  generateRouter,
+  ApiRouteConfig,
+  AuditService,
+  BaseAuditPlugin,
+  AuditLogger,
+  WBCGroupManagementPlugin,
   DynamicRoutesMap,
   RoutesIgnored,
-  DynamicAuthorizationService,
-  WBCGroupManagementPlugin,
   DDBDynamicAuthorizationPermissionsPlugin,
-  CASLAuthorizationPlugin
-} from '@aws/workbench-core-authorization';
-import { AwsService, MetadataService } from '@aws/workbench-core-base';
-import {
+  CASLAuthorizationPlugin,
+  DynamicAuthorizationService,
   DataSetService as WorkbenchDataSetService,
   DdbDataSetMetadataPlugin,
   S3DataSetStoragePlugin,
-  WbcDataSetsAuthorizationPlugin
-} from '@aws/workbench-core-datasets';
-import {
+  WbcDataSetsAuthorizationPlugin,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
-} from '@aws/workbench-core-environments';
-import { LoggingService } from '@aws/workbench-core-logging';
-import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
+  EnvironmentTypeConfigService,
+  LoggingService,
+  CognitoUserManagementPlugin,
+  UserManagementService,
+  AwsService,
+  MetadataService
+} from '@aws/swb-app';
 import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix, storageLocationPrefix } from './constants';
 import * as DynamicRouteConfig from './dynamicRouteConfig';

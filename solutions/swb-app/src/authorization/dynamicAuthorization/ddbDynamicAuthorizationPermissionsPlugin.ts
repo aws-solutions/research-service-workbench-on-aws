@@ -3,20 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  DynamoDBService,
-  JSONValue,
-  addPaginationToken,
-  getPaginationToken,
-  QueryParams,
-  DEFAULT_API_PAGE_SIZE,
-  MAX_API_PAGE_SIZE,
-  fromPaginationToken
-} from '@aws/workbench-core-base';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import { createRouter, RadixRouter } from 'radix3';
+import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
+import QueryParams from '../../base/interfaces/queryParams';
+import JSONValue from '../../base/types/json';
+import {
+  addPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  fromPaginationToken,
+  getPaginationToken,
+  MAX_API_PAGE_SIZE
+} from '../../base/utilities/paginationHelper';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
 import { RouteMapError } from '../errors/routeMapError';

@@ -3,9 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ConflictError } from '@aws/swb-app';
-import { MetadataService } from '@aws/workbench-core-base';
-import { EnvironmentTypeConfigService } from '@aws/workbench-core-environments';
+import { ConflictError, EnvironmentTypeConfigService, MetadataService } from '@aws/swb-app';
 import { EnvTypeConfigService } from './envTypeConfigService';
 
 describe('envTypeConfigService', () => {

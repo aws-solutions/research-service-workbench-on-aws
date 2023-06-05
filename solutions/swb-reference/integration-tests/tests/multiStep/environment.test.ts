@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { Environment } from '@aws/workbench-core-environments';
+import { WBCEnvironment as Environment } from '@aws/swb-app';
 import ClientSession from '../../support/clientSession';
 import { EnvironmentHelper } from '../../support/complex/environmentHelper';
 import { PaabHelper } from '../../support/complex/paabHelper';

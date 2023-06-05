@@ -24,13 +24,15 @@ import {
   ListUserSshKeysForProjectResponse,
   NoKeyExistsError,
   NonUniqueKeyError,
-  SendPublicKeyRequest
+  SendPublicKeyRequest,
+  AccountsProject as Project,
+  ProjectService,
+  ProjectStatus,
+  ForbiddenError,
+  WBCEnvironment as Environment,
+  EnvironmentService,
+  AwsService
 } from '@aws/swb-app';
-import { Project, ProjectService } from '@aws/workbench-core-accounts';
-import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projectStatus';
-import { ForbiddenError } from '@aws/workbench-core-authorization';
-import { AwsService } from '@aws/workbench-core-base';
-import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
 import { DescribeInstancesCommandOutput, EC2, KeyPairInfo } from '@aws-sdk/client-ec2';
 import { EC2InstanceConnect, SendSSHPublicKeyCommandOutput } from '@aws-sdk/client-ec2-instance-connect';
 import SshKeyService from './sshKeyService';
