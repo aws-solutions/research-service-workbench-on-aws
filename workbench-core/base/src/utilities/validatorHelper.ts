@@ -34,7 +34,11 @@ import {
   awsRegionMessage,
   sshKeyIdRegex,
   userIdRegex,
-  datasetIdRegex
+  datasetIdRegex,
+  envMgmtRoleArnRegExp,
+  envMgmtRoleArnMessage,
+  hostingAccountHandlerRoleArnMessage,
+  hostingAccountHandlerRoleArnRegExp
 } from './textUtil';
 
 interface ZodPagination {
@@ -60,6 +64,8 @@ declare module 'zod' {
     awsRegion: () => ZodString;
     optionalNonEmpty: () => ZodOptional<ZodString>;
     awsAccountId: () => ZodString;
+    envMgmtRoleArn: () => ZodString;
+    hostingAccountHandlerRoleArn: () => ZodString;
     sshKeyId: () => ZodString;
     userId: () => ZodString;
   }
@@ -144,6 +150,14 @@ z.ZodString.prototype.optionalNonEmpty = function (): ZodOptional<ZodString> {
 
 z.ZodString.prototype.awsAccountId = function (): ZodString {
   return this.regex(awsAccountIdRegExp(), { message: awsAccountIdMessage });
+};
+
+z.ZodString.prototype.envMgmtRoleArn = function (): ZodString {
+  return this.regex(envMgmtRoleArnRegExp(), { message: envMgmtRoleArnMessage });
+};
+
+z.ZodString.prototype.hostingAccountHandlerRoleArn = function (): ZodString {
+  return this.regex(hostingAccountHandlerRoleArnRegExp(), { message: hostingAccountHandlerRoleArnMessage });
 };
 
 z.ZodString.prototype.awsRegion = function (): ZodString {

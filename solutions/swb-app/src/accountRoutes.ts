@@ -15,7 +15,8 @@ import {
   UpdateAccountRequest,
   UpdateAccountRequestParser,
   GetAccountRequest,
-  GetAccountRequestParser
+  GetAccountRequestParser,
+  isInvalidAwsAccountIdError
 } from '@aws/workbench-core-accounts';
 import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -69,9 +70,15 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
-
-      const createdAccount = await hostingAccountService.create(validatedRequest);
-      res.status(201).send(createdAccount);
+      try {
+        const createdAccount = await hostingAccountService.create(validatedRequest);
+        res.status(201).send(createdAccount);
+      } catch (e) {
+        if (isInvalidAwsAccountIdError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        throw e;
+      }
     })
   );
 
