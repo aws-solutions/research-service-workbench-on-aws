@@ -4,6 +4,7 @@
  */
 
 import { ProjectStatus } from './constants/projectStatus';
+import { isInvalidAwsAccountIdError } from './errors/InvalidAwsAccountIdError';
 import AccountHandler from './handlers/accountHandler';
 import {
   AwsAccountTemplateUrlsRequest,
@@ -86,5 +87,6 @@ export {
   AssignUserToProjectRequestParser,
   AssignUserToProjectRequest,
   Project,
-  ProjectStatus
+  ProjectStatus,
+  isInvalidAwsAccountIdError
 };

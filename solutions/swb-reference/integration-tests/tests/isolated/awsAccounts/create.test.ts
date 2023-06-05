@@ -28,16 +28,20 @@ describe('awsAccounts create negative tests', () => {
   });
 
   const validLaunchParameters = {
-    awsAccountId: randomTextGenerator.getFakeText('fakeAccount'),
-    envMgmtRoleArn: randomTextGenerator.getFakeText('fakeEnvMgmtRoleArn'),
-    hostingAccountHandlerRoleArn: randomTextGenerator.getFakeText('fakeHostingAccountHandlerRoleArn'),
+    awsAccountId: '123456789012',
+    envMgmtRoleArn: `arn:aws:iam::123456789012:role/${randomTextGenerator.getFakeText(
+      'fakeEnvMgmtRoleArn'
+    )}-env-mgmt`,
+    hostingAccountHandlerRoleArn: `arn:aws:iam::123456789012:role/${randomTextGenerator.getFakeText(
+      'fakeHostingAccountHandlerRoleArn'
+    )}-hosting-account-role`,
     name: randomTextGenerator.getFakeText('fakeName'),
     externalId: randomTextGenerator.getFakeText('fakeExternalId')
   };
 
   describe('when creating an account', () => {
     describe('and the creation params are invalid', () => {
-      test('it throws a validation error', async () => {
+      test('with empty body it throws a validation error', async () => {
         try {
           await adminSession.resources.accounts.create({}, false);
         } catch (e) {
@@ -51,6 +55,53 @@ describe('awsAccounts create negative tests', () => {
           );
         }
       });
+      test('with accountId that is too long it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.awsAccountId = '123456789012345';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: 'awsAccountId: must be a 12 digit number'
+            })
+          );
+        }
+      });
+      test('with accountId of account that does not exist it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.awsAccountId = '123456789012';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: "Please provide a valid 'awsAccountId' for the hosting account"
+            })
+          );
+        }
+      });
+      test('with incorrect envMgtmRoleArn and hostingAccountHandlerRoleArn it throws a validation error', async () => {
+        try {
+          const body = { ...validLaunchParameters };
+          body.envMgmtRoleArn = 'fakeValue';
+          body.hostingAccountHandlerRoleArn = 'fakeValue';
+          await adminSession.resources.accounts.create(body, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message:
+                'envMgmtRoleArn: must be a valid envMgmtRoleArn. hostingAccountHandlerRoleArn: must be a valid hostingAccountHandlerRoleArn'
+            })
+          );
+        }
+      });
     });
     describe('and the account is already onboarded', () => {
       test('it throws an error', async () => {
@@ -59,6 +110,7 @@ describe('awsAccounts create negative tests', () => {
         const existingAccounts = await accountHelper.listOnboardedAccounts();
 
         invalidParam.awsAccountId = _.first(existingAccounts)!.awsAccountId;
+
         try {
           await adminSession.resources.accounts.create(invalidParam, false);
         } catch (e) {

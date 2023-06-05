@@ -3,9 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './ddbUtil';
+import { buildConcatenatedSk, buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './ddbUtil';
 
 describe('ddbUtil', () => {
+  describe('buildConcatenatedSk', () => {
+    test('it builds the expected key pattern', () => {
+      const key1 = 'RESOURCE#resource-1';
+      const key2 = 'RESOURCE#resource-2';
+      expect(buildConcatenatedSk([key1, key2])).toEqual(key1 + key2);
+    });
+  });
+
   describe('buildDynamoDbKey', () => {
     test('it builds the expected key pattern', () => {
       const id = 'id';
