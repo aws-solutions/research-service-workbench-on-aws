@@ -11,7 +11,7 @@ export const CreateAccountRequestParser = z.object({
   awsAccountId: z.string().awsAccountId().required(),
   envMgmtRoleArn: z.string().envMgmtRoleArn().required(),
   hostingAccountHandlerRoleArn: z.string().hostingAccountHandlerRoleArn().required(),
-  externalId: z.string().required()
+  externalId: z.string().externalId().required()
 });
 
 export type CreateAccountRequest = z.infer<typeof CreateAccountRequestParser>;
