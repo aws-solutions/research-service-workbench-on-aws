@@ -101,7 +101,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // Add file to dataset
   router.get(
-    '/projects/:projectsId/datasets/:dataSetId/upload-requests',
+    '/projects/:projectId/datasets/:dataSetId/upload-requests',
     wrapAsync(async (req: Request, res: Response) => {
       if (req.params.dataSetId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('dataSetId request parameter is invalid');
@@ -221,7 +221,17 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         }
       );
 
-      await dataSetService.removeAccessForProject(validatedRequest);
+      try {
+        await dataSetService.removeAccessForProject(validatedRequest);
+      } catch (e) {
+        console.error(e);
+
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+      }
 
       res.status(204).send();
     })

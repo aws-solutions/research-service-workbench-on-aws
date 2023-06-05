@@ -9,7 +9,12 @@ import {
   CFNTemplateParameters,
   CFNTemplateParametersParser
 } from './aws/helpers/cloudFormationTemplate';
-import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
+import {
+  buildConcatenatedSk,
+  buildDynamoDbKey,
+  buildDynamoDBPkSk,
+  removeDynamoDbKeys
+} from './aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
@@ -73,6 +78,7 @@ export {
   CognitoTokenService,
   QueryParams,
   IamRoleCloneService,
+  buildConcatenatedSk,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
   removeDynamoDbKeys,

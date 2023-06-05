@@ -16,6 +16,7 @@ import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
+import { VerifyProjectAccessForDatasetsRequest } from './dataSets/verifyProjectAccessForDatasetsParser';
 import { Environment } from './environments/environment';
 import { EnvironmentItem } from './environments/environmentItem';
 import { EnvironmentPlugin } from './environments/environmentPlugin';
@@ -128,5 +129,6 @@ export {
   EnvironmentPlugin,
   ListEnvironmentsRequest,
   Environment,
-  EnvironmentItem
+  EnvironmentItem,
+  VerifyProjectAccessForDatasetsRequest
 };

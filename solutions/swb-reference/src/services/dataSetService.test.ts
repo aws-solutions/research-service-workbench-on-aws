@@ -263,7 +263,7 @@ describe('DataSetService', () => {
 
         test('it throws an error', async () => {
           await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
-            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the following project(s) ['${externalProjectId}']`
+            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the provided project(s)`
           );
         });
       });

@@ -16,6 +16,7 @@ import { ListDataSetAccessPermissionsRequest } from './listDataSetAccessPermissi
 import { PermissionsResponse } from './permissionsResponseParser';
 import { ProjectAddAccessRequest } from './projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from './projectRemoveAccessRequestParser';
+import { VerifyProjectAccessForDatasetsRequest } from './verifyProjectAccessForDatasetsParser';
 
 export interface DataSetPlugin {
   storagePlugin: DataSetStoragePlugin;
@@ -56,4 +57,5 @@ export interface DataSetPlugin {
 
   addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse>;
   removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse>;
+  verifyProjectAccessForDatasets(request: VerifyProjectAccessForDatasetsRequest): Promise<boolean>;
 }
