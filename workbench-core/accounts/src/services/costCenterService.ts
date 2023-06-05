@@ -17,7 +17,6 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import * as Boom from '@hapi/boom';
-import { z } from 'zod';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
