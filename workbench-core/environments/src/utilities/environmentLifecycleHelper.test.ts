@@ -101,6 +101,7 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
     helper.environmentService.addMetadata = jest.fn();
+    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE
     const response = await helper.getDatasetsToMount(datasetIds, envMetadata, ['sampleKeyARN1']);
@@ -172,6 +173,7 @@ describe('EnvironmentLifecycleHelper', () => {
       };
     });
     helper.environmentService.addMetadata = jest.fn();
+    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE & CHECK
     await expect(
