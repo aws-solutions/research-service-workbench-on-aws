@@ -35,4 +35,39 @@ describe('Get Cost Center negative tests', () => {
       }
     });
   });
+
+  describe('with a bad character', () => {
+    test('it throw 404 error', async () => {
+      const invalidId = '%ff';
+      try {
+        await adminSession.resources.costCenters.costCenter(invalidId).get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Not Found`
+          })
+        );
+      }
+    });
+  });
+
+  describe('with an id that is too long', () => {
+    test('it throw 404 error', async () => {
+      const invalidId =
+        'cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9- 4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6- 13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc- 1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41- 8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4- aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9- 4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6- 13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc- 1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41- 8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4- aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9- 4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6- 13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc- 1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41- 8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4- aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9- 4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6- 13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc- 1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41- 8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4- aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9- 4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6- 13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc- 1f457ad6-13b9-4db4-aa41-8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41- 8cee25abc9b9cc-1f457ad6-13b9-4db4-aa41-8cee25abc9b9';
+      try {
+        await adminSession.resources.costCenters.costCenter(invalidId).get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Not Found`
+          })
+        );
+      }
+    });
+  });
 });

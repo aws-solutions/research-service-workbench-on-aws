@@ -40,6 +40,23 @@ describe('Update Cost Center negative tests', () => {
     });
   });
   describe('with invalid parameters', () => {
+    test('a name that is longer than allowed throws 404 error', async () => {
+      const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
+      try {
+        const name =
+          'atrudea-test-cost-centeratrudea-test-cost-centeratrudea-test- cost-centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- center-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centert-cost-centeratrudea-test-cost-centeratrudea- test-cost-centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test- cost-centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- centeratrudea-test-cost-centeratrudea-test-cost-centeratrudea-test-cost- center';
+        await adminSession.resources.costCenters.costCenter(id).update({ name }, true);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message:
+              'name: Input must be less than 112 characters. name: must contain only letters, numbers, hyphens, underscores, and periods'
+          })
+        );
+      }
+    });
     test('with incorrect name type it throw 404 error', async () => {
       const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
       try {
