@@ -24,7 +24,7 @@ import {
 import CostCenterService from './accounts/services/costCenterService';
 import ProjectService from './accounts/services/projectService';
 import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
-import { validateAndParse } from './base/utilities/validatorHelper';
+import { validateAndParse, z } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpCostCenterRoutes(
@@ -79,7 +79,12 @@ export function setUpCostCenterRoutes(
   router.get(
     '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.status(200).send(await costCenterService.getCostCenter(req.params.id));
+      const validatedData = z.string().costCenterId().safeParse(req.params.id);
+      if (!validatedData.success) {
+        throw Boom.notFound();
+      }
+
+      res.status(200).send(await costCenterService.getCostCenter(validatedData.data));
     })
   );
 

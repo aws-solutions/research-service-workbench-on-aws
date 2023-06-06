@@ -9,7 +9,7 @@ import { z } from '../../../base/utilities/validatorHelper';
 export const UpdateCostCenterRequestParser = z
   .object({
     id: z.string().costCenterId().required(),
-    name: z.string().optionalNonEmpty(),
+    name: z.string().swbName().optionalNonEmpty(),
     description: z.string().swbDescription().optionalNonEmpty()
   })
   .strict();
