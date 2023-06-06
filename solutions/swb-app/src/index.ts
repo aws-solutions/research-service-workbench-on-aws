@@ -150,6 +150,7 @@ import { S3DataSetStoragePlugin } from './dataSets/datasetService/s3DataSetStora
 import { WbcDataSetsAuthorizationPlugin } from './dataSets/datasetService/wbcDataSetsAuthorizationPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
+import { IsProjectAuthorizedForDatasetsRequest } from './dataSets/isProjectAuthorizedForDatasetsParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
 import { EnvironmentStatus } from './environments/constants/environmentStatus';
 import { Environment } from './environments/environment';
@@ -424,5 +425,6 @@ export {
   JSONValue,
   RelationshipDDBItem,
   RelationshipDDBItemParser,
-  IamRoleCloneService
+  IamRoleCloneService,
+  IsProjectAuthorizedForDatasetsRequest
 };

@@ -9,9 +9,9 @@ import { z } from '../../../base/utilities/validatorHelper';
 export const CreateAccountRequestParser = z.object({
   name: z.string().swbName().required(),
   awsAccountId: z.string().awsAccountId().required(),
-  envMgmtRoleArn: z.string().required(),
-  hostingAccountHandlerRoleArn: z.string().required(),
-  externalId: z.string().required()
+  envMgmtRoleArn: z.string().envMgmtRoleArn().required(),
+  hostingAccountHandlerRoleArn: z.string().hostingAccountHandlerRoleArn().required(),
+  externalId: z.string().externalId().required()
 });
 
 export type CreateAccountRequest = z.infer<typeof CreateAccountRequestParser>;

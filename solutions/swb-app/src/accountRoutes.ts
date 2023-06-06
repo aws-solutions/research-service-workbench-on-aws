@@ -7,6 +7,7 @@
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 
+import { isInvalidAwsAccountIdError } from './accounts/errors/InvalidAwsAccountIdError';
 import {
   AwsAccountTemplateUrlsRequest,
   AwsAccountTemplateUrlsRequestParser
@@ -75,9 +76,15 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
-
-      const createdAccount = await hostingAccountService.create(validatedRequest);
-      res.status(201).send(createdAccount);
+      try {
+        const createdAccount = await hostingAccountService.create(validatedRequest);
+        res.status(201).send(createdAccount);
+      } catch (e) {
+        if (isInvalidAwsAccountIdError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        throw e;
+      }
     })
   );
 

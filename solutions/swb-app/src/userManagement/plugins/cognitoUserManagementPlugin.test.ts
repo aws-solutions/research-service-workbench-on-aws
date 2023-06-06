@@ -2,7 +2,6 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
@@ -38,6 +37,10 @@ import {
   QueryCommand
 } from '@aws-sdk/client-dynamodb';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import {
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from '../../accounts/models/projects/listUsersForRoleRequest';
 import AwsService from '../../base/aws/awsService';
 import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
@@ -56,6 +59,7 @@ describe('CognitoUserManagementPlugin tests', () => {
   let userInfo: Omit<User, 'roles'>;
   let cognitoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let ddbMock: AwsStub<DDBServiceInputTypes, DDBServiceOutputTypes>;
+  let paginationToken: string;
 
   let aws: AwsService;
   let plugin: CognitoUserManagementPlugin;
@@ -86,7 +90,9 @@ describe('CognitoUserManagementPlugin tests', () => {
       email: 'Sample-email-address',
       status: Status.ACTIVE
     };
-    roles = ['Role1', 'Role2'];
+    roles = ['Researcher', 'ProjectAdmin'];
+    paginationToken =
+      'IkNBSVNxQUlJQVJLQkFnZ0RFdndCQUgwVkljdU9TWFc1TWhieDliN2xZZWRQK3BQVzJ2NzRKbXF6YysySzVycUFleUpBYmlJNklsQmhaMmx1WVhScGIyNURiMjUwYVc1MVlYUnBiMjVFVkU4aUxDSnVaWGgwUzJWNUlqb2lRVUZCUVVGQlFVRkRUakJNUVZGRlFsbFhaV1JyWWpCUVUzQnBVVU40Vm5CV1oxZEtTWGxpSzBWUk5VMUhWVE5oYVRaRGFsRjROR1pWZGpWc1ltMVpOMDVVU1RCT2VsVjZUMGRGZEUxVVFtdFplVEF3VDFSRk0weFVaekZPVkZWMFRVZEthazlYU20xWlYxSnFUMGRLYTA5M1BUMGlMQ0p3WVdkcGJtRjBhVzl1UkdWd2RHZ2lPakVzSW5CeVpYWnBiM1Z6VW1WeGRXVnpkRlJwYldVaU9qRTJPRFV3TnpReE5qSXdOelI5R2lDRnpmNlU4OExHVFlSVU9wdWxCRFQ4Qlh6ZGkyVk55MDVObFVPY2Irci9qQT09Ig==';
   });
 
   describe('getUser tests', () => {
@@ -722,10 +728,10 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminListGroupsForUserCommand)
         .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
 
-      const users = await plugin.listUsers();
+      const users = await plugin.listUsers({});
 
-      expect(users.length).toBe(1);
-      expect(users).toMatchObject([{ ...userInfo, roles }]);
+      expect(users.data.length).toBe(1);
+      expect(users).toMatchObject({ data: [{ ...userInfo, roles }] });
     });
 
     it('should return an empty array for user.role for users with no groups', async () => {
@@ -744,19 +750,19 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
       cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
 
-      const users = await plugin.listUsers();
+      const users = await plugin.listUsers({});
 
-      expect(users.length).toBe(1);
-      expect(users).toMatchObject([{ ...userInfo, roles: [] }]);
+      expect(users.data.length).toBe(1);
+      expect(users).toMatchObject({ data: [{ ...userInfo, roles: [] }] });
     });
 
     it('should return an empty array when no users are in the user pool', async () => {
       cognitoMock.on(ListUsersCommand).resolves({});
 
-      const users = await plugin.listUsers();
+      const users = await plugin.listUsers({});
 
-      expect(users.length).toBe(0);
-      expect(users).toMatchObject<string[]>([]);
+      expect(users.data.length).toBe(0);
+      expect(users).toMatchObject({ data: [] });
     });
 
     it('should return an empty array when the users dont have user ids', async () => {
@@ -775,60 +781,153 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminListGroupsForUserCommand)
         .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
 
-      const users = await plugin.listUsers();
+      const users = await plugin.listUsers({});
 
-      expect(users.length).toBe(0);
-      expect(users).toMatchObject([]);
+      expect(users.data.length).toBe(0);
+      expect(users).toMatchObject({ data: [] });
     });
 
     it('should populate missing values with empty strings', async () => {
       cognitoMock.on(ListUsersCommand).resolves({ Users: [{ Username: userInfo.id }] });
       cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: roles.map(() => ({})) });
 
-      const users = await plugin.listUsers();
+      const users = await plugin.listUsers({});
 
-      expect(users.length).toBe(1);
-      expect(users).toMatchObject<User[]>([
-        { id: userInfo.id, firstName: '', lastName: '', email: '', status: Status.INACTIVE, roles: [] }
-      ]);
+      expect(users.data.length).toBe(1);
+      expect(users).toMatchObject({
+        data: [
+          { id: userInfo.id, firstName: '', lastName: '', email: '', status: Status.INACTIVE, roles: [] }
+        ]
+      });
+    });
+
+    it('should return a pagination token in response when Cognito returns PaginationToken', async () => {
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Username: userInfo.id,
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ],
+            Enabled: true
+          }
+        ],
+        PaginationToken: paginationToken
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const users = await plugin.listUsers({ pageSize: 1 });
+
+      expect(users.data.length).toBe(1);
+      expect(users.paginationToken).toBeDefined();
+    });
+
+    it('should not return a pagination token in response when Cognito does not return a PaginationToken', async () => {
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Username: userInfo.id,
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ],
+            Enabled: true
+          }
+        ]
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const users = await plugin.listUsers({ pageSize: 1 });
+
+      expect(users.data.length).toBe(1);
+      expect(users.paginationToken).toBeUndefined();
+    });
+
+    it('should propagate pagination params to Cognito', async () => {
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Username: userInfo.id,
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ],
+            Enabled: true
+          }
+        ]
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const users = await plugin.listUsers({
+        pageSize: 1,
+        paginationToken: paginationToken
+      });
+
+      expect(users.data.length).toBe(1);
+      expect(users.paginationToken).toBeUndefined();
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(IdpUnavailableError);
+      await expect(plugin.listUsers({})).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsers({})).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsers({})).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(TooManyRequestsError);
+      await expect(plugin.listUsers({})).rejects.toThrow(TooManyRequestsError);
+    });
+
+    it('should throw InvalidParameterError when the invalid pagination token is passed in request', async () => {
+      cognitoMock.on(ListUsersCommand).rejects(new InvalidParameterException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.listUsers({})).rejects.toThrow(InvalidParameterError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new Error());
 
-      await expect(plugin.listUsers()).rejects.toThrow(Error);
+      await expect(plugin.listUsers({})).rejects.toThrow(Error);
     });
   });
 
   describe('listUsersForRole tests', () => {
+    let request: ListUsersForRoleRequest;
+
+    beforeEach(() => {
+      request = ListUsersForRoleRequestParser.parse({
+        role: roles[0],
+        projectId: 'fakeProjectId'
+      });
+    });
+
     it('should return a list of Users in the given group', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({ Users: [{ Username: userInfo.id }] });
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(1);
       expect(users).toMatchObject<string[]>([userInfo.id]);
@@ -837,7 +936,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should return an empty array when no users are in group', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({});
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
       expect(users).toMatchObject<string[]>([]);
@@ -846,7 +945,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should return an empty array when the users dont have user ids', async () => {
       cognitoMock.on(ListUsersInGroupCommand).resolves({ Users: [{}] });
 
-      const users = await plugin.listUsersForRole(roles[0]);
+      const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
       expect(users).toMatchObject<string[]>([]);
@@ -857,7 +956,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(IdpUnavailableError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -865,7 +964,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -873,7 +972,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
@@ -881,7 +980,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: 'Group not found.' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(RoleNotFoundError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
@@ -889,13 +988,13 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(TooManyRequestsError);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(ListUsersInGroupCommand).rejects(new Error());
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(Error);
+      await expect(plugin.listUsersForRole(request)).rejects.toThrow(Error);
     });
   });
 
@@ -968,13 +1067,15 @@ describe('CognitoUserManagementPlugin tests', () => {
 
     describe('when user has reached role limit', () => {
       beforeEach(() => {
-        roles = Array(plugin.userRoleLimit).fill('Role1');
+        roles = Array(plugin.userRoleLimit).fill('Researcher');
         cognitoMock
           .on(AdminListGroupsForUserCommand)
           .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
       });
       it('should throw an error', async () => {
-        await expect(plugin.addUserToRole(userInfo.id, 'Role2')).rejects.toThrow(UserRolesExceedLimitError);
+        await expect(plugin.addUserToRole(userInfo.id, 'ProjectAdmin')).rejects.toThrow(
+          UserRolesExceedLimitError
+        );
       });
     });
 
@@ -1261,7 +1362,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       ddbMock.on(QueryCommand).resolves({
         Items: [
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }
@@ -1269,7 +1370,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
       const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
 
-      expect(validatedRoles).toStrictEqual(['Role2']);
+      expect(validatedRoles).toStrictEqual(['ProjectAdmin']);
     });
 
     it('Modify roles if user is temporarily allowed access', async () => {
@@ -1296,7 +1397,7 @@ describe('CognitoUserManagementPlugin tests', () => {
             expirationTime: { N: expiredTimeString }
           },
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }
@@ -1304,7 +1405,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
       const validatedRoles = await plugin.validateUserRoles(userInfo.id, roles);
 
-      expect(validatedRoles).toStrictEqual(['Role2', 'Role3']);
+      expect(validatedRoles).toStrictEqual(['ProjectAdmin', 'Role3']);
     });
 
     it('Do not modify roles if user is temporarily revoked access but has expired', async () => {
@@ -1312,7 +1413,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       ddbMock.on(QueryCommand).resolves({
         Items: [
           {
-            roleId: { S: 'Role1' },
+            roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
             expirationTime: { N: expiredTimeString }
           }

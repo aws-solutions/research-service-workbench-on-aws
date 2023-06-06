@@ -5,13 +5,10 @@
 
 // disabling because the tsdoc links need the imports to work
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IdpUnavailableError } from './errors/idpUnavailableError';
-import { InvalidParameterError } from './errors/invalidParameterError';
-import { PluginConfigurationError } from './errors/pluginConfigurationError';
-import { RoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
-import { RoleNotFoundError } from './errors/roleNotFoundError';
-import { UserAlreadyExistsError } from './errors/userAlreadyExistsError';
-import { UserNotFoundError } from './errors/userNotFoundError';
+import { ListUsersRequest } from '../accounts/users/listUsersRequest';
+import { ListUsersResponse } from '../accounts/users/listUsersResponse';
+import { ListUsersForRoleRequest } from '../base/interfaces/listUsersForRoleRequest';
+import PaginatedResponse from '../base/interfaces/paginatedResponse';
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
 
@@ -109,25 +106,27 @@ export interface UserManagementPlugin {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array of {@link User}s
+   * @param request - the request object according to {@link ListUsersRequest}
+   * @returns a {@link ListUsersResponse} object
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link TooManyRequestsError} - the request was rate limited
+   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
-  listUsers(): Promise<User[]>;
+  listUsers(request: ListUsersRequest): Promise<ListUsersResponse>;
 
   /**
    * List the user IDs assoicated with a given role.
-   * @param role - the role for which the users should be listed.
-   * @returns an array containing the user ids that are associated with the role
+   * @param request - a ListUsersForRoleRequest object
+   * @returns a paginated response the user ids that are associated with the role
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
-  listUsersForRole(role: string): Promise<string[]>;
+  listUsersForRole(request: ListUsersForRoleRequest): Promise<PaginatedResponse<string>>;
 
   /**
    * List the currently available roles.

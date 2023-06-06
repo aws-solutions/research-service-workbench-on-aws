@@ -4,6 +4,7 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { ListUsersForRoleRequestParser } from '../../accounts/models/projects/listUsersForRoleRequest';
 import { buildDynamoDBPkSk } from '../../base/aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
 import { PluginConfigurationError } from '../../userManagement/errors/pluginConfigurationError';
@@ -103,11 +104,15 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     const { groupId } = request;
 
+    const projectId = groupId.split('#')[0];
+    const role = groupId.split('#')[1];
+    const listRequest = ListUsersForRoleRequestParser.parse({ role, projectId });
+
     try {
-      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      const response = await this._userManagementService.listUsersForRole(listRequest);
       return {
         data: {
-          userIds
+          userIds: response.data
         }
       };
     } catch (error) {

@@ -6,6 +6,8 @@
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import _ from 'lodash';
+import { ListUsersRequest, ListUsersRequestParser } from './accounts/users/listUsersRequest';
+import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
 import { validateAndParse } from './base/utilities/validatorHelper';
 import { wrapAsync } from './errorHandlers';
 import { isInvalidParameterError } from './userManagement/errors/invalidParameterError';
@@ -50,8 +52,23 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const users = await userService.listUsers();
-      res.status(200).json({ users });
+      const validatedRequest = validateAndParse<ListUsersRequest>(ListUsersRequestParser, {
+        ...req.query
+      });
+      try {
+        const users = await userService.listUsers(validatedRequest);
+        res.status(200).json({ users });
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e) || isInvalidParameterError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing users.`);
+      }
     })
   );
 

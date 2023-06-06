@@ -74,7 +74,7 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   beforeEach(() => {
-    groupId = 'groupId';
+    groupId = 'proj-00f1682c-4d74-4747-ac1a-2d176d081ba6#ProjectAdmin';
     userId = 'userId';
     status = 'active';
     mockUser = {
@@ -241,7 +241,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('getGroupUsers', () => {
     it('returns an array of userID in the data object for the requested group', async () => {
-      mockUserManagementPlugin.listUsersForRole = jest.fn().mockResolvedValue([userId]);
+      mockUserManagementPlugin.listUsersForRole = jest.fn().mockResolvedValue({ data: [userId] });
       const response = await wbcGroupManagementPlugin.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
       expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds: [userId] } });

@@ -7,6 +7,7 @@ import * as Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { EnvironmentUtilityServices } from './apiRouteConfig';
 import { isInvalidPaginationTokenError } from './base/errors/invalidPaginationTokenError';
+import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { Environment } from './environments/models/environments/environment';
 import { wrapAsync } from './errorHandlers';
 import { isProjectDeletedError } from './errors/projectDeletedError';
@@ -38,7 +39,8 @@ import { validateAndParse } from './validatorHelper';
 export function setUpProjectEnvRoutes(
   router: Router,
   environments: { [key: string]: EnvironmentUtilityServices },
-  projectEnvironmentService: ProjectEnvPlugin
+  projectEnvironmentService: ProjectEnvPlugin,
+  datasetService: DataSetPlugin
 ): void {
   const supportedEnvs = Object.keys(environments);
 
@@ -60,6 +62,17 @@ export function setUpProjectEnvRoutes(
       if (req.body.id) {
         throw Boom.badRequest(
           'id cannot be passed in the request body when trying to launch a new environment'
+        );
+      }
+
+      const authorizedDatasets = await datasetService.isProjectAuthorizedForDatasets({
+        authenticatedUser: res.locals.user,
+        datasetIds: environmentRequest.datasetIds,
+        projectId: req.params.projectId
+      });
+      if (!authorizedDatasets) {
+        throw Boom.forbidden(
+          `${environmentRequest.projectId} does not have access to the provided dataset(s)`
         );
       }
 

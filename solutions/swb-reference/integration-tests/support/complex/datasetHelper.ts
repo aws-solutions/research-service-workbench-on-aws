@@ -23,8 +23,9 @@ export class DatasetHelper {
     if (listedObjects.Contents!.length === 0) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const deleteParams: { Bucket: string; Delete: { Objects: any } } = {
+    const deleteParams: { Bucket: string; ExpectedBucketOwner: string; Delete: { Objects: any } } = {
       Bucket: bucket,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID!,
       Delete: { Objects: [] }
     };
     listedObjects.Contents!.forEach((key) => {

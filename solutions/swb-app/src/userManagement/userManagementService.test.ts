@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { ListUsersForRoleRequestParser } from '../base/interfaces/listUsersForRoleRequest';
 import { Status, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 import { UserManagementService } from './userManagementService';
@@ -23,7 +24,9 @@ describe('User Management Service', () => {
       activateUser: jest.fn().mockImplementation(() => {}),
       deactivateUser: jest.fn().mockImplementation(() => {}),
       listUsers: jest.fn().mockImplementation(() => [mockUser.id]),
-      listUsersForRole: jest.fn().mockImplementation(() => [mockUser.id]),
+      listUsersForRole: jest.fn().mockImplementation(() => {
+        return { data: [mockUser.id] };
+      }),
       listRoles: jest.fn().mockImplementation(() => [mockUser.roles]),
       addUserToRole: jest.fn().mockImplementation(() => {}),
       removeUserFromRole: jest.fn().mockImplementation(() => {}),
@@ -42,7 +45,7 @@ describe('User Management Service', () => {
       lastName: 'sampleLastName',
       email: 'sampleEmail',
       status: Status.ACTIVE,
-      roles: ['sampleRole']
+      roles: ['Researcher']
     };
   });
 
@@ -82,13 +85,17 @@ describe('User Management Service', () => {
   });
 
   test('listUsers', async () => {
-    const users = await userManagementService.listUsers();
+    const users = await userManagementService.listUsers({});
     expect(users).toEqual([mockUser.id]);
   });
 
   test('listUsersForRole', async () => {
-    const users = await userManagementService.listUsersForRole(mockUser.roles[0]);
-    expect(users).toEqual([mockUser.id]);
+    const request = ListUsersForRoleRequestParser.parse({
+      role: mockUser.roles[0],
+      projectId: 'fakeProjectId'
+    });
+    const response = await userManagementService.listUsersForRole(request);
+    expect(response.data).toEqual([mockUser.id]);
   });
 
   test('listRoles', async () => {

@@ -52,6 +52,22 @@ describe('multiStep users integration test', () => {
     const { data: allUsersListedByPA } = await pa1Session.resources.users.get();
     expect(allUsersListedByPA).toEqual(allUsersListedByITAdmin);
 
+    // test pagination
+    await adminSession.resources.users.create({
+      ...mockUserInput,
+      email: `success+activate-deactivate-user-${uuidv4()}@simulator.amazonses.com`
+    });
+    const listResponse = await adminSession.resources.users.get({ pageSize: 1 });
+    expect(listResponse.data.users.data.length).toEqual(1);
+    const user1Id = listResponse.data.users.data[0].id;
+    const paginationToken = listResponse.data.users.paginationToken;
+    expect(paginationToken).toBeDefined();
+
+    const listResponse2 = await adminSession.resources.users.get({ pageSize: 1, paginationToken });
+    expect(listResponse2.data.users.data.length).toEqual(1);
+    const user2Id = listResponse2.data.users.data[0].id;
+    expect(user1Id).not.toEqual(user2Id);
+
     // test PA has permission of `Get User`
     const { data: acutalUserGetByPA } = await pa1Session.resources.users.user(mockUserId).get();
     expect(acutalUserGetByPA).toMatchObject(mockUser);

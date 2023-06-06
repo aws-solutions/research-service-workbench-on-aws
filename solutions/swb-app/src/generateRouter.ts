@@ -105,7 +105,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService
   );
-  setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
+  setUpProjectEnvRoutes(
+    router,
+    apiRouteConfig.environments,
+    apiRouteConfig.projectEnvPlugin,
+    apiRouteConfig.dataSetService
+  );
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 

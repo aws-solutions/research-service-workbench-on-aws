@@ -35,7 +35,8 @@ export default class S3Service {
       const putObjectParam = {
         Bucket: s3BucketName,
         Key: `${file.s3Prefix}${file.fileName}`,
-        Body: file.fileContent
+        Body: file.fileContent,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       };
       await this._s3.putObject(putObjectParam);
     }
@@ -70,7 +71,8 @@ export default class S3Service {
           const putObjectParam = {
             Bucket: s3BucketName,
             Key: `${prefix}${dirName}${name}`,
-            Body: fileContent
+            Body: fileContent,
+            ExpectedBucketOwner: process.env.MAIN_ACCT_ID
           };
 
           await this._s3.putObject(putObjectParam);
@@ -91,7 +93,11 @@ export default class S3Service {
     if (s3BucketParams.length !== 2) throw new Error(`Invalid S3 URL format ${s3BucketURL}`);
     const s3Bucket = s3BucketParams[0].replace('https://', '');
     const key = s3BucketParams[1];
-    const stream = await this._s3.getObject({ Bucket: s3Bucket, Key: key });
+    const stream = await this._s3.getObject({
+      Bucket: s3Bucket,
+      Key: key,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+    });
     const streamString = await this._streamToString(stream.Body! as Readable);
     const yamlFile = await yaml.load(streamString, { schema: schema });
     return yamlFile as CFNTemplate;
@@ -127,7 +133,8 @@ export default class S3Service {
     // Sign the url
     const command = new GetObjectCommand({
       Bucket: s3BucketName,
-      Key: key
+      Key: key,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     return getSignedUrl(this._s3, command, { expiresIn: expirationSeconds });
   }
@@ -144,8 +151,16 @@ export default class S3Service {
     prefix: string,
     timeToLiveSeconds: number
   ): Promise<string> {
-    return await getSignedUrl(this._s3, new PutObjectCommand({ Bucket: s3BucketName, Key: prefix }), {
-      expiresIn: timeToLiveSeconds
-    });
+    return await getSignedUrl(
+      this._s3,
+      new PutObjectCommand({
+        Bucket: s3BucketName,
+        Key: prefix,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+      }),
+      {
+        expiresIn: timeToLiveSeconds
+      }
+    );
   }
 }

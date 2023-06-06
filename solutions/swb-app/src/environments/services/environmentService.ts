@@ -9,7 +9,11 @@ import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { AuthenticatedUser } from '../../authorization/models/authenticatedUser';
-import { buildDynamoDBPkSk, buildDynamoDbKey } from '../../base/aws/helpers/dynamoDB/ddbUtil';
+import {
+  buildConcatenatedSk,
+  buildDynamoDBPkSk,
+  buildDynamoDbKey
+} from '../../base/aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
 import resourceTypeToKey from '../../base/constants/resourceTypeToKey';
 import PaginatedResponse from '../../base/interfaces/paginatedResponse';
@@ -402,6 +406,49 @@ export class EnvironmentService {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
     await this._dynamoDBService.updateExecuteAndFormat({ key, params: { item: data } });
+  }
+
+  /**
+   * Store metadata in DDB relating the environment's project with the dataset and endpoint that gets mounted on the env
+   * @param projectId - Environment's projectId
+   * @param datasetId - Dataset that is mounted on the Environment
+   * @param endpointId - Endpoint for the Dataset that was mounted on the Environment
+   */
+  public async storeProjectDatasetEndpointRelationship(
+    projectId: string,
+    datasetId: string,
+    endpointId: string
+  ): Promise<void> {
+    const key = {
+      pk: buildDynamoDbKey(projectId, resourceTypeToKey.project),
+      sk: buildConcatenatedSk([
+        buildDynamoDbKey(datasetId, resourceTypeToKey.dataset),
+        buildDynamoDbKey(endpointId, resourceTypeToKey.endpoint)
+      ])
+    };
+
+    await this._dynamoDBService.updateExecuteAndFormat({ key, params: { item: {} } });
+  }
+
+  /**
+   * Deletes metadata in DDB that relates environment's project with the dataset and endpoint that gets mounted on the env
+   * @param projectId - Environment's projectId
+   * @param datasetId - Dataset that is mounted on the Environment
+   * @param endpointId - Endpoint for the Dataset that was mounted on the Environment
+   */
+  public async removeProjectDatasetEndpointRelationship(
+    projectId: string,
+    datasetId: string,
+    endpointId: string
+  ): Promise<void> {
+    const key = {
+      pk: buildDynamoDbKey(projectId, resourceTypeToKey.project),
+      sk: buildConcatenatedSk([
+        buildDynamoDbKey(datasetId, resourceTypeToKey.dataset),
+        buildDynamoDbKey(endpointId, resourceTypeToKey.endpoint)
+      ])
+    };
+    await this._dynamoDBService.deleteItem({ key });
   }
 
   /**

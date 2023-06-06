@@ -206,6 +206,11 @@ export default class EnvironmentLifecycleHelper {
             roles: []
           }
         );
+        await this.environmentService.removeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          endpoint.dataSetId,
+          endpoint.id
+        );
       })
     );
   }
@@ -254,7 +259,7 @@ export default class EnvironmentLifecycleHelper {
           dataSetId: endpoint.dataSetId,
           endPointUrl: endpoint.endPointUrl,
           path: endpoint.path,
-          storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
+          storageArn: `arn:aws:s3:::${dataSet.storageName}`
         };
 
         await this.environmentService.addMetadata(
@@ -263,6 +268,12 @@ export default class EnvironmentLifecycleHelper {
           mountObject.endpointId,
           resourceTypeToKey.endpoint,
           endpointObj
+        );
+
+        await this.environmentService.storeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          dataSetId,
+          mountObject.endpointId
         );
 
         endpointsCreated.push(endpointObj);

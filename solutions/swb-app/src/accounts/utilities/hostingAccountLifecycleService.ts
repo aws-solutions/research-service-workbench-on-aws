@@ -6,7 +6,12 @@
 import { Readable } from 'stream';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
+import {
+  GetBucketPolicyCommandOutput,
+  PutBucketPolicyCommandInput,
+  NoSuchBucket,
+  S3ServiceException
+} from '@aws-sdk/client-s3';
 import * as Boom from '@hapi/boom';
 import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
@@ -16,6 +21,7 @@ import { IamRoleCloneService } from '../../base/utilities/iamRoleCloneService';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken } from '../../base/utilities/paginationHelper';
 import { IamHelper } from '../../dataSets/datasetService/awsUtilities/iamHelper';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import { InvalidAwsAccountIdError } from '../errors/InvalidAwsAccountIdError';
 import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
 import { AwsAccountTemplateUrlsRequest } from '../models/accounts/awsAccountTemplateUrlsRequest';
@@ -177,7 +183,8 @@ export default class HostingAccountLifecycleService {
     let bucketPolicy: PolicyDocument = new PolicyDocument();
     try {
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
-        Bucket: bucketName
+        Bucket: bucketName,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       });
       bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
     } catch (e) {
@@ -194,11 +201,23 @@ export default class HostingAccountLifecycleService {
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
+      Policy: JSON.stringify(bucketPolicy.toJSON()),
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     // Update bucket policy
-    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+    try {
+      await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+    } catch (e) {
+      if (
+        e.name === 'MalformedPolicy' &&
+        e.Detail === `"AWS" : "arn:aws:iam::${awsAccountId}:root"` &&
+        e instanceof S3ServiceException
+      ) {
+        throw new InvalidAwsAccountIdError("Please provide a valid 'awsAccountId' for the hosting account");
+      }
+      throw e;
+    }
   }
 
   private _updateBucketPolicyDocumentWithAllStatements(
@@ -345,15 +364,18 @@ export default class HostingAccountLifecycleService {
     // Check if hosting account stack has the latest CFN template
     const onboardAccountS3Response = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account.cfn.yaml'
+      Key: 'onboard-account.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const onboardAccountByonResponse = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account-byon.cfn.yaml'
+      Key: 'onboard-account-byon.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const onboardAccountTgwResponse = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account-tgw.cfn.yaml'
+      Key: 'onboard-account-tgw.cfn.yaml',
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     const streamToString = (stream: Readable): Promise<string> =>
       new Promise((resolve, reject) => {
@@ -643,11 +665,11 @@ export default class HostingAccountLifecycleService {
   }): Promise<void> {
     const { statusHandlerArn, artifactBucketArn, mainAcctEncryptionArnList } = arns;
 
-    // Update main account default event bus to accept hosting account state change events
-    await this.updateBusPermissions(statusHandlerArn, awsAccountId);
-
     // Add account to artifactBucket's bucket policy
     await this.updateArtifactsBucketPolicy(artifactBucketArn, awsAccountId);
+
+    // Update main account default event bus to accept hosting account state change events
+    await this.updateBusPermissions(statusHandlerArn, awsAccountId);
 
     // Update main account encryption key policy
     await Promise.all(

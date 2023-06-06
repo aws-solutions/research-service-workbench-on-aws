@@ -8,7 +8,16 @@
 
 import { join } from 'path';
 
-import { App, Aws, CfnOutput, CfnParameter, CfnResource, Duration, Stack } from 'aws-cdk-lib';
+import {
+  App,
+  Aws,
+  CfnOutput,
+  CfnParameter,
+  CfnResource,
+  DefaultStackSynthesizer,
+  Duration,
+  Stack
+} from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -145,6 +154,9 @@ export class RSWStack extends Stack {
         account: isSolutionsBuild() ? Aws.ACCOUNT_ID : process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       },
+      synthesizer: new DefaultStackSynthesizer({
+        generateBootstrapVersionRule: isSolutionsBuild() ? false : true
+      }),
       ...props
     };
 

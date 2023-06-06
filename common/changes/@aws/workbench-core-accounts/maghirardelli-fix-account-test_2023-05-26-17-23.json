@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "delete accountService.delete as it is never used",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

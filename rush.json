@@ -56,12 +56,6 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@aws/workbench-core-environments-ui",
-      "projectFolder": "workbench-core/environments-ui",
-      "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
       "packageName": "@aws/workbench-core-accounts-ui",
       "projectFolder": "workbench-core/accounts-ui",
       "reviewCategory": "production",

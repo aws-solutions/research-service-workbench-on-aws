@@ -4,9 +4,13 @@
  */
 
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
+import { ListUsersForRoleRequest } from '../../accounts/models/projects/listUsersForRoleRequest';
+import { ListUsersRequest } from '../../accounts/users/listUsersRequest';
+import { ListUsersResponse } from '../../accounts/users/listUsersResponse';
 import AwsService from '../../base/aws/awsService';
 import { buildDynamoDbKey } from '../../base/aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from '../../base/aws/helpers/dynamoDB/dynamoDBService';
+import PaginatedResponse from '../../base/interfaces/paginatedResponse';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -391,21 +395,27 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the users within the user pool.
    *
-   * @returns an array of {@link User}s
+   * @param request - the request object according to {@link ListUsersRequest}
+   * @returns a {@link ListUsersResponse} object
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
+   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
-  public async listUsers(): Promise<User[]> {
+  public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
     try {
       const response = await this._aws.clients.cognito.listUsers({
-        UserPoolId: this._userPoolId
+        UserPoolId: this._userPoolId,
+        Limit: request.pageSize,
+        PaginationToken: request.paginationToken
+          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
+          : undefined
       });
 
       if (!response.Users) {
-        return [];
+        return { data: [] };
       }
 
       const users = await Promise.all(
@@ -423,7 +433,13 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         })
       );
 
-      return users.filter((user) => user.id);
+      const data = users.filter((user) => user.id);
+
+      if (!response.PaginationToken) {
+        return { data };
+      }
+
+      return { data, paginationToken: Buffer.from(response.PaginationToken).toString('base64') };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -438,6 +454,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);
       }
+      if (error.name === 'InvalidParameterException') {
+        throw new InvalidParameterError('Invalid parameter');
+      }
       throw error;
     }
   }
@@ -445,7 +464,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the user ids associated with a given group.
    *
-   * @param role - the group to list the users associated with it
+   * @param request - a ListUsersForRoleRequest object
    * @returns an array containing the user ids that are associated with the group
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -454,14 +473,40 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
-  public async listUsersForRole(role: string): Promise<string[]> {
+  public async listUsersForRole(request: ListUsersForRoleRequest): Promise<PaginatedResponse<string>> {
     try {
-      const { Users: users } = await this._aws.clients.cognito.listUsersInGroup({
+      const groupId = `${request.projectId}#${request.role}`;
+      const response = await this._aws.clients.cognito.listUsersInGroup({
         UserPoolId: this._userPoolId,
-        GroupName: role
+        GroupName: groupId,
+        Limit: request.pageSize,
+        NextToken: request.paginationToken
+          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
+          : undefined
       });
 
-      return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
+      const users = response.Users;
+
+      if (!users || users.length === 0) {
+        return {
+          data: []
+        };
+      }
+
+      const userNames: string[] = [];
+
+      for (const user of users) {
+        if (!user.Username) {
+          continue;
+        }
+
+        userNames.push(user.Username);
+      }
+
+      return {
+        data: userNames,
+        paginationToken: response.NextToken ? Buffer.from(response.NextToken).toString('base64') : undefined
+      };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -474,6 +519,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
           throw new RoleNotFoundError('Role does not exist.');
         }
         throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'InvalidParameterException') {
+        throw new InvalidParameterError('Invalid parameter');
       }
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);

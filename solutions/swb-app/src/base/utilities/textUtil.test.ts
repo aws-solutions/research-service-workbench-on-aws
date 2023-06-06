@@ -206,7 +206,7 @@ describe('textUtil', () => {
   });
   describe('lengthValidationMessage', () => {
     test('returns validation message', () => {
-      expect(lengthValidationMessage(3)).toEqual('Input must be less than 3 characters');
+      expect(lengthValidationMessage(3)).toEqual('Input must be 3 characters or less');
     });
   });
 
