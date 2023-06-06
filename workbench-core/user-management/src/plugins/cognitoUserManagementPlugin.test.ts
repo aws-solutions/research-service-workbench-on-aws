@@ -235,7 +235,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         ],
         Enabled: true
       });
-      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: [] });
 
       const user = await plugin.getUser(userInfo.id);
 
@@ -334,7 +334,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
-      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: [] });
 
       const userRoles = await plugin.getUserRoles(userInfo.id);
 
@@ -751,7 +751,7 @@ describe('CognitoUserManagementPlugin tests', () => {
           }
         ]
       });
-      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: [] });
 
       const users = await plugin.listUsers({});
 
@@ -1065,7 +1065,7 @@ describe('CognitoUserManagementPlugin tests', () => {
   describe('addUserToRole tests', () => {
     beforeEach(() => {
       ddbMock.on(UpdateItemCommand).resolves({});
-      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: [] });
     });
 
     describe('when user has reached role limit', () => {
@@ -1084,7 +1084,6 @@ describe('CognitoUserManagementPlugin tests', () => {
 
     it('should add the requested User to the group when the user id and group both exist', async () => {
       const addUserToRoleMock = cognitoMock.on(AdminAddUserToGroupCommand).resolves({});
-
       await plugin.addUserToRole(userInfo.id, roles[0]);
 
       expect(addUserToRoleMock.calls().length).toBe(2);
