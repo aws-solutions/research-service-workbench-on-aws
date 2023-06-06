@@ -18,6 +18,7 @@ import {
 import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { z } from 'zod';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpCostCenterRoutes(
@@ -72,7 +73,12 @@ export function setUpCostCenterRoutes(
   router.get(
     '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.status(200).send(await costCenterService.getCostCenter(req.params.id));
+      const validatedData = z.string().costCenterId().safeParse(req.params.id);
+      if (!validatedData.success) {
+        throw Boom.notFound();
+      }
+
+      res.status(200).send(await costCenterService.getCostCenter(validatedData.data));
     })
   );
 

@@ -53,7 +53,7 @@ export async function handler(event: any) {
     // SWB APIs do not have trailing slash, but this gets added when UI passes down the path
     apiPath = apiPath.substring(0, apiPath.length - 1);
   }
-  const targetPath = `${baseUrl}${apiPath}`;
+  const targetPath = encodeURI(`${baseUrl}${apiPath}`);
 
   if (event.httpMethod) HTTP_METHOD = event.httpMethod;
   if (event.headers) {
