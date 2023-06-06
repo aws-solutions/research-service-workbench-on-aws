@@ -38,11 +38,6 @@ jobs:
       #     cd solutions/swb-ui/infrastructure
       #     node ../../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: cdk synth example
-        run: |
-          cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk:synth
-
       - name: Run cfn-nag on all .template.json files
         uses: stelligent/cfn_nag@master
         with:
