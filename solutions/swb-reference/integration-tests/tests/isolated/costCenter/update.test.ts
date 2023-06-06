@@ -52,7 +52,7 @@ describe('Update Cost Center negative tests', () => {
           new HttpError(400, {
             error: 'Bad Request',
             message:
-              'name: Input must be less than 112 characters. name: must contain only letters, numbers, hyphens, underscores, and periods'
+              'name: Input must be 112 characters or less. name: must contain only letters, numbers, hyphens, underscores, and periods'
           })
         );
       }
