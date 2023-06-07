@@ -9,6 +9,7 @@ jest.mock('uuid', () => ({
   })
 }));
 
+import { AwsService, PaginatedResponse } from '@aws/workbench-core-base';
 import {
   DeleteItemCommand,
   DynamoDBClient,
@@ -18,7 +19,6 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { AwsService, PaginatedResponse } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';

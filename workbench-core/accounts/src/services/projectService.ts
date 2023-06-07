@@ -5,7 +5,6 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
   QueryParams,
@@ -22,6 +21,7 @@ import {
   DynamoDBService
 } from '@aws/workbench-core-base';
 import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
+import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';

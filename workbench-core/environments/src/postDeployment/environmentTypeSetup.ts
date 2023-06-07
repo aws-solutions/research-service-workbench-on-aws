@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ProductViewSummary, ProvisioningArtifactDetail } from '@aws-sdk/client-service-catalog';
 import { AwsService, resourceTypeToKey, CFNTemplateParameters } from '@aws/workbench-core-base';
+import { ProductViewSummary, ProvisioningArtifactDetail } from '@aws-sdk/client-service-catalog';
 import { EnvironmentType } from '../models/environmentTypes/environmentType';
 import EnvironmentTypeService from '../services/environmentTypeService';
 

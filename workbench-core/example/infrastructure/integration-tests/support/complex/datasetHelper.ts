@@ -1,10 +1,10 @@
-import { AccessPoint } from '@aws-sdk/client-s3-control';
 import { AwsService, buildDynamoDbKey, buildDynamoDBPkSk, JSONValue } from '@aws/workbench-core-base';
 import {
   dataSetPrefix,
   endpointPrefix,
   storageLocationPrefix
 } from '@aws/workbench-core-example-app/lib/configs/constants';
+import { AccessPoint } from '@aws-sdk/client-s3-control';
 import Setup from '../setup';
 
 export class DatasetHelper {

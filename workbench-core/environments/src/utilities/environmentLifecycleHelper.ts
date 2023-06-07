@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
   CASLAuthorizationPlugin,
@@ -20,6 +19,7 @@ import {
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
+import { Output } from '@aws-sdk/client-cloudformation';
 import _ from 'lodash';
 import { Environment } from '../models/environments/environment';
 import { EnvironmentService } from '../services/environmentService';

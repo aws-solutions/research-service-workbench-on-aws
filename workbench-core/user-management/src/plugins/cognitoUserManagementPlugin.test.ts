@@ -3,6 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import {
+  AwsService,
+  DynamoDBService,
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from '@aws/workbench-core-base';
+import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDeleteUserCommand,
@@ -36,12 +42,6 @@ import {
   UpdateItemCommand,
   QueryCommand
 } from '@aws-sdk/client-dynamodb';
-import {
-  AwsService,
-  DynamoDBService,
-  ListUsersForRoleRequest,
-  ListUsersForRoleRequestParser
-} from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
   CognitoUserManagementPlugin,
