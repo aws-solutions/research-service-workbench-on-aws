@@ -36,6 +36,7 @@ describe('UpdateProjectRequestParser', () => {
               type: 'string',
               inclusive: true,
               message: nonEmptyMessage,
+              exact: false,
               path: ['updatedValues', 'name']
             }
           ];
@@ -101,6 +102,7 @@ describe('UpdateProjectRequestParser', () => {
               type: 'string',
               inclusive: true,
               message: nonEmptyMessage,
+              exact: false,
               path: ['updatedValues', 'description']
             }
           ];
