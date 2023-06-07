@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "update rush dependencies and change ttl type to number",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

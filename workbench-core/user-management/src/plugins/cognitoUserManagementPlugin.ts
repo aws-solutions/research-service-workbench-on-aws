@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
 import {
   AwsService,
   DynamoDBService,
@@ -11,6 +10,7 @@ import {
   ListUsersForRoleRequest,
   PaginatedResponse
 } from '@aws/workbench-core-base';
+import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';

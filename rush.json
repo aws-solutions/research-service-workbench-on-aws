@@ -35,7 +35,7 @@
       "packageName": "@aws/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
-      "shouldPublish": false
+      "shouldPublish": true
     },
     {
       "packageName": "@aws/workbench-core-environments",
@@ -47,7 +47,7 @@
       "packageName": "@aws/workbench-core-swb-common-ui",
       "projectFolder": "workbench-core/swb-common-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-logging",
@@ -107,19 +107,19 @@
       "packageName": "@aws/workbench-core-datasets-ui",
       "projectFolder": "workbench-core/datasets-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-environments-ui",
       "projectFolder": "workbench-core/environments-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-accounts-ui",
       "projectFolder": "workbench-core/accounts-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-example-app",

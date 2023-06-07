@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-logging",
+      "comment": "update rush dependencies",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-logging"
+}

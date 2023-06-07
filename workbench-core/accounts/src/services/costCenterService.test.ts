@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { CostCenterStatus } from '../constants/costCenterStatus';
