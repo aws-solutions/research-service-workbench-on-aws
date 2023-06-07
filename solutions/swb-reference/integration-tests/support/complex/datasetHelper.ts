@@ -1,5 +1,5 @@
-import { AccessPoint } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
+import { AccessPoint } from '@aws-sdk/client-s3-control';
 import _ from 'lodash';
 import Setup from '../setup';
 
