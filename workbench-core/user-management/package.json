@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-user-management",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Package to handle server-side user management",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

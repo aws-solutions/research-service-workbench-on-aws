@@ -1,6 +1,6 @@
 {
   "name": "@aws/swb-app",
-  "version": "0.1.2",
+  "version": "2.0.0",
   "description": "This package sets up API routes for SWB",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
