@@ -1,5 +1,12 @@
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+# Overview
+
+Research Service Workbench on AWS is a backend API designed to empower AWS partners to more easily build self-service portals for research institutions, allowing their researchers to create and manage secure research computing environments. RSW builds on AWS services including Amazon S3, Service Catalog, and AWS Systems Manager to deliver comprehensive, cutting-edge capabilities in less time while meeting the high bar for security and governance demanded by regulators and funding agencies.
+
+Using a custom built portal provided by a partner, built on Research Service Workbench, research IT departments can more easily work with partners to deliver a self-service portal with a comprehensive catalog of tools tailored to the needs of the researchers they support. Using a portal built using RSW, researchers can create, access, and retire environments without needing to be experts on cloud infrastructure or security. They can work individually or collaborate with others on the same data, with RSW securely orchestrating the connection of research environments to Amazon S3. Furthermore, environments are deployed in specific AWS accounts and Amazon Virtual Private Clouds (VPCs), allowing connectivity to resources on and off campus. Institutions are fully in control of their data, data flows, and AWS footprint. They can scale investments in IT and security across multiple research programs, reducing duplicate effort and freeing up resources to focus on science.
+
+To learn more about FWoA and how to deploy, refer to the Research Service Workbench [Implementation Guide](https://www.docs.aws.a2z.com/solutions/latest/research-service-workbench-on-aws/overview.html).
 
 # Codecov
 ## `main branch coverage`
@@ -65,3 +72,6 @@ If you discover a potential security issue in this project we ask that you notif
 ## Licensing
 
 See the [LICENSE](LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+
+## Metrics Collection
+This solution collects anonymous operational metrics to help AWS improve the quality of features of the solution. For more information, including how to disable this capability, please see the [Implementation Guide](https://docs.aws.amazon.com/solutions/latest/research-service-workbench-on-aws/monitoring-the-solution-with-aws-service-catalog-appregistry.html).
