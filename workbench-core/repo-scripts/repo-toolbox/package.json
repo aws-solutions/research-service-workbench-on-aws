@@ -36,9 +36,9 @@
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
-    "@rushstack/heft": "^0.47.5",
-    "@rushstack/heft-jest-plugin": "^0.3.28",
-    "@rushstack/heft-node-rig": "^1.10.5",
+    "@rushstack/heft": "^0.50.5",
+    "@rushstack/heft-jest-plugin": "^0.5.11",
+    "@rushstack/heft-node-rig": "^1.12.11",
     "@types/diff": "5.0.1",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^18.15.11",
