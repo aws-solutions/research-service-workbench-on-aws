@@ -144,6 +144,7 @@ ajv under the Massachusetts Institute of Technology (MIT) license
 ansi-regex under the Massachusetts Institute of Technology (MIT) license
 ansi-styles under the Massachusetts Institute of Technology (MIT) license
 astral-regex under the Massachusetts Institute of Technology (MIT) license
+at-least-node under the ISC license
 aws-cdk under the Apache License 2.0
 aws-cdk-lib under the Apache License 2.0
 aws-jwt-verify under the Apache License 2.0
