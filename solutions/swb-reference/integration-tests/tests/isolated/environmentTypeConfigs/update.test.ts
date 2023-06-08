@@ -22,7 +22,7 @@ describe('update environment type configs', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;

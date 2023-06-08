@@ -30,7 +30,7 @@ describe('multiStep environment test', () => {
   let environmentHelper: EnvironmentHelper;
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;

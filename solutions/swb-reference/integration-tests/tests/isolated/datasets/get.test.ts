@@ -19,7 +19,7 @@ describe('datasets get negative tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;

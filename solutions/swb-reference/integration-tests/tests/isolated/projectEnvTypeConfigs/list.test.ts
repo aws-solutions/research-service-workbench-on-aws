@@ -24,7 +24,7 @@ describe('list environment type configs associated to project', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;

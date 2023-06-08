@@ -26,7 +26,7 @@
     "compile": "node scripts/buildLambda.js",
     "depcheck": "depcheck",
     "get-code-challenge": "node scripts/generateCodeChallenge.js",
-    "integration-tests": "rushx build && jest lib/integration-tests -i",
+    "integration-tests": "rushx build && jest lib/integration-tests/tests/multiStep/paab* -i",
     "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",

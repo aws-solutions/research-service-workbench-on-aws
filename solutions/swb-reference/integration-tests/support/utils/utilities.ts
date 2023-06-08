@@ -92,6 +92,7 @@ function generateRandomString(length: number, validChars: string): string {
 function generateRandomAlphaNumericString(length: number): string {
   return generateRandomString(length, validAlphaNumeric);
 }
+
 export {
   sleep,
   checkHttpError,

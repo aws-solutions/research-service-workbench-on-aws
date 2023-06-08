@@ -18,7 +18,9 @@ describe('Delete Key Pair negative tests', () => {
   let sshKeyId: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   beforeEach(async () => {

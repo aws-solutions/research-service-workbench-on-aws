@@ -31,9 +31,16 @@ export class PaabHelper {
     this._outputError = outputError;
   }
 
-  public async createResources(): Promise<PaabResources> {
+  public async createResources(filename: string): Promise<PaabResources> {
     // create IT admin session
     const adminSession: ClientSession = await this._setup.getDefaultAdminSession(this._outputError);
+    // Example: lib/integration-tests/tests/isolated/datasets/create.test.ts => isolated-datasets-create
+    const testName: string = filename
+      .replace(/.test.js/g, '')
+      .split('/')
+      .slice(-3)
+      .join('-');
+    console.log(testName);
 
     // set up new cost center
     const { data: costCenter } = await adminSession.resources.costCenters.create({
@@ -49,8 +56,8 @@ export class PaabHelper {
     for (const projectName of projectNames) {
       // must follow Array order
       const projectResponse = await adminSession.resources.projects.create({
-        name: this._randomTextGenerator.getFakeText(projectName),
-        description: `${projectName} for integ tests`,
+        name: this._randomTextGenerator.getFakeText(projectName + testName),
+        description: `${projectName} for integ tests ${testName}`,
         costCenterId: costCenter.id
       });
       projectIds.push(projectResponse.data.id);

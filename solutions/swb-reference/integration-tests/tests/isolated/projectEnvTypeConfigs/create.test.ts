@@ -26,7 +26,7 @@ describe('Associate Project with EnvTypeConfig', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     projectId = paabResources.project1Id;
   });

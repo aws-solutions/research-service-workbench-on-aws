@@ -20,7 +20,7 @@ describe('get dataset for project tests', () => {
 
   beforeAll(async () => {
     paabHelper = new PaabHelper();
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
     pa1Session = paabResources.pa1Session;

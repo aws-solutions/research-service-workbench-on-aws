@@ -25,7 +25,7 @@ describe('multiStep dataset integration test', () => {
   let project2Id: string;
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;

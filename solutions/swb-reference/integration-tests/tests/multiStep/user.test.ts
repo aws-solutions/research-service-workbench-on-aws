@@ -15,7 +15,7 @@ describe('multiStep users integration test', () => {
   let pa1Session: ClientSession;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session } = await paabHelper.createResources(__filename));
   });
 
   beforeEach(async () => {

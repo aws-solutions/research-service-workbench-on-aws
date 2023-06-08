@@ -20,7 +20,7 @@ describe('assign user to project negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, project1Id } = await paabHelper.createResources());
+    ({ adminSession, project1Id } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {

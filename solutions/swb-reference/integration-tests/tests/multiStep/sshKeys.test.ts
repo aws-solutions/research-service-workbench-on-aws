@@ -15,7 +15,7 @@ describe('sshKeys API multiStep integration test', () => {
   let project1Id: string;
 
   beforeAll(async () => {
-    const resources = await paabHelper.createResources();
+    const resources = await paabHelper.createResources(__filename);
     ({ pa1Session, rs1Session, project1Id } = resources);
   });
 
