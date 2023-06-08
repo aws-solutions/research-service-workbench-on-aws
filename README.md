@@ -1,5 +1,3 @@
-
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 # Overview
 
 Research Service Workbench on AWS is a backend API designed to empower AWS partners to more easily build self-service portals for research institutions, allowing their researchers to create and manage secure research computing environments. RSW builds on AWS services including Amazon S3, Service Catalog, and AWS Systems Manager to deliver comprehensive, cutting-edge capabilities in less time while meeting the high bar for security and governance demanded by regulators and funding agencies.
