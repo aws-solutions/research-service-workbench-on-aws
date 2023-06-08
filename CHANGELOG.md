@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 This solution consist of multiple packages. Please click the links in each version release for the CHANGELOG in each updated package.
 
-## [2.0.0] - 2023-06-09
+## [2.0.0] - 2023-06-08
 
 ### Added
 - Package swb-reference [CHANGELOG](./solutions/swb-reference/CHANGELOG.md)
