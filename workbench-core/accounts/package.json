@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-accounts",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Access and management of resources helping in connecting to AWS hosting accounts.",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

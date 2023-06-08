@@ -2,6 +2,251 @@
   "name": "@aws/workbench-core-environments",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@aws/workbench-core-environments_v1.0.0",
+      "date": "Wed, 07 Jun 2023 21:47:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Create reciprical Database With Env item on environment creation"
+          },
+          {
+            "comment": "Integrating AuthZ with Projects"
+          },
+          {
+            "comment": "update datasets integration tests"
+          },
+          {
+            "comment": "refactor: moved handler/envTypeHandler to postDeployment/envTypeSetup"
+          },
+          {
+            "comment": "chore: add zod validations"
+          },
+          {
+            "comment": "ETC zod updates"
+          },
+          {
+            "comment": "chore: update zod method usages"
+          },
+          {
+            "comment": "refactor ddb.update()"
+          },
+          {
+            "comment": "Add environment type revoke validation"
+          },
+          {
+            "comment": "Add environments to app registry on launch"
+          },
+          {
+            "comment": "Add zod to environments API"
+          },
+          {
+            "comment": "restrict ET model inputs"
+          },
+          {
+            "comment": "Remove pk sk from envrionments response"
+          },
+          {
+            "comment": "allow non admin users to see environments within same project"
+          },
+          {
+            "comment": "add get environment type configs service method to retrieve by batch"
+          },
+          {
+            "comment": "Add Zod generic pagination"
+          },
+          {
+            "comment": "change putRequests params to putItems"
+          },
+          {
+            "comment": "fix: cognito user pool id retrieval"
+          },
+          {
+            "comment": "Updated to use new storageLocation optimization."
+          },
+          {
+            "comment": "Fixing postDeployment setup"
+          },
+          {
+            "comment": "Replaced require with import"
+          },
+          {
+            "comment": "Updated for DataSets AuthZ."
+          },
+          {
+            "comment": "solution renaming"
+          },
+          {
+            "comment": "replace with authorized fictitious data"
+          },
+          {
+            "comment": " update nonEmpty() to optionalNonEmpty()"
+          },
+          {
+            "comment": "Small refactor"
+          },
+          {
+            "comment": "update test"
+          },
+          {
+            "comment": "refactor pagination utilities"
+          },
+          {
+            "comment": "Updated file path parsing to use the `path` module."
+          },
+          {
+            "comment": "added better error handling when launching an environment and metadata doesn't exist"
+          },
+          {
+            "comment": "add prefixes to resource ids to allow easier resource identification"
+          },
+          {
+            "comment": "Add Project to Dataset+Endpoint metadata to track relationship during environment create/delete"
+          },
+          {
+            "comment": "revert"
+          },
+          {
+            "comment": "add post deployment script for mock dynamic auth z"
+          },
+          {
+            "comment": "Modified Environment object: removed datasetIds and changed type to be the Environment Type Config's sk value"
+          },
+          {
+            "comment": "Add AVAILABLE/DELETE status to ETC"
+          },
+          {
+            "comment": "Changing Admin to ITAdmin"
+          },
+          {
+            "comment": "Updated @aws-sdk/* dependencies to ^3.186.0"
+          },
+          {
+            "comment": "basic changes to avoid failure when handling new dataset authenticated user parameters"
+          },
+          {
+            "comment": "update audit config"
+          },
+          {
+            "comment": "updating DataSetService usage for new constructor argument"
+          },
+          {
+            "comment": "Updated to use `addDataSetExternalEndpointForGroup`."
+          },
+          {
+            "comment": "Updated unit tests to match new Datasets interface."
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "Replace schemas with Zod and use new ddb schema on ETC routes"
+          },
+          {
+            "comment": "nodejs version update"
+          },
+          {
+            "comment": "remove log that might expose sensitive information"
+          }
+        ],
+        "none": [
+          {
+            "comment": "chore: make packages more modular"
+          },
+          {
+            "comment": "codecov update"
+          },
+          {
+            "comment": "Formatting fixes"
+          },
+          {
+            "comment": "add license-check-and-add to package.json"
+          },
+          {
+            "comment": "add license-checker"
+          },
+          {
+            "comment": "change github owner to aws-solutions"
+          },
+          {
+            "comment": "fix dependencies"
+          },
+          {
+            "comment": "change audit logger import"
+          },
+          {
+            "comment": "revert to 2ae2a9a"
+          },
+          {
+            "comment": "Updated tests to match new interfaces"
+          },
+          {
+            "comment": "refactored"
+          },
+          {
+            "comment": "eslint fixes"
+          },
+          {
+            "comment": "bootstrap itadmin"
+          },
+          {
+            "comment": "test: add accounts integ test"
+          },
+          {
+            "comment": "update jest coverage"
+          },
+          {
+            "comment": "add expected bucket owner to S3 call"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Update routes for ETC with project as boundary"
+          },
+          {
+            "comment": "Updates for separating UI packages"
+          },
+          {
+            "comment": "Add environment type creation and update id format"
+          },
+          {
+            "comment": "pass mainaccount keys to env provisioning"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Prevent updates on TERMINATED environments and removed projectId from createEnvironmentRequest"
+          },
+          {
+            "comment": "Add new Template getting API, upgrade packages"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-authorization\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-datasets\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-user-management\" to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.2",
       "tag": "@aws/workbench-core-environments_v0.1.2",
       "date": "Wed, 10 Aug 2022 17:48:12 GMT",
