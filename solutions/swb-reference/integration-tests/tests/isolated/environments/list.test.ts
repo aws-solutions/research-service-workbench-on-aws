@@ -202,6 +202,7 @@ describe('list environments', () => {
       console.log('A Project Admin of Project1 and Project3, cannot LIST environments from Project2');
       try {
         await paSession.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
       } catch (e) {
         checkHttpError(
           e,
@@ -218,6 +219,7 @@ describe('list environments', () => {
       console.log('A Researcher of Project1 and Project3, cannot LIST environments from Project2');
       try {
         await rs1Session.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
       } catch (e) {
         checkHttpError(
           e,
