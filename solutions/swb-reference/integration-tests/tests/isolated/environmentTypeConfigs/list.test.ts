@@ -44,7 +44,7 @@ describe('list environment type configs', () => {
   });
 
   describe('Project Admin tests', () => {
-    test('list environments type configs for project excecutes successfully', async () => {
+    test('list environments type configs for project executes successfully', async () => {
       const { data: response } = await paSession.resources.projects
         .project(projectId)
         .environmentTypes()
@@ -69,7 +69,7 @@ describe('list environment type configs', () => {
   });
 
   describe('Researcher tests', () => {
-    test('list environments type configs for project excecutes successfully', async () => {
+    test('list environments type configs for project executes successfully', async () => {
       const { data: response } = await researcherSession.resources.projects
         .project(projectId)
         .environmentTypes()

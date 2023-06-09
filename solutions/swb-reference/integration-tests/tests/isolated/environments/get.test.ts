@@ -11,7 +11,7 @@ import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 describe('get environment negative tests', () => {
   const paabHelper: PaabHelper = new PaabHelper();
   let itAdminSession: ClientSession;
-  let paSession: ClientSession;
+  let pa1Session: ClientSession;
   let projectId: string;
   let researcherSession: ClientSession;
 
@@ -22,7 +22,7 @@ describe('get environment negative tests', () => {
   beforeAll(async () => {
     const paabResources = await paabHelper.createResources();
     itAdminSession = paabResources.adminSession;
-    paSession = paabResources.pa1Session;
+    pa1Session = paabResources.pa1Session;
     projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
   });
@@ -76,7 +76,7 @@ describe('get environment negative tests', () => {
     test('environment does not exist', async () => {
       const fakeEnvId = getFakeEnvId();
       try {
-        await paSession.resources.projects.project(projectId).environments().environment(fakeEnvId).get();
+        await pa1Session.resources.projects.project(projectId).environments().environment(fakeEnvId).get();
       } catch (e) {
         checkHttpError(
           e,
@@ -92,7 +92,11 @@ describe('get environment negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
       try {
-        await paSession.resources.projects.project(fakeProjectId).environments().environment(fakeEnvId).get();
+        await pa1Session.resources.projects
+          .project(fakeProjectId)
+          .environments()
+          .environment(fakeEnvId)
+          .get();
       } catch (e) {
         checkHttpError(
           e,
