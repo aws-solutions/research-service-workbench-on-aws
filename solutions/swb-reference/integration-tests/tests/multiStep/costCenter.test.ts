@@ -37,7 +37,6 @@ describe('multiStep costCenter test', () => {
       await session.resources.costCenters.costCenter(costCenterId).get();
       throw new Error('Getting cost center did not throw an error');
     } catch (e) {
-      console.log('inside catch clause 1');
       checkHttpError(
         e,
         new HttpError(403, {
@@ -49,7 +48,6 @@ describe('multiStep costCenter test', () => {
       await session.resources.costCenters.get();
       throw new Error('Listing cost centers did not throw an error');
     } catch (e) {
-      console.log('inside catch clause 2');
       checkHttpError(
         e,
         new HttpError(403, {
