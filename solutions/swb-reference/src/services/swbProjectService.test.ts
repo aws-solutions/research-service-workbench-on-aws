@@ -221,7 +221,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
   const paRole: string = `${projectId}#ProjectAdmin`;
 
   // Dataset permissions
-  for (const action of ['CREATE', 'READ']) {
+  for (const action of ['CREATE']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -229,6 +229,20 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       identityType: identityType,
       subjectId: allSubjectId,
       subjectType: SwbAuthZSubject.SWB_DATASET,
+      conditions: {
+        projectId: { $eq: projectId }
+      }
+    });
+  }
+  // List Datasets permission
+  for (const action of ['READ']) {
+    identityPermissions.push({
+      action: action as Action,
+      effect: allowEffect,
+      identityId: paRole,
+      identityType: identityType,
+      subjectId: allSubjectId,
+      subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
       conditions: {
         projectId: { $eq: projectId }
       }
@@ -281,7 +295,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       identityId: paRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_PROJECT
+      subjectType: SwbAuthZSubject.SWB_PROJECT_LIST
     });
   }
   // Project permissions
@@ -344,7 +358,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
   const allowEffect: Effect = 'ALLOW';
   const researcherRole: string = `${projectId}#Researcher`;
 
-  // Dataset permissions
+  // List Dataset permissions
   for (const action of ['READ']) {
     identityPermissions.push({
       action: action as Action,
@@ -352,7 +366,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       identityId: researcherRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_DATASET,
+      subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
       conditions: {
         projectId: { $eq: projectId }
       }
@@ -405,7 +419,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       identityId: researcherRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_PROJECT
+      subjectType: SwbAuthZSubject.SWB_PROJECT_LIST
     });
   }
   // Project permissions

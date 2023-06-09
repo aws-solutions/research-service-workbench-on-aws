@@ -123,7 +123,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_DATASET,
+          subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
           subjectId: '*',
           projectId: '${projectId}'
         }
@@ -396,7 +396,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT,
+          subjectType: SwbAuthZSubject.SWB_PROJECT_LIST,
           subjectId: '*'
         }
       }
@@ -407,7 +407,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT,
+          subjectType: SwbAuthZSubject.SWB_PROJECT_LIST,
           subjectId: '*'
         }
       }
