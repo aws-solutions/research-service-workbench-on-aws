@@ -13,14 +13,17 @@ describe('list users for project tests', () => {
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
+  let rs1Session: ClientSession;
   let project1Id: string;
+  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id, pa2Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, project1Id, pa2Session, rs1Session, project2Id } =
+      await paabHelper.createResources());
   });
 
   afterAll(async () => {
@@ -96,6 +99,49 @@ describe('list users for project tests', () => {
           new HttpError(400, {
             error: 'Bad Request',
             message: `Invalid parameter`
+          })
+        );
+      }
+    });
+
+    test('ensure researcher cannot list users for projects', async () => {
+      try {
+        await rs1Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure project admin cannot list users for other projects they are not project admin of', async () => {
+      await pa1Session.resources.projects.project(project1Id).assignUserToProject(pa2Session.getUserId()!, {
+        role: 'Researcher'
+      });
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+      await pa1Session.resources.projects.project(project1Id).removeUserFromProject(pa2Session.getUserId()!);
+    });
+
+    test('ensure researcher cannot list users for projects in a different project', async () => {
+      try {
+        await rs1Session.resources.projects.project(project2Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }
