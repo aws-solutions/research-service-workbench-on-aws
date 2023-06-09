@@ -13,6 +13,7 @@ import { GetUserGroupsRequest, GetUserGroupsResponse } from './models/getUserGro
 import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './models/isUserAssignedToGroup';
 import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 import { SetGroupStatusRequest, SetGroupStatusResponse } from './models/setGroupStatus';
+import { ValidateUserGroupsRequest, ValidateUserGroupsResponse } from './models/validateUserGroups';
 
 /**
  * Implement the `GroupManagementPlugin` interface to connect the DynamicAuthorizationService
@@ -147,4 +148,12 @@ export interface GroupManagementPlugin {
    * @returns - {@link DoesGroupExistResponse}
    */
   doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse>;
+
+  /**
+   * Validate user roles to ensure given/revoked roles are modified.
+   * @param request - {@link ValidateUserGroupsRequest}
+   *
+   * @returns - {@link ValidateUserGroupsResponse}
+   */
+  validateUserGroups(request: ValidateUserGroupsRequest): Promise<ValidateUserGroupsResponse>;
 }

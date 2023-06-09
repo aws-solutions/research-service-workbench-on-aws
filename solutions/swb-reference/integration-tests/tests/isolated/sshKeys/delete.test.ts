@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Key Pair negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(2);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
@@ -29,8 +29,7 @@ describe('Delete Key Pair negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  describe('when key does not exist', () => {
-    let invalidSshKeyId: string;
+  describe('for project that does exist', () => {
     const testBundle = [
       {
         username: 'projectAdmin1',
@@ -44,28 +43,52 @@ describe('Delete Key Pair negative tests', () => {
       }
     ];
 
-    beforeEach(() => {
-      invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+    describe('when key does not exist', () => {
+      let invalidSshKeyId: string;
+      beforeEach(() => {
+        invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+      });
+
+      test.each(testBundle)('it throws 404', async (testCase) => {
+        const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+        const session = sessionFunc();
+        const projectId = projectIdFunc();
+
+        console.log(`as ${username}`);
+
+        try {
+          await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(404, {
+              error: 'Not Found',
+              message: `Key ${invalidSshKeyId} does not exist`
+            })
+          );
+        }
+      });
     });
 
-    test.each(testBundle)('within a valid project', async (testCase) => {
-      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
-      const session = sessionFunc();
-      const projectId = projectIdFunc();
+    describe('when provided key id is invalid', () => {
+      let invalidSshKeyId: string;
+      beforeEach(() => {
+        invalidSshKeyId = `sshkey-malformed`;
+      });
 
-      console.log(`as ${username}`);
+      test.each(testBundle)('it throws 400', async (testCase) => {
+        const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+        const session = sessionFunc();
+        const projectId = projectIdFunc();
 
-      try {
-        await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: `Key ${invalidSshKeyId} does not exist`
-          })
-        );
-      }
+        console.log(`as ${username}`);
+
+        try {
+          await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
+        } catch (e) {
+          checkHttpError(e, new HttpError(400, { error: 'Bad Request', message: 'sshKeyId: Invalid ID' }));
+        }
+      });
     });
   });
 

@@ -4,7 +4,6 @@
  */
 import { DataSet } from '@aws/workbench-core-datasets';
 import axios from 'axios';
-import { getProjectAdminRole } from '../../../../src/utils/roleUtils';
 import ClientSession from '../../../support/clientSession';
 import { DatasetHelper } from '../../../support/complex/datasetHelper';
 import { PaabHelper } from '../../../support/complex/paabHelper';
@@ -14,10 +13,11 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets file upload tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(2);
   const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   let datasetHelper: DatasetHelper;
+  let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let project1Id: string;
@@ -34,8 +34,6 @@ describe('datasets file upload tests', () => {
         storageName: settings.get('DataSetsBucketName'),
         awsAccountId: settings.get('mainAccountId'),
         region: settings.get('awsRegion'),
-        owner: getProjectAdminRole(project1Id),
-        ownerType: 'GROUP',
         type: 'internal'
       });
     dataSet = data;
@@ -46,6 +44,7 @@ describe('datasets file upload tests', () => {
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
 
+    adminSession = paabResources.adminSession;
     pa1Session = paabResources.pa1Session;
     pa2Session = paabResources.pa2Session;
     datasetHelper = new DatasetHelper();
@@ -116,6 +115,72 @@ describe('datasets file upload tests', () => {
           );
         }
       });
+
+      it('returns a 400 error when an invalid file name is passed in', async () => {
+        try {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id)
+            .getFileUploadUrls('invalid?file*name');
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: 'filenames: must contain only letters, numbers, hyphens, underscores, and periods'
+            })
+          );
+        }
+      });
+
+      it('receives a 403 if dataSet does not exist', async () => {
+        try {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset('dataset-12345678-1234-1234-123f-1234567890ab')
+            .getFileUploadUrls('TestFile1');
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
+
+    describe('owner of dataset', () => {
+      describe('uses a project that does not have access to the dataset', () => {
+        beforeEach(async () => {
+          await adminSession.resources.projects
+            .project(project2Id)
+            .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+        });
+        afterEach(async () => {
+          await adminSession.resources.projects
+            .project(project2Id)
+            .removeUserFromProject(pa1Session.getUserId()!);
+        });
+        it('receives 403 when trying to get a file upload URL', async () => {
+          try {
+            await pa1Session.resources.projects
+              .project(project2Id)
+              .dataSets()
+              .dataset(dataSet.id)
+              .getFileUploadUrls('TestFile1');
+          } catch (e) {
+            checkHttpError(
+              e,
+              new HttpError(403, {
+                error: 'User is not authorized'
+              })
+            );
+          }
+        });
+      });
     });
 
     describe('not the owner of the dataset', () => {
@@ -127,11 +192,18 @@ describe('datasets file upload tests', () => {
             .dataset(dataSet.id)
             .associateWithProject(project2Id, 'read-only');
         });
+        afterEach(async () => {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id)
+            .disassociateFromProject(project2Id);
+        });
 
         it('receives a 403 when trying to get a file upload URL', async () => {
           try {
             await pa2Session.resources.projects
-              .project(project1Id)
+              .project(project2Id)
               .dataSets()
               .dataset(dataSet.id)
               .getFileUploadUrls('TestFile1');
@@ -154,15 +226,61 @@ describe('datasets file upload tests', () => {
             .dataset(dataSet.id)
             .associateWithProject(project2Id, 'read-write');
         });
+        afterEach(async () => {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id)
+            .disassociateFromProject(project2Id);
+        });
 
         it('receives a 200 when trying to get a file upload URL', async () => {
           const result = await pa2Session.resources.projects
-            .project(project1Id)
+            .project(project2Id)
             .dataSets()
             .dataset(dataSet.id)
             .getFileUploadUrls('TestFile1');
 
           expect(result.data.urls.length).toBe(1);
+        });
+
+        it('throws error when using a project user does not have access to', async () => {
+          try {
+            await pa2Session.resources.projects
+              .project(project1Id)
+              .dataSets()
+              .dataset(dataSet.id)
+              .getFileUploadUrls('TestFile1');
+          } catch (e) {
+            checkHttpError(
+              e,
+              new HttpError(403, {
+                error: 'User is not authorized'
+              })
+            );
+          }
+        });
+
+        it('throws error after disassociating dataset from project', async () => {
+          await pa1Session.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .dataset(dataSet.id)
+            .disassociateFromProject(project2Id);
+          try {
+            await pa2Session.resources.projects
+              .project(project2Id)
+              .dataSets()
+              .dataset(dataSet.id)
+              .getFileUploadUrls('TestFile1');
+          } catch (e) {
+            checkHttpError(
+              e,
+              new HttpError(403, {
+                error: 'User is not authorized'
+              })
+            );
+          }
         });
       });
     });

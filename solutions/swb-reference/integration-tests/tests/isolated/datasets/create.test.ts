@@ -16,7 +16,7 @@ describe('datasets create negative tests', () => {
   let adminSession: ClientSession;
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
+    paabHelper = new PaabHelper(1);
     const paabResources = await paabHelper.createResources();
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;
@@ -31,8 +31,8 @@ describe('datasets create negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  describe('missing parameters', () => {
-    test('returns an error specifying the missing parameters', async () => {
+  describe('Validation error', () => {
+    test('Missing parameters', async () => {
       try {
         await pa1Session.resources.projects.project(project1Id).dataSets().create({}, false);
       } catch (e) {
@@ -41,7 +41,111 @@ describe('datasets create negative tests', () => {
           new HttpError(400, {
             error: 'Bad Request',
             message:
-              'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. type: Required'
+              'name: Required. storageName: Required. path: Required. awsAccountId: Required. region: Required. ' +
+              'type: Invalid literal value, expected "internal"'
+          })
+        );
+      }
+    });
+
+    test('Extra parameters', async () => {
+      try {
+        const createRequest = paabHelper.createDatasetRequest(project1Id);
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .create({ ...createRequest, ownerType: 'GROUP' }, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: ": Unrecognized key(s) in object: 'ownerType'"
+          })
+        );
+      }
+    });
+
+    test('Duplicate creation', async () => {
+      const createRequest = paabHelper.createDatasetRequest(project1Id);
+      console.log(createRequest);
+      await pa1Session.resources.projects.project(project1Id).dataSets().create(createRequest);
+      console.log(createRequest);
+      try {
+        await pa1Session.resources.projects.project(project1Id).dataSets().create(createRequest);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(409, {
+            error: 'Conflict',
+            message:
+              "Cannot create the DataSet. A DataSet must have a unique 'name', and the requested name already exists."
+          })
+        );
+      }
+    });
+
+    test('Storage name not equal to main account S3 bucket name', async () => {
+      const createRequest = paabHelper.createDatasetRequest(project1Id);
+      try {
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .create({ ...createRequest, storageName: 'wrong-s3-bucket-name' }, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: "Please use data set S3 bucket name from main account for 'storageName'."
+          })
+        );
+      }
+    });
+
+    test('Account number not equal to main account number', async () => {
+      const createRequest = paabHelper.createDatasetRequest(project1Id);
+      try {
+        await pa1Session.resources.projects
+          .project(project1Id)
+          .dataSets()
+          .create({ ...createRequest, awsAccountId: '123456789012' }, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: "Please use main account ID for 'awsAccountId'."
+          })
+        );
+      }
+    });
+
+    test('Syntax error in parameters', async () => {
+      try {
+        await pa1Session.resources.projects.project(project1Id).dataSets().create(
+          {
+            storageName: 'illegal?bucket?name',
+            awsAccountId: '1234',
+            path: 'illegal?path', // using same name to help potential troubleshooting
+            name: 'illegal?name',
+            region: 'us-test-1',
+            type: 'external'
+          },
+          false
+        );
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message:
+              'name: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'storageName: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'path: must contain only letters, numbers, hyphens, underscores, and periods. ' +
+              'awsAccountId: must be a 12 digit number. ' +
+              'region: must be valid AWS region. ' +
+              'type: Invalid literal value, expected "internal"'
           })
         );
       }

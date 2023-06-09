@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
+import { buildDynamoDBPkSk, ListUsersForRoleRequestParser } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
@@ -13,6 +12,7 @@ import {
   TooManyRequestsError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';
@@ -30,6 +30,11 @@ import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './m
 import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 import { SetGroupMetadata } from './models/SetGroupMetadata';
 import { SetGroupStatusRequest, SetGroupStatusResponse } from './models/setGroupStatus';
+import {
+  ValidateUserGroupsRequest,
+  ValidateUserGroupsRequestParser,
+  ValidateUserGroupsResponse
+} from './models/validateUserGroups';
 
 /**
  * A WBCGroupManagementPlugin instance that interfaces with Workbench Core's UserManagementService to provide group management.
@@ -100,11 +105,15 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     const { groupId } = request;
 
+    const projectId = groupId.split('#')[0];
+    const role = groupId.split('#')[1];
+    const listRequest = ListUsersForRoleRequestParser.parse({ role, projectId });
+
     try {
-      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      const response = await this._userManagementService.listUsersForRole(listRequest);
       return {
         data: {
-          userIds
+          userIds: response.data
         }
       };
     } catch (error) {
@@ -266,5 +275,12 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       }
       throw err;
     }
+  }
+  public async validateUserGroups(request: ValidateUserGroupsRequest): Promise<ValidateUserGroupsResponse> {
+    const { userId, groupIds } = ValidateUserGroupsRequestParser.parse(request);
+    const validGroupIds = await this._userManagementService.validateUserRoles(userId, groupIds);
+    return {
+      validGroupIds
+    };
   }
 }

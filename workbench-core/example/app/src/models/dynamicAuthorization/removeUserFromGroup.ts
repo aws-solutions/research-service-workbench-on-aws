@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const RemoveUserFromGroupRequestParser = z
@@ -11,7 +11,7 @@ export const RemoveUserFromGroupRequestParser = z
     /**
      * User id associated to user to be removed from the group
      */
-    userId: z.string()
+    userId: z.string().userId().required()
   })
   .strict();
 

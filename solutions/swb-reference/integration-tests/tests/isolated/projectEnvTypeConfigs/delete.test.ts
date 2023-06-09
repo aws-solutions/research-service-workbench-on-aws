@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Disassociate Project with EnvTypeConfig', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
@@ -45,9 +45,9 @@ describe('Disassociate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find project invalid-project-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `projectId: Invalid ID`
         })
       );
     }
@@ -85,9 +85,9 @@ describe('Disassociate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
@@ -125,9 +125,9 @@ describe('Disassociate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config invalid-etc-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeConfigId: Invalid ID`
         })
       );
     }

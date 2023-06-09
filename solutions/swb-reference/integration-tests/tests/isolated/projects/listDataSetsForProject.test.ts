@@ -21,7 +21,7 @@ describe('list datasets for project tests', () => {
   });
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
+    paabHelper = new PaabHelper(1);
     const paabResources = await paabHelper.createResources();
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
@@ -35,10 +35,17 @@ describe('list datasets for project tests', () => {
   });
 
   describe('negative tests', () => {
-    test('IT Admin cannot view any datasets, so the call will return an empty list', async () => {
-      const { data } = await itAdminSession.resources.projects.project(project1Id).dataSets().get();
-
-      expect(data.data).toStrictEqual([]);
+    test('IT Admin gets 403', async () => {
+      try {
+        await itAdminSession.resources.projects.project(project1Id).dataSets().get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
     });
 
     test('Project Admin from project 2 cannot list datasets for project 1', async () => {
@@ -62,7 +69,7 @@ describe('list datasets for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            message: `pageSize: Must be Between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
@@ -79,7 +86,7 @@ describe('list datasets for project tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Page size must be between 1 and ${MAX_API_PAGE_SIZE}`
+            message: `pageSize: Must be Between 1 and ${MAX_API_PAGE_SIZE}`
           })
         );
       }
@@ -103,7 +110,19 @@ describe('list datasets for project tests', () => {
       dataset1Id = response1.data.id;
       dataset2Id = response2.data.id;
     });
-
+    const invalidProjects: string[] = ['proj-123'];
+    test.each(invalidProjects)('project id that does not exist', async (invalidProject) => {
+      try {
+        await itAdminSession.resources.projects.project(invalidProject).dataSets().get();
+      } catch (error) {
+        checkHttpError(
+          error,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
     test('Project Admin can list datasets for a project', async () => {
       const { data } = await pa1Session.resources.projects.project(project1Id).dataSets().get();
 
@@ -115,7 +134,6 @@ describe('list datasets for project tests', () => {
       );
       expect(data.data.length).toBe(2);
     });
-
     test('Researcher can list datasets for a project', async () => {
       const { data } = await researcher1Session.resources.projects.project(project1Id).dataSets().get();
 
@@ -158,6 +176,49 @@ describe('list datasets for project tests', () => {
 
       expect(lastRequest.data).toStrictEqual([]);
       expect(lastRequest.paginationToken).toBeUndefined();
+    });
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => pa1Session,
+        projectId: () => project1Id
+      },
+      {
+        username: 'researcher',
+        session: () => researcher1Session,
+        projectId: () => project1Id
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc, projectId: projectFunc } = testCase;
+      let session: ClientSession;
+      let projectId: string;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+        projectId = projectFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects.project(projectId).dataSets().get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
     });
   });
 });

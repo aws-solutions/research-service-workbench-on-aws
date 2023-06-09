@@ -3,15 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
-  buildDynamoDBPkSk,
   PaginatedResponse,
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';
@@ -65,15 +64,6 @@ export default class AccountService {
       });
     }
     return accounts;
-  }
-
-  /**
-   * Delete a hosting account record in DDB
-   * @param accountId - The ID of the account to delete
-   */
-  public async delete(accountId: string): Promise<void> {
-    const accountKey = buildDynamoDBPkSk(accountId, resourceTypeToKey.account);
-    await this._dynamoDBService.delete(accountKey).execute();
   }
 
   /**

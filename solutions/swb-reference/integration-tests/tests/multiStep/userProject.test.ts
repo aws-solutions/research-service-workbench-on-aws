@@ -4,20 +4,24 @@
  */
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
+import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
 
 describe('multiStep user to project integration test', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let project1Id: string;
   let costCenterId: string;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources());
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'test cost center',
+      name: 'test-cost-center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
@@ -30,55 +34,90 @@ describe('multiStep user to project integration test', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
-  describe('Happy path', () => {
+  describe('Happy path for ITAdmin', () => {
     test.each(['ProjectAdmin', 'Researcher'])('for role: %p', async (role: string) => {
-      // create project
-      console.log('Creating project...');
-      const { data: project } = await adminSession.resources.projects.create({
-        name: `TestProject-${uuidv4()}`,
-        description: 'Project for happy path user to project API',
-        costCenterId
-      });
-
       // create user
-      console.log('Creating user...');
-      const { data: user } = await adminSession.resources.users.create({
-        firstName: 'Project',
+      console.log('ITAdmin creating a user...');
+      const mockUserInput = {
+        firstName: 'mockUser',
         lastName: role,
         email: `success+user-to-project-user-${uuidv4()}@simulator.amazonses.com`
-      });
+      };
+      const { data: mockUser } = await adminSession.resources.users.create(mockUserInput);
+      const mockUserId = mockUser.id;
 
       // assign user to project
-      console.log(`Assigning user ${user.id} to project ${project.id}...`);
-      await adminSession.resources.projects.project(project.id).assignUserToProject(user.id, { role });
+      console.log(`ITAdmin assigning user ${mockUserId} to project ${project1Id}...`);
+      await adminSession.resources.projects.project(project1Id).assignUserToProject(mockUserId, { role });
 
       // list users by role
-      const { data: users } = await adminSession.resources.projects
-        .project(project.id)
+      console.log(`ITAdmin listing user ${mockUserId} to project ${project1Id}...`);
+      const usersByITAdminResponse = await adminSession.resources.projects
+        .project(project1Id)
         .listUsersForProject(role);
 
-      expect(users.users).toEqual([
-        expect.objectContaining({
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email
-        })
-      ]);
+      expect(usersByITAdminResponse.data.data).toContainEqual(expect.objectContaining({ id: mockUserId }));
+
+      // remove mock user from project
+      console.log(`Removing user ${mockUserId} from project ${project1Id}...`);
+      await adminSession.resources.projects.project(project1Id).removeUserFromProject(mockUserId);
+
+      // list users by role
+      console.log(`retrieving user ${mockUserId} from project ${project1Id} should not return user`);
+      const updatedUsersByITAdminResponse = await adminSession.resources.projects
+        .project(project1Id)
+        .listUsersForProject(role);
+
+      expect(updatedUsersByITAdminResponse.data.data).not.toContainEqual(
+        expect.objectContaining({ id: mockUserId })
+      );
+    });
+  });
+
+  describe('Happy path for ProjectAdmin', () => {
+    test.each(['ProjectAdmin', 'Researcher'])('for role: %p', async (role: string) => {
+      // create user by ITAdmin, not PA
+      console.log('IT Admin creating a user...');
+      const mockUserInput = {
+        firstName: 'mockUser',
+        lastName: role,
+        email: `success+user-to-project-user-${uuidv4()}@simulator.amazonses.com`
+      };
+      const { data: mockUser } = await adminSession.resources.users.create(mockUserInput);
+      const mockUserId = mockUser.id;
+
+      // assign user to project
+      console.log(`Project Admin assigning user ${mockUserId} to project ${project1Id}...`);
+      await pa1Session.resources.projects.project(project1Id).assignUserToProject(mockUserId, { role });
+
+      // list users by role
+      console.log(`Project Admin listing user ${mockUserId} to project ${project1Id}...`);
+      const usersByPAResponse = await pa1Session.resources.projects
+        .project(project1Id)
+        .listUsersForProject(role);
+      const usersByITAdminResponse = await adminSession.resources.projects
+        .project(project1Id)
+        .listUsersForProject(role);
+
+      expect(usersByPAResponse.data.data).toEqual(usersByITAdminResponse.data.data);
+      expect(usersByPAResponse.data.data).toContainEqual(expect.objectContaining({ id: mockUserId }));
 
       // remove users from project
-      console.log(`Removing user ${user} from project ${project.id}...`);
-      await adminSession.resources.projects.project(project.id).removeUserFromProject(user.id);
+      console.log(`Project Admin removing user ${mockUserId} from project ${project1Id}...`);
+      await pa1Session.resources.projects.project(project1Id).removeUserFromProject(mockUserId);
 
       // list users by role
-      const { data: noUsers } = await adminSession.resources.projects
-        .project(project.id)
+      const updatedUsersByPAResponse = await pa1Session.resources.projects
+        .project(project1Id)
         .listUsersForProject(role);
 
-      expect(noUsers.users).toEqual([]);
+      expect(updatedUsersByPAResponse.data.data).not.toContainEqual(
+        expect.objectContaining({ id: mockUserId })
+      );
     });
   });
 

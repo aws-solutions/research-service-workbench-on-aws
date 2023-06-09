@@ -51,6 +51,7 @@ interface Constants {
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
+  USER_AGENT_STRING: string;
 }
 
 interface SecretConstants {
@@ -59,9 +60,10 @@ interface SecretConstants {
 }
 
 const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
-const SolutionName: string = 'Service Workbench on AWS v2'; //TODO: retrieve value dynamically
+const SolutionName: string = 'Research Service Workbench on AWS'; //TODO: retrieve value dynamically
 const SolutionVersion: string = '2.0.0'; //TODO: retrieve value dynamically
 const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
+const customUserAgentString: string = `AwsSolution/${SolutionId}/${SolutionVersion}`;
 
 const regionShortNamesMap: { [id: string]: string } = {
   'us-east-2': 'oh',
@@ -98,10 +100,10 @@ function getConstants(region?: string): Constants {
   // eslint-disable-next-line security/detect-object-injection
   const AWS_REGION_SHORT_NAME = config.awsRegionShortName || regionShortNamesMap[AWS_REGION]; // If users forgot to enter shortname, this can fill it in
 
-  const STACK_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`;
-  const SC_PORTFOLIO_NAME = `swb-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
-  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
-  const USER_POOL_NAME = `swb-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const STACK_NAME = `rsw-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const SC_PORTFOLIO_NAME = `rsw-${config.stage}-${AWS_REGION_SHORT_NAME}`; // Service Catalog Portfolio Name
+  const USER_POOL_CLIENT_NAME = `rsw-client-${config.stage}-${AWS_REGION_SHORT_NAME}`;
+  const USER_POOL_NAME = `rsw-userpool-${config.stage}-${AWS_REGION_SHORT_NAME}`;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
@@ -138,9 +140,10 @@ function getConstants(region?: string): Constants {
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
-  const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
-  const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
-  const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
+  const VPC_ID_OUTPUT_KEY = 'RswVpcIdOutput';
+  const ECS_SUBNET_IDS_OUTPUT_KEY = 'RswEcsSubnetIdsOutput';
+  const ECS_SUBNET_AZS_OUTPUT_KEY = 'RswEcsAzsOutput';
+  const USER_AGENT_STRING = customUserAgentString;
 
   return {
     STAGE: config.stage,
@@ -184,7 +187,8 @@ function getConstants(region?: string): Constants {
     ECS_SUBNET_IDS_OUTPUT_KEY,
     ECS_SUBNET_AZS_OUTPUT_KEY,
     ALB_INTERNET_FACING,
-    FIELDS_TO_MASK_WHEN_AUDITING
+    FIELDS_TO_MASK_WHEN_AUDITING,
+    USER_AGENT_STRING
   };
 }
 
@@ -199,7 +203,7 @@ function isSolutionsBuild(): boolean {
 async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   const config = getConfig();
   const AWS_REGION = config.awsRegion;
-  const awsService = new AwsService({ region: AWS_REGION });
+  const awsService = new AwsService({ region: AWS_REGION, userAgent: customUserAgentString });
   const rootUserParamStorePath = config.rootUserEmailParamStorePath;
 
   const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
@@ -264,6 +268,7 @@ const enum SwbAuthZSubject {
   SWB_AWS_ACCOUNT_TEMPLATE_URL = 'SWB_AWS_ACCOUNT_TEMPLATE_URL',
   SWB_COST_CENTER = 'SWB_COST_CENTER',
   SWB_DATASET = 'SWB_DATASET',
+  SWB_DATASET_LIST = 'SWB_DATASET_LIST',
   SWB_DATASET_ACCESS_LEVEL = 'SWB_DATASET_ACCESS_LEVEL',
   SWB_DATASET_UPLOAD = 'SWB_DATASET_UPLOAD',
   SWB_ENVIRONMENT = 'SWB_ENVIRONMENT',
@@ -271,6 +276,7 @@ const enum SwbAuthZSubject {
   SWB_ENVIRONMENT_TYPE = 'SWB_ENVIRONMENT_TYPE',
   SWB_ETC = 'SWB_ETC',
   SWB_PROJECT = 'SWB_PROJECT',
+  SWB_PROJECT_LIST = 'SWB_PROJECT_LIST',
   SWB_PROJECT_USER_ASSOCIATION = 'SWB_PROJECT_USER_ASSOCIATION',
   SWB_SSH_KEY = 'SWB_SSH_KEY',
   SWB_USER = 'SWB_USER'
@@ -288,5 +294,6 @@ export {
   SolutionId,
   SolutionName,
   SolutionVersion,
+  customUserAgentString,
   ApplicationType
 };

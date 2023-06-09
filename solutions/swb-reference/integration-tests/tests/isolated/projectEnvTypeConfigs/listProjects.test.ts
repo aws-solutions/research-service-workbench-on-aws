@@ -48,9 +48,9 @@ describe('list projects associated to environment type config', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config invalid-config-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeConfigId: Invalid ID`
         })
       );
     }
@@ -86,9 +86,9 @@ describe('list projects associated to environment type config', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
@@ -111,5 +111,31 @@ describe('list projects associated to environment type config', () => {
         })
       );
     }
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.environmentTypes
+            .environmentType(envTypeId)
+            .configurations()
+            .environmentTypeConfig(envTypeConfigId)
+            .projects()
+            .get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
   });
 });

@@ -15,7 +15,7 @@ import { checkHttpError, sleep } from '../../support/utils/utilities';
 
 describe('multiStep environment type and environment type config test', () => {
   const envTypeHandler = new EnvironmentTypeHelper();
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;
@@ -78,7 +78,7 @@ describe('multiStep environment type and environment type config test', () => {
     console.log('Update Environment Type Name');
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
       {
-        name: 'updated name'
+        name: 'updated_name'
       },
       true
     );
@@ -86,7 +86,7 @@ describe('multiStep environment type and environment type config test', () => {
       .environmentType(envType.id)
       .get();
     expect(updatedNameEnvType).toMatchObject({
-      name: 'updated name'
+      name: 'updated_name'
     });
 
     //Update description for Environment Type

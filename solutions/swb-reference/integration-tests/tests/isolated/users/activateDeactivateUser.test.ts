@@ -115,9 +115,9 @@ describe('userManagement activate/deactivate user integration test', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find user ${invalidUuid}`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: 'userId: Invalid ID'
         })
       );
     }

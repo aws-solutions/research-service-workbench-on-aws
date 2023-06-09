@@ -2,14 +2,20 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { lengthValidationMessage, urlFilterMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('list environment types', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  const paabHelper = new PaabHelper(0);
+  let itAdminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -17,6 +23,10 @@ describe('list environment types', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources();
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
@@ -84,5 +94,77 @@ describe('list environment types', () => {
         })
       );
     }
+  });
+  test('list environments types fails when filter by name exceeding length', async () => {
+    try {
+      await adminSession.resources.environmentTypes.get({
+        filter: {
+          name: { begins: generateRandomAlphaNumericString(urlFilterMaxLength + 1) }
+        }
+      });
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `filter.name.begins: ${lengthValidationMessage(urlFilterMaxLength)}`
+        })
+      );
+    }
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await itAdminSession.resources.environmentTypes.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => paSession
+      },
+      {
+        username: 'researcher',
+        session: () => researcherSession
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc } = testCase;
+      let session: ClientSession;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.environmentTypes.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
   });
 });

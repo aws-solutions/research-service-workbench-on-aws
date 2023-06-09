@@ -8,7 +8,7 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomString, validSwbName } from '../../../support/utils/utilities';
 
 describe('Update Project negative tests', () => {
   const setup: Setup = Setup.getSetup();
@@ -31,7 +31,7 @@ describe('Update Project negative tests', () => {
     const projectName = randomTextGenerator.getFakeText('test-project-name');
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'project integration test cost center',
+      name: 'projectIntegrationTestCostCenter',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
@@ -52,7 +52,7 @@ describe('Update Project negative tests', () => {
 
     beforeEach(async () => {
       const { data: newProject } = await adminSession.resources.projects.create({
-        name: randomTextGenerator.getFakeText('test-existing-name'),
+        name: generateRandomString(10, validSwbName),
         description: 'Update Project negative tests--Second Project',
         costCenterId: costCenterId
       });

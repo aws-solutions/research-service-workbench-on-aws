@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get EnvTypeConfig with Project route', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
@@ -46,9 +46,9 @@ describe('Get EnvTypeConfig with Project route', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: 'Resource not found'
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `projectId: Invalid ID`
           })
         );
       }
@@ -86,9 +86,9 @@ describe('Get EnvTypeConfig with Project route', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: 'Resource not found'
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `envTypeId: Invalid ID`
           })
         );
       }
@@ -126,9 +126,9 @@ describe('Get EnvTypeConfig with Project route', () => {
       } catch (e) {
         checkHttpError(
           e,
-          new HttpError(404, {
-            error: 'Not Found',
-            message: 'Resource not found'
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `envTypeConfigId: Invalid ID`
           })
         );
       }

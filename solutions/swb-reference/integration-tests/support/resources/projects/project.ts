@@ -28,8 +28,12 @@ export default class Project extends Resource {
     return this._axiosInstance.delete(`${this._api}/users/${userId}/relationships`);
   }
 
-  public async listUsersForProject(role: string): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/users`, { params: { role } });
+  public async listUsersForProject(
+    role: string,
+    pageSize: number = 50,
+    paginationToken?: string
+  ): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/users`, { params: { role, pageSize, paginationToken } });
   }
 
   public environments(): Environments {

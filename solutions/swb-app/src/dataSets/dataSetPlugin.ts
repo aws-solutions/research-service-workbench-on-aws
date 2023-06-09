@@ -12,6 +12,7 @@ import { DataSetAddExternalEndpointResponse } from './dataSetAddExternalEndpoint
 import { DataSetExternalEndpointRequest } from './dataSetExternalEndpointRequest';
 import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './getAccessPermissionRequestParser';
+import { IsProjectAuthorizedForDatasetsRequest } from './isProjectAuthorizedForDatasetsParser';
 import { ListDataSetAccessPermissionsRequest } from './listDataSetAccessPermissionsRequestParser';
 import { PermissionsResponse } from './permissionsResponseParser';
 import { ProjectAddAccessRequest } from './projectAddAccessRequestParser';
@@ -56,4 +57,5 @@ export interface DataSetPlugin {
 
   addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse>;
   removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse>;
+  isProjectAuthorizedForDatasets(request: IsProjectAuthorizedForDatasetsRequest): Promise<boolean>;
 }

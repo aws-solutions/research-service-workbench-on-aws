@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
 import {
   CASLAuthorizationPlugin,
@@ -20,6 +19,7 @@ import {
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
+import { Output } from '@aws-sdk/client-cloudformation';
 import _ from 'lodash';
 import { Environment } from '../models/environments/environment';
 import { EnvironmentService } from '../services/environmentService';
@@ -205,6 +205,11 @@ export default class EnvironmentLifecycleHelper {
             roles: []
           }
         );
+        await this.environmentService.removeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          endpoint.dataSetId,
+          endpoint.id
+        );
       })
     );
   }
@@ -253,7 +258,7 @@ export default class EnvironmentLifecycleHelper {
           dataSetId: endpoint.dataSetId,
           endPointUrl: endpoint.endPointUrl,
           path: endpoint.path,
-          storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
+          storageArn: `arn:aws:s3:::${dataSet.storageName}`
         };
 
         await this.environmentService.addMetadata(
@@ -262,6 +267,12 @@ export default class EnvironmentLifecycleHelper {
           mountObject.endpointId,
           resourceTypeToKey.endpoint,
           endpointObj
+        );
+
+        await this.environmentService.storeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          dataSetId,
+          mountObject.endpointId
         );
 
         endpointsCreated.push(endpointObj);
@@ -434,7 +445,7 @@ export default class EnvironmentLifecycleHelper {
     operation: string;
     envType: string;
   }): Promise<AwsService> {
-    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn} with externalId ${payload.externalId}`);
+    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn}.`);
     const params = {
       roleArn: payload.envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,

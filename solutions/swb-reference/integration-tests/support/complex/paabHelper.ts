@@ -6,7 +6,6 @@ import {
   CreateDataSetRequest,
   CreateDataSetRequestParser
 } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getProjectAdminRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../clientSession';
 import Setup from '../setup';
 import RandomTextGenerator from '../utils/randomTextGenerator';
@@ -25,14 +24,20 @@ export class PaabHelper {
   private _setup: Setup;
   private _randomTextGenerator: RandomTextGenerator;
   private _outputError: boolean | undefined;
+  private _numberOfProjects: number = 3;
 
-  public constructor(outputError?: boolean) {
+  public constructor(numberOfProjects?: number, outputError?: boolean) {
     this._setup = Setup.getSetup();
     this._randomTextGenerator = new RandomTextGenerator(this._setup.getSettings().get('runId'));
     this._outputError = outputError;
+    if (numberOfProjects) this._numberOfProjects = numberOfProjects;
   }
 
   public async createResources(): Promise<PaabResources> {
+    if (this._numberOfProjects > 3) {
+      throw new Error('PaabHelper cannot support more than 3 projects');
+    }
+
     // create IT admin session
     const adminSession: ClientSession = await this._setup.getDefaultAdminSession(this._outputError);
 
@@ -42,13 +47,10 @@ export class PaabHelper {
       accountId: this._setup.getSettings().get('defaultHostingAccountId'),
       description: 'Cost Center for integ test'
     });
-
-    // create two projects
-    const projectNames: string[] = ['Project1', 'Project2', 'Project3'];
     const projectIds: string[] = [];
 
-    for (const projectName of projectNames) {
-      // must follow Array order
+    for (let i = 1; i <= this._numberOfProjects; i++) {
+      const projectName = `Project${i}`;
       const projectResponse = await adminSession.resources.projects.create({
         name: this._randomTextGenerator.getFakeText(projectName),
         description: `${projectName} for integ tests`,
@@ -56,39 +58,45 @@ export class PaabHelper {
       });
       projectIds.push(projectResponse.data.id);
     }
+
     const [project1Id, project2Id, project3Id] = projectIds;
 
     // create PA1, PA2, Researcher1 sessions
-    let pa1Session: ClientSession = await this._setup.getSessionForUserType(
+    const pa1Session: ClientSession = await this._setup.getSessionForUserType(
       'projectAdmin1',
       this._outputError
     );
-    let pa2Session: ClientSession = await this._setup.getSessionForUserType(
+    const pa2Session: ClientSession = await this._setup.getSessionForUserType(
       'projectAdmin2',
       this._outputError
     );
-    let rs1Session: ClientSession = await this._setup.getSessionForUserType('researcher1', this._outputError);
+    const rs1Session: ClientSession = await this._setup.getSessionForUserType(
+      'researcher1',
+      this._outputError
+    );
 
     // associate users with corresponding projects properly (as IT Admin)
-    await adminSession.resources.projects
-      .project(project1Id)
-      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
-    await adminSession.resources.projects
-      .project(project3Id)
-      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
-    await adminSession.resources.projects
-      .project(project2Id)
-      .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
-    await adminSession.resources.projects
-      .project(project1Id)
-      .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
-    await adminSession.resources.projects
-      .project(project3Id)
-      .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
-
-    pa1Session = await this._setup.getSessionForUserType('projectAdmin1', this._outputError);
-    pa2Session = await this._setup.getSessionForUserType('projectAdmin2', this._outputError);
-    rs1Session = await this._setup.getSessionForUserType('researcher1', this._outputError);
+    if (this._numberOfProjects >= 1) {
+      await adminSession.resources.projects
+        .project(project1Id)
+        .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+      await adminSession.resources.projects
+        .project(project1Id)
+        .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
+    }
+    if (this._numberOfProjects >= 2) {
+      await adminSession.resources.projects
+        .project(project2Id)
+        .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
+    }
+    if (this._numberOfProjects === 3) {
+      await adminSession.resources.projects
+        .project(project3Id)
+        .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
+      await adminSession.resources.projects
+        .project(project3Id)
+        .assignUserToProject(rs1Session.getUserId()!, { role: 'Researcher' });
+    }
 
     return {
       adminSession,
@@ -111,8 +119,6 @@ export class PaabHelper {
       path: dataSetName, // using same name to help potential troubleshooting
       name: dataSetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(projectId),
-      ownerType: 'GROUP',
       type: 'internal'
     });
   }

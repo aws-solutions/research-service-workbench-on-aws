@@ -5,17 +5,8 @@
 
 import * as crypto from 'crypto';
 import {
-  DescribeKeyPairsCommandOutput,
-  EC2,
-  KeyFormat,
-  KeyType,
-  KeyPairInfo,
-  Reservation,
-  Tag
-} from '@aws-sdk/client-ec2';
-import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
-import {
   AwsServiceError,
+  ConflictError,
   CreateSshKeyRequest,
   CreateSshKeyResponse,
   DeleteSshKeyRequest,
@@ -39,6 +30,16 @@ import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
+import {
+  DescribeKeyPairsCommandOutput,
+  EC2,
+  KeyFormat,
+  KeyType,
+  KeyPairInfo,
+  Reservation,
+  Tag
+} from '@aws-sdk/client-ec2';
+import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 
 export default class SshKeyService implements SshKeyPlugin {
   private _aws: AwsService;
@@ -226,10 +227,15 @@ export default class SshKeyService implements SshKeyPlugin {
    * @param request - a {@link SendPublicKeyRequest}
    */
   public async sendPublicKey(request: SendPublicKeyRequest): Promise<SendPublicKeyResponse> {
-    const { environmentId, userId } = request;
+    const { projectId: reqProjectId, environmentId, userId } = request;
 
     // get environment instanceId and projectId
     const { instanceId, projectId, status } = await this._environmentService.getEnvironment(environmentId);
+    if (reqProjectId !== projectId) {
+      throw new ConflictError(
+        `Requested Project ID ${reqProjectId} does not match environment Project ID ${projectId}`
+      );
+    }
     if (!instanceId) {
       // getEnvironment could return an environment before the instance is spun up
       throw new NoInstanceFoundError(
