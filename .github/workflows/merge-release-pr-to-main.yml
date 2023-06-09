@@ -13,6 +13,7 @@ on:
         required: true
 
 jobs:
+  ## TODO add integration test for main
   merge-release-pr-to-main:
     runs-on: ubuntu-20.04
     steps:
