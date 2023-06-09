@@ -56,7 +56,7 @@ export class PaabHelper {
     for (const projectName of projectNames) {
       // must follow Array order
       const projectResponse = await adminSession.resources.projects.create({
-        name: this._randomTextGenerator.getFakeText(projectName + testName),
+        name: testName + this._randomTextGenerator.getFakeText(projectName),
         description: `${projectName} for integ tests ${testName}`,
         costCenterId: costCenter.id
       });
