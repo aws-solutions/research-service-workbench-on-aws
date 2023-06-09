@@ -195,7 +195,10 @@ export class SWBProjectService implements ProjectPlugin {
 
   private _generatePAIdentityPermissions(projectId: string, paRole: string): IdentityPermission[] {
     return [
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET, ['CREATE', 'READ'], paRole, {
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET, ['CREATE'], paRole, {
+        projectId: { $eq: projectId }
+      }),
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET_LIST, ['READ'], paRole, {
         projectId: { $eq: projectId }
       }),
       ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_ENVIRONMENT, ['CREATE', 'READ'], paRole, {
@@ -207,7 +210,7 @@ export class SWBProjectService implements ProjectPlugin {
       }),
       // Adding a permission for ListProjects so that as soon as a Project Admin gets added to their first project
       // they can begin to call ListProjects
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT, ['READ'], paRole),
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT_LIST, ['READ'], paRole),
       // Access for GetProject and GetProjects
       ...this._generateIdentityPermissions(
         projectId,
@@ -243,7 +246,7 @@ export class SWBProjectService implements ProjectPlugin {
     researcherRole: string
   ): IdentityPermission[] {
     return [
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET, ['READ'], researcherRole, {
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_DATASET_LIST, ['READ'], researcherRole, {
         projectId: { $eq: projectId }
       }),
       ...this._generateIdentityPermissions(
@@ -264,7 +267,7 @@ export class SWBProjectService implements ProjectPlugin {
       }),
       // Adding a permission for ListProjects so that as soon as a Researcher gets added to their first project
       // they can begin to call ListProjects
-      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT, ['READ'], researcherRole),
+      ...this._generateIdentityPermissions('*', SwbAuthZSubject.SWB_PROJECT_LIST, ['READ'], researcherRole),
       // Access for GetProject and GetProjects
       ...this._generateIdentityPermissions(projectId, SwbAuthZSubject.SWB_PROJECT, ['READ'], researcherRole),
       ...this._generateIdentityPermissions(

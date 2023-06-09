@@ -23,7 +23,7 @@ import { checkHttpError, poll } from '../../support/utils/utilities';
 describe('multiStep environment test', () => {
   const settings: Settings = Setup.getSetup().getSettings();
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;

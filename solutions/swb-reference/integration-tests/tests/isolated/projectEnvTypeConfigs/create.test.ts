@@ -12,7 +12,7 @@ import { checkHttpError, generateRandomString, validSwbName } from '../../../sup
 
 describe('Associate Project with EnvTypeConfig', () => {
   const setup: Setup = Setup.getSetup();
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');

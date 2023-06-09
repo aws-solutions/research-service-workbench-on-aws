@@ -1,13 +1,9 @@
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
 # swb-reference
 ## `main branch coverage`
 [![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
 ## `develop branch coverage`
 [![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
-
-The 0.1.0 beta release is available for customers to test the newly re-architected Research Service Workbench solution from AWS.
 
 This release includes:
 
