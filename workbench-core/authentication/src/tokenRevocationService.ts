@@ -14,7 +14,7 @@ interface TokenRevocationRecord {
     sk: string;
   };
   item: {
-    ttl: string;
+    ttl: number;
   };
 }
 /**

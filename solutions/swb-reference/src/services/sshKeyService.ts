@@ -5,16 +5,6 @@
 
 import * as crypto from 'crypto';
 import {
-  DescribeKeyPairsCommandOutput,
-  EC2,
-  KeyFormat,
-  KeyType,
-  KeyPairInfo,
-  Reservation,
-  Tag
-} from '@aws-sdk/client-ec2';
-import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
-import {
   AwsServiceError,
   ConflictError,
   CreateSshKeyRequest,
@@ -40,6 +30,16 @@ import { ProjectService } from '@aws/workbench-core-accounts';
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
+import {
+  DescribeKeyPairsCommandOutput,
+  EC2,
+  KeyFormat,
+  KeyType,
+  KeyPairInfo,
+  Reservation,
+  Tag
+} from '@aws-sdk/client-ec2';
+import { EC2InstanceConnect } from '@aws-sdk/client-ec2-instance-connect';
 
 export default class SshKeyService implements SshKeyPlugin {
   private _aws: AwsService;

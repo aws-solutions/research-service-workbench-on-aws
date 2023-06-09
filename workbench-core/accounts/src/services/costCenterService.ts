@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
   resourceTypeToKey,
@@ -16,6 +15,7 @@ import {
   addPaginationToken
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account } from '../models/accounts/account';

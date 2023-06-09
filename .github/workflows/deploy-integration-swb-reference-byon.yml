@@ -88,6 +88,8 @@ jobs:
           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
       - name: Run Integration tests
+        env:
+            NODE_OPTIONS: "--max_old_space_size=4096"
         run: |
           cd solutions/swb-reference
           STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js integration-tests

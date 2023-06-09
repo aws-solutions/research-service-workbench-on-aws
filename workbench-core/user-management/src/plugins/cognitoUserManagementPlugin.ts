@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
 import {
   AwsService,
   DynamoDBService,
@@ -11,6 +10,7 @@ import {
   ListUsersForRoleRequest,
   PaginatedResponse
 } from '@aws/workbench-core-base';
+import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -37,7 +37,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   private _userPoolId: string;
   private _aws: AwsService;
   private _tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number };
-  public readonly userRoleLimit: number = 25;
+  public readonly userRoleLimit: number = 100;
 
   /**
    *
@@ -119,10 +119,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async getUserRoles(id: string): Promise<string[]> {
     try {
-      const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
-        UserPoolId: this._userPoolId,
-        Username: id
-      });
+      const groups = await this._aws.helpers.cognito.getUserGroups(this._userPoolId, id);
 
       if (!groups) {
         return [];

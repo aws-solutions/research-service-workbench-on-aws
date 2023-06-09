@@ -4,14 +4,6 @@
  */
 
 import { Readable } from 'stream';
-import { Output } from '@aws-sdk/client-cloudformation';
-import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import {
-  GetBucketPolicyCommandOutput,
-  PutBucketPolicyCommandInput,
-  NoSuchBucket,
-  S3ServiceException
-} from '@aws-sdk/client-s3';
 import {
   addPaginationToken,
   AwsService,
@@ -20,6 +12,14 @@ import {
   PaginatedResponse
 } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
+import { Output } from '@aws-sdk/client-cloudformation';
+import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import {
+  GetBucketPolicyCommandOutput,
+  PutBucketPolicyCommandInput,
+  NoSuchBucket,
+  S3ServiceException
+} from '@aws-sdk/client-s3';
 import * as Boom from '@hapi/boom';
 import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
