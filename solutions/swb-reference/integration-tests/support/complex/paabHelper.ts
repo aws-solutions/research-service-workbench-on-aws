@@ -42,7 +42,7 @@ export class PaabHelper {
       description: 'Cost Center for integ test'
     });
 
-    // create two projects
+    // create three projects
     const projectNames: string[] = ['Project1', 'Project2', 'Project3'];
     const projectIds: string[] = [];
 
