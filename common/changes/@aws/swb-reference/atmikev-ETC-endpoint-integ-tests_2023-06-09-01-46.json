@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "updated integration tests",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}
