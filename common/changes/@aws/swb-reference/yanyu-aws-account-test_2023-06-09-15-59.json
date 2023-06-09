@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "add additional integration tests",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}
