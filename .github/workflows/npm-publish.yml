@@ -1,10 +1,8 @@
 name: npm-publish
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
     branches:
-      - main
+      - 'main'
 
 jobs:  
   rush-publish:  
@@ -17,7 +15,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.MERGE_TOKEN }}
-          ref: ${{ steps.set-ref.outputs.ref }}
           fetch-depth: 0
 
       - name: Base Action
