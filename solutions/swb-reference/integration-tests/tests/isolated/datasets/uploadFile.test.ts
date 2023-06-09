@@ -13,7 +13,7 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets file upload tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(2);
   const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
   let datasetHelper: DatasetHelper;
