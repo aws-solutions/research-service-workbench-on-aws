@@ -1,8 +1,8 @@
 import ClientSession from '../../support/clientSession';
-import Setup from '../../support/setup';
 import { PaabHelper } from '../../support/complex/paabHelper';
-import { checkHttpError } from '../../support/utils/utilities';
+import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
+import { checkHttpError } from '../../support/utils/utilities';
 
 describe('multiStep costCenter test', () => {
   const setup: Setup = Setup.getSetup();
@@ -23,7 +23,7 @@ describe('multiStep costCenter test', () => {
   async function checkThatRoleCannotAccessCostCenter(
     role: 'researcher' | 'projectAdmin',
     costCenterId: string
-  ) {
+  ): Promise<void> {
     console.log(`Check ${role} cannot access cost center`);
     let session: ClientSession;
     if (role === 'researcher') {
@@ -37,6 +37,7 @@ describe('multiStep costCenter test', () => {
       await session.resources.costCenters.costCenter(costCenterId).get();
       throw new Error('Getting cost center did not throw an error');
     } catch (e) {
+      console.log('inside catch clause 1');
       checkHttpError(
         e,
         new HttpError(403, {
@@ -48,6 +49,7 @@ describe('multiStep costCenter test', () => {
       await session.resources.costCenters.get();
       throw new Error('Listing cost centers did not throw an error');
     } catch (e) {
+      console.log('inside catch clause 2');
       checkHttpError(
         e,
         new HttpError(403, {
