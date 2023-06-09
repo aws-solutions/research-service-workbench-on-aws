@@ -16,7 +16,7 @@ describe('datasets create negative tests', () => {
   let adminSession: ClientSession;
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
+    paabHelper = new PaabHelper(1);
     const paabResources = await paabHelper.createResources();
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;

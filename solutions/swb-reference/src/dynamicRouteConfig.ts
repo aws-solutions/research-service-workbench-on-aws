@@ -396,7 +396,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT,
+          subjectType: SwbAuthZSubject.SWB_PROJECT_LIST,
           subjectId: '*'
         }
       }

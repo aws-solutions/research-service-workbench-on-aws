@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('remove user from project negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let project1Id: string;
 
