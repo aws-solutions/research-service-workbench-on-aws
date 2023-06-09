@@ -34,6 +34,7 @@ export default class AuthorizationSetup {
 
     //IT Admin Permissions
     const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
+    const projectListPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT_LIST, ['READ']);
     const userPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_USER);
     const projectToUserAssociationPermissions = this._mapActions(
       itAdmin,
@@ -59,6 +60,7 @@ export default class AuthorizationSetup {
     await this.createIdentityPermissions(
       [
         ...projectPermissions,
+        ...projectListPermissions,
         ...environmentPermissions,
         ...environmentTypePermissions,
         ...environmentTypeConfigPermissions,
