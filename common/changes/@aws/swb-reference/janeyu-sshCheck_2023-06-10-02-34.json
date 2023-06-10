@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "integ test for ssh",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}
