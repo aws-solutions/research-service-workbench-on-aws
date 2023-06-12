@@ -15,7 +15,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('list environments', () => {
-  const paabHelper = new PaabHelper(1);
+  const paabHelper = new PaabHelper(2);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
