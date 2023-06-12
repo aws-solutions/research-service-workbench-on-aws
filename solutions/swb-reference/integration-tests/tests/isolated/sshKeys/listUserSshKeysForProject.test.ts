@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('listUserSshKeysForProject negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(2);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;

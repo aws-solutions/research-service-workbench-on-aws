@@ -12,7 +12,7 @@ describe('update environment type configs', () => {
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(0);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;

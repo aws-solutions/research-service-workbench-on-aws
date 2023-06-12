@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list environment type configs associated to project', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let paSession: ClientSession;

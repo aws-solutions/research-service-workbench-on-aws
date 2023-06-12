@@ -9,7 +9,7 @@ import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
 
 describe('sshKeys API multiStep integration test', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(1);
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
   let project1Id: string;

@@ -15,7 +15,7 @@ import { checkHttpError, sleep } from '../../support/utils/utilities';
 
 describe('multiStep environment type and environment type config test', () => {
   const envTypeHandler = new EnvironmentTypeHelper();
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;

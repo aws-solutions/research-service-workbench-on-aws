@@ -11,7 +11,7 @@ import { checkHttpError } from '../../support/utils/utilities';
 
 describe('multiStep user to project integration test', () => {
   const setup: Setup = Setup.getSetup();
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let project1Id: string;

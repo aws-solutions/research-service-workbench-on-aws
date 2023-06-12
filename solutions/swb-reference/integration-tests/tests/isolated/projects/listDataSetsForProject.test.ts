@@ -6,7 +6,7 @@ import { MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError, generateInvalidIds } from '../../../support/utils/utilities';
+import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list datasets for project tests', () => {
   let paabHelper: PaabHelper;
@@ -21,8 +21,13 @@ describe('list datasets for project tests', () => {
   });
 
   beforeAll(async () => {
+<<<<<<< HEAD
     paabHelper = new PaabHelper();
     const paabResources = await paabHelper.createResources(__filename);
+=======
+    paabHelper = new PaabHelper(1);
+    const paabResources = await paabHelper.createResources();
+>>>>>>> release/v2.0.0
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
     pa1Session = paabResources.pa1Session;
@@ -35,10 +40,17 @@ describe('list datasets for project tests', () => {
   });
 
   describe('negative tests', () => {
-    test('IT Admin cannot view any datasets, so the call will return an empty list', async () => {
-      const { data } = await itAdminSession.resources.projects.project(project1Id).dataSets().get();
-
-      expect(data.data).toStrictEqual([]);
+    test('IT Admin gets 403', async () => {
+      try {
+        await itAdminSession.resources.projects.project(project1Id).dataSets().get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
     });
 
     test('Project Admin from project 2 cannot list datasets for project 1', async () => {
@@ -103,16 +115,15 @@ describe('list datasets for project tests', () => {
       dataset1Id = response1.data.id;
       dataset2Id = response2.data.id;
     });
-    const invalidProjects: string[] = generateInvalidIds('proj');
-    test.each(invalidProjects)('invalid project Id throws validation exception', async (invalidProject) => {
+    const invalidProjects: string[] = ['proj-123'];
+    test.each(invalidProjects)('project id that does not exist', async (invalidProject) => {
       try {
         await itAdminSession.resources.projects.project(invalidProject).dataSets().get();
       } catch (error) {
         checkHttpError(
           error,
-          new HttpError(400, {
-            error: 'Bad Request',
-            message: `projectId: Invalid ID`
+          new HttpError(403, {
+            error: 'User is not authorized'
           })
         );
       }

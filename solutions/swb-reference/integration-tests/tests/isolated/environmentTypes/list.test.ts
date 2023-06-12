@@ -12,7 +12,7 @@ import { checkHttpError, generateRandomAlphaNumericString } from '../../../suppo
 describe('list environment types', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(0);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;

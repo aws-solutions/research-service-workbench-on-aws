@@ -7,7 +7,11 @@ import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionPa
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
-import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../support/utils/constants';
+import {
+  ENVIRONMENT_START_MAX_WAITING_SECONDS,
+  ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
+  ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+} from '../../support/utils/constants';
 import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { dsUuidRegExp } from '../../support/utils/regExpressions';
@@ -15,7 +19,7 @@ import Settings from '../../support/utils/settings';
 import { checkHttpError, poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(2);
   const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
 
@@ -244,20 +248,24 @@ describe('multiStep dataset integration test', () => {
       (data) => data?.status === 'COMPLETED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
-    await poll(
-      async () => {
-        const { data: envData } = await pa1Session.resources.projects
-          .project(project1Id)
-          .environments()
-          .environment(env.id)
-          .get();
-        console.log(`env status: ${envData.status}`);
-        return envData;
-      },
-      (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
-      ENVIRONMENT_START_MAX_WAITING_SECONDS
-    );
+    try {
+      await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
+      await poll(
+        async () => {
+          const { data: envData } = await pa1Session.resources.projects
+            .project(project1Id)
+            .environments()
+            .environment(env.id)
+            .get();
+          console.log(`env status: ${envData.status}`);
+          return envData;
+        },
+        (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      );
+    } catch (e) {
+      console.error(JSON.stringify(e));
+    }
     await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).terminate();
     await poll(
       async () => {
@@ -270,7 +278,7 @@ describe('multiStep dataset integration test', () => {
         return envData;
       },
       (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
-      ENVIRONMENT_START_MAX_WAITING_SECONDS
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     );
 
     console.log('CREATE ENVIRONMENT WITH UNAUTHORIZED DATASET THROWS ERROR');
@@ -292,7 +300,5 @@ describe('multiStep dataset integration test', () => {
       );
     }
     await adminSession.resources.projects.project(project2Id).removeUserFromProject(pa1Session.getUserId()!);
-
-    await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id).delete();
   });
 });

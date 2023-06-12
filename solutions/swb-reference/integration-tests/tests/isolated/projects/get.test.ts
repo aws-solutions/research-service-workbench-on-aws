@@ -1,33 +1,38 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('datasets delete negative tests', () => {
+describe('Get Project negative tests', () => {
+  const paabHelper: PaabHelper = new PaabHelper(2);
   let pa1Session: ClientSession;
-  let project1Id: string;
-  let paabHelper: PaabHelper;
+  let rs1Session: ClientSession;
+  let project2Id: string;
+
+  beforeEach(async () => {
+    expect.hasAssertions();
+  });
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources(__filename);
-    project1Id = paabResources.project1Id;
+    const paabResources = await paabHelper.createResources();
     pa1Session = paabResources.pa1Session;
-    expect.hasAssertions();
+    rs1Session = paabResources.rs1Session;
+    project2Id = paabResources.project2Id;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
   });
 
-  describe('when the dataset does not exist', () => {
+  describe('when a ProjectAdmin GETs a project they do not belong to', () => {
     test('it returns a 403', async () => {
       try {
-        await pa1Session.resources.projects
-          .project(project1Id)
-          .dataSets()
-          .dataset('dataset-00000000-0000-0000-0000-000000000000')
-          .delete();
+        await pa1Session.resources.projects.project(project2Id).get();
       } catch (e) {
         checkHttpError(
           e,
@@ -39,14 +44,10 @@ describe('datasets delete negative tests', () => {
     });
   });
 
-  describe('When the project does not exist', () => {
-    test('It returns a 403', async () => {
+  describe('when a Researcher GETs a project they do not belong to', () => {
+    test('it returns a 403', async () => {
       try {
-        await pa1Session.resources.projects
-          .project('proj-00000000-0000-0000-0000-000000000000')
-          .dataSets()
-          .dataset('dataset-00000000-0000-0000-0000-000000000000')
-          .delete();
+        await rs1Session.resources.projects.project(project2Id).get();
       } catch (e) {
         checkHttpError(
           e,
