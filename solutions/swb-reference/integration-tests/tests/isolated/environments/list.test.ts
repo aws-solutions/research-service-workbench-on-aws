@@ -19,7 +19,9 @@ describe('list environments', () => {
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
-  let validProjectId: string;
+  let rs1Session: ClientSession;
+  let projectId1: string;
+  let projectId2: string;
   const validEnvStatuses = [
     'PENDING',
     'COMPLETED',
@@ -70,7 +72,9 @@ describe('list environments', () => {
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
-    validProjectId = paabResources.project1Id;
+    projectId1 = paabResources.project1Id;
+    projectId2 = paabResources.project2Id;
+    rs1Session = paabResources.rs1Session;
   });
 
   afterAll(async () => {
@@ -193,9 +197,39 @@ describe('list environments', () => {
         );
       }
     });
+
+    test('list project environments when user not associated to a valid project', async () => {
+      console.log('A Project Admin of Project1 and Project3, cannot LIST environments from Project2');
+      try {
+        await paSession.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   describe('Researcher tests', () => {
+    test('list project environments when user not associated to a valid project', async () => {
+      console.log('A Researcher of Project1 and Project3, cannot LIST environments from Project2');
+      try {
+        await rs1Session.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
     test('not authorized to call list environments', async () => {
       try {
         const queryParams = {
@@ -255,12 +289,12 @@ describe('list environments', () => {
       {
         username: 'projectAdmin',
         session: () => paSession,
-        projectId: () => validProjectId
+        projectId: () => projectId1
       },
       {
         username: 'researcher',
         session: () => researcherSession,
-        projectId: () => validProjectId
+        projectId: () => projectId1
       }
     ];
 

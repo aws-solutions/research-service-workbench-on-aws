@@ -389,7 +389,9 @@ describe('multiStep environment test', () => {
     expect(researcherProj1Environments.data.filter((env) => env.id === env1.id).length).toEqual(1);
     expect(researcherProj1Environments.data.filter((env) => env.id === env3.id).length).toEqual(0);
 
-    console.log('Verifying Researcher1 CANNOT see Environment1 on single get REQUEST using project3');
+    console.log(
+      'Verifying Researcher1 CANNOT see Environment1 on single GET request using project3, even if they have access to both projects'
+    );
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).get()
     ).rejects.toThrowError(
@@ -405,7 +407,9 @@ describe('multiStep environment test', () => {
     expect(researcherProj3Environments.data.filter((env) => env.id === env3.id).length).toEqual(1);
     expect(researcherProj3Environments.data.filter((env) => env.id === env1.id).length).toEqual(0);
 
-    console.log('Verifying Researcher1 CANNOT see Environment2...');
+    console.log(
+      'Verifying Researcher1 CANNOT see Environment2, linked to a project that Researcher1 does not have access to...'
+    );
     // List Environments for Project
     const { data: researcherEnvironments }: ListEnvironmentResponse = await rs1Session.resources.projects
       .project(project1Id)
