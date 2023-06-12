@@ -15,6 +15,8 @@ describe('awsAccounts create negative tests', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -22,6 +24,8 @@ describe('awsAccounts create negative tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
   });
 
   afterAll(async () => {
@@ -186,6 +190,38 @@ describe('awsAccounts create negative tests', () => {
               error: 'Bad Request',
               message:
                 'This AWS Account was found in DDB. Please provide the correct id value in request body'
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('Project admin or researcher can not list aws Accounts', () => {
+    describe('As project admin', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await paSession.resources.accounts.create({}, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
+
+    describe('As researcher', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await researcherSession.resources.accounts.create({}, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }
