@@ -61,7 +61,7 @@ describe('multiStep environment test', () => {
 
   beforeAll(async () => {
     ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session } =
-      await paabHelper.createResources());
+      await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {

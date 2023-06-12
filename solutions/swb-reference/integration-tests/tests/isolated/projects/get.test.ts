@@ -19,7 +19,7 @@ describe('Get Project negative tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     pa1Session = paabResources.pa1Session;
     rs1Session = paabResources.rs1Session;
     project2Id = paabResources.project2Id;
