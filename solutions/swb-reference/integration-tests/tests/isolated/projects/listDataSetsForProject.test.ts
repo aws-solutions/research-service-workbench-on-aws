@@ -22,7 +22,7 @@ describe('list datasets for project tests', () => {
 
   beforeAll(async () => {
     paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
     pa1Session = paabResources.pa1Session;

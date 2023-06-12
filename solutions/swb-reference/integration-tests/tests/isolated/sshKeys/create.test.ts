@@ -17,7 +17,9 @@ describe('cannot create SSH key', () => {
   let project2Id: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   beforeEach(async () => {
