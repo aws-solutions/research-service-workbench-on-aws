@@ -19,7 +19,7 @@ describe('environment stop negative tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
