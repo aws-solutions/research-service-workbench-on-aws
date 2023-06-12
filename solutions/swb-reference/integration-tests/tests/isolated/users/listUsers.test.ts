@@ -4,24 +4,25 @@
  */
 
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list users negative tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(0);
   let adminSession: ClientSession;
+  let rs1Session: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, rs1Session } = await paabHelper.createResources());
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('with invalid parameters', () => {
@@ -100,5 +101,18 @@ describe('list users negative tests', () => {
         }
       });
     });
+  });
+
+  it('Researcher: should return 403 error when try to list users', async () => {
+    try {
+      await rs1Session.resources.users.get();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
   });
 });
