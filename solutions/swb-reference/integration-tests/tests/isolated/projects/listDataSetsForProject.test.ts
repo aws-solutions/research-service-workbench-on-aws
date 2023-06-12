@@ -21,13 +21,8 @@ describe('list datasets for project tests', () => {
   });
 
   beforeAll(async () => {
-<<<<<<< HEAD
-    paabHelper = new PaabHelper();
-    const paabResources = await paabHelper.createResources(__filename);
-=======
     paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources();
->>>>>>> release/v2.0.0
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
     pa1Session = paabResources.pa1Session;
