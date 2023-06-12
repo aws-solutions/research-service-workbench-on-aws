@@ -43,6 +43,7 @@ describe('multiStep environment type and environment type config test', () => {
       id: expectedId,
       status: 'NOT_APPROVED'
     });
+
     //Throws when creating ETC with non Approved ET
     console.log('Throw when creating Environment Type Config with non approved Environment Type');
     try {
@@ -67,12 +68,20 @@ describe('multiStep environment type and environment type config test', () => {
       },
       true
     );
+
+    console.log('Get Environment Type as IT Admin');
     const { data: approvedEnvType } = await adminSession.resources.environmentTypes
       .environmentType(envType.id)
       .get();
     expect(approvedEnvType).toMatchObject({
       status: 'APPROVED'
     });
+
+    console.log('Get Environment Type as Proj Admin');
+    await paSession.resources.environmentTypes.environmentType(envType.id).configurations().get();
+
+    console.log('Get Environment Type as Researcher');
+    await researcherSession.resources.environmentTypes.environmentType(envType.id).configurations().get();
 
     //Update Name for Environment Type
     console.log('Update Environment Type Name');
