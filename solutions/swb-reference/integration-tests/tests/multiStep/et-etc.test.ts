@@ -77,12 +77,6 @@ describe('multiStep environment type and environment type config test', () => {
       status: 'APPROVED'
     });
 
-    console.log('Get Environment Type as Proj Admin');
-    await paSession.resources.environmentTypes.environmentType(envType.id).configurations().get();
-
-    console.log('Get Environment Type as Researcher');
-    await researcherSession.resources.environmentTypes.environmentType(envType.id).configurations().get();
-
     //Update Name for Environment Type
     console.log('Update Environment Type Name');
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
@@ -159,6 +153,12 @@ describe('multiStep environment type and environment type config test', () => {
     ).resolves.not.toThrow();
 
     //Test retrieving as ITAdmin
+    console.log('Get Environment Type as Admin');
+    await adminSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Admin');
+    await adminSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: response } = await adminSession.resources.projects
       .project(projectId)
@@ -190,6 +190,12 @@ describe('multiStep environment type and environment type config test', () => {
     expect(projectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length).toBeTruthy();
 
     //Test retrieving as Project Admin
+    console.log('Get Environment Type as Proj Admin');
+    await paSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Project Admin');
+    await paSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: paResponse } = await paSession.resources.projects
       .project(projectId)
@@ -223,6 +229,12 @@ describe('multiStep environment type and environment type config test', () => {
     ).toBeTruthy();
 
     //Test retrieving as Researcher
+    console.log('Get Environment Type as Researcher');
+    await researcherSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Researcher');
+    await researcherSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: researcherResponse } = await researcherSession.resources.projects
       .project(projectId)
