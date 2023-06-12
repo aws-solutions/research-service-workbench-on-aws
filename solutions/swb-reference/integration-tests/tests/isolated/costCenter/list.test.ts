@@ -18,7 +18,7 @@ describe('List Cost Center negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession } = await paabHelper.createResources());
+    ({ adminSession } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {

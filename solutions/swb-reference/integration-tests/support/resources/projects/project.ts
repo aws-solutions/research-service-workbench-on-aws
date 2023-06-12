@@ -56,7 +56,7 @@ export default class Project extends Resource {
     try {
       await this.delete();
     } catch (e) {
-      console.warn(
+      console.error(
         `Could not delete project ${this._id}". 
         Encountered error: ${e}`
       );

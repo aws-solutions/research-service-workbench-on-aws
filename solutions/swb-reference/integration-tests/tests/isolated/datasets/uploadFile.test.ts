@@ -40,7 +40,7 @@ describe('datasets file upload tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
 
