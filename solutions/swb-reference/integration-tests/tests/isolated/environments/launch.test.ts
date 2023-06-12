@@ -13,8 +13,9 @@ describe('environments launch negative tests', () => {
   const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
-  let paSession: ClientSession;
-  let projectId: string;
+  let pa1Session: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
   let researcherSession: ClientSession;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   const validLaunchParameters = {
@@ -33,8 +34,9 @@ describe('environments launch negative tests', () => {
   beforeAll(async () => {
     const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
-    paSession = paabResources.pa1Session;
-    projectId = paabResources.project1Id;
+    pa1Session = paabResources.pa1Session;
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
     researcherSession = paabResources.rs1Session;
   });
 
@@ -46,9 +48,44 @@ describe('environments launch negative tests', () => {
     test('Unable to launch', async () => {
       try {
         await itAdminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .create(validLaunchParameters, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Project admin and researcher not associated with project', () => {
+    test('Unable to launch - project admin', async () => {
+      try {
+        // await pa1Session.resources.projects
+        //     .project(project2Id)
+        //     .environments()
+        //     .create(validLaunchParameters, false);
+        const pa1Client = pa1Session.getAxiosInstance();
+        await pa1Client.post(`/projects/:${project2Id}/environments`, validLaunchParameters);
+      } catch (e) {
+        console.log(e);
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('Unable to launch - researcher', async () => {
+      try {
+        const researcherClient = researcherSession.getAxiosInstance();
+        await researcherClient.post(`/projects/:${project2Id}/environments`, validLaunchParameters);
       } catch (e) {
         checkHttpError(
           e,
@@ -67,7 +104,7 @@ describe('environments launch negative tests', () => {
           //eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.name;
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -83,7 +120,7 @@ describe('environments launch negative tests', () => {
           //eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envTypeId;
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -99,7 +136,7 @@ describe('environments launch negative tests', () => {
           //eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envTypeConfigId;
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -115,7 +152,7 @@ describe('environments launch negative tests', () => {
           //eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envType;
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -131,7 +168,7 @@ describe('environments launch negative tests', () => {
           //eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.description;
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -144,7 +181,7 @@ describe('environments launch negative tests', () => {
       });
       test('all parameters', async () => {
         try {
-          await paSession.resources.projects.project(projectId).environments().create({}, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create({}, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -161,7 +198,7 @@ describe('environments launch negative tests', () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           invalidParam.envTypeId = 'wrong-id-format';
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -177,7 +214,7 @@ describe('environments launch negative tests', () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const invalidParam: any = { ...validLaunchParameters };
           invalidParam.envTypeConfigId = 'wrong-id-format';
-          await paSession.resources.projects.project(projectId).environments().create(invalidParam, false);
+          await pa1Session.resources.projects.project(project1Id).environments().create(invalidParam, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -191,7 +228,7 @@ describe('environments launch negative tests', () => {
       test('error when project does not exist', async () => {
         const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
         try {
-          await paSession.resources.projects.project(fakeProjectId).environments().create({});
+          await pa1Session.resources.projects.project(fakeProjectId).environments().create({});
         } catch (e) {
           checkHttpError(
             e,
@@ -210,7 +247,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.name;
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -229,7 +266,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envTypeId;
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -248,7 +285,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envTypeConfigId;
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -267,7 +304,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.envType;
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -286,7 +323,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           delete invalidParam.description;
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -301,7 +338,7 @@ describe('environments launch negative tests', () => {
       });
       test('all parameters', async () => {
         try {
-          await researcherSession.resources.projects.project(projectId).environments().create({}, false);
+          await researcherSession.resources.projects.project(project1Id).environments().create({}, false);
         } catch (e) {
           checkHttpError(
             e,
@@ -319,7 +356,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           invalidParam.envTypeId = 'wrong-id-format';
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
@@ -338,7 +375,7 @@ describe('environments launch negative tests', () => {
           const invalidParam: any = { ...validLaunchParameters };
           invalidParam.envTypeConfigId = 'wrong-id-format';
           await researcherSession.resources.projects
-            .project(projectId)
+            .project(project1Id)
             .environments()
             .create(invalidParam, false);
         } catch (e) {
