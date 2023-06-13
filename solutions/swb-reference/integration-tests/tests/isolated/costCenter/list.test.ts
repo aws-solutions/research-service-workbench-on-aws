@@ -10,7 +10,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('List Cost Center negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(0);
   let adminSession: ClientSession;
 
   beforeEach(async () => {

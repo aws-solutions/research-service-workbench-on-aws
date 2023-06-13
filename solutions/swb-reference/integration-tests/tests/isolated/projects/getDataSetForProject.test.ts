@@ -19,7 +19,7 @@ describe('get dataset for project tests', () => {
   });
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
+    paabHelper = new PaabHelper(1);
     const paabResources = await paabHelper.createResources();
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
@@ -53,24 +53,20 @@ describe('get dataset for project tests', () => {
         }
       }
     );
-    test.each(invalidDatasets)(
-      'invalid dataset Id throws validation exception for PA',
-      async (invalidDataset) => {
-        try {
-          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(invalidDataset).get();
-        } catch (error) {
-          checkHttpError(
-            error,
-            new HttpError(400, {
-              error: 'Bad Request',
-              message: `dataSetId: Invalid ID`
-            })
-          );
-        }
+    test.each(invalidDatasets)('non-existing dataset Id throws 403 for PA', async (invalidDataset) => {
+      try {
+        await pa1Session.resources.projects.project(project1Id).dataSets().dataset(invalidDataset).get();
+      } catch (error) {
+        checkHttpError(
+          error,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
       }
-    );
+    });
     test.each(invalidDatasets)(
-      'invalid dataset Id throws validation exception for Researcher',
+      'non-existing dataset Id throws 403 for Researcher',
       async (invalidDataset) => {
         try {
           await researcher1Session.resources.projects
@@ -81,9 +77,8 @@ describe('get dataset for project tests', () => {
         } catch (error) {
           checkHttpError(
             error,
-            new HttpError(400, {
-              error: 'Bad Request',
-              message: `dataSetId: Invalid ID`
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }
