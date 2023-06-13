@@ -124,7 +124,7 @@ describe('sshKeys API multiStep integration test', () => {
             e,
             new HttpError(403, {
               error: 'Forbidden',
-              message: `Current user ${session2.getUserId()} cannot delete a key they do not own`
+              message: `Current user cannot delete a key they do not own`
             })
           );
         }
