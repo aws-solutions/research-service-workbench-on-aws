@@ -51,6 +51,7 @@ describe('multiStep environment type and environment type config test', () => {
         .environmentType(envType.id)
         .configurations()
         .create({}, true);
+      throw new Error('Creating ETC with non approved Environment Type did not throw an error');
     } catch (e) {
       checkHttpError(
         e,
@@ -130,6 +131,8 @@ describe('multiStep environment type and environment type config test', () => {
         },
         true
       );
+
+    console.log('Get Environment Type Config as Admin');
     const { data: updatedEnvTypeConfig } = await adminSession.resources.environmentTypes
       .environmentType(envType.id)
       .configurations()
