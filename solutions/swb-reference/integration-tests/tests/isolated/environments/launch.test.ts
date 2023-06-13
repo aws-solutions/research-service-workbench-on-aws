@@ -10,7 +10,7 @@ import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('environments launch negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(2);
   const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
