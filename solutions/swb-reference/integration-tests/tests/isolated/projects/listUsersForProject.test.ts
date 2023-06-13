@@ -20,7 +20,7 @@ describe('list users for project tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id, pa2Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, project1Id, pa2Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {

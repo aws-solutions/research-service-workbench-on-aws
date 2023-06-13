@@ -10,7 +10,7 @@ describe('datasets delete negative tests', () => {
 
   beforeAll(async () => {
     paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;
     expect.hasAssertions();

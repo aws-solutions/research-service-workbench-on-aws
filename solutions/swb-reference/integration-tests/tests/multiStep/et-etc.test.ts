@@ -22,7 +22,7 @@ describe('multiStep environment type and environment type config test', () => {
   let researcherSession: ClientSession;
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
