@@ -534,7 +534,7 @@ describe('multiStep environment test', () => {
 
     console.log('Wait for all environments to complete creation');
     await Promise.all([
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         rs1Session,
         project1Id,
         env1.id,
@@ -542,7 +542,7 @@ describe('multiStep environment test', () => {
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project2Id,
         env2.id,
@@ -550,7 +550,7 @@ describe('multiStep environment test', () => {
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         rs1Session,
         project3Id,
         env3.id,
@@ -594,7 +594,7 @@ describe('multiStep environment test', () => {
 
     console.log('Wait for all environments to be stopped');
     await Promise.all([
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         rs1Session,
         project1Id,
         env1.id,
@@ -602,7 +602,7 @@ describe('multiStep environment test', () => {
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project2Id,
         env2.id,
@@ -610,7 +610,7 @@ describe('multiStep environment test', () => {
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project3Id,
         env3.id,
@@ -650,7 +650,7 @@ describe('multiStep environment test', () => {
 
     console.log('Wait for all environments to complete starting');
     await Promise.all([
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         rs1Session,
         project1Id,
         env1.id,
@@ -658,7 +658,7 @@ describe('multiStep environment test', () => {
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         pa2Session,
         project2Id,
         env2.id,
@@ -666,7 +666,7 @@ describe('multiStep environment test', () => {
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project3Id,
         env3.id,
@@ -686,7 +686,7 @@ describe('multiStep environment test', () => {
 
     console.log('Wait for all environments to be stopped');
     await Promise.all([
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         rs1Session,
         project1Id,
         env1.id,
@@ -694,7 +694,7 @@ describe('multiStep environment test', () => {
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project2Id,
         env2.id,
@@ -702,7 +702,7 @@ describe('multiStep environment test', () => {
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project3Id,
         env3.id,
@@ -723,7 +723,7 @@ describe('multiStep environment test', () => {
 
     console.log('Verifying Env1, Env2 and Env3 are terminated...');
     await Promise.all([
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project1Id,
         env1.id,
@@ -731,7 +731,7 @@ describe('multiStep environment test', () => {
         'TERMINATED',
         ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project2Id,
         env2.id,
@@ -739,7 +739,7 @@ describe('multiStep environment test', () => {
         'TERMINATED',
         ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
       ),
-      await _waitForEnvironmentToReachState(
+      _waitForEnvironmentToReachState(
         adminSession,
         project3Id,
         env3.id,
