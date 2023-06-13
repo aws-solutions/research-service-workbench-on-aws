@@ -53,9 +53,11 @@ describe('multiStep users integration test', () => {
 
       // test PA should see the same result of  `List Users` as ITAdmin
       console.log('ITAdmin and ProjectAdmin listing all users');
-      const { data: allUsersListedByITAdmin } = await adminSession.resources.users.get();
-      const { data: allUsersListedByPA } = await pa1Session.resources.users.get();
-      expect(allUsersListedByPA).toEqual(allUsersListedByITAdmin);
+      const [allUsersListedByITAdmin, allUsersListedByPA] = await Promise.all([
+        adminSession.resources.users.get(),
+        pa1Session.resources.users.get()
+      ]);
+      expect(allUsersListedByPA.data).toEqual(allUsersListedByITAdmin.data);
 
       // test pagination
       await adminSession.resources.users.create({
@@ -77,7 +79,7 @@ describe('multiStep users integration test', () => {
       const { data: acutalUserGetByPA } = await pa1Session.resources.users.user(mockUserId).get();
       expect(acutalUserGetByPA).toMatchObject(mockUser);
 
-      console.log('Researcher has cannot call get a user by userId');
+      console.log('Researcher cannot call get a user by userId');
       try {
         await rs1Session.resources.users.user(mockUserId).get();
       } catch (e) {
@@ -94,54 +96,6 @@ describe('multiStep users integration test', () => {
         ...updateMockUserInput,
         id: mockUserId
       });
-
-      console.log('PA cannot update the user');
-      try {
-        await pa1Session.resources.users.user(mockUserId).update(updateMockUserInput, true);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
-
-      console.log('researcher cannot update the user');
-      try {
-        await rs1Session.resources.users.user(mockUserId).update(updateMockUserInput, true);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
-
-      console.log('PA cannot delete the user');
-      try {
-        await pa1Session.resources.users.user(mockUserId).purge();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
-
-      console.log('researcher cannot delete the user');
-      try {
-        await rs1Session.resources.users.user(mockUserId).purge();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
 
       await adminSession.resources.users.user(mockUserId).deactivate();
       const { data: inactiveUser } = await adminSession.resources.users.user(mockUserId).get();

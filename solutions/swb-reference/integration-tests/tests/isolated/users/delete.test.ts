@@ -19,7 +19,7 @@ describe('delete user negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {

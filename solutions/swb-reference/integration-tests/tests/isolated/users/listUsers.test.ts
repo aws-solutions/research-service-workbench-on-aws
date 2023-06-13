@@ -18,7 +18,7 @@ describe('list users negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, rs1Session } = await paabHelper.createResources());
+    ({ adminSession, rs1Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
