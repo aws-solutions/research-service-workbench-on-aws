@@ -10,13 +10,14 @@ import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('environments launch negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper(1);
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   const validLaunchParameters = {
     name: randomTextGenerator.getFakeText('name'),
@@ -38,14 +39,15 @@ describe('environments launch negative tests', () => {
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
   });
 
-  describe('ITAdmin tests', () => {
-    test('Unable to launch', async () => {
+  describe('403 error is thrown when', () => {
+    test('IT Admin launch environment', async () => {
       try {
         await itAdminSession.resources.projects
           .project(project1Id)
@@ -60,19 +62,14 @@ describe('environments launch negative tests', () => {
         );
       }
     });
-  });
 
-  describe('Project admin and researcher not associated with project', () => {
-    test('Unable to launch - project admin', async () => {
+    test('Project admin launch environment under project they are not associated with', async () => {
       try {
-        // await pa1Session.resources.projects
-        //     .project(project2Id)
-        //     .environments()
-        //     .create(validLaunchParameters, false);
-        const pa1Client = pa1Session.getAxiosInstance();
-        await pa1Client.post(`/projects/:${project2Id}/environments`, validLaunchParameters);
+        await pa1Session.resources.projects
+          .project(project2Id)
+          .environments()
+          .create(validLaunchParameters, false);
       } catch (e) {
-        console.log(e);
         checkHttpError(
           e,
           new HttpError(403, {
@@ -82,10 +79,12 @@ describe('environments launch negative tests', () => {
       }
     });
 
-    test('Unable to launch - researcher', async () => {
+    test('Researcher launch environment under project they are not associated with', async () => {
       try {
-        const researcherClient = researcherSession.getAxiosInstance();
-        await researcherClient.post(`/projects/:${project2Id}/environments`, validLaunchParameters);
+        await researcherSession.resources.projects
+          .project(project2Id)
+          .environments()
+          .create(validLaunchParameters, false);
       } catch (e) {
         checkHttpError(
           e,
@@ -93,6 +92,17 @@ describe('environments launch negative tests', () => {
             error: 'User is not authorized'
           })
         );
+      }
+    });
+
+    test('Anonymous user launch environment', async () => {
+      try {
+        await anonymousSession.resources.projects
+          .project(project1Id)
+          .environments()
+          .create(validLaunchParameters, false);
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
       }
     });
   });

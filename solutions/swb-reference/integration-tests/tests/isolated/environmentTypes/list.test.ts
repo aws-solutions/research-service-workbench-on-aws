@@ -30,6 +30,7 @@ describe('list environment types', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
