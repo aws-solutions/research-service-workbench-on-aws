@@ -188,5 +188,33 @@ describe('datasets create negative tests', () => {
         checkHttpError(actualError, expectedError);
       }
     });
+
+    describe('user with no project', () => {
+      beforeAll(async () => {
+        //Remove researcher 1 from project 1 to make it a user with no project associated
+        await adminSession.resources.projects
+          .project(project1Id)
+          .removeUserFromProject(researcher1Sesssion.getUserId()!);
+      });
+      afterAll(async () => {
+        await adminSession.resources.projects
+          .project(project1Id)
+          .assignUserToProject(researcher1Sesssion.getUserId()!, {
+            role: 'Researcher'
+          });
+      });
+
+      test('User with no project cannot create datasets', async () => {
+        try {
+          const createRequest = paabHelper.createDatasetRequest(project1Id);
+          await researcher1Sesssion.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .create(createRequest, false);
+        } catch (actualError) {
+          checkHttpError(actualError, expectedError);
+        }
+      });
+    });
   });
 });
