@@ -6,11 +6,15 @@
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
+import HttpError from '../../../support/utils/HttpError';
+import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('awsAccountTemplateUrls tests', () => {
   const mockExternalId = 'workbench-integration-test';
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -18,6 +22,8 @@ describe('awsAccountTemplateUrls tests', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
   });
 
   afterAll(async () => {
@@ -38,5 +44,35 @@ describe('awsAccountTemplateUrls tests', () => {
     const tgwUrls = _.get(urls, 'onboard-account-tgw');
     expect(tgwUrls.createUrl).toBeTruthy();
     expect(tgwUrls.updateUrl).toBeTruthy();
+  });
+
+  describe('As project admin', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await paSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    describe('As researcher', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await researcherSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
   });
 });
