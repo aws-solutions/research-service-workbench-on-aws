@@ -10,6 +10,7 @@ describe('Delete Cost Center negative tests', () => {
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
   const paabHelper: PaabHelper = new PaabHelper();
+  const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -49,29 +50,15 @@ describe('Delete Cost Center negative tests', () => {
     });
 
     test('ProjectAdmin cannot soft delete a CostCenter', async () => {
-      try {
-        await pa1Session.resources.costCenters.costCenter(costCenterId).delete();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
+      await expect(pa1Session.resources.costCenters.costCenter(costCenterId).delete()).rejects.toThrow(
+        unauthorizedHttpError
+      );
     });
 
     test('Researcher cannot soft delete a CostCenter', async () => {
-      try {
-        await researcherSession.resources.costCenters.costCenter(costCenterId).delete();
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
+      await expect(researcherSession.resources.costCenters.costCenter(costCenterId).delete()).rejects.toThrow(
+        unauthorizedHttpError
+      );
     });
   });
 

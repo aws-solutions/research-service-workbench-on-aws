@@ -12,6 +12,7 @@ describe('Update Cost Center negative tests', () => {
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
   const paabHelper: PaabHelper = new PaabHelper();
+  const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -56,29 +57,15 @@ describe('Update Cost Center negative tests', () => {
     });
 
     test('ProjectAdmin cannot update a CostCenter', async () => {
-      try {
-        await pa1Session.resources.costCenters.costCenter(costCenterId).update({ name }, true);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
+      await expect(
+        pa1Session.resources.costCenters.costCenter(costCenterId).update({ name }, true)
+      ).rejects.toThrow(unauthorizedHttpError);
     });
 
     test('Researcher cannot update a CostCenter', async () => {
-      try {
-        await researcherSession.resources.costCenters.costCenter(costCenterId).update({ name }, true);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
-      }
+      await expect(
+        researcherSession.resources.costCenters.costCenter(costCenterId).update({ name }, true)
+      ).rejects.toThrow(unauthorizedHttpError);
     });
   });
 
