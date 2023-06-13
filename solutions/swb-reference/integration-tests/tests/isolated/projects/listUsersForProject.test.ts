@@ -104,9 +104,22 @@ describe('list users for project tests', () => {
       }
     });
 
-    test('ensure researcher cannot list users for projects', async () => {
+    test('ensure researcher cannot list ProjectAdmin users for projects', async () => {
       try {
         await rs1Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure researcher cannot list Researcher users for projects', async () => {
+      try {
+        await rs1Session.resources.projects.project(project1Id).listUsersForProject('Researcher');
       } catch (e) {
         checkHttpError(
           e,
@@ -132,6 +145,32 @@ describe('list users for project tests', () => {
         );
       }
       await pa1Session.resources.projects.project(project1Id).removeUserFromProject(pa2Session.getUserId()!);
+    });
+
+    test('ensure project admin cannot list ProjectAdmin users for other projects they do not belong to', async () => {
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure project admin cannot list Researcher users for other projects they do not belong to', async () => {
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('Reseacher');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
     });
 
     test('ensure researcher cannot list users for projects in a different project', async () => {
