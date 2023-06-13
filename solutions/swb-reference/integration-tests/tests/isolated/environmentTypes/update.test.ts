@@ -4,24 +4,66 @@
  */
 import { swbNameMaxLength, lengthValidationMessage, swbDescriptionMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('update environment types', () => {
-  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const testEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
+  });
+
+  test('fails when trying to update environment type as projectAdmin', async () => {
+    try {
+      await paSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
+        {
+          name: 'updated_name'
+        },
+        true
+      );
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('fails when trying to update environment type as researcher', async () => {
+    try {
+      await researcherSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
+        {
+          name: 'updated_name'
+        },
+        true
+      );
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
   });
 
   test('fails when trying to update invalid prop', async () => {
