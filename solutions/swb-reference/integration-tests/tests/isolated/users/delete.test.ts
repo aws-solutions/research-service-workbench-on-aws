@@ -4,24 +4,26 @@
  */
 import { Status, User } from '@aws/workbench-core-user-management';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('delete user negative tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(0);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   test('user does not exist', async () => {
@@ -57,6 +59,46 @@ describe('delete user negative tests', () => {
           message: `Could not delete user ${userId}. Expected status: ${Status[Status.INACTIVE]}; received: ${
             Status[Status.ACTIVE]
           }`
+        })
+      );
+    }
+  });
+
+  test('ProjectAdmin: should return 403 error when delete a user', async () => {
+    let userId = '';
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await pa1Session.resources.users.user(userId).purge();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Researcher: should return 403 error when delete a user', async () => {
+    let userId = '';
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await rs1Session.resources.users.user(userId).purge();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
         })
       );
     }
