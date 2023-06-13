@@ -48,6 +48,10 @@ export default class AuthorizationSetup {
     ]);
     const environmentTypePermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT_TYPE);
     const environmentTypeConfigPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ETC);
+    const environmentTypeConfigListPermissions = this._mapActions(
+      itAdmin,
+      SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC
+    );
     const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, ['READ']);
     const awsAccountTemplateUrlsPermissions = this._mapActions(
       itAdmin,
@@ -64,6 +68,7 @@ export default class AuthorizationSetup {
         ...environmentPermissions,
         ...environmentTypePermissions,
         ...environmentTypeConfigPermissions,
+        ...environmentTypeConfigListPermissions,
         ...datasetPermissions,
         ...userPermissions,
         ...costCenterPermissions,

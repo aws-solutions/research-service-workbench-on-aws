@@ -202,17 +202,6 @@ describe('multiStep environment type and environment type config test', () => {
       .get();
     expect(paSingleResponse.id === envTypeConfig.id).toBeTruthy();
 
-    console.log('Retrieve project association from etc as list');
-    const { data: paProjectsResponse } = await paSession.resources.environmentTypes
-      .environmentType(envType.id)
-      .configurations()
-      .environmentTypeConfig(envTypeConfig.id)
-      .projects()
-      .get();
-    expect(
-      paProjectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length
-    ).toBeTruthy();
-
     //Test retrieving as Researcher
     console.log('Retrieve etc association from project as list');
     const { data: researcherResponse } = await researcherSession.resources.projects
@@ -235,17 +224,6 @@ describe('multiStep environment type and environment type config test', () => {
       .environmentTypeConfig(envTypeConfig.id)
       .get();
     expect(researcherSingleResponse.id === envTypeConfig.id).toBeTruthy();
-
-    console.log('Retrieve project association from etc as list');
-    const { data: researcherProjectsResponse } = await researcherSession.resources.environmentTypes
-      .environmentType(envType.id)
-      .configurations()
-      .environmentTypeConfig(envTypeConfig.id)
-      .projects()
-      .get();
-    expect(
-      researcherProjectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length
-    ).toBeTruthy();
 
     //Throw when Delete Environment Type Config with active associations
     console.log('Throw when Deleting Environment Type Config with active associations');
