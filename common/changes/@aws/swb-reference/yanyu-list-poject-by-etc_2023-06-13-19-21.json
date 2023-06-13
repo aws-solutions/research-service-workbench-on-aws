@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "only allow ITAdmin to list projects by ETC",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}
