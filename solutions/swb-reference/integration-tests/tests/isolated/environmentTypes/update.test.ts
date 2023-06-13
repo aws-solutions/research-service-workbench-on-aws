@@ -48,7 +48,7 @@ describe('update environment types', () => {
     }
   });
 
-  test('fails when trying to update environment type as projectAdmin', async () => {
+  test('fails when trying to update environment type as researcher', async () => {
     try {
       await researcherSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
         {
