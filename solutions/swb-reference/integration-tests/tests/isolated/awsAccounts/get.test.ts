@@ -2,66 +2,46 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
-import Account from '../../../support/resources/accounts/account';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('awsAccounts update negative tests', () => {
+describe('get hosting account', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
-  let account: Account;
-  const accountId = `${resourceTypeToKey.account.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
+  let accountId: string;
 
   beforeEach(() => {
     expect.hasAssertions();
-    account = adminSession.resources.accounts.account(accountId);
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    accountId = setup.getSettings().get('defaultHostingAccountId');
   });
 
   afterAll(async () => {
     await setup.cleanup();
   });
 
-  describe('when updating an account', () => {
-    describe('and the update params are invalid', () => {
-      test('it throws a validation error', async () => {
-        try {
-          const surpriseIntValue = 1 as unknown as string;
-
-          await account.update(
-            {
-              name: surpriseIntValue
-            },
-            true
-          );
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              error: 'Bad Request',
-              message: 'name: Expected string, received number'
-            })
-          );
-        }
+  describe('with valid accountId', () => {
+    describe('as IT Admin', () => {
+      test('it returns account information', async () => {
+        await expect(adminSession.resources.accounts.account(accountId).get()).resolves.not.toThrow();
       });
     });
   });
 
-  describe('Project admin or researcher can not update aws Account', () => {
+  describe('Project admin or researcher can not get aws Account', () => {
     describe('As project admin', () => {
       test('it throws 403 error', async () => {
         try {
-          await paSession.resources.accounts.account(accountId).update({ name: 'testName' }, true);
+          await paSession.resources.accounts.account(accountId).get();
         } catch (e) {
           checkHttpError(
             e,
@@ -76,7 +56,7 @@ describe('awsAccounts update negative tests', () => {
     describe('As researcher', () => {
       test('it throws 403 error', async () => {
         try {
-          await researcherSession.resources.accounts.account(accountId).update({ name: 'testName' }, true);
+          await researcherSession.resources.accounts.account(accountId).get();
         } catch (e) {
           checkHttpError(
             e,
