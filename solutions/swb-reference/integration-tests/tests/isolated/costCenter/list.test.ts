@@ -6,23 +6,64 @@
 import { nonEmptyMessage } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
+import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('List Cost Center negative tests', () => {
-  const paabHelper = new PaabHelper(0);
-  let adminSession: ClientSession;
+  const setup: Setup = Setup.getSetup();
+  let itAdminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let researcherSession: ClientSession;
+  const paabHelper: PaabHelper = new PaabHelper(0);
+  const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession } = await paabHelper.createResources(__filename));
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    pa1Session = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
+  });
+
+  describe('authorization test:', () => {
+    let costCenterId: string;
+
+    beforeAll(async () => {
+      const accountId = setup.getSettings().get('defaultHostingAccountId');
+      const { data: costCenter } = await itAdminSession.resources.costCenters.create({
+        accountId,
+        name: 'costCenterIntegTest'
+      });
+
+      costCenterId = costCenter.id;
+    });
+
+    afterAll(async () => {
+      await itAdminSession.resources.costCenters.costCenter(costCenterId).delete();
+    });
+
+    test('ITAdmin can list Cost Centers', async () => {
+      const response = await itAdminSession.resources.costCenters.get();
+
+      expect(response.status).toEqual(200);
+    });
+
+    test('ProjectAdmin cannot list Cost Centers', async () => {
+      await expect(pa1Session.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
+    });
+
+    test('Researcher cannot list Cost Centers', async () => {
+      await expect(researcherSession.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
+    });
   });
 
   describe('with filter', () => {
@@ -31,7 +72,7 @@ describe('List Cost Center negative tests', () => {
 
       test('it throws 400 error', async () => {
         try {
-          await adminSession.resources.costCenters.get({
+          await itAdminSession.resources.costCenters.get({
             filter: { name: { eq: '' } }
           });
         } catch (e) {
@@ -54,7 +95,7 @@ describe('List Cost Center negative tests', () => {
     describe('as IT Admin', () => {
       test('it throws 400 error', async () => {
         try {
-          await adminSession.resources.costCenters.get(queryParams);
+          await itAdminSession.resources.costCenters.get(queryParams);
         } catch (e) {
           checkHttpError(
             e,

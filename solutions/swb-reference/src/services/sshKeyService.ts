@@ -129,7 +129,7 @@ export default class SshKeyService implements SshKeyPlugin {
     // Check that current user owns the key from the request
     const sshKeyUser = this._getUserFromTags(key.Tags!);
     if (sshKeyUser !== currentUserId) {
-      throw new ForbiddenError(`Current user ${currentUserId} cannot delete a key they do not own`);
+      throw new ForbiddenError(`Current user cannot delete a key they do not own`);
     }
 
     // delete ssh key

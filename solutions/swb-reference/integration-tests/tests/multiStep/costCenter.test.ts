@@ -3,10 +3,10 @@ import Setup from '../../support/setup';
 
 describe('multiStep costCenter test', () => {
   const setup: Setup = Setup.getSetup();
-  let adminSession: ClientSession;
+  let itAdminSession: ClientSession;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    itAdminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {
@@ -16,39 +16,51 @@ describe('multiStep costCenter test', () => {
   test('create, get, update, list, delete', async () => {
     console.log('Creating Cost Centers');
     const accountId = setup.getSettings().get('defaultHostingAccountId');
-    const { data: createdCostCenterA } = await adminSession.resources.costCenters.create({
+    const createCostCenterAResponse = await itAdminSession.resources.costCenters.create({
       accountId,
       name: 'costCenterA'
     });
+    expect(createCostCenterAResponse.status).toEqual(201);
 
-    const { data: createdCostCenterB } = await adminSession.resources.costCenters.create({
+    const createCostCenterBResponse = await itAdminSession.resources.costCenters.create({
       accountId,
       name: 'costCenterB'
     });
+    expect(createCostCenterBResponse.status).toEqual(201);
+
+    const costCenterA = createCostCenterAResponse.data;
+    const costCenterB = createCostCenterBResponse.data;
 
     console.log('Get Cost Center A');
-    const { data: getCostCenterA } = await adminSession.resources.costCenters
-      .costCenter(createdCostCenterA.id)
-      .get();
-    expect(getCostCenterA).toMatchObject(createdCostCenterA);
+    const responseCostCenterA = await itAdminSession.resources.costCenters.costCenter(costCenterA.id).get();
+    expect(responseCostCenterA.status).toEqual(200);
+
+    const getCostCenterA = responseCostCenterA.data;
+    expect(getCostCenterA).toMatchObject(costCenterA);
 
     console.log('Search for Cost Center B');
-    const { data: listCostCenter } = await adminSession.resources.costCenters.get({
+    const responseCostCenterB = await itAdminSession.resources.costCenters.get({
       'filter[name][begins]': 'costCenterB'
     });
+    expect(responseCostCenterB.status).toEqual(200);
+
+    const listCostCenter = responseCostCenterB.data;
     expect(listCostCenter.data.length).toEqual(1);
-    expect(listCostCenter.data[0]).toMatchObject(createdCostCenterB);
+    expect(listCostCenter.data[0]).toMatchObject(costCenterB);
 
     console.log('Update Cost Center B');
     const name = 'costCenterB-nameUpdated';
     const description = 'costCenterB-descriptionUpdated';
-    const { data: updatedCostCenterB } = await adminSession.resources.costCenters
-      .costCenter(createdCostCenterB.id)
+    const response = await itAdminSession.resources.costCenters
+      .costCenter(costCenterB.id)
       .update({ name, description }, true);
+    expect(response.status).toEqual(200);
+
+    const updatedCostCenterB = response.data;
     expect(updatedCostCenterB).toMatchObject({ name, description });
 
     console.log('Delete Cost Center B');
-    // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.costCenters.costCenter(createdCostCenterB.id).delete()).resolves;
+    const deleteResponse = await itAdminSession.resources.costCenters.costCenter(costCenterB.id).delete();
+    expect(deleteResponse.status).toEqual(204);
   });
 });
