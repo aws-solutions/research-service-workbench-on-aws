@@ -52,7 +52,7 @@ describe('get environment type configs', () => {
   describe('Researcher tests', () => {
     test('unauthorized to call GetEnvironmentTypeConfig', async () => {
       try {
-        await paSession.resources.environmentTypes
+        await researcherSession.resources.environmentTypes
           .environmentType(envTypeId)
           .configurations()
           .environmentTypeConfig(envTypeConfigId)

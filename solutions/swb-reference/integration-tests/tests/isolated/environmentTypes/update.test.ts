@@ -4,9 +4,9 @@
  */
 import { swbNameMaxLength, lengthValidationMessage, swbDescriptionMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('update environment types', () => {
   let adminSession: ClientSession;
