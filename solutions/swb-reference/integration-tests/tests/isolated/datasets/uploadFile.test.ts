@@ -261,6 +261,51 @@ describe('datasets file upload tests', () => {
             );
           }
         });
+
+        describe('and has "read" only access for researcher', () => {
+          let dataSet2: DataSet;
+          beforeEach(async () => {
+            const { data } = await pa2Session.resources.projects
+              .project(project2Id)
+              .dataSets()
+              .create({
+                storageName: settings.get('DataSetsBucketName'),
+                awsAccountId: settings.get('mainAccountId'),
+                region: settings.get('awsRegion'),
+                type: 'internal'
+              });
+            dataSet2 = data;
+            await pa2Session.resources.projects
+              .project(project2Id)
+              .dataSets()
+              .dataset(dataSet2.id)
+              .associateWithProject(project1Id, 'read-only');
+          });
+
+          afterEach(async () => {
+            await pa2Session.resources.projects
+              .project(project2Id)
+              .dataSets()
+              .dataset(dataSet2.id)
+              .disassociateFromProject(project1Id);
+          });
+          it('receives a 403 when trying to get a file upload URL', async () => {
+            try {
+              await rs1Session.resources.projects
+                .project(project1Id)
+                .dataSets()
+                .dataset(dataSet2.id)
+                .getFileUploadUrls('TestFile1');
+            } catch (e) {
+              checkHttpError(
+                e,
+                new HttpError(403, {
+                  error: 'User is not authorized'
+                })
+              );
+            }
+          });
+        });
       });
 
       describe('and has "read-write" access', () => {
