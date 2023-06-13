@@ -4,6 +4,7 @@
  */
 
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
@@ -21,6 +22,10 @@ interface CreateRequest {
 }
 
 describe('Create Project negative tests', () => {
+  const paabHelper = new PaabHelper(1);
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
@@ -29,10 +34,13 @@ describe('Create Project negative tests', () => {
   let createRequest: CreateRequest;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -192,6 +200,40 @@ describe('Create Project negative tests', () => {
               message: `Cost center ${costCenterId} was deleted`
             })
           );
+        }
+      });
+
+      test('Project Admin passing in project it does not belong to gets 403', async () => {
+        try {
+          await pa1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+
+      test('Researcher gets 403', async () => {
+        try {
+          await rs1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+
+      test('unauthorized user gets 403', async () => {
+        try {
+          await anonymousSession.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

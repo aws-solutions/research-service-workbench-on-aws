@@ -15,6 +15,7 @@ interface PaabResources {
   pa1Session: ClientSession;
   pa2Session: ClientSession;
   rs1Session: ClientSession;
+  anonymousSession: ClientSession;
   project1Id: string;
   project2Id: string;
   project3Id: string;
@@ -40,6 +41,7 @@ export class PaabHelper {
 
     // create IT admin session
     const adminSession: ClientSession = await this._setup.getDefaultAdminSession(this._outputError);
+    const anonymousSession: ClientSession = await this._setup.createAnonymousSession();
     // Example: lib/integration-tests/tests/isolated/datasets/create.test.ts => isolated-datasets-create
     const testName: string = filename
       .replace(/.test.js/g, '')
@@ -110,6 +112,7 @@ export class PaabHelper {
       pa1Session,
       pa2Session,
       rs1Session,
+      anonymousSession,
       project1Id,
       project2Id,
       project3Id
