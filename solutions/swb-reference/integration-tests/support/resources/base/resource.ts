@@ -49,7 +49,7 @@ export default class Resource {
   }
 
   public async delete(): Promise<AxiosResponse> {
-    return await this._axiosInstance.delete(this._api);
+    return this._axiosInstance.delete(this._api);
   }
 
   public async purge(): Promise<void> {

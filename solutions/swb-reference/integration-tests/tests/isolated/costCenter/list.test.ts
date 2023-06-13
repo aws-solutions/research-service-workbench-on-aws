@@ -40,7 +40,7 @@ describe('List Cost Center negative tests', () => {
       const accountId = setup.getSettings().get('defaultHostingAccountId');
       const { data: costCenter } = await itAdminSession.resources.costCenters.create({
         accountId,
-        name: 'costCenterA'
+        name: 'costCenterIntegTest'
       });
 
       costCenterId = costCenter.id;
