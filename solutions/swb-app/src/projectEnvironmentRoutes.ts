@@ -56,7 +56,7 @@ export function setUpProjectEnvRoutes(
 
       if (!supportedEnvs.includes(envType)) {
         throw Boom.badRequest(
-          `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
+          `No service provided for environment. Supported environments types are: ${supportedEnvs}`
         );
       }
       if (req.body.id) {
@@ -71,9 +71,7 @@ export function setUpProjectEnvRoutes(
         projectId: req.params.projectId
       });
       if (!authorizedDatasets) {
-        throw Boom.forbidden(
-          `${environmentRequest.projectId} does not have access to the provided dataset(s)`
-        );
+        throw Boom.forbidden(`Project does not have access to the provided dataset(s)`);
       }
 
       let env: Environment;
@@ -87,9 +85,7 @@ export function setUpProjectEnvRoutes(
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem creating environment of type ${envType} for project ${req.body.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem creating environment for project`);
       }
       try {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -135,7 +131,7 @@ export function setUpProjectEnvRoutes(
         );
       } else if (!['STOPPED', 'FAILED'].includes(envStatus)) {
         throw Boom.badRequest(
-          `Environment must be in state STOPPED or FAILED before beginning termination. ${environment.id} currently in state ${envStatus}.`
+          `Environment must be in state STOPPED or FAILED before beginning termination. Environment currently in state ${envStatus}.`
         );
       } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -143,7 +139,7 @@ export function setUpProjectEnvRoutes(
         res.status(204).send();
       } else {
         throw Boom.badRequest(
-          `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
+          `No service provided for environment. Supported environments types are: ${supportedEnvs}`
         );
       }
     })
@@ -171,7 +167,7 @@ export function setUpProjectEnvRoutes(
         res.status(204).send();
       } else {
         throw Boom.badRequest(
-          `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
+          `No service provided for environment. Supported environments types are: ${supportedEnvs}`
         );
       }
     })
@@ -199,7 +195,7 @@ export function setUpProjectEnvRoutes(
         res.status(204).send();
       } else {
         throw Boom.badRequest(
-          `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
+          `No service provided for environment. Supported environments types are: ${supportedEnvs}`
         );
       }
     })
@@ -246,7 +242,7 @@ export function setUpProjectEnvRoutes(
         res.status(200).send(response);
       } else {
         throw Boom.badRequest(
-          `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
+          `No service provided for environment. Supported environments types are: ${supportedEnvs}`
         );
       }
     })
@@ -266,9 +262,7 @@ export function setUpProjectEnvRoutes(
         true
       );
       if (env.projectId !== validatedRequest.projectId) {
-        throw Boom.notFound(
-          `Couldnt find environment ${validatedRequest.environmentId} with project ${validatedRequest.projectId}`
-        );
+        throw Boom.notFound(`Couldnt find environment with project`);
       }
       res.status(200).send(env);
     })
@@ -305,9 +299,7 @@ export function setUpProjectEnvRoutes(
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem listing environments for project ${validatedRequest.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem listing environments for project`);
       }
     })
   );

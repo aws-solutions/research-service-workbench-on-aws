@@ -77,7 +77,7 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
     const project = await this._projectService.getProject({ projectId });
 
     if (project.status === ProjectStatus.DELETED) {
-      throw new ProjectDeletedError(`Project ${projectId} was deleted`);
+      throw new ProjectDeletedError(`Project was deleted`);
     }
 
     await this._envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
@@ -261,11 +261,8 @@ export class ProjectEnvTypeConfigService implements ProjectEnvTypeConfigPlugin {
           (e) => e.status !== 'FAILED' && e.projectId === projectId
         );
         if (activeEnvironments.length > 0) {
-          const activeEnvironmentsSummary = activeEnvironments
-            .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
-            .join('\n');
           throw new ConflictError(
-            `There are active environments using this configuration: ${activeEnvironmentsSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to disassociate configuration.`
+            `There are active environments using this configuration. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to disassociate configuration.`
           );
         }
         paginationToken = dependencies.paginationToken;

@@ -63,9 +63,7 @@ export function setUpCostCenterRoutes(
       async function checkDependency(costCenterId: string): Promise<void> {
         const costCenterHaveProjects = await projectService.doesCostCenterHaveProjects(costCenterId);
         if (costCenterHaveProjects) {
-          throw Boom.conflict(
-            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
-          );
+          throw Boom.conflict(`CostCenter cannot be deleted because it has project(s) associated with it`);
         }
       }
       res.status(204).send(await costCenterService.softDeleteCostCenter(validatedRequest, checkDependency));

@@ -70,7 +70,7 @@ export class EnvironmentService {
         .get(buildDynamoDBPkSk(envId, resourceTypeToKey.environment))
         .execute()) as GetItemCommandOutput;
       if (!data.Item) {
-        throw Boom.notFound(`Could not find environment ${envId}`);
+        throw Boom.notFound(`Could not find environment`);
       }
 
       return this._mapDDBItemToEnvironment(data.Item!);
@@ -80,7 +80,7 @@ export class EnvironmentService {
       .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
       .execute();
     if (data.Count === 0) {
-      throw Boom.notFound(`Could not find environment ${envId}`);
+      throw Boom.notFound(`Could not find environment`);
     }
     const items = data.Items!.map((item) => {
       return item;
@@ -185,13 +185,13 @@ export class EnvironmentService {
     try {
       await this.getEnvironment(envId).then((env) => {
         if (env.status === 'TERMINATED') {
-          throw Boom.badRequest(`Cannot update terminated environment ${envId}`);
+          throw Boom.badRequest(`Cannot update terminated environment`);
         }
       });
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         console.log('message', e.message);
-        throw Boom.notFound(`Could not find environment ${envId} to update`);
+        throw Boom.notFound(`Could not find environment to update`);
       }
       throw e;
     }
@@ -290,16 +290,14 @@ export class EnvironmentService {
     });
     // ETC
     if (envTypeConfig === undefined) {
-      throw Boom.badRequest(
-        `envTypeId ${params.envTypeId} with envTypeConfigId ${params.envTypeConfigId} does not exist`
-      );
+      throw Boom.badRequest(`Requested envTypeId with requested envTypeConfigId does not exist`);
     }
     // PROJ
     const project = metadata.find((item) => {
       return item.resourceType === 'project';
     });
     if (project === undefined) {
-      throw Boom.badRequest(`projectId ${params.projectId} does not exist`);
+      throw Boom.badRequest(`projectId does not exist`);
     }
     // DATASET
     const datasets = metadata.filter((item) => {
@@ -312,7 +310,7 @@ export class EnvironmentService {
       return !validDatasetIds.includes(id);
     });
     if (dsIdsNotFound.length > 0) {
-      throw Boom.badRequest(`datasetIds ${dsIdsNotFound} do not exist`);
+      throw Boom.badRequest(`datasetIds do not exist`);
     }
 
     // WRITE metadata to DDB

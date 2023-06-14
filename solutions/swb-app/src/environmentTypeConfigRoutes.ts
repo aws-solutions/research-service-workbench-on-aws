@@ -105,9 +105,7 @@ export function setUpEnvTypeConfigRoutes(
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem listing configurations for environment type ${listEnvTypeConfigRequest.envTypeId}`
-        );
+        throw Boom.badImplementation(`There was a problem listing configurations for environment type`);
       }
     })
   );
