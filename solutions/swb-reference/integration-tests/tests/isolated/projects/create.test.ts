@@ -82,7 +82,7 @@ describe('Create Project negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Project name "${existingProjectName}" is in use by a non deleted project. Please use another name.`
+              message: `Project name is in use by a non deleted project. Please use another name.`
             })
           );
         }
@@ -198,7 +198,7 @@ describe('Create Project negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Cost center ${costCenterId} was deleted`
+              message: `Cost center was deleted`
             })
           );
         }
