@@ -9,12 +9,13 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('get environment negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper(1);
+  const paabHelper: PaabHelper = new PaabHelper(2);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
-  let projectId: string;
   let researcherSession: ClientSession;
   let anonymousSession: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,9 +25,10 @@ describe('get environment negative tests', () => {
     const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
-    projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
     anonymousSession = paabResources.anonymousSession;
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
   });
 
   afterAll(async () => {
@@ -38,7 +40,7 @@ describe('get environment negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       try {
         await itAdminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .environment(fakeEnvId)
           .get();
@@ -78,7 +80,7 @@ describe('get environment negative tests', () => {
     test('environment does not exist', async () => {
       const fakeEnvId = getFakeEnvId();
       try {
-        await paSession.resources.projects.project(projectId).environments().environment(fakeEnvId).get();
+        await paSession.resources.projects.project(project1Id).environments().environment(fakeEnvId).get();
       } catch (e) {
         checkHttpError(
           e,
@@ -104,6 +106,20 @@ describe('get environment negative tests', () => {
         );
       }
     });
+
+    test('projectAdmin not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await paSession.resources.projects.project(project2Id).environments().environment(fakeEnvId).get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   describe('Researcher tests', () => {
@@ -111,7 +127,7 @@ describe('get environment negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       try {
         await researcherSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .environment(fakeEnvId)
           .get();
@@ -144,14 +160,31 @@ describe('get environment negative tests', () => {
         );
       }
     });
+
+    test('researcher not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await researcherSession.resources.projects
+          .project(project2Id)
+          .environments()
+          .environment(fakeEnvId)
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   test('Unauthenticated user gets 401', async () => {
     const fakeEnvId = getFakeEnvId();
-    const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
     try {
       await anonymousSession.resources.projects
-        .project(fakeProjectId)
+        .project(project1Id)
         .environments()
         .environment(fakeEnvId)
         .get();
