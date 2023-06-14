@@ -11,6 +11,7 @@ describe('datasets delete negative tests', () => {
   let pa1Session: ClientSession;
   let adminSession: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let paabHelper: PaabHelper;
   let setup: Setup;
@@ -26,6 +27,7 @@ describe('datasets delete negative tests', () => {
     pa1Session = paabResources.pa1Session;
     adminSession = paabResources.adminSession;
     rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const dataset1Name = randomTextGenerator.getFakeText('isolated-datasets-delete-ds1');
     const dataSetBody = CreateDataSetRequestParser.parse({
@@ -140,6 +142,14 @@ describe('datasets delete negative tests', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+
+      test('Unauthorized user cannot delete dataset', async () => {
+        try {
+          await anonymousSession.resources.datasets.dataset(dataSet1Id).delete();
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

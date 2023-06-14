@@ -5,7 +5,6 @@
 
 import { nonEmptyMessage } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
@@ -15,22 +14,22 @@ describe('List Cost Center negative tests', () => {
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
-  const paabHelper: PaabHelper = new PaabHelper(0);
-  const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
+  let anonymousSession: ClientSession;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
+  const unauthorizedHttpError = new HttpError(401, {});
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources(__filename);
-    itAdminSession = paabResources.adminSession;
-    pa1Session = paabResources.pa1Session;
-    researcherSession = paabResources.rs1Session;
+    itAdminSession = await setup.getDefaultAdminSession();
+    pa1Session = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -58,11 +57,15 @@ describe('List Cost Center negative tests', () => {
     });
 
     test('ProjectAdmin cannot list Cost Centers', async () => {
-      await expect(pa1Session.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
+      await expect(pa1Session.resources.costCenters.get()).rejects.toThrow(forbiddenHttpError);
     });
 
     test('Researcher cannot list Cost Centers', async () => {
-      await expect(researcherSession.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
+      await expect(researcherSession.resources.costCenters.get()).rejects.toThrow(forbiddenHttpError);
+    });
+
+    test('Unauthorized user cannot list Cost Centers', async () => {
+      await expect(anonymousSession.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
     });
   });
 

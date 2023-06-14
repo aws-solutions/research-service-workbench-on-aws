@@ -4,38 +4,34 @@
  */
 import { lengthValidationMessage, urlFilterMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('list environment types', () => {
   const setup: Setup = Setup.getSetup();
-  let adminSession: ClientSession;
-  const paabHelper = new PaabHelper(0);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    const paabResources = await paabHelper.createResources(__filename);
-    itAdminSession = paabResources.adminSession;
-    paSession = paabResources.pa1Session;
-    researcherSession = paabResources.rs1Session;
+    itAdminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
   test('list environments types when filter and sorting by name', async () => {
-    const { data: response } = await adminSession.resources.environmentTypes.get({
+    const { data: response } = await itAdminSession.resources.environmentTypes.get({
       filter: {
         name: { begins: 'Sage' }
       },
@@ -47,7 +43,7 @@ describe('list environment types', () => {
   });
 
   test('list environments types when filter and sorting by status', async () => {
-    const { data: response } = await adminSession.resources.environmentTypes.get({
+    const { data: response } = await itAdminSession.resources.environmentTypes.get({
       filter: {
         status: { begins: 'NOT' }
       },
@@ -60,7 +56,7 @@ describe('list environment types', () => {
 
   test('list environments types fails when filter by invalid prop', async () => {
     try {
-      await adminSession.resources.environmentTypes.get({
+      await itAdminSession.resources.environmentTypes.get({
         filter: {
           someProperty: { begins: 'NOT' }
         }
@@ -78,7 +74,7 @@ describe('list environment types', () => {
 
   test('list environments types fails when filter and sorting different props', async () => {
     try {
-      await adminSession.resources.environmentTypes.get({
+      await itAdminSession.resources.environmentTypes.get({
         filter: {
           status: { begins: 'NOT' }
         },
@@ -98,7 +94,7 @@ describe('list environment types', () => {
   });
   test('list environments types fails when filter by name exceeding length', async () => {
     try {
-      await adminSession.resources.environmentTypes.get({
+      await itAdminSession.resources.environmentTypes.get({
         filter: {
           name: { begins: generateRandomAlphaNumericString(urlFilterMaxLength + 1) }
         }
@@ -167,5 +163,13 @@ describe('list environment types', () => {
         }
       });
     });
+  });
+
+  test(`unauthorized user cannot call list ET`, async () => {
+    try {
+      await anonymousSession.resources.environmentTypes.get({});
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

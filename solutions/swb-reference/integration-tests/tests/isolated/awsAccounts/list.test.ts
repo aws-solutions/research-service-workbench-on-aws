@@ -12,6 +12,7 @@ describe('list hosting accounts', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -21,6 +22,7 @@ describe('list hosting accounts', () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
@@ -78,6 +80,16 @@ describe('list hosting accounts', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthorized user', () => {
+      test('it throws 401 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.get(queryParams);
+        } catch (e) {
+          checkHttpError(e, new HttpError(401, {}));
         }
       });
     });

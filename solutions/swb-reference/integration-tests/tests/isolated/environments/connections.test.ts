@@ -14,6 +14,7 @@ describe('environments connection negative tests', () => {
   let paSession: ClientSession;
   let projectId: string;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -25,6 +26,7 @@ describe('environments connection negative tests', () => {
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -142,5 +144,19 @@ describe('environments connection negative tests', () => {
         );
       }
     });
+  });
+
+  test('unauthorized user receives 401 when trying to connect to environment', async () => {
+    const fakeEnvId = getFakeEnvId();
+
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environments()
+        .environment(fakeEnvId)
+        .connect();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

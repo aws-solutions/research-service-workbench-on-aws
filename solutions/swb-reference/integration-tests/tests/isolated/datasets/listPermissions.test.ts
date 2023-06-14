@@ -11,6 +11,7 @@ describe('negative tests for get dataset permissions', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let paabHelper: PaabHelper;
@@ -30,7 +31,7 @@ describe('negative tests for get dataset permissions', () => {
     pa2Session = paabResources.pa2Session;
     rs1Session = paabResources.rs1Session;
     adminSession = paabResources.adminSession;
-    adminSession = paabResources.adminSession;
+    anonymousSession = paabResources.anonymousSession;
 
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const dataset1Name = randomTextGenerator.getFakeText('isolated-datasets-delete-ds1');
@@ -47,6 +48,10 @@ describe('negative tests for get dataset permissions', () => {
       .dataSets()
       .create(dataSetBody, false);
     dataSet1Id = dataSet1.id;
+  });
+
+  beforeEach(() => {
+    expect.hasAssertions();
   });
 
   afterAll(async () => {
@@ -141,5 +146,13 @@ describe('negative tests for get dataset permissions', () => {
         );
       }
     });
+  });
+
+  test('Unauthorized user cannot list dataset access permissions', async () => {
+    try {
+      await anonymousSession.resources.datasets.dataset(dataSet1Id).listAccessPermissions();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

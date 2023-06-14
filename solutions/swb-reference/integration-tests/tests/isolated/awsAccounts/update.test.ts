@@ -14,6 +14,7 @@ describe('awsAccounts update negative tests', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   let account: Account;
   const accountId = `${resourceTypeToKey.account.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
 
@@ -26,6 +27,7 @@ describe('awsAccounts update negative tests', () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
@@ -84,6 +86,16 @@ describe('awsAccounts update negative tests', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthorized user', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.account(accountId).update({ name: 'testName' }, true);
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

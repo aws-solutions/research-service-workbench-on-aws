@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
@@ -11,24 +10,24 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('create environment type configs', () => {
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
-  const paabHelper: PaabHelper = new PaabHelper(0);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources(__filename);
-    itAdminSession = paabResources.adminSession;
-    paSession = paabResources.pa1Session;
-    researcherSession = paabResources.rs1Session;
+    itAdminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('ITAdmin tests', () => {
@@ -233,5 +232,21 @@ describe('create environment type configs', () => {
         );
       }
     });
+  });
+
+  test('unauthorized user cannot create ETC', async () => {
+    try {
+      await anonymousSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
+        {
+          name: 'this should fail',
+          type: 'typeTest',
+          description: 'description',
+          params: []
+        },
+        false
+      );
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

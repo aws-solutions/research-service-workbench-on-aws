@@ -17,6 +17,7 @@ describe('awsAccounts create negative tests', () => {
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -26,6 +27,7 @@ describe('awsAccounts create negative tests', () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
@@ -224,6 +226,16 @@ describe('awsAccounts create negative tests', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthorized user', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.create({}, false);
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

@@ -10,6 +10,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('get environment type', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let anonymousSession: ClientSession;
   const invalidIds = [
     'et1-prod-1234567890123,pa-1234567890123', //invalid prefix
     'et-prod1-1234567890123,pa-1234567890123', //invalid product prefix
@@ -26,13 +27,14 @@ describe('get environment type', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
     await setup.cleanup();
   });
 
-  test.each(invalidIds)('fails when trying to get invalid format id', async (invalidId) => {
+  test.each(invalidIds)('IT Admin fails when trying to get invalid format id', async (invalidId) => {
     try {
       await adminSession.resources.environmentTypes.environmentType(invalidId).get();
     } catch (e) {
@@ -46,7 +48,7 @@ describe('get environment type', () => {
     }
   });
 
-  test('fails when trying to get non existing environment Type', async () => {
+  test('IT Admin fails when trying to get non existing environment Type', async () => {
     try {
       await adminSession.resources.environmentTypes.environmentType(testEnvTypeId).get();
     } catch (e) {
@@ -57,6 +59,14 @@ describe('get environment type', () => {
           message: `Could not find environment type ${testEnvTypeId}`
         })
       );
+    }
+  });
+
+  test('Unauthorized user fails when trying to get environment Type', async () => {
+    try {
+      await anonymousSession.resources.environmentTypes.environmentType(testEnvTypeId).get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
     }
   });
 });

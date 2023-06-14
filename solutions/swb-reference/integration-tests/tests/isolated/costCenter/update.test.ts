@@ -1,5 +1,4 @@
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
@@ -11,7 +10,7 @@ describe('Update Cost Center negative tests', () => {
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
-  const paabHelper: PaabHelper = new PaabHelper();
+  let anonymousSession: ClientSession;
   const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
@@ -19,14 +18,13 @@ describe('Update Cost Center negative tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources(__filename);
-    itAdminSession = paabResources.adminSession;
-    pa1Session = paabResources.pa1Session;
-    researcherSession = paabResources.rs1Session;
+    itAdminSession = await setup.getDefaultAdminSession();
+    pa1Session = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -66,6 +64,12 @@ describe('Update Cost Center negative tests', () => {
       await expect(
         researcherSession.resources.costCenters.costCenter(costCenterId).update({ name }, true)
       ).rejects.toThrow(unauthorizedHttpError);
+    });
+
+    test('Unauthorized user cannot update a CostCenter', async () => {
+      await expect(
+        anonymousSession.resources.costCenters.costCenter(costCenterId).update({ name }, true)
+      ).rejects.toThrow(new HttpError(403, {}));
     });
   });
 

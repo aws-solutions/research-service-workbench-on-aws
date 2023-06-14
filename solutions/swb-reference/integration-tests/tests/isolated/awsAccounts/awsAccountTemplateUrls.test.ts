@@ -15,6 +15,7 @@ describe('awsAccountTemplateUrls tests', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,6 +25,7 @@ describe('awsAccountTemplateUrls tests', () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
   });
 
   afterAll(async () => {
@@ -73,6 +75,16 @@ describe('awsAccountTemplateUrls tests', () => {
           );
         }
       });
+    });
+  });
+
+  describe('As unauthorized user', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await anonymousSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
+      }
     });
   });
 });

@@ -11,6 +11,7 @@ describe('datasets create negative tests', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let researcher1Sesssion: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let paabHelper: PaabHelper;
   let adminSession: ClientSession;
@@ -23,7 +24,10 @@ describe('datasets create negative tests', () => {
     pa2Session = paabResources.pa2Session;
     researcher1Sesssion = paabResources.rs1Session;
     adminSession = paabResources.adminSession;
+    anonymousSession = paabResources.anonymousSession;
+  });
 
+  beforeEach(() => {
     expect.hasAssertions();
   });
 

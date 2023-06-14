@@ -12,6 +12,7 @@ describe('get hosting account', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   let accountId: string;
 
   beforeEach(() => {
@@ -22,6 +23,7 @@ describe('get hosting account', () => {
     adminSession = await setup.getDefaultAdminSession();
     paSession = await setup.getSessionForUserType('projectAdmin1');
     researcherSession = await setup.getSessionForUserType('researcher1');
+    anonymousSession = await setup.createAnonymousSession();
     accountId = setup.getSettings().get('defaultHostingAccountId');
   });
 
@@ -64,6 +66,16 @@ describe('get hosting account', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthorized user', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.account(accountId).get();
+        } catch (e) {
+          checkHttpError(e, new HttpError(401, {}));
         }
       });
     });
