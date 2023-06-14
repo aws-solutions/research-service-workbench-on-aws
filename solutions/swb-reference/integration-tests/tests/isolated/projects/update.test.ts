@@ -5,11 +5,11 @@
 
 import { Project } from '@aws/workbench-core-accounts/lib/models/projects/project';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError, generateRandomString, validSwbName } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('Update Project negative tests', () => {
   const paabHelper = new PaabHelper(2);

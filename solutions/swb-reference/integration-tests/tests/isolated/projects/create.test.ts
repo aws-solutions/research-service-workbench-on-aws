@@ -203,7 +203,7 @@ describe('Create Project negative tests', () => {
         }
       });
 
-      test('Project Admin passing in project it does not belong to gets 403', async () => {
+      test('Project Admin gets 403', async () => {
         try {
           await pa1Session.resources.projects.create();
         } catch (e) {

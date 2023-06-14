@@ -77,6 +77,7 @@ describe('multiStep project tests', () => {
     console.log('Deleting Project');
     // eslint-disable-next-line no-unused-expressions
     expect(await adminSession.resources.projects.project(createdProject.id).delete()).resolves;
+    // eslint-disable-next-line no-unused-expressions
     expect(await pa1Session.resources.projects.project(project1Id).delete()).resolves;
 
     console.log("Listing projects doesn't return deleted project");
