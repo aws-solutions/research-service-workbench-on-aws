@@ -145,15 +145,14 @@ describe('multiStep environment type and environment type config test', () => {
 
     //Associate project to created environment type config
     console.log('Associate Project with Environment Type Config');
-    await expect(
-      adminSession.resources.projects
-        .project(projectId)
-        .environmentTypes()
-        .environmentType(envType.id)
-        .configurations()
-        .environmentTypeConfig(envTypeConfig.id)
-        .associate()
-    ).resolves.not.toThrow();
+    const { status: associateProjWithEnvTypeConfigStatusCode } = await adminSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .associate();
+    expect(associateProjWithEnvTypeConfigStatusCode).toEqual(204);
 
     //Test retrieving as ITAdmin
     console.log('Get Environment Type as Admin');
@@ -184,13 +183,34 @@ describe('multiStep environment type and environment type config test', () => {
     expect(singleResponse.id === envTypeConfig.id).toBeTruthy();
 
     console.log('Retrieve project association from etc as list');
-    const { data: projectsResponse } = await adminSession.resources.environmentTypes
+    const { data: projectsResponse, status: listProjByEnvTypeConfigStatusCode } =
+      await adminSession.resources.environmentTypes
+        .environmentType(envType.id)
+        .configurations()
+        .environmentTypeConfig(envTypeConfig.id)
+        .projects()
+        .get();
+    expect(listProjByEnvTypeConfigStatusCode).toEqual(200);
+    expect(projectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length).toBeTruthy();
+
+    console.log('Get envTypeConfig associated with project');
+    const { status: getEnvTypeConfigAssociatedWithProjStatusCode } = await adminSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
       .environmentType(envType.id)
       .configurations()
       .environmentTypeConfig(envTypeConfig.id)
-      .projects()
       .get();
-    expect(projectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length).toBeTruthy();
+    expect(getEnvTypeConfigAssociatedWithProjStatusCode).toEqual(200);
+
+    console.log('List envTypeConfigs for project');
+    const { status: listEnvTypeConfigsForProjectStatusCode } = await adminSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envType.id)
+      .configurations()
+      .get();
+    expect(listEnvTypeConfigsForProjectStatusCode).toEqual(200);
 
     //Test retrieving as Project Admin
     console.log('Get Environment Type as Proj Admin');
@@ -302,13 +322,12 @@ describe('multiStep environment type and environment type config test', () => {
     //Delete Environment Type Config
     console.log('Delete Environment Type Config');
     await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle
-    await expect(
-      adminSession.resources.environmentTypes
-        .environmentType(envType.id)
-        .configurations()
-        .environmentTypeConfig(envTypeConfig.id)
-        .delete()
-    ).resolves;
+    const { status: deleteEnvironmentTypeConfigStatusCode } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
+      .delete();
+    expect(deleteEnvironmentTypeConfigStatusCode).toEqual(204);
 
     //Revoke Environment Type
     console.log('Revoke Environment Type');

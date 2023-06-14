@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { ListProjectsResponse } from '../../models/projects';
 import { DEFLAKE_DELAY_IN_MILLISECONDS } from '../../utils/constants';
@@ -18,7 +19,7 @@ export default class EnvironmentTypeConfig extends Resource {
     this._clientSession = clientSession;
   }
 
-  public async associate(): Promise<void> {
+  public async associate(): Promise<AxiosResponse> {
     await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //Avoid throttling
     return this._axiosInstance.put(`${this._api}/relationships`);
   }
