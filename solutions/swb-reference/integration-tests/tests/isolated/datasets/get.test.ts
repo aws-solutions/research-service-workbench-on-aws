@@ -13,9 +13,10 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError, generateInvalidIds } from '../../../support/utils/utilities';
 
 describe('datasets get negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(3);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project3Id: string;
   let researcherSession: ClientSession;
@@ -32,6 +33,7 @@ describe('datasets get negative tests', () => {
     adminSession = paabResources.adminSession;
     pa1Session = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     project1Id = paabResources.project1Id;
     project3Id = paabResources.project3Id;
 
@@ -130,5 +132,13 @@ describe('datasets get negative tests', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user cannot get dataset', async () => {
+    try {
+      await anonymousSession.resources.projects.project(project3Id).dataSets().dataset(dataSet1Id).get();
+    } catch (error) {
+      checkHttpError(error, new HttpError(401, {}));
+    }
   });
 });

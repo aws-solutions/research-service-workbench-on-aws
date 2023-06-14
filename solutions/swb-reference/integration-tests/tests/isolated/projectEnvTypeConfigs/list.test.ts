@@ -14,6 +14,7 @@ describe('list environment type configs associated to project', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
@@ -28,6 +29,7 @@ describe('list environment type configs associated to project', () => {
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
@@ -187,5 +189,58 @@ describe('list environment type configs associated to project', () => {
         }
       });
     });
+  });
+
+  describe('Researcher test', () => {
+    test('cannot list ETCs for project where researcher is not a part of the project', async () => {
+      try {
+        await researcherSession.resources.projects
+          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Project Admin test', () => {
+    test('cannot list ETCs for project where Project Admin is not a part of the project', async () => {
+      try {
+        await paSession.resources.projects
+          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  test('Unauthenticated user cannot list ETCs', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

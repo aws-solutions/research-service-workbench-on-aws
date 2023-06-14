@@ -11,10 +11,11 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('update user negative tests', () => {
-  const paabHelper = new PaabHelper(0);
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let mockUserId: string;
 
   beforeEach(() => {
@@ -22,7 +23,9 @@ describe('update user negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
     // create user
     const mockUserInput = {
       firstName: 'Test',
@@ -157,6 +160,22 @@ describe('update user negative tests', () => {
           error: 'User is not authorized'
         })
       );
+    }
+  });
+
+  test('negative test unauthenticated user: should return 403 error when update a user', async () => {
+    let userId = '';
+    const updateMockUserInput = { firstName: 'updatedFirstName', lastName: 'updatedLastName' };
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await anonymousSession.resources.users.user(userId).update(updateMockUserInput, true);
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

@@ -14,6 +14,7 @@ describe('get environment negative tests', () => {
   let paSession: ClientSession;
   let projectId: string;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -25,6 +26,7 @@ describe('get environment negative tests', () => {
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -142,5 +144,19 @@ describe('get environment negative tests', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user gets 401', async () => {
+    const fakeEnvId = getFakeEnvId();
+    const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+    try {
+      await anonymousSession.resources.projects
+        .project(fakeProjectId)
+        .environments()
+        .environment(fakeEnvId)
+        .get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

@@ -13,6 +13,7 @@ describe('environment start negative tests', () => {
   let paSession: ClientSession;
   let projectId: string;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,6 +25,7 @@ describe('environment start negative tests', () => {
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -143,5 +145,18 @@ describe('environment start negative tests', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user gets error', async () => {
+    const fakeEnvId = getFakeEnvId();
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environments()
+        .environment(fakeEnvId)
+        .start();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

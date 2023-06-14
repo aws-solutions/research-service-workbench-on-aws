@@ -6,6 +6,7 @@ import { lengthValidationMessage } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
 import { AccountHelper } from '../../../support/complex/accountHelper';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
@@ -13,22 +14,27 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('awsAccounts create negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -224,6 +230,16 @@ describe('awsAccounts create negative tests', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthenticated user', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.create({}, false);
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

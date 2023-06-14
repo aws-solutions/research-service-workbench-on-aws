@@ -8,11 +8,12 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment stop negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,6 +25,7 @@ describe('environment stop negative tests', () => {
     paSession = paabResources.pa1Session;
     projectId = paabResources.project1Id;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -143,5 +145,18 @@ describe('environment stop negative tests', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user gets error', async () => {
+    const fakeEnvId = getFakeEnvId();
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environments()
+        .environment(fakeEnvId)
+        .stop();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

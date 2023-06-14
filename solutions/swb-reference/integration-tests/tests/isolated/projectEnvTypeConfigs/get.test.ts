@@ -9,17 +9,19 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Get EnvTypeConfig with Project route', () => {
-  const paabHelper: PaabHelper = new PaabHelper(1);
+  const paabHelper: PaabHelper = new PaabHelper(2);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
-  let paSession: ClientSession;
+  let pa1Session: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
   const nonExistentEnvTypeConfigId = 'etc-12345678-1234-1234-1234-123456789012';
-  let projectId: string;
+  let project1Id: string;
+  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -28,12 +30,29 @@ describe('Get EnvTypeConfig with Project route', () => {
   beforeAll(async () => {
     const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
-    paSession = paabResources.pa1Session;
+    pa1Session = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
-    projectId = paabResources.project1Id;
+    anonymousSession = paabResources.anonymousSession;
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
+
+    await adminSession.resources.projects
+      .project(project2Id)
+      .environmentTypes()
+      .environmentType(envTypeId)
+      .configurations()
+      .environmentTypeConfig(envTypeConfigId)
+      .associate();
   });
 
   afterAll(async () => {
+    await adminSession.resources.projects
+      .project(project2Id)
+      .environmentTypes()
+      .environmentType(envTypeId)
+      .configurations()
+      .environmentTypeConfig(envTypeConfigId)
+      .disassociate();
     await paabHelper.cleanup();
   });
 
@@ -81,7 +100,7 @@ describe('Get EnvTypeConfig with Project route', () => {
     test('fails when using invalid format envType Id', async () => {
       try {
         await adminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environmentTypes()
           .environmentType('invalid-envType-id')
           .configurations()
@@ -101,7 +120,7 @@ describe('Get EnvTypeConfig with Project route', () => {
     test('fails when using non existing envType Id', async () => {
       try {
         await adminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environmentTypes()
           .environmentType(nonExistentEnvTypeId)
           .configurations()
@@ -121,7 +140,7 @@ describe('Get EnvTypeConfig with Project route', () => {
     test('fails when using invalid format envTypeConfig Id', async () => {
       try {
         await adminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environmentTypes()
           .environmentType(envTypeId)
           .configurations()
@@ -141,7 +160,7 @@ describe('Get EnvTypeConfig with Project route', () => {
     test('fails when using non existing envTypeConfig Id', async () => {
       try {
         await adminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environmentTypes()
           .environmentType(envTypeId)
           .configurations()
@@ -163,10 +182,11 @@ describe('Get EnvTypeConfig with Project route', () => {
     test('cannot get ETC for project where researcher is not a part of the project', async () => {
       try {
         await researcherSession.resources.projects
-          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+          .project(project2Id)
           .environmentTypes()
           .environmentType(envTypeId)
           .configurations()
+          .environmentTypeConfig(envTypeConfigId)
           .get();
       } catch (e) {
         checkHttpError(
@@ -182,11 +202,12 @@ describe('Get EnvTypeConfig with Project route', () => {
   describe('Project Admin test', () => {
     test('cannot get ETC for project where Project Admin is not a part of the project', async () => {
       try {
-        await paSession.resources.projects
-          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+        await pa1Session.resources.projects
+          .project(project2Id)
           .environmentTypes()
           .environmentType(envTypeId)
           .configurations()
+          .environmentTypeConfig(envTypeConfigId)
           .get();
       } catch (e) {
         checkHttpError(
@@ -197,5 +218,19 @@ describe('Get EnvTypeConfig with Project route', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user cannot get ETC', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project(project2Id)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

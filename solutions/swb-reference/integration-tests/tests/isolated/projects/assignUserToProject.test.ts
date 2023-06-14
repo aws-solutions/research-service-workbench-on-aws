@@ -165,7 +165,7 @@ describe('assign user to project negative tests', () => {
       }
     });
 
-    test('unauthorized user gets 403', async () => {
+    test('Unauthenticated user gets 403', async () => {
       try {
         await anonymousSession.resources.projects
           .project(project1Id)
