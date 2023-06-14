@@ -10,6 +10,8 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('list projects associated to environment type config', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
@@ -21,6 +23,8 @@ describe('list projects associated to environment type config', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
   });
 
   afterAll(async () => {
@@ -35,6 +39,42 @@ describe('list projects associated to environment type config', () => {
       .projects()
       .get({});
     expect(Array.isArray(response.data)).toBe(true);
+  });
+
+  test('Project Admin list projects by environments type config throws 403', async () => {
+    try {
+      await paSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .projects()
+        .get();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Researcher tests list projects by environments type config throws 403', async () => {
+    try {
+      await researcherSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .projects()
+        .get();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
   });
 
   test('list envTypeConfigProjects fails when using invalid format environment type config Id', async () => {
