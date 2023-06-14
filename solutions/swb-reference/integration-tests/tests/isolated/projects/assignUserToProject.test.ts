@@ -18,6 +18,7 @@ describe('assign user to project negative tests', () => {
   let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -150,12 +151,7 @@ describe('assign user to project negative tests', () => {
           .project(project2Id)
           .assignUserToProject(userId ?? rs1Session.getUserId, { role: 'Researcher' });
       } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
+        checkHttpError(e, forbiddenHttpError);
       }
     });
 
@@ -165,12 +161,7 @@ describe('assign user to project negative tests', () => {
           .project(project1Id)
           .assignUserToProject(userId ?? '', { role: 'Researcher' });
       } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
+        checkHttpError(e, forbiddenHttpError);
       }
     });
 

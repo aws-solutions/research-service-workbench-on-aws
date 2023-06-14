@@ -32,6 +32,7 @@ describe('Create Project negative tests', () => {
   let existingProjectName: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let createRequest: CreateRequest;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeAll(async () => {
     ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
@@ -207,12 +208,7 @@ describe('Create Project negative tests', () => {
         try {
           await pa1Session.resources.projects.create();
         } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(403, {
-              error: 'User is not authorized'
-            })
-          );
+          checkHttpError(e, forbiddenHttpError);
         }
       });
 
@@ -220,12 +216,7 @@ describe('Create Project negative tests', () => {
         try {
           await rs1Session.resources.projects.create();
         } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(403, {
-              error: 'User is not authorized'
-            })
-          );
+          checkHttpError(e, forbiddenHttpError);
         }
       });
 

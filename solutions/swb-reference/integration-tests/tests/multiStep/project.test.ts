@@ -75,10 +75,8 @@ describe('multiStep project tests', () => {
     expect(updatedProjectAsPA).toMatchObject({ name: getProjectAsPA.name, description: newDescription });
 
     console.log('Deleting Project');
-    // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject.id).delete()).resolves;
-    // eslint-disable-next-line no-unused-expressions
-    expect(await pa1Session.resources.projects.project(project1Id).delete()).resolves;
+    await adminSession.resources.projects.project(createdProject.id).delete();
+    await pa1Session.resources.projects.project(project1Id).delete();
 
     console.log("Listing projects doesn't return deleted project");
     const { data: listProjectAfterDelete } = await adminSession.resources.projects.get({

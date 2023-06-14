@@ -16,6 +16,7 @@ describe('remove user from project negative tests', () => {
   let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -68,12 +69,7 @@ describe('remove user from project negative tests', () => {
         .project(project2Id)
         .removeUserFromProject(rs1Session.getUserId() ?? '');
     } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
+      checkHttpError(e, forbiddenHttpError);
     }
   });
 
@@ -83,12 +79,7 @@ describe('remove user from project negative tests', () => {
         .project(project1Id)
         .removeUserFromProject(adminSession.getUserId() ?? '');
     } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
+      checkHttpError(e, forbiddenHttpError);
     }
   });
 
