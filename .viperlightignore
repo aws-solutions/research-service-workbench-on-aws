@@ -46,6 +46,6 @@ solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:41
 solutions/swb-reference/integration-tests/tests/multiStep/user.test.ts:65
 
 # Fake emails for user to project integ tests
-solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:96
+solutions/swb-reference/integration-tests/tests/isolated/projects/assignUserToProject.test.ts:97
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:48
 solutions/swb-reference/integration-tests/tests/multiStep/userProject.test.ts:88
