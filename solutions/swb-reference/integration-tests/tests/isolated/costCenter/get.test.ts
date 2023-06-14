@@ -83,7 +83,7 @@ describe('Get Cost Center negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find cost center ${invalidId}`
+            message: `Could not find cost center`
           })
         );
       }
