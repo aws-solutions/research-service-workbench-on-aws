@@ -61,7 +61,7 @@ describe('Get Project negative tests', () => {
     });
   });
 
-  test('unauthorized user gets 401', async () => {
+  test('Unauthenticated user gets 401', async () => {
     try {
       await anonymousSession.resources.projects.project(project2Id).get();
     } catch (e) {

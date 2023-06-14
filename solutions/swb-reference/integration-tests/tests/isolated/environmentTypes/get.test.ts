@@ -62,7 +62,7 @@ describe('get environment type', () => {
     }
   });
 
-  test('Unauthorized user fails when trying to get environment Type', async () => {
+  test('Unauthenticated user fails when trying to get environment Type', async () => {
     try {
       await anonymousSession.resources.environmentTypes.environmentType(testEnvTypeId).get();
     } catch (e) {

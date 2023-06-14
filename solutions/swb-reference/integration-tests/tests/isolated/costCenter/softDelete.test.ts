@@ -1,10 +1,12 @@
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
@@ -16,10 +18,11 @@ describe('Delete Cost Center negative tests', () => {
   });
 
   beforeAll(async () => {
-    itAdminSession = await setup.getDefaultAdminSession();
-    pa1Session = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    pa1Session = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -59,7 +62,7 @@ describe('Delete Cost Center negative tests', () => {
       );
     });
 
-    test('Unauthorized user cannot soft delete a CostCenter', async () => {
+    test('Unauthenticated user cannot soft delete a CostCenter', async () => {
       await expect(anonymousSession.resources.costCenters.costCenter(costCenterId).delete()).rejects.toThrow(
         new HttpError(403, {})
       );

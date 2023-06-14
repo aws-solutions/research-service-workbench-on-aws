@@ -3,11 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('create environment type configs', () => {
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
   let itAdminSession: ClientSession;
@@ -20,10 +22,11 @@ describe('create environment type configs', () => {
   });
 
   beforeAll(async () => {
-    itAdminSession = await setup.getDefaultAdminSession();
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -234,7 +237,7 @@ describe('create environment type configs', () => {
     });
   });
 
-  test('unauthorized user cannot create ETC', async () => {
+  test('Unauthenticated user cannot create ETC', async () => {
     try {
       await anonymousSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
         {

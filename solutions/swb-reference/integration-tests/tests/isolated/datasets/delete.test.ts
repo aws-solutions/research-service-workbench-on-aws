@@ -145,7 +145,7 @@ describe('datasets delete negative tests', () => {
         }
       });
 
-      test('Unauthorized user cannot delete dataset', async () => {
+      test('Unauthenticated user cannot delete dataset', async () => {
         try {
           await anonymousSession.resources.datasets.dataset(dataSet1Id).delete();
         } catch (e) {

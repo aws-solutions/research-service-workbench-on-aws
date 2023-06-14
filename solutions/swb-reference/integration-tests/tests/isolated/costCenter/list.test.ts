@@ -8,9 +8,11 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('List Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
@@ -23,10 +25,11 @@ describe('List Cost Center negative tests', () => {
   });
 
   beforeAll(async () => {
-    itAdminSession = await setup.getDefaultAdminSession();
-    pa1Session = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    pa1Session = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -64,7 +67,7 @@ describe('List Cost Center negative tests', () => {
       await expect(researcherSession.resources.costCenters.get()).rejects.toThrow(forbiddenHttpError);
     });
 
-    test('Unauthorized user cannot list Cost Centers', async () => {
+    test('Unauthenticated user cannot list Cost Centers', async () => {
       await expect(anonymousSession.resources.costCenters.get()).rejects.toThrow(unauthorizedHttpError);
     });
   });

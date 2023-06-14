@@ -8,7 +8,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment stop negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let projectId: string;
@@ -147,7 +147,7 @@ describe('environment stop negative tests', () => {
     });
   });
 
-  test('unauthorized user gets error', async () => {
+  test('Unauthenticated user gets error', async () => {
     const fakeEnvId = getFakeEnvId();
     try {
       await anonymousSession.resources.projects

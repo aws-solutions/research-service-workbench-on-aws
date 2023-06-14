@@ -14,15 +14,15 @@ describe('list users for project tests', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
-  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id, pa2Session, rs1Session, project2Id } =
+    ({ adminSession, pa1Session, project1Id, pa2Session, rs1Session, anonymousSession } =
       await paabHelper.createResources(__filename));
   });
 
@@ -173,16 +173,11 @@ describe('list users for project tests', () => {
       }
     });
 
-    test('ensure researcher cannot list users for projects in a different project', async () => {
+    test('ensure unauthenticated user cannot list users for projects', async () => {
       try {
-        await rs1Session.resources.projects.project(project2Id).listUsersForProject('ProjectAdmin');
+        await anonymousSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
       } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(403, {
-            error: 'User is not authorized'
-          })
-        );
+        checkHttpError(e, new HttpError(401, {}));
       }
     });
   });

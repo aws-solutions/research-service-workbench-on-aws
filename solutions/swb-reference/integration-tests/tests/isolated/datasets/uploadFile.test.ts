@@ -227,7 +227,7 @@ describe('datasets file upload tests', () => {
             }
           });
 
-          it('Unauthorized user should get a 401 when requesting file upload URL', async () => {
+          it('Unauthenticated user should get a 401 when requesting file upload URL', async () => {
             try {
               await anonymousSession.resources.datasets.dataset(dataSet.id).getFileUploadUrls('TestFile1');
             } catch (e) {

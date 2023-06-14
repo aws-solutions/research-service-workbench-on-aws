@@ -219,6 +219,18 @@ describe('datasets create negative tests', () => {
           checkHttpError(actualError, expectedError);
         }
       });
+
+      test('Unauthenticated user cannot create dataset', async () => {
+        try {
+          const createRequest = paabHelper.createDatasetRequest(project1Id);
+          await anonymousSession.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .create(createRequest, false);
+        } catch (actualError) {
+          checkHttpError(actualError, new HttpError(403, {}));
+        }
+      });
     });
   });
 });

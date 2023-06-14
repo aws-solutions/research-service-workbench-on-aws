@@ -146,7 +146,7 @@ describe('environments connection negative tests', () => {
     });
   });
 
-  test('unauthorized user receives 401 when trying to connect to environment', async () => {
+  test('Unauthenticated user cannot connect to environment', async () => {
     const fakeEnvId = getFakeEnvId();
 
     try {

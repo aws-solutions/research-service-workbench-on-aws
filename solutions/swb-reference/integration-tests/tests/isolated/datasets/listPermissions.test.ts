@@ -148,7 +148,7 @@ describe('negative tests for get dataset permissions', () => {
     });
   });
 
-  test('Unauthorized user cannot list dataset access permissions', async () => {
+  test('Unauthenticated user cannot list dataset access permissions', async () => {
     try {
       await anonymousSession.resources.datasets.dataset(dataSet1Id).listAccessPermissions();
     } catch (e) {

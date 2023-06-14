@@ -146,7 +146,7 @@ describe('get environment negative tests', () => {
     });
   });
 
-  test('unauthorized user gets 401', async () => {
+  test('Unauthenticated user gets 401', async () => {
     const fakeEnvId = getFakeEnvId();
     const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
     try {

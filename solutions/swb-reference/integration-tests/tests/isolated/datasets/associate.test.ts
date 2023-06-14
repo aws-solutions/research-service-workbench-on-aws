@@ -132,7 +132,7 @@ describe('negative tests for associating datasets with project', () => {
       }
     });
 
-    test('Unauthorized user cannot associate any dataset to any project', async () => {
+    test('Unauthenticated user cannot associate any dataset to any project', async () => {
       try {
         await anonymousSession.resources.datasets
           .dataset(dataSet1Id)

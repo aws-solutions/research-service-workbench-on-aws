@@ -166,7 +166,7 @@ describe('list environment type configs', () => {
     });
   });
 
-  test('unauthorized user cannot call list environments type configs (non-project route)', async () => {
+  test('Unauthenticated user cannot call list environments type configs (non-project route)', async () => {
     try {
       await anonymousSession.resources.environmentTypes.environmentType(envTypeId).configurations().get({});
     } catch (e) {

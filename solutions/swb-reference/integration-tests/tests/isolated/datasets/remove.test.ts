@@ -144,7 +144,7 @@ describe('negatives tests for remove dataset from project', () => {
     });
   });
 
-  test('Unauthorized user cannot remove a dataset from a project ', async () => {
+  test('Unauthenticated user cannot remove a dataset from a project ', async () => {
     try {
       await anonymousSession.resources.datasets.dataset(dataSet1Id).disassociateFromProject(project1Id);
     } catch (e) {

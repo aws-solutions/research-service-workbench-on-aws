@@ -147,7 +147,7 @@ describe('environment start negative tests', () => {
     });
   });
 
-  test('unauthorized user gets error', async () => {
+  test('Unauthenticated user gets error', async () => {
     const fakeEnvId = getFakeEnvId();
     try {
       await anonymousSession.resources.projects

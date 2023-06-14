@@ -10,9 +10,11 @@ import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('awsAccounts create negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let paSession: ClientSession;
@@ -24,10 +26,11 @@ describe('awsAccounts create negative tests', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -230,7 +233,7 @@ describe('awsAccounts create negative tests', () => {
       });
     });
 
-    describe('As unauthorized user', () => {
+    describe('As unauthenticated user', () => {
       test('it throws 403 error', async () => {
         try {
           await anonymousSession.resources.accounts.create({}, false);

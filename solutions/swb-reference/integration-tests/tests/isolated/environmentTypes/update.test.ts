@@ -12,6 +12,7 @@ describe('update environment types', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   const paabHelper: PaabHelper = new PaabHelper(1);
   const testEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
@@ -157,6 +158,19 @@ describe('update environment types', () => {
           message: `description: ${lengthValidationMessage(swbDescriptionMaxLength)}`
         })
       );
+    }
+  });
+
+  test(`Unauthenticated user cannot call update ET`, async () => {
+    try {
+      await anonymousSession.resources.environmentTypes.environmentType(testEnvTypeId).update(
+        {
+          name: 'updated_name'
+        },
+        true
+      );
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
     }
   });
 });

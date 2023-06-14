@@ -329,7 +329,7 @@ describe('list environments', () => {
     });
   });
 
-  test('Unauthorized user not authorized to call list environments', async () => {
+  test('Unauthenticated user not authorized to call list environments', async () => {
     try {
       await anonymousSession.resources.environments.get({});
     } catch (e) {

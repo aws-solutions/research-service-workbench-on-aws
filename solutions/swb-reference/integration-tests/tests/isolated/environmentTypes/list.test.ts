@@ -7,8 +7,10 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('list environment types', () => {
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
@@ -20,10 +22,11 @@ describe('list environment types', () => {
   });
 
   beforeAll(async () => {
-    itAdminSession = await setup.getDefaultAdminSession();
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -165,7 +168,7 @@ describe('list environment types', () => {
     });
   });
 
-  test(`unauthorized user cannot call list ET`, async () => {
+  test(`Unauthenticated user cannot call list ET`, async () => {
     try {
       await anonymousSession.resources.environmentTypes.get({});
     } catch (e) {

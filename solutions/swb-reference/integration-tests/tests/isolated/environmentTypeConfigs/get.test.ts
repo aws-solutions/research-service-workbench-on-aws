@@ -3,11 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('get environment type configs', () => {
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
@@ -20,9 +22,10 @@ describe('get environment type configs', () => {
   });
 
   beforeAll(async () => {
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
-    anonymousSession = await setup.createAnonymousSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -67,7 +70,7 @@ describe('get environment type configs', () => {
     });
   });
 
-  test('Unauthorized user cannot call GetEnvironmentTypeConfig', async () => {
+  test('Unauthenticated user cannot call GetEnvironmentTypeConfig', async () => {
     try {
       await anonymousSession.resources.environmentTypes
         .environmentType(envTypeId)

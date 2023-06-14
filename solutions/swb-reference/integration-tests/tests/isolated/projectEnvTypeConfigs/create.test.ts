@@ -16,6 +16,7 @@ describe('Associate Project with EnvTypeConfig', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
@@ -32,6 +33,7 @@ describe('Associate Project with EnvTypeConfig', () => {
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
@@ -74,6 +76,20 @@ describe('Associate Project with EnvTypeConfig', () => {
           error: 'User is not authorized'
         })
       );
+    }
+  });
+
+  test('Unauthenticated user cannot associate project with ETC', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .associate();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 

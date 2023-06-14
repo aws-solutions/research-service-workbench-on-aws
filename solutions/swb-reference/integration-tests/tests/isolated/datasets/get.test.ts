@@ -134,7 +134,7 @@ describe('datasets get negative tests', () => {
     });
   });
 
-  test('Unauthorized user cannot get dataset', async () => {
+  test('Unauthenticated user cannot get dataset', async () => {
     try {
       await anonymousSession.resources.projects.project(project3Id).dataSets().dataset(dataSet1Id).get();
     } catch (error) {
