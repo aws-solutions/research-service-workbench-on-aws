@@ -12,13 +12,20 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('awsAccounts update negative tests', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let account: Account;
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
 
   beforeEach(() => {
     expect.hasAssertions();
+    account = adminSession.resources.accounts.account(accountId);
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
   });
 
   afterAll(async () => {
@@ -26,13 +33,6 @@ describe('awsAccounts update negative tests', () => {
   });
 
   describe('when updating an account', () => {
-    let account: Account;
-
-    beforeEach(() => {
-      const accountId = `${resourceTypeToKey.account.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
-      account = adminSession.resources.accounts.account(accountId);
-    });
-
     describe('and the update params are invalid', () => {
       test('it throws a validation error', async () => {
         try {
@@ -50,6 +50,38 @@ describe('awsAccounts update negative tests', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message: 'name: Expected string, received number'
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('Project admin or researcher can not list aws Accounts', () => {
+    describe('As project admin', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await paSession.resources.accounts.account(accountId).update({ name: 'testName' }, true);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
+
+    describe('As researcher', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await researcherSession.resources.accounts.account(accountId).update({ name: 'testName' }, true);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }

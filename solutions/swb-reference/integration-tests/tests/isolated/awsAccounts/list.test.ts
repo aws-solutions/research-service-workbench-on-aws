@@ -10,6 +10,8 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('list hosting accounts', () => {
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -17,6 +19,8 @@ describe('list hosting accounts', () => {
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    paSession = await setup.getSessionForUserType('projectAdmin1');
+    researcherSession = await setup.getSessionForUserType('researcher1');
   });
 
   afterAll(async () => {
@@ -37,6 +41,41 @@ describe('list hosting accounts', () => {
             new HttpError(400, {
               error: 'Bad Request',
               message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('Project admin or researcher can not list aws Accounts', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('As project admin', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await paSession.resources.accounts.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
+
+    describe('As researcher', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await researcherSession.resources.accounts.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }
