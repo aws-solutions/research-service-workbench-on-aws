@@ -11,16 +11,22 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('assign user to project negative tests', () => {
-  const paabHelper = new PaabHelper(1);
+  const paabHelper = new PaabHelper(2);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
+  let project2Id: string;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession, project1Id } = await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session, anonymousSession, project1Id, project2Id } =
+      await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
@@ -136,6 +142,36 @@ describe('assign user to project negative tests', () => {
             message: `User ${userId} is already assigned to the project ${project1Id}`
           })
         );
+      }
+    });
+
+    test('Project Admin passing in project it does not belong to gets 403', async () => {
+      try {
+        await pa1Session.resources.projects
+          .project(project2Id)
+          .assignUserToProject(userId ?? rs1Session.getUserId, { role: 'Researcher' });
+      } catch (e) {
+        checkHttpError(e, forbiddenHttpError);
+      }
+    });
+
+    test('Researcher gets 403', async () => {
+      try {
+        await rs1Session.resources.projects
+          .project(project1Id)
+          .assignUserToProject(userId ?? '', { role: 'Researcher' });
+      } catch (e) {
+        checkHttpError(e, forbiddenHttpError);
+      }
+    });
+
+    test('unauthorized user gets 403', async () => {
+      try {
+        await anonymousSession.resources.projects
+          .project(project1Id)
+          .assignUserToProject(userId ?? rs1Session.getUserId, { role: 'Researcher' });
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
       }
     });
   });

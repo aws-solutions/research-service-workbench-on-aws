@@ -3,17 +3,21 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../support/clientSession';
+import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
 import { generateRandomString, validSwbName } from '../../support/utils/utilities';
 
 describe('multiStep project tests', () => {
+  const paabHelper = new PaabHelper(1);
+  let pa1Session: ClientSession;
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   let projectName: string;
+  let project1Id: string;
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources(__filename));
   });
 
   beforeEach(async () => {
@@ -28,6 +32,7 @@ describe('multiStep project tests', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -40,8 +45,16 @@ describe('multiStep project tests', () => {
     });
 
     console.log('Getting Project');
-    const { data: getProject } = await adminSession.resources.projects.project(createdProject.id).get();
-    expect(getProject).toMatchObject(createdProject);
+    const { data: getProjectAsITAdmin } = await adminSession.resources.projects
+      .project(createdProject.id)
+      .get();
+    expect(getProjectAsITAdmin).toMatchObject(createdProject);
+
+    const { data: getProjectAsPA } = await pa1Session.resources.projects.project(project1Id).get();
+    expect(getProjectAsPA.id).toEqual(project1Id);
+
+    const { data: getProjectAsResearcher } = await adminSession.resources.projects.project(project1Id).get();
+    expect(getProjectAsResearcher.id).toEqual(project1Id);
 
     console.log('Listing Projects');
     const { data: listProject } = await adminSession.resources.projects.get({
@@ -56,10 +69,14 @@ describe('multiStep project tests', () => {
       .project(createdProject.id)
       .update({ name: newName, description: newDescription }, true);
     expect(updatedProject).toMatchObject({ name: newName, description: newDescription });
+    const { data: updatedProjectAsPA } = await adminSession.resources.projects
+      .project(project1Id)
+      .update({ description: newDescription }, true);
+    expect(updatedProjectAsPA).toMatchObject({ name: getProjectAsPA.name, description: newDescription });
 
     console.log('Deleting Project');
-    // eslint-disable-next-line no-unused-expressions
-    expect(await adminSession.resources.projects.project(createdProject.id).delete()).resolves;
+    await adminSession.resources.projects.project(createdProject.id).delete();
+    await pa1Session.resources.projects.project(project1Id).delete();
 
     console.log("Listing projects doesn't return deleted project");
     const { data: listProjectAfterDelete } = await adminSession.resources.projects.get({

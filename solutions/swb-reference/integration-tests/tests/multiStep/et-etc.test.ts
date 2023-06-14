@@ -43,6 +43,7 @@ describe('multiStep environment type and environment type config test', () => {
       id: expectedId,
       status: 'NOT_APPROVED'
     });
+
     //Throws when creating ETC with non Approved ET
     console.log('Throw when creating Environment Type Config with non approved Environment Type');
     try {
@@ -50,6 +51,7 @@ describe('multiStep environment type and environment type config test', () => {
         .environmentType(envType.id)
         .configurations()
         .create({}, true);
+      throw new Error('Creating ETC with non approved Environment Type did not throw an error');
     } catch (e) {
       checkHttpError(
         e,
@@ -67,6 +69,8 @@ describe('multiStep environment type and environment type config test', () => {
       },
       true
     );
+
+    console.log('Get Environment Type as IT Admin');
     const { data: approvedEnvType } = await adminSession.resources.environmentTypes
       .environmentType(envType.id)
       .get();
@@ -127,6 +131,8 @@ describe('multiStep environment type and environment type config test', () => {
         },
         true
       );
+
+    console.log('Get Environment Type Config as Admin');
     const { data: updatedEnvTypeConfig } = await adminSession.resources.environmentTypes
       .environmentType(envType.id)
       .configurations()
@@ -150,6 +156,12 @@ describe('multiStep environment type and environment type config test', () => {
     ).resolves.not.toThrow();
 
     //Test retrieving as ITAdmin
+    console.log('Get Environment Type as Admin');
+    await adminSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Admin');
+    await adminSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: response } = await adminSession.resources.projects
       .project(projectId)
@@ -181,6 +193,12 @@ describe('multiStep environment type and environment type config test', () => {
     expect(projectsResponse.data.filter((projETC: Project) => projETC.id === projectId).length).toBeTruthy();
 
     //Test retrieving as Project Admin
+    console.log('Get Environment Type as Proj Admin');
+    await paSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Project Admin');
+    await paSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: paResponse } = await paSession.resources.projects
       .project(projectId)
@@ -203,6 +221,12 @@ describe('multiStep environment type and environment type config test', () => {
     expect(paSingleResponse.id === envTypeConfig.id).toBeTruthy();
 
     //Test retrieving as Researcher
+    console.log('Get Environment Type as Researcher');
+    await researcherSession.resources.environmentTypes.environmentType(envType.id).get();
+
+    console.log('List Environment Types as Researcher');
+    await researcherSession.resources.environmentTypes.get();
+
     console.log('Retrieve etc association from project as list');
     const { data: researcherResponse } = await researcherSession.resources.projects
       .project(projectId)

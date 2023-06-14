@@ -4,6 +4,7 @@
  */
 
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
@@ -21,18 +22,26 @@ interface CreateRequest {
 }
 
 describe('Create Project negative tests', () => {
+  const paabHelper = new PaabHelper(1);
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   let existingProjectName: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let createRequest: CreateRequest;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -192,6 +201,30 @@ describe('Create Project negative tests', () => {
               message: `Cost center ${costCenterId} was deleted`
             })
           );
+        }
+      });
+
+      test('Project Admin gets 403', async () => {
+        try {
+          await pa1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, forbiddenHttpError);
+        }
+      });
+
+      test('Researcher gets 403', async () => {
+        try {
+          await rs1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, forbiddenHttpError);
+        }
+      });
+
+      test('unauthorized user gets 403', async () => {
+        try {
+          await anonymousSession.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });
