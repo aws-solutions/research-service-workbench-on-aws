@@ -26,6 +26,7 @@ describe('Delete Cost Center negative tests', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

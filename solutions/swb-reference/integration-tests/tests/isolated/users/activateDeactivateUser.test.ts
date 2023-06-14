@@ -6,10 +6,9 @@
 import { Status, User } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 const fakeUuid = '00000000-0000-0000-0000-000000000000';
 const invalidUuid = '12345';

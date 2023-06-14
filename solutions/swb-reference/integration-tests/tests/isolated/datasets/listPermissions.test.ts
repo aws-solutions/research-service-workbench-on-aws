@@ -56,6 +56,7 @@ describe('negative tests for get dataset permissions', () => {
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   test('ITAdmin cannot get dataset permissions', async () => {

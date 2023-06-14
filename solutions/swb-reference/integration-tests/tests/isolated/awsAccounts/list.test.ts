@@ -4,12 +4,10 @@
  */
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
-import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list hosting accounts', () => {
-  const setup: Setup = Setup.getSetup();
   const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
@@ -29,7 +27,7 @@ describe('list hosting accounts', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('with invalid paginationToken', () => {

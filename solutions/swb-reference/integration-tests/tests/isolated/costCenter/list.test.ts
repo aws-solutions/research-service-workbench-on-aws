@@ -5,10 +5,10 @@
 
 import { nonEmptyMessage } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('List Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
@@ -33,6 +33,7 @@ describe('List Cost Center negative tests', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

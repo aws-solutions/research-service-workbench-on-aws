@@ -30,6 +30,7 @@ describe('create environment type configs', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

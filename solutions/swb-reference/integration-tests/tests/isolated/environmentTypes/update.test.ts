@@ -25,6 +25,7 @@ describe('update environment types', () => {
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -170,7 +171,7 @@ describe('update environment types', () => {
         true
       );
     } catch (e) {
-      checkHttpError(e, new HttpError(401, {}));
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

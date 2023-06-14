@@ -31,6 +31,7 @@ describe('get hosting account', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

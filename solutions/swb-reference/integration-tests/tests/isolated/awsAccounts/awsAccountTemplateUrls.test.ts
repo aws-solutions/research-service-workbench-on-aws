@@ -5,14 +5,12 @@
 
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('awsAccountTemplateUrls tests', () => {
   const mockExternalId = 'workbench-integration-test';
-  const setup: Setup = Setup.getSetup();
   const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
@@ -32,7 +30,7 @@ describe('awsAccountTemplateUrls tests', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   it('returns all six expected URLs when called.', async () => {

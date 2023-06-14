@@ -56,6 +56,7 @@ describe('datasets file upload tests', () => {
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('when trying to upload a file for a project that is', () => {

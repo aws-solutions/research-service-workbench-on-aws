@@ -51,6 +51,7 @@ describe('datasets delete negative tests', () => {
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('when the dataset does not exist', () => {

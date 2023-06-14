@@ -4,14 +4,12 @@
  */
 import { lengthValidationMessage, urlFilterMaxLength } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('list environment types', () => {
   const paabHelper: PaabHelper = new PaabHelper(1);
-  const setup: Setup = Setup.getSetup();
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
@@ -30,7 +28,7 @@ describe('list environment types', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   test('list environments types when filter and sorting by name', async () => {

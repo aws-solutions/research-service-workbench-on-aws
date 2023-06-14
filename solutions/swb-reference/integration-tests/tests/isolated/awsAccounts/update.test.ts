@@ -4,14 +4,12 @@
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Account from '../../../support/resources/accounts/account';
-import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('awsAccounts update negative tests', () => {
-  const setup: Setup = Setup.getSetup();
   const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
@@ -34,7 +32,7 @@ describe('awsAccounts update negative tests', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('when updating an account', () => {

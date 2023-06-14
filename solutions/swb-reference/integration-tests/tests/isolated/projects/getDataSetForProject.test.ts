@@ -5,10 +5,10 @@
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
+import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError, generateInvalidIds } from '../../../support/utils/utilities';
-import Setup from '../../../support/setup';
 
 describe('get dataset for project tests', () => {
   const paabHelper: PaabHelper = new PaabHelper(2);
@@ -17,6 +17,7 @@ describe('get dataset for project tests', () => {
   let itAdminSession: ClientSession;
   let researcher1Session: ClientSession;
   let pa1Session: ClientSession;
+  let pa2Session: ClientSession;
   let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
@@ -31,6 +32,7 @@ describe('get dataset for project tests', () => {
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
     pa1Session = paabResources.pa1Session;
+    pa2Session = paabResources.pa2Session;
     anonymousSession = paabResources.anonymousSession;
     project1Id = paabResources.project1Id;
     project2Id = paabResources.project2Id;
@@ -106,7 +108,7 @@ describe('get dataset for project tests', () => {
           region: settings.get('awsRegion'),
           type: 'internal'
         });
-        const { data: dataSet1 } = await pa1Session.resources.projects
+        const { data: dataSet1 } = await pa2Session.resources.projects
           .project(project2Id)
           .dataSets()
           .create(dataSetBody, false);

@@ -69,6 +69,7 @@ describe('negatives tests for remove dataset from project', () => {
   });
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   test('ITAdmin should not be able to remove dataset from project', async () => {

@@ -6,11 +6,11 @@ import { lengthValidationMessage } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
 import { AccountHelper } from '../../../support/complex/accountHelper';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
-import { PaabHelper } from '../../../support/complex/paabHelper';
 
 describe('awsAccounts create negative tests', () => {
   const setup: Setup = Setup.getSetup();
@@ -34,6 +34,7 @@ describe('awsAccounts create negative tests', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

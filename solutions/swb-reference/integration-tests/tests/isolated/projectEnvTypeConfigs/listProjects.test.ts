@@ -33,6 +33,7 @@ describe('list projects associated to environment type config', () => {
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 

@@ -56,6 +56,7 @@ describe('negative tests for associating datasets with project', () => {
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   test('ITAdmin does not have the permissions to associate a dataset to a project', async () => {
