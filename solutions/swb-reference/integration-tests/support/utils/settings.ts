@@ -19,6 +19,7 @@ interface Setting {
   projectAdmin1PasswordParamStorePath: string;
   projectAdmin2UserNameParamStorePath: string;
   projectAdmin2PasswordParamStorePath: string;
+  externalId: string;
   costCenterId: string;
   projectName: string;
 

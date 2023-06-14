@@ -37,7 +37,7 @@ describe('multiStep awsAccount integration test', () => {
         awsAccountId: awsAccountIdToUse,
         envMgmtRoleArn: `arn:aws:iam::${awsAccountIdToUse}:role/${stackName}-env-mgmt`,
         name: randomTextGenerator.getFakeText('fakeName'),
-        externalId: 'workbench'
+        externalId: settings.get('externalId')
       };
 
       const createResponse = await adminSession.resources.accounts.create(createAccountParams, false);

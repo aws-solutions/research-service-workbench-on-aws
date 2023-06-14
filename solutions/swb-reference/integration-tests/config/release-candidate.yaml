@@ -21,6 +21,9 @@ projectAdmin2PasswordParamStorePath: '/swb/release-candidate/pa2/password'
 researcher1UserNameParamStorePath: '/swb/release-candidate/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/release-candidate/researcher1/password'
 
+## Default external ID
+externalId: 'workbench'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-abb7962c-e584-4657-b8dc-2d2770b5a06d'
 

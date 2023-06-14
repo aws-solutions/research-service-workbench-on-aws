@@ -21,6 +21,9 @@
 #researcher1UserNameParamStorePath: ''
 #researcher1PasswordParamStorePath: ''
 
+## Default external ID
+#externalId: 'workbench'
+
 ## Default Hosting Account
 #defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 
