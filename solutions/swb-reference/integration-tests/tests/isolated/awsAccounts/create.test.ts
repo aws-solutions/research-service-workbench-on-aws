@@ -203,7 +203,7 @@ describe('awsAccounts create negative tests', () => {
     });
   });
 
-  describe('Project admin or researcher can not list aws Accounts', () => {
+  describe('Project admin or researcher can not create aws Accounts', () => {
     describe('As project admin', () => {
       test('it throws 403 error', async () => {
         try {
