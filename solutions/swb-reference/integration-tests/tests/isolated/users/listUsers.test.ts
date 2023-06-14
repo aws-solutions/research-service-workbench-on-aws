@@ -11,6 +11,7 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('list users negative tests', () => {
   const paabHelper = new PaabHelper(0);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
   let rs1Session: ClientSession;
 
   beforeEach(() => {
@@ -18,7 +19,7 @@ describe('list users negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, rs1Session } = await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
@@ -103,16 +104,26 @@ describe('list users negative tests', () => {
     });
   });
 
-  it('Researcher: should return 403 error when try to list users', async () => {
-    try {
-      await rs1Session.resources.users.get();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
+  describe('boundary tests', () => {
+    test('cannot list users if user is a researcher', async () => {
+      try {
+        await rs1Session.resources.users.get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('can list users if user is a ITAdmin', async () => {
+      await expect(adminSession.resources.users.get()).resolves.not.toThrow();
+    });
+
+    test('can list users if user is a project admin', async () => {
+      await expect(pa1Session.resources.users.get()).resolves.not.toThrow();
+    });
   });
 });
