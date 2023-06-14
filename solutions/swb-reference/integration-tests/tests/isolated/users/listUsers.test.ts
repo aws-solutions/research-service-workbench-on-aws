@@ -9,7 +9,7 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list users negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(0);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
@@ -19,7 +19,7 @@ describe('list users negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
