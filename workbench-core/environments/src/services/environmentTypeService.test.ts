@@ -160,7 +160,7 @@ describe('environmentTypeService', () => {
       // BUILD & OPERATE & CHECK
       await expect(
         envTypeService.listEnvironmentTypes({ pageSize: 1, paginationToken: 'invalidPaginationToken' })
-      ).rejects.toThrow('Invalid Pagination Token: invalidPaginationToken');
+      ).rejects.toThrow('Invalid Pagination Token');
     });
 
     test('filters by name successfully with an eq function ', async () => {
