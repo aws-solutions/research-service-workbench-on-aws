@@ -538,7 +538,6 @@ describe('multiStep environment test', () => {
         rs1Session,
         project1Id,
         env1.id,
-        'PENDING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
@@ -546,7 +545,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project2Id,
         env2.id,
-        'PENDING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
@@ -554,7 +552,6 @@ describe('multiStep environment test', () => {
         rs1Session,
         project3Id,
         env3.id,
-        'PENDING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       )
@@ -598,7 +595,6 @@ describe('multiStep environment test', () => {
         rs1Session,
         project1Id,
         env1.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
@@ -606,7 +602,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project2Id,
         env2.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
@@ -614,7 +609,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project3Id,
         env3.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       )
@@ -654,7 +648,6 @@ describe('multiStep environment test', () => {
         rs1Session,
         project1Id,
         env1.id,
-        'STARTING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
@@ -662,7 +655,6 @@ describe('multiStep environment test', () => {
         pa2Session,
         project2Id,
         env2.id,
-        'STARTING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       ),
@@ -670,7 +662,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project3Id,
         env3.id,
-        'STARTING',
         'COMPLETED',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       )
@@ -690,7 +681,6 @@ describe('multiStep environment test', () => {
         rs1Session,
         project1Id,
         env1.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
@@ -698,7 +688,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project2Id,
         env2.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       ),
@@ -706,7 +695,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project3Id,
         env3.id,
-        'STOPPING',
         'STOPPED',
         ENVIRONMENT_STOP_MAX_WAITING_SECONDS
       )
@@ -727,7 +715,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project1Id,
         env1.id,
-        'TERMINATING',
         'TERMINATED',
         ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
       ),
@@ -735,7 +722,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project2Id,
         env2.id,
-        'TERMINATING',
         'TERMINATED',
         ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
       ),
@@ -743,7 +729,6 @@ describe('multiStep environment test', () => {
         adminSession,
         project3Id,
         env3.id,
-        'TERMINATING',
         'TERMINATED',
         ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
       )
@@ -778,14 +763,13 @@ async function _waitForEnvironmentToReachState(
   session: ClientSession,
   projectId: string,
   envId: string,
-  transitionState: string,
   desiredState: string,
   timeout: number
 ): Promise<void> {
   console.log(`Waiting for Environment ${envId} is in state ${desiredState}...`);
   await poll(
     async () => session.resources.projects.project(projectId).environments().environment(envId).get(),
-    (env) => env?.data?.status !== transitionState,
+    (env) => env?.data?.status === desiredState || env?.data?.status.includes('FAIL'),
     timeout
   );
   const { data: env } = await session.resources.projects
