@@ -8,10 +8,11 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment terminate negative tests', () => {
-  const paabHelper: PaabHelper = new PaabHelper(1);
+  const paabHelper: PaabHelper = new PaabHelper(2);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
-  let projectId: string;
+  let project1Id: string;
+  let project2Id: string;
   let researcherSession: ClientSession;
   let anonymousSession: ClientSession;
 
@@ -23,7 +24,8 @@ describe('environment terminate negative tests', () => {
     const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
-    projectId = paabResources.project1Id;
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
     researcherSession = paabResources.rs1Session;
     anonymousSession = paabResources.anonymousSession;
   });
@@ -37,7 +39,7 @@ describe('environment terminate negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       try {
         await itAdminSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .environment(fakeEnvId)
           .terminate();
@@ -78,7 +80,7 @@ describe('environment terminate negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       try {
         await paSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .environment(fakeEnvId)
           .terminate();
@@ -110,6 +112,24 @@ describe('environment terminate negative tests', () => {
         );
       }
     });
+
+    test('projectAdmin not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await paSession.resources.projects
+          .project(project2Id)
+          .environments()
+          .environment(fakeEnvId)
+          .terminate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   describe('Researcher tests', () => {
@@ -117,7 +137,7 @@ describe('environment terminate negative tests', () => {
       const fakeEnvId = getFakeEnvId();
       try {
         await researcherSession.resources.projects
-          .project(projectId)
+          .project(project1Id)
           .environments()
           .environment(fakeEnvId)
           .terminate();
@@ -149,13 +169,31 @@ describe('environment terminate negative tests', () => {
         );
       }
     });
+
+    test('researcher not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await researcherSession.resources.projects
+          .project(project2Id)
+          .environments()
+          .environment(fakeEnvId)
+          .terminate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   test('Unauthenticated user gets error', async () => {
     const fakeEnvId = getFakeEnvId();
     try {
       await anonymousSession.resources.projects
-        .project(projectId)
+        .project(project1Id)
         .environments()
         .environment(fakeEnvId)
         .terminate();
