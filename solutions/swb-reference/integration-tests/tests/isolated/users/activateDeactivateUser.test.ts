@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Status } from '@aws/workbench-core-user-management';
+import { Status, User } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
@@ -14,8 +14,11 @@ const fakeUuid = '00000000-0000-0000-0000-000000000000';
 const invalidUuid = '12345';
 
 describe('userManagement activate/deactivate user integration test', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let userId: string;
 
   beforeEach(() => {
@@ -23,7 +26,9 @@ describe('userManagement activate/deactivate user integration test', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
 
     const { data } = await adminSession.resources.users.create({
       firstName: 'Test',
@@ -34,7 +39,7 @@ describe('userManagement activate/deactivate user integration test', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   it('should be able to activate an inactive user', async () => {
@@ -121,5 +126,84 @@ describe('userManagement activate/deactivate user integration test', () => {
         })
       );
     }
+  });
+
+  describe('Unauthorized tests', () => {
+    beforeEach(async () => {
+      const users = await adminSession.resources.users.get();
+      const user = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+    });
+
+    it('ProjectAdmin: should return 403 error when try to activate a user', async () => {
+      try {
+        await pa1Session.resources.users.user(userId).activate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    it('Researcher: should return 403 error when try to activate a user', async () => {
+      try {
+        await rs1Session.resources.users.user(userId).activate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    it('Unauthenticated user: should return 403 error when try to activate a user', async () => {
+      try {
+        await anonymousSession.resources.users.user(userId).activate();
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
+      }
+    });
+
+    it('ProjectAdmin: should return 403 error when try to deactivate a user', async () => {
+      try {
+        await pa1Session.resources.users.user(userId).deactivate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    it('Researcher: should return 403 error when try to deactivate a user', async () => {
+      try {
+        await rs1Session.resources.users.user(userId).deactivate();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    it('Unauthenticated user: should return 403 error when try to deactivate a user', async () => {
+      try {
+        await anonymousSession.resources.users.user(userId).deactivate();
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
+      }
+    });
   });
 });

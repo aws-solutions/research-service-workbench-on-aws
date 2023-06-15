@@ -3,15 +3,18 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('get hosting account', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   let accountId: string;
 
   beforeEach(() => {
@@ -19,13 +22,16 @@ describe('get hosting account', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
-    paSession = await setup.getSessionForUserType('projectAdmin1');
-    researcherSession = await setup.getSessionForUserType('researcher1');
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     accountId = setup.getSettings().get('defaultHostingAccountId');
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -64,6 +70,16 @@ describe('get hosting account', () => {
               error: 'User is not authorized'
             })
           );
+        }
+      });
+    });
+
+    describe('As unauthenticated user', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await anonymousSession.resources.accounts.account(accountId).get();
+        } catch (e) {
+          checkHttpError(e, new HttpError(401, {}));
         }
       });
     });

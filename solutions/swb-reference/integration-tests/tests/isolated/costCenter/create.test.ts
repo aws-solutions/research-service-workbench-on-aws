@@ -8,12 +8,13 @@ import { checkHttpError, generateInvalidIds } from '../../../support/utils/utili
 
 describe('Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   let validCreateRequest: { name: string; description: string; accountId: string };
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
-  const paabHelper: PaabHelper = new PaabHelper();
   const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
@@ -25,6 +26,7 @@ describe('Cost Center negative tests', () => {
     itAdminSession = paabResources.adminSession;
     pa1Session = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
 
     validCreateRequest = {
       name: randomTextGenerator.getFakeText('costCenterName'),
@@ -34,8 +36,8 @@ describe('Cost Center negative tests', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('authorization test:', () => {
@@ -54,6 +56,12 @@ describe('Cost Center negative tests', () => {
     test('Researcher cannot create CostCenter', async () => {
       await expect(researcherSession.resources.costCenters.create(validCreateRequest)).rejects.toThrow(
         unauthorizedHttpError
+      );
+    });
+
+    test('Unauthenticated user cannot create CostCenter', async () => {
+      await expect(anonymousSession.resources.costCenters.create(validCreateRequest)).rejects.toThrow(
+        new HttpError(403, {})
       );
     });
   });

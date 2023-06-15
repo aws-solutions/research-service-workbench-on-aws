@@ -11,6 +11,7 @@ describe('negatives tests for remove dataset from project', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let paabHelper: PaabHelper;
@@ -30,7 +31,7 @@ describe('negatives tests for remove dataset from project', () => {
     pa2Session = paabResources.pa2Session;
     rs1Session = paabResources.rs1Session;
     adminSession = paabResources.adminSession;
-    adminSession = paabResources.adminSession;
+    anonymousSession = paabResources.anonymousSession;
 
     const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const dataset1Name = randomTextGenerator.getFakeText('isolated-datasets-delete-ds1');
@@ -50,6 +51,8 @@ describe('negatives tests for remove dataset from project', () => {
   });
 
   beforeEach(async () => {
+    expect.hasAssertions();
+
     await pa1Session.resources.projects
       .project(project1Id)
       .dataSets()
@@ -66,6 +69,7 @@ describe('negatives tests for remove dataset from project', () => {
   });
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   test('ITAdmin should not be able to remove dataset from project', async () => {
@@ -139,5 +143,13 @@ describe('negatives tests for remove dataset from project', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user cannot remove a dataset from a project ', async () => {
+    try {
+      await anonymousSession.resources.datasets.dataset(dataSet1Id).disassociateFromProject(project1Id);
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

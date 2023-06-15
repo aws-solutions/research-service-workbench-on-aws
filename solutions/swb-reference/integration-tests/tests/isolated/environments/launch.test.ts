@@ -95,7 +95,7 @@ describe('environments launch negative tests', () => {
       }
     });
 
-    test('Anonymous user launch environment', async () => {
+    test('Unauthenticated user cannot launch environment', async () => {
       try {
         await anonymousSession.resources.projects
           .project(project1Id)

@@ -21,6 +21,7 @@ describe('datasets file upload tests', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let dataSet: DataSet;
@@ -49,11 +50,13 @@ describe('datasets file upload tests', () => {
     pa1Session = paabResources.pa1Session;
     pa2Session = paabResources.pa2Session;
     rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     datasetHelper = new DatasetHelper();
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('when trying to upload a file for a project that is', () => {
@@ -222,6 +225,14 @@ describe('datasets file upload tests', () => {
                   error: 'User is not authorized'
                 })
               );
+            }
+          });
+
+          it('Unauthenticated user should get a 401 when requesting file upload URL', async () => {
+            try {
+              await anonymousSession.resources.datasets.dataset(dataSet.id).getFileUploadUrls('TestFile1');
+            } catch (e) {
+              checkHttpError(e, new HttpError(401, {}));
             }
           });
         });
