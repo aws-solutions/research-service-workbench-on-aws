@@ -4,24 +4,29 @@
  */
 
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list users negative tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   describe('with invalid parameters', () => {
@@ -99,6 +104,37 @@ describe('list users negative tests', () => {
           );
         }
       });
+    });
+  });
+
+  describe('boundary tests', () => {
+    test('cannot list users if user is a researcher', async () => {
+      try {
+        await rs1Session.resources.users.get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('cannot list users if user is unauthenticated', async () => {
+      try {
+        await anonymousSession.resources.users.get();
+      } catch (e) {
+        checkHttpError(e, new HttpError(401, {}));
+      }
+    });
+
+    test('can list users if user is a ITAdmin', async () => {
+      await expect(adminSession.resources.users.get()).resolves.not.toThrow();
+    });
+
+    test('can list users if user is a project admin', async () => {
+      await expect(pa1Session.resources.users.get()).resolves.not.toThrow();
     });
   });
 });

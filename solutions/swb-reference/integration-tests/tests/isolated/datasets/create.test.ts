@@ -11,19 +11,23 @@ describe('datasets create negative tests', () => {
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
   let researcher1Sesssion: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let paabHelper: PaabHelper;
   let adminSession: ClientSession;
 
   beforeAll(async () => {
     paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;
     pa2Session = paabResources.pa2Session;
     researcher1Sesssion = paabResources.rs1Session;
     adminSession = paabResources.adminSession;
+    anonymousSession = paabResources.anonymousSession;
+  });
 
+  beforeEach(() => {
     expect.hasAssertions();
   });
 
@@ -187,6 +191,46 @@ describe('datasets create negative tests', () => {
         console.log(JSON.stringify(expectedError));
         checkHttpError(actualError, expectedError);
       }
+    });
+
+    describe('user with no project', () => {
+      beforeAll(async () => {
+        //Remove researcher 1 from project 1 to make it a user with no project associated
+        await adminSession.resources.projects
+          .project(project1Id)
+          .removeUserFromProject(researcher1Sesssion.getUserId()!);
+      });
+      afterAll(async () => {
+        await adminSession.resources.projects
+          .project(project1Id)
+          .assignUserToProject(researcher1Sesssion.getUserId()!, {
+            role: 'Researcher'
+          });
+      });
+
+      test('User with no project cannot create datasets', async () => {
+        try {
+          const createRequest = paabHelper.createDatasetRequest(project1Id);
+          await researcher1Sesssion.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .create(createRequest, false);
+        } catch (actualError) {
+          checkHttpError(actualError, expectedError);
+        }
+      });
+
+      test('Unauthenticated user cannot create dataset', async () => {
+        try {
+          const createRequest = paabHelper.createDatasetRequest(project1Id);
+          await anonymousSession.resources.projects
+            .project(project1Id)
+            .dataSets()
+            .create(createRequest, false);
+        } catch (actualError) {
+          checkHttpError(actualError, new HttpError(403, {}));
+        }
+      });
     });
   });
 });

@@ -9,27 +9,30 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('update environment type configs', () => {
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
-  const paabHelper: PaabHelper = new PaabHelper(0);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('ITAdmin tests', () => {
@@ -149,5 +152,22 @@ describe('update environment type configs', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user cannot call UpdateEnvironmentTypeConfig', async () => {
+    try {
+      await anonymousSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig('etc-12345678-1234-1234-1234-123456789012')
+        .update(
+          {
+            description: 'new Description'
+          },
+          true
+        );
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

@@ -14,16 +14,18 @@ describe('List Project negative tests', () => {
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(async () => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -132,6 +134,14 @@ describe('List Project negative tests', () => {
           );
         }
       });
+    });
+
+    test('Unauthenticated user gets 401', async () => {
+      try {
+        await anonymousSession.resources.projects.get();
+      } catch (e) {
+        checkHttpError(e, new HttpError(401, {}));
+      }
     });
   });
 });

@@ -3,15 +3,19 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { Status, User } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('update user negative tests', () => {
-  const setup: Setup = Setup.getSetup();
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let mockUserId: string;
 
   beforeEach(() => {
@@ -19,7 +23,9 @@ describe('update user negative tests', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
     // create user
     const mockUserInput = {
       firstName: 'Test',
@@ -34,7 +40,7 @@ describe('update user negative tests', () => {
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   it('should return a 400 error when the provided email is not a valid email address', async () => {
@@ -112,6 +118,64 @@ describe('update user negative tests', () => {
           message: ": Unrecognized key(s) in object: 'roles'"
         })
       );
+    }
+  });
+
+  test('negative test ProjectAdmin: should return 403 error when update a user', async () => {
+    let userId = '';
+    const updateMockUserInput = { firstName: 'updatedFirstName', lastName: 'updatedLastName' };
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await pa1Session.resources.users.user(userId).update(updateMockUserInput, true);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('negative test Researcher: should return 403 error when update a user', async () => {
+    let userId = '';
+    const updateMockUserInput = { firstName: 'updatedFirstName', lastName: 'updatedLastName' };
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await rs1Session.resources.users.user(userId).update(updateMockUserInput, true);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('negative test unauthenticated user: should return 403 error when update a user', async () => {
+    let userId = '';
+    const updateMockUserInput = { firstName: 'updatedFirstName', lastName: 'updatedLastName' };
+    try {
+      const users = await adminSession.resources.users.get();
+      const user: User = users.data.users.data.find((user: User) => user.status === Status.ACTIVE);
+
+      expect(user).toBeDefined();
+
+      userId = user.id;
+      await anonymousSession.resources.users.user(userId).update(updateMockUserInput, true);
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

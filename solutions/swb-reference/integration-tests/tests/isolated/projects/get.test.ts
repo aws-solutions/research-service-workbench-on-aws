@@ -12,6 +12,7 @@ describe('Get Project negative tests', () => {
   const paabHelper: PaabHelper = new PaabHelper(2);
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project2Id: string;
 
   beforeEach(async () => {
@@ -19,9 +20,10 @@ describe('Get Project negative tests', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     pa1Session = paabResources.pa1Session;
     rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     project2Id = paabResources.project2Id;
   });
 
@@ -57,5 +59,13 @@ describe('Get Project negative tests', () => {
         );
       }
     });
+  });
+
+  test('Unauthenticated user gets 401', async () => {
+    try {
+      await anonymousSession.resources.projects.project(project2Id).get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

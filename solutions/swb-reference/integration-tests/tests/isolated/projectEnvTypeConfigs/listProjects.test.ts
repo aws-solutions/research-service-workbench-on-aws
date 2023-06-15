@@ -3,13 +3,18 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list projects associated to environment type config', () => {
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
@@ -20,10 +25,15 @@ describe('list projects associated to environment type config', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -35,6 +45,55 @@ describe('list projects associated to environment type config', () => {
       .projects()
       .get({});
     expect(Array.isArray(response.data)).toBe(true);
+  });
+
+  test('Project Admin list projects by environments type config throws 403', async () => {
+    try {
+      await paSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .projects()
+        .get();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Researcher tests list projects by environments type config throws 403', async () => {
+    try {
+      await researcherSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .projects()
+        .get();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Unauthenticated user tests list projects by environments type config throws 401', async () => {
+    try {
+      await anonymousSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .projects()
+        .get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 
   test('list envTypeConfigProjects fails when using invalid format environment type config Id', async () => {

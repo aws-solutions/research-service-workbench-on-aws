@@ -15,6 +15,7 @@ interface PaabResources {
   pa1Session: ClientSession;
   pa2Session: ClientSession;
   rs1Session: ClientSession;
+  anonymousSession: ClientSession;
   project1Id: string;
   project2Id: string;
   project3Id: string;
@@ -33,13 +34,21 @@ export class PaabHelper {
     if (numberOfProjects) this._numberOfProjects = numberOfProjects;
   }
 
-  public async createResources(): Promise<PaabResources> {
+  public async createResources(filename: string): Promise<PaabResources> {
     if (this._numberOfProjects > 3) {
       throw new Error('PaabHelper cannot support more than 3 projects');
     }
 
     // create IT admin session
     const adminSession: ClientSession = await this._setup.getDefaultAdminSession(this._outputError);
+    const anonymousSession: ClientSession = await this._setup.createAnonymousSession();
+    // Example: lib/integration-tests/tests/isolated/datasets/create.test.ts => isolated-datasets-create
+    const testName: string = filename
+      .replace(/.test.js/g, '')
+      .split('/')
+      .slice(-3)
+      .join('-');
+    console.log(testName);
 
     // set up new cost center
     const { data: costCenter } = await adminSession.resources.costCenters.create({
@@ -52,8 +61,8 @@ export class PaabHelper {
     for (let i = 1; i <= this._numberOfProjects; i++) {
       const projectName = `Project${i}`;
       const projectResponse = await adminSession.resources.projects.create({
-        name: this._randomTextGenerator.getFakeText(projectName),
-        description: `${projectName} for integ tests`,
+        name: testName + this._randomTextGenerator.getFakeText(projectName),
+        description: `${projectName} for integ tests ${testName}`,
         costCenterId: costCenter.id
       });
       projectIds.push(projectResponse.data.id);
@@ -103,6 +112,7 @@ export class PaabHelper {
       pa1Session,
       pa2Session,
       rs1Session,
+      anonymousSession,
       project1Id,
       project2Id,
       project3Id

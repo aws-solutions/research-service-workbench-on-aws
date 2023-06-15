@@ -12,6 +12,9 @@ describe('Disassociate Project with EnvTypeConfig', () => {
   const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
@@ -24,13 +27,68 @@ describe('Disassociate Project with EnvTypeConfig', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+  });
+
+  test('Project Admin cannot disassociate project with ETC', async () => {
+    try {
+      await paSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .disassociate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Researcher cannot disassociate project with ETC', async () => {
+    try {
+      await researcherSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .disassociate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Unauthenticated user cannot disassociate project with ETC', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .disassociate();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 
   test('fails when using invalid format project Id', async () => {

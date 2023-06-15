@@ -13,6 +13,8 @@ describe('list users for project tests', () => {
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
 
   beforeEach(() => {
@@ -20,7 +22,8 @@ describe('list users for project tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id, pa2Session } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, project1Id, pa2Session, rs1Session, anonymousSession } =
+      await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
@@ -98,6 +101,83 @@ describe('list users for project tests', () => {
             message: `Invalid parameter`
           })
         );
+      }
+    });
+
+    test('ensure researcher cannot list ProjectAdmin users for projects', async () => {
+      try {
+        await rs1Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure researcher cannot list Researcher users for projects', async () => {
+      try {
+        await rs1Session.resources.projects.project(project1Id).listUsersForProject('Researcher');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure project admin cannot list users for other projects they are not project admin of', async () => {
+      await pa1Session.resources.projects.project(project1Id).assignUserToProject(pa2Session.getUserId()!, {
+        role: 'Researcher'
+      });
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+      await pa1Session.resources.projects.project(project1Id).removeUserFromProject(pa2Session.getUserId()!);
+    });
+
+    test('ensure project admin cannot list ProjectAdmin users for other projects they do not belong to', async () => {
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure project admin cannot list Researcher users for other projects they do not belong to', async () => {
+      try {
+        await pa2Session.resources.projects.project(project1Id).listUsersForProject('Reseacher');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ensure unauthenticated user cannot list users for projects', async () => {
+      try {
+        await anonymousSession.resources.projects.project(project1Id).listUsersForProject('ProjectAdmin');
+      } catch (e) {
+        checkHttpError(e, new HttpError(401, {}));
       }
     });
   });

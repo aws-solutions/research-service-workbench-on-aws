@@ -14,20 +14,24 @@ describe('list datasets for project tests', () => {
   let researcher1Session: ClientSession;
   let pa1Session: ClientSession;
   let pa2Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
+  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper(1);
-    const paabResources = await paabHelper.createResources();
+    paabHelper = new PaabHelper(2);
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     researcher1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     pa1Session = paabResources.pa1Session;
     pa2Session = paabResources.pa2Session;
     project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
   });
 
   afterAll(async () => {
@@ -58,6 +62,27 @@ describe('list datasets for project tests', () => {
             error: 'User is not authorized'
           })
         );
+      }
+    });
+
+    test('Researcher from project 1 cannot list datasets for project 2', async () => {
+      try {
+        await researcher1Session.resources.projects.project(project2Id).dataSets().get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('Unauthenticated user cannot list datasets for project', async () => {
+      try {
+        await anonymousSession.resources.projects.project(project1Id).dataSets().get();
+      } catch (e) {
+        checkHttpError(e, new HttpError(401, {}));
       }
     });
 

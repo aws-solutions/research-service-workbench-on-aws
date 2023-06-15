@@ -15,11 +15,14 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError, generateRandomAlphaNumericString } from '../../../support/utils/utilities';
 
 describe('list environments', () => {
-  const paabHelper = new PaabHelper(1);
+  const paabHelper = new PaabHelper(2);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
-  let validProjectId: string;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
+  let projectId1: string;
+  let projectId2: string;
   const validEnvStatuses = [
     'PENDING',
     'COMPLETED',
@@ -66,11 +69,14 @@ describe('list environments', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
-    validProjectId = paabResources.project1Id;
+    projectId1 = paabResources.project1Id;
+    projectId2 = paabResources.project2Id;
+    rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -193,9 +199,39 @@ describe('list environments', () => {
         );
       }
     });
+
+    test('list project environments when user not associated to a valid project', async () => {
+      console.log('A Project Admin of Project1 and Project3, cannot LIST environments from Project2');
+      try {
+        await paSession.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
   });
 
   describe('Researcher tests', () => {
+    test('list project environments when user not associated to a valid project', async () => {
+      console.log('A Researcher of Project1 and Project3, cannot LIST environments from Project2');
+      try {
+        await rs1Session.resources.projects.project(projectId2).environments().listProjectEnvironments();
+        throw new Error('Listing project environments with unauthorized user did not throw an error');
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
     test('not authorized to call list environments', async () => {
       try {
         const queryParams = {
@@ -255,12 +291,12 @@ describe('list environments', () => {
       {
         username: 'projectAdmin',
         session: () => paSession,
-        projectId: () => validProjectId
+        projectId: () => projectId1
       },
       {
         username: 'researcher',
         session: () => researcherSession,
-        projectId: () => validProjectId
+        projectId: () => projectId1
       }
     ];
 
@@ -291,5 +327,13 @@ describe('list environments', () => {
         }
       });
     });
+  });
+
+  test('Unauthenticated user not authorized to call list environments', async () => {
+    try {
+      await anonymousSession.resources.environments.get({});
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

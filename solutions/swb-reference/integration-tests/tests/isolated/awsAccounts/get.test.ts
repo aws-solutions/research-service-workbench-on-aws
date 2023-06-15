@@ -4,15 +4,18 @@
  */
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
+import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
-describe('list hosting accounts', () => {
+describe('get hosting account', () => {
+  const setup: Setup = Setup.getSetup();
   const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
   let anonymousSession: ClientSession;
+  let accountId: string;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,41 +27,27 @@ describe('list hosting accounts', () => {
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
     anonymousSession = paabResources.anonymousSession;
+    accountId = setup.getSettings().get('defaultHostingAccountId');
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
-  describe('with invalid paginationToken', () => {
-    const pagToken = '1';
-    const queryParams = { paginationToken: pagToken };
-
+  describe('with valid accountId', () => {
     describe('as IT Admin', () => {
-      test('it throws 400 error', async () => {
-        try {
-          await adminSession.resources.accounts.get(queryParams);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
-            })
-          );
-        }
+      test('it returns account information', async () => {
+        await expect(adminSession.resources.accounts.account(accountId).get()).resolves.not.toThrow();
       });
     });
   });
 
-  describe('Project admin or researcher can not list aws Accounts', () => {
-    const pagToken = '1';
-    const queryParams = { paginationToken: pagToken };
-
+  describe('Project admin or researcher can not get aws Account', () => {
     describe('As project admin', () => {
       test('it throws 403 error', async () => {
         try {
-          await paSession.resources.accounts.get(queryParams);
+          await paSession.resources.accounts.account(accountId).get();
         } catch (e) {
           checkHttpError(
             e,
@@ -73,7 +62,7 @@ describe('list hosting accounts', () => {
     describe('As researcher', () => {
       test('it throws 403 error', async () => {
         try {
-          await researcherSession.resources.accounts.get(queryParams);
+          await researcherSession.resources.accounts.account(accountId).get();
         } catch (e) {
           checkHttpError(
             e,
@@ -86,9 +75,9 @@ describe('list hosting accounts', () => {
     });
 
     describe('As unauthenticated user', () => {
-      test('it throws 401 error', async () => {
+      test('it throws 403 error', async () => {
         try {
-          await anonymousSession.resources.accounts.get(queryParams);
+          await anonymousSession.resources.accounts.account(accountId).get();
         } catch (e) {
           checkHttpError(e, new HttpError(401, {}));
         }

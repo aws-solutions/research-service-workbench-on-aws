@@ -18,7 +18,7 @@ describe('multiStep user to project integration test', () => {
   let costCenterId: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources(__filename));
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
       name: 'test-cost-center',
