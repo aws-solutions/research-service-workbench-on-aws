@@ -1,7 +1,7 @@
-import { PolicyDocument } from '@aws-cdk/aws-iam';
-import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
 import Setup from '../setup';
 import Settings from '../utils/settings';
@@ -81,8 +81,8 @@ export class AccountHelper {
   }
 
   public async removeAccountFromKeyPolicy(awsAccountId: string): Promise<void> {
-    const mainAcctS3ArtifactEncryptionArn = this._settings.get('MainAccountS3ArtifactEncryptionKeyOutput');
-    const mainAcctS3DatasetsEncryptionArn = this._settings.get('MainAccountS3DatasetsEncryptionKeyOutput');
+    const mainAcctS3ArtifactEncryptionArn = this._settings.get('S3ArtifactEncryptionKeyOutputCC25B0CD');
+    const mainAcctS3DatasetsEncryptionArn = this._settings.get('S3DatasetsEncryptionKeyOutput05C7794D');
     const mainAcctEncryptionArnList = [mainAcctS3ArtifactEncryptionArn, mainAcctS3DatasetsEncryptionArn];
     await Promise.all(
       _.map(mainAcctEncryptionArnList, async (mainAcctEncryptionArn) => {
@@ -114,7 +114,8 @@ export class AccountHelper {
   public async removeAccountFromBucketPolicy(awsAccountId: string): Promise<void> {
     const bucketName = this._settings.get('S3BucketArtifactsArnOutput').split(':').pop();
     const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._awsSdk.clients.s3.getBucketPolicy({
-      Bucket: bucketName
+      Bucket: bucketName,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
     let bucketPolicy;
     bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
@@ -133,7 +134,8 @@ export class AccountHelper {
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
+      Policy: JSON.stringify(bucketPolicy.toJSON()),
+      AccountId: process.env.MAIN_ACCT_ID
     };
 
     // Update bucket policy
@@ -141,7 +143,7 @@ export class AccountHelper {
   }
 
   public async deOnboardAccount(awsAccountId: string): Promise<void> {
-    // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
+    // Undo all operations that happen in: hostingAccountLifecycleService.createAccount()
 
     // Update main account default event bus to remove hosting account state change events
     await this.removeBusPermissions(awsAccountId);

@@ -5,7 +5,6 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
   QueryParams,
@@ -21,6 +20,8 @@ import {
   PaginatedResponse,
   DynamoDBService
 } from '@aws/workbench-core-base';
+import { InvalidPaginationTokenError } from '@aws/workbench-core-base/lib/errors/invalidPaginationTokenError';
+import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { ProjectStatus } from '../constants/projectStatus';
@@ -356,7 +357,7 @@ export default class ProjectService {
       const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
       const exclusiveStartProject = projectsOnPage.find((project) => project.id === exclusiveStartProjectId);
       if (exclusiveStartProject === undefined) {
-        throw Boom.badRequest('Pagination token is invalid.');
+        throw new InvalidPaginationTokenError('Pagination token is invalid.');
       }
       const indexOfExclusiveStartProject = projectsOnPage.indexOf(exclusiveStartProject);
       projectsOnPage = projectsOnPage.slice(indexOfExclusiveStartProject + 1);

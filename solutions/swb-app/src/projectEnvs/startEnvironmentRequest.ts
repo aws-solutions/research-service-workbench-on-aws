@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const StartEnvironmentRequestParser = z.object({
-  projectId: z.string().min(1),
-  environmentId: z.string().min(1)
+  projectId: z.string().projId().required(),
+  environmentId: z.string().envId().required()
 });
 
 export type StartEnvironmentRequest = z.infer<typeof StartEnvironmentRequestParser>;

@@ -3,13 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import {
   EnvironmentTypeService,
   UpdateEnvironmentTypeRequest,
   UpdateEnvironmentTypeRequestParser,
   ListEnvironmentTypesRequest,
-  ListEnvironmentTypesRequestParser
+  ListEnvironmentTypesRequestParser,
+  GetEnvironmentTypeRequest,
+  GetEnvironmentTypeRequestParser
 } from '@aws/workbench-core-environments';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
@@ -19,8 +23,11 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await environmentTypeService.getEnvironmentType(req.params.id);
-      res.send(envType);
+      const validatedRequest = validateAndParse<GetEnvironmentTypeRequest>(GetEnvironmentTypeRequestParser, {
+        envTypeId: req.params.id
+      });
+      const envType = await environmentTypeService.getEnvironmentType(validatedRequest.envTypeId);
+      res.status(200).send(envType);
     })
   );
 
@@ -32,8 +39,20 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         ListEnvironmentTypesRequestParser,
         req.query
       );
-      const envTypes = await environmentTypeService.listEnvironmentTypes(request);
-      res.send(envTypes);
+      try {
+        const envTypes = await environmentTypeService.listEnvironmentTypes(request);
+        res.status(200).send(envTypes);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(`There was a problem listing environment types`);
+      }
     })
   );
 

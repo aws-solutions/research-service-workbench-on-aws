@@ -4,10 +4,16 @@
  */
 
 import ClientSession from '../../../support/clientSession';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError } from '../../../support/utils/utilities';
+import {
+  checkHttpError,
+  generateRandomString,
+  validSwbName,
+  validSwbDescription
+} from '../../../support/utils/utilities';
 
 interface CreateRequest {
   name?: string;
@@ -16,18 +22,26 @@ interface CreateRequest {
 }
 
 describe('Create Project negative tests', () => {
+  const paabHelper = new PaabHelper(1);
+  let pa1Session: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
   let existingProjectName: string;
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let createRequest: CreateRequest;
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   afterAll(async () => {
+    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -35,14 +49,14 @@ describe('Create Project negative tests', () => {
     expect.hasAssertions();
 
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'project integration test cost center',
+      name: generateRandomString(10, validSwbName),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
-      description: 'a test costcenter'
+      description: generateRandomString(10, validSwbDescription)
     });
     costCenterId = costCenter.id;
 
     createRequest = {
-      name: 'valid name',
+      name: 'validName',
       description: 'valid description',
       costCenterId
     };
@@ -51,7 +65,7 @@ describe('Create Project negative tests', () => {
   describe('with a name', () => {
     describe('that belongs to an existing project', () => {
       beforeEach(async () => {
-        existingProjectName = randomTextGenerator.getFakeText('test-project-name');
+        existingProjectName = generateRandomString(10, validSwbName);
         await adminSession.resources.projects.create({
           name: existingProjectName,
           description: 'Create Project negative tests--Project for TOP SECRET dragon research',
@@ -121,7 +135,7 @@ describe('Create Project negative tests', () => {
   describe('with a cost center', () => {
     describe('that does not exist', () => {
       beforeEach(async () => {
-        createRequest.costCenterId = 'cc-invalid-cost-center';
+        createRequest.costCenterId = 'cc-1234abcd-1234-abcd-1234-abcd1234abcd';
       });
 
       test('it throws 400 error', async () => {
@@ -132,7 +146,7 @@ describe('Create Project negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Could not find cost center cc-invalid-cost-center`
+              message: `Could not find cost center cc-1234abcd-1234-abcd-1234-abcd1234abcd`
             })
           );
         }
@@ -162,9 +176,9 @@ describe('Create Project negative tests', () => {
     describe('that was deleted', () => {
       beforeEach(async () => {
         const { data: costCenter } = await adminSession.resources.costCenters.create({
-          name: 'project integration test cost center',
+          name: generateRandomString(10, validSwbName),
           accountId: setup.getSettings().get('defaultHostingAccountId'),
-          description: 'a test costcenter'
+          description: generateRandomString(10, validSwbDescription)
         });
         costCenterId = costCenter.id;
 
@@ -187,6 +201,30 @@ describe('Create Project negative tests', () => {
               message: `Cost center ${costCenterId} was deleted`
             })
           );
+        }
+      });
+
+      test('Project Admin gets 403', async () => {
+        try {
+          await pa1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, forbiddenHttpError);
+        }
+      });
+
+      test('Researcher gets 403', async () => {
+        try {
+          await rs1Session.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, forbiddenHttpError);
+        }
+      });
+
+      test('Unauthenticated user gets 403', async () => {
+        try {
+          await anonymousSession.resources.projects.create();
+        } catch (e) {
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

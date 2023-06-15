@@ -9,9 +9,12 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('list environment type configs associated to project', () => {
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
   const nonExistentEnvTypeId = 'et-prod-0123456789012,pa-0123456789012';
@@ -22,8 +25,11 @@ describe('list environment type configs associated to project', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
@@ -52,9 +58,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find project invalid-project-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `projectId: Invalid ID`
         })
       );
     }
@@ -90,9 +96,9 @@ describe('list environment type configs associated to project', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type invalid-envType-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
@@ -114,6 +120,127 @@ describe('list environment type configs associated to project', () => {
           message: `Could not find environment type ${nonExistentEnvTypeId}`
         })
       );
+    }
+  });
+
+  describe('with invalid paginationToken', () => {
+    const pagToken = '1';
+    const queryParams = { paginationToken: pagToken };
+
+    describe('as IT Admin', () => {
+      test('it throws 400 error', async () => {
+        try {
+          await adminSession.resources.environmentTypes
+            .environmentType(envTypeId)
+            .configurations()
+            .get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+
+    // PA & Researcher must be through project route
+    const testBundle = [
+      {
+        username: 'projectAdmin',
+        session: () => paSession,
+        projectId: () => projectId
+      },
+      {
+        username: 'researcher',
+        session: () => researcherSession,
+        projectId: () => projectId
+      }
+    ];
+
+    describe.each(testBundle)('for each user', (testCase) => {
+      const { username, session: sessionFunc, projectId: projectFunc } = testCase;
+      let session: ClientSession;
+      let projectId: string;
+
+      beforeEach(async () => {
+        session = sessionFunc();
+        projectId = projectFunc();
+      });
+
+      test(`it throws 400 error as ${username}`, async () => {
+        try {
+          await session.resources.projects
+            .project(projectId)
+            .environmentTypes()
+            .environmentType(envTypeId)
+            .configurations()
+            .get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('Researcher test', () => {
+    test('cannot list ETCs for project where researcher is not a part of the project', async () => {
+      try {
+        await researcherSession.resources.projects
+          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Project Admin test', () => {
+    test('cannot list ETCs for project where Project Admin is not a part of the project', async () => {
+      try {
+        await paSession.resources.projects
+          .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+          .environmentTypes()
+          .environmentType(envTypeId)
+          .configurations()
+          .get();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  test('Unauthenticated user cannot list ETCs', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project('proj-30a71a7a-f450-4188-941c-de1482e4dd92')
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .get();
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
     }
   });
 });

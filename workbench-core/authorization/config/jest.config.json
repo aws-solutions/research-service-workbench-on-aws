@@ -3,10 +3,10 @@
   "collectCoverage": true,
   "coverageThreshold": {
     "global": {
-      "branches": 97,
-      "functions": 97,
-      "lines": 97,
-      "statements": 97
+      "branches": 99,
+      "functions": 99,
+      "lines": 99,
+      "statements": 99
     }
   },
   "coveragePathIgnorePatterns": ["<rootDir>/src/index.ts"],

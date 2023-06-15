@@ -3,10 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue, MetadataService } from '@aws/workbench-core-base';
+import {
+  DynamoDBService,
+  JSONValue,
+  MetadataService,
+  PaginatedResponse,
+  RelationshipDDBItemParser
+} from '@aws/workbench-core-base';
 
 export interface DatabaseServicePlugin {
-  getAssociations(type: string, id: string): Promise<Associable[]>;
+  getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined>;
+
+  listAssociations(
+    entity: Associable,
+    relationType: string,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<PaginatedResponse<Associable>>;
   storeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
   removeAssociations(entity: Associable, relations: Associable[]): Promise<void>;
 }
@@ -53,8 +68,37 @@ export class DatabaseService implements DatabaseServicePlugin {
     }
   }
 
-  public getAssociations(type: string, id: string): Promise<Associable[]> {
-    return Promise.resolve([]);
+  public async listAssociations(
+    entity: Associable,
+    relationType: string,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<PaginatedResponse<Associable>> {
+    const response = await this._metadataService.listDependentMetadata(
+      entity.type,
+      entity.id,
+      relationType,
+      RelationshipDDBItemParser,
+      queryParams
+    );
+
+    const associables: Associable[] = response.data.map((item) => {
+      return {
+        type: relationType,
+        id: item.id,
+        data: {
+          pk: item.pk,
+          sk: item.sk
+        }
+      };
+    });
+
+    return {
+      data: associables,
+      paginationToken: response.paginationToken
+    };
   }
 
   public async removeAssociations(entity: Associable, relations: Associable[]): Promise<void> {
@@ -77,5 +121,28 @@ export class DatabaseService implements DatabaseServicePlugin {
         relations.map((item) => item.id)
       );
     }
+  }
+
+  public async getAssociation(entity: Associable, relationship: Associable): Promise<Associable | undefined> {
+    const association = await this._metadataService.getMetadataItem(
+      entity.type,
+      entity.id,
+      relationship.type,
+      relationship.id,
+      RelationshipDDBItemParser
+    );
+
+    if (association === undefined) {
+      return undefined;
+    }
+
+    return {
+      type: relationship.type,
+      id: relationship.id,
+      data: {
+        pk: association.pk as string,
+        sk: association.sk as string
+      }
+    };
   }
 }

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { AwsService } from '@aws/workbench-core-base';
 import {
   GetKeyPolicyCommandInput,
   GetKeyPolicyCommandOutput,
@@ -22,7 +22,7 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
-import { AwsService } from '@aws/workbench-core-base';
+import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { EndpointExistsError } from './errors/endpointExistsError';
@@ -65,7 +65,8 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     const params: PutObjectCommandInput = {
       Bucket: name,
       ContentLength: 0,
-      Key: objectKey
+      Key: objectKey,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     await this._aws.clients.s3.putObject(params);
@@ -264,7 +265,8 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     let bucketPolicy: PolicyDocument = new PolicyDocument();
     try {
       const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
-        Bucket: name
+        Bucket: name,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       };
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
         getBucketPolicyConfig
@@ -284,7 +286,8 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: name,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
+      Policy: JSON.stringify(bucketPolicy.toJSON()),
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
