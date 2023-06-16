@@ -11,6 +11,7 @@ overrides:
   http-cache-semantics: '>=4.1.1'
   cacheable-request: '>=10.2.7'
   xml2js: '>=0.5.0'
+  fast-xml-parser: '>=4.2.4'
 
 importers:
 
@@ -1651,7 +1652,7 @@ packages:
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
       '@aws-sdk/util-waiter': 3.226.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -1828,7 +1829,7 @@ packages:
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
       '@aws-sdk/util-waiter': 3.226.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -1919,7 +1920,7 @@ packages:
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
       '@aws-sdk/util-waiter': 3.226.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - aws-crt
@@ -2056,7 +2057,7 @@ packages:
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
       '@aws-sdk/xml-builder': 3.201.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -2119,7 +2120,7 @@ packages:
       '@aws-sdk/util-utf8-node': 3.208.0
       '@aws-sdk/util-waiter': 3.226.0
       '@aws-sdk/xml-builder': 3.201.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - '@aws-sdk/signature-v4-crt'
@@ -2704,7 +2705,7 @@ packages:
       '@aws-sdk/util-user-agent-node': 3.226.0
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - aws-crt
@@ -2748,7 +2749,7 @@ packages:
       '@aws-sdk/util-user-agent-node': 3.254.0
       '@aws-sdk/util-utf8-browser': 3.188.0
       '@aws-sdk/util-utf8-node': 3.208.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - aws-crt
@@ -2792,7 +2793,7 @@ packages:
       '@aws-sdk/util-user-agent-browser': 3.267.0
       '@aws-sdk/util-user-agent-node': 3.267.0
       '@aws-sdk/util-utf8': 3.254.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - aws-crt
@@ -2836,7 +2837,7 @@ packages:
       '@aws-sdk/util-user-agent-browser': 3.272.0
       '@aws-sdk/util-user-agent-node': 3.272.0
       '@aws-sdk/util-utf8': 3.254.0
-      fast-xml-parser: 4.0.11
+      fast-xml-parser: 4.2.4
       tslib: 2.4.1
     transitivePeerDependencies:
       - aws-crt
@@ -7906,7 +7907,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001480
+      caniuse-lite: 1.0.30001503
       electron-to-chromium: 1.4.227
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -8039,8 +8040,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001480:
-    resolution: {integrity: sha512-q7cpoPPvZYgtyC4VaBSN0Bt+PJ4c4EYRf0DrduInOz2SkFpHD5p3LnvEpqBp7UnJn+8x1Ogl1s38saUxe+ihQQ==}
+  /caniuse-lite/1.0.30001503:
+    resolution: {integrity: sha512-Sf9NiF+wZxPfzv8Z3iS0rXM1Do+iOy2Lxvib38glFX+08TCYYYGR5fRJXk4d77C4AYwhUjgYgMsMudbh2TqCKw==}
 
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
@@ -9758,8 +9759,8 @@ packages:
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
-  /fast-xml-parser/4.0.11:
-    resolution: {integrity: sha512-4aUg3aNRR/WjQAcpceODG1C3x3lFANXRo8+1biqfieHmg9pyMt7qB4lQV/Ta6sJCTbA5vfD8fnA8S54JATiFUA==}
+  /fast-xml-parser/4.2.4:
+    resolution: {integrity: sha512-fbfMDvgBNIdDJLdLOwacjFAPYt67tr31H9ZhWSm45CDAxvd0I6WTlSOUo7K2P/K5sA5JgMKG64PI3DMcaFdWpQ==}
     hasBin: true
     dependencies:
       strnum: 1.0.5
@@ -12349,7 +12350,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001480
+      caniuse-lite: 1.0.30001503
       postcss: 8.4.5
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
