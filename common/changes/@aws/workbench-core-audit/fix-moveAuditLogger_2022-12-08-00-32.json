@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-audit",
+      "comment": "add audit logger",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-audit"
+}

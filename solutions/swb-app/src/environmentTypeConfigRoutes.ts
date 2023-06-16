@@ -2,7 +2,6 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import {
@@ -56,7 +55,7 @@ export function setUpEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId }
       );
       const envTypeConfig = await environmentTypeConfigService.getEnvTypeConfig(envTypeConfigRequest);
-      res.status(200).send(envTypeConfig);
+      res.send(envTypeConfig);
     })
   );
 
@@ -74,7 +73,7 @@ export function setUpEnvTypeConfigRoutes(
       );
       try {
         const envTypeConfig = await environmentTypeConfigService.deleteEnvTypeConfig(validatedRequest);
-        res.status(204).send(envTypeConfig);
+        res.send(envTypeConfig);
       } catch (e) {
         if (isConflictError(e)) {
           throw Boom.conflict(e.message);
@@ -93,22 +92,8 @@ export function setUpEnvTypeConfigRoutes(
         { envTypeId: req.params.envTypeId, ...req.query }
       );
 
-      try {
-        const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);
-        res.status(200).send(envTypeConfig);
-      } catch (e) {
-        if (Boom.isBoom(e)) {
-          throw e;
-        }
-
-        if (isInvalidPaginationTokenError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-
-        throw Boom.badImplementation(
-          `There was a problem listing configurations for environment type ${listEnvTypeConfigRequest.envTypeId}`
-        );
-      }
+      const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);
+      res.send(envTypeConfig);
     })
   );
 

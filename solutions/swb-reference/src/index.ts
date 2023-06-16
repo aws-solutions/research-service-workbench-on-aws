@@ -7,21 +7,16 @@
 import { WorkbenchAppRegistry } from '@aws/workbench-core-infrastructure';
 import * as cdk from 'aws-cdk-lib';
 import { ApplicationType, SolutionId, SolutionName, SolutionVersion } from './constants';
-import { RSWStack } from './RSWStack';
+import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-const rswBackendStack: RSWStack = new RSWStack(app, {
-  solutionId: SolutionId,
-  solutionName: SolutionName,
-  solutionVersion: SolutionVersion
-});
-
-new WorkbenchAppRegistry(rswBackendStack, `${rswBackendStack.stackName}-AppRegistryStack`, {
+const swbBackendStack: SWBStack = new SWBStack(app);
+new WorkbenchAppRegistry(swbBackendStack, `${swbBackendStack.stackName}-AppRegistryStack`, {
   solutionId: SolutionId,
   solutionName: SolutionName,
   solutionVersion: SolutionVersion,
-  attributeGroupName: `${rswBackendStack.stackName}-AppRegistryGroup`,
+  attributeGroupName: `${swbBackendStack.stackName}-AppRegistryGroup`,
   applicationType: ApplicationType,
-  appRegistryApplicationName: `${rswBackendStack.stackName}-AppRegistryApplication`
+  appRegistryApplicationName: `${swbBackendStack.stackName}-AppRegistryApplication`
 });
 app.synth();

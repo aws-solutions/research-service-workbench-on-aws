@@ -5,8 +5,7 @@
 
 import { Readable } from 'stream';
 
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
-import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
+import { PolicyDocument } from '@aws-cdk/aws-iam';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -29,8 +28,7 @@ import {
   S3Client,
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
-  NoSuchBucket,
-  S3ServiceException
+  NoSuchBucket
 } from '@aws-sdk/client-s3';
 import {
   AcceptPortfolioShareCommand,
@@ -40,11 +38,11 @@ import {
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { SdkStream } from '@aws-sdk/types';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
-import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import _ from 'lodash';
-import { InvalidAwsAccountIdError } from '../errors/InvalidAwsAccountIdError';
 import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 
@@ -53,7 +51,6 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
-  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-1234abcd-1234-abcd-1234-abcd1234abcd`;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
   let accountMetadata = {};
 
@@ -86,7 +83,7 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     accountMetadata = {
-      id: mockAccountId,
+      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -176,7 +173,7 @@ describe('HostingAccountLifecycleService', () => {
 
     await expect(
       hostingAccountLifecycleService.updateAccount({
-        id: mockAccountId,
+        id: 'abc-xyz',
         name: 'someName'
       })
     ).resolves.not.toThrowError();
@@ -321,46 +318,18 @@ describe('HostingAccountLifecycleService', () => {
     scMock.on(AcceptPortfolioShareCommand).resolves({});
 
     //Mock comparing hosting account template
-    const readableStreamWithIncorrectTemplateBody = new Readable({
+    const readableStream = new Readable({
       read() {}
     });
 
-    readableStreamWithIncorrectTemplateBody.push('XYZ');
-    readableStreamWithIncorrectTemplateBody.push(null);
-
-    const readableStreamWithCorrectTemplateBody = new Readable({
-      read() {}
-    });
-
-    readableStreamWithCorrectTemplateBody.push('ABC');
-    readableStreamWithCorrectTemplateBody.push(null);
+    readableStream.push('ABC');
+    readableStream.push(null);
 
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
-    s3Mock
-      .on(GetObjectCommand, {
-        Bucket: 'artifactBucket',
-        Key: 'onboard-account.cfn.yaml'
-      })
-      .resolves({
-        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
-      });
-    s3Mock
-      .on(GetObjectCommand, {
-        Bucket: 'artifactBucket',
-        Key: 'onboard-account-byon.cfn.yaml'
-      })
-      .resolves({
-        Body: readableStreamWithCorrectTemplateBody as SdkStream<Readable>
-      });
-    s3Mock
-      .on(GetObjectCommand, {
-        Bucket: 'artifactBucket',
-        Key: 'onboard-account-tgw.cfn.yaml'
-      })
-      .resolves({
-        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
-      });
+    s3Mock.on(GetObjectCommand).resolves({
+      Body: readableStream as SdkStream<Readable>
+    });
 
     // Mocking actual template pulled from CFN Stack
     cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });
@@ -642,76 +611,6 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, '123456789012')
     ).resolves.not.toThrowError();
-  });
-
-  test('updateArtifactsBucketPolicy throws error when awsAccountId is invalid', async () => {
-    const fakeAwsAccountId = '123456789012';
-    const sampleBucketName = 'randomBucketName';
-    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`;
-
-    // Mock S3 calls
-    const s3Mock = mockClient(S3Client);
-    s3Mock.on(GetBucketPolicyCommand).resolves({
-      Policy: `
-      {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Deny requests that do not use SigV4",
-                "Effect": "Deny",
-                "Principal": {
-                    "AWS": "*"
-                },
-                "Action": "s3:*",
-                "Resource": "${sampleBucketArn}/*",
-                "Condition": {
-                    "StringNotEquals": {
-                        "s3:signatureversion": "AWS4-HMAC-SHA256"
-                    }
-                }
-            },
-            {
-                "Sid": "List:environment-files",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::someOtherAccount:root"
-                },
-                "Action": "s3:ListBucket",
-                "Resource": "${sampleBucketArn}",
-                "Condition": {
-                    "StringLike": {
-                        "s3:prefix": "environment-files*"
-                    }
-                }
-            },
-            {
-                "Sid": "Get:environment-files",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::someOtherAccount:root"
-                },
-                "Action": "s3:GetObject",
-                "Resource": "${sampleBucketArn}/environment-files*"
-            }
-        ]
-    }`
-    });
-    const s3ServiceException = new S3ServiceException({
-      $fault: 'client',
-      $metadata: {},
-      name: 'MalformedPolicy'
-    });
-
-    // @ts-ignore
-    s3ServiceException.Detail = `"AWS" : "arn:aws:iam::${fakeAwsAccountId}:root"`;
-
-    s3Mock.on(PutBucketPolicyCommand).rejects(s3ServiceException);
-
-    await expect(
-      hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, fakeAwsAccountId)
-    ).rejects.toMatchObject(
-      new InvalidAwsAccountIdError("Please provide a valid 'awsAccountId' for the hosting account")
-    );
   });
 
   test('updateMainAccountEncryptionKeyPolicy works when adding new account ID', async () => {

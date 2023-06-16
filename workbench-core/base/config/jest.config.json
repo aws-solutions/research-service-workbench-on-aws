@@ -4,17 +4,14 @@
   "coveragePathIgnorePatterns": [
     "<rootDir>/src/aws/awsService.ts",
     "<rootDir>/src/aws/clients/*",
-    "<rootDir>/src/types/relationshipDDBItem",
-    "<rootDir>/src/services/secretsService.ts",
-    "<rootDir>/src/interfaces/listUsersForRoleRequest.ts",
-    "<rootDir>/src/index.ts"
+    "<rootDir>/src/types/relationshipDDBItem"
   ],
   "coverageThreshold": {
     "global": {
       "branches": 70,
       "functions": 70,
-      "lines": 80,
-      "statements": 75
+      "lines": 70,
+      "statements": 70
     }
   },
   "coverageReporters": ["json-summary", "json"]

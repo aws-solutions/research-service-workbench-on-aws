@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Add new Template getting API, upgrade packages",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

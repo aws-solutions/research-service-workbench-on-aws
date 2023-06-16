@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "BREAKING CHANGE: `createUser` function now returns the created `User`.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

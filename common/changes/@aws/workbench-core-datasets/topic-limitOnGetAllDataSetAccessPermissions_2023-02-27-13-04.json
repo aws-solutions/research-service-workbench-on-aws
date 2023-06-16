@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "enabled pageSize for getAllDataSetAccessPermissions",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

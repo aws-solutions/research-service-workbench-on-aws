@@ -15,7 +15,6 @@ import { DataSetExternalEndpointRequest } from './dataSets/dataSetExternalEndpoi
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
-import { IsProjectAuthorizedForDatasetsRequest } from './dataSets/isProjectAuthorizedForDatasetsParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
 import { Environment } from './environments/environment';
 import { EnvironmentItem } from './environments/environmentItem';
@@ -129,6 +128,5 @@ export {
   EnvironmentPlugin,
   ListEnvironmentsRequest,
   Environment,
-  EnvironmentItem,
-  IsProjectAuthorizedForDatasetsRequest
+  EnvironmentItem
 };

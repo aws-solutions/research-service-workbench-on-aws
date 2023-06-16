@@ -2,16 +2,15 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteSshKeyRequestParser = z
   .object({
-    projectId: z.string().projId().required(),
-    sshKeyId: z.string().sshKeyId().required(),
-    currentUserId: z.string().userId().required()
+    projectId: z.string(),
+    sshKeyId: z.string(),
+    currentUserId: z.string()
   })
-  .required()
   .strict();
 
 export type DeleteSshKeyRequest = z.infer<typeof DeleteSshKeyRequestParser>;

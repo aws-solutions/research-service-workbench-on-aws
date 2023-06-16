@@ -5,7 +5,6 @@
 
 // disabling because the tsdoc links need the imports to work
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ListUsersForRoleRequest, PaginatedResponse } from '@aws/workbench-core-base';
 import { IdpUnavailableError } from './errors/idpUnavailableError';
 import { InvalidParameterError } from './errors/invalidParameterError';
 import { PluginConfigurationError } from './errors/pluginConfigurationError';
@@ -16,8 +15,6 @@ import { UserNotFoundError } from './errors/userNotFoundError';
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
-import { ListUsersRequest } from './users/listUsersRequest';
-import { ListUsersResponse } from './users/listUsersResponse';
 /**
  *
  */
@@ -127,21 +124,19 @@ export class UserManagementService {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @param request - the request object according to {@link ListUsersRequest}
-   * @returns a {@link ListUsersResponse} object
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link TooManyRequestsError} - the request was rate limited
-   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
-  public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
-    return this._userManagementPlugin.listUsers(request);
+  public async listUsers(): Promise<User[]> {
+    return this._userManagementPlugin.listUsers();
   }
 
   /**
    * List the user IDs associated with a given role.
-   * @param request - a ListUsersForRoleRequest object
+   * @param role - the role for which the users should be listed.
    * @returns an array containing the user ids that are associated with the role
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -149,8 +144,8 @@ export class UserManagementService {
    * @throws {@link RoleNotFoundError} - role could not be found
    * @throws {@link TooManyRequestsError} - the request was rate limited
    */
-  public async listUsersForRole(request: ListUsersForRoleRequest): Promise<PaginatedResponse<string>> {
-    return this._userManagementPlugin.listUsersForRole(request);
+  public async listUsersForRole(role: string): Promise<string[]> {
+    return this._userManagementPlugin.listUsersForRole(role);
   }
 
   /**
@@ -220,16 +215,5 @@ export class UserManagementService {
    */
   public async deleteRole(role: string): Promise<void> {
     await this._userManagementPlugin.deleteRole(role);
-  }
-
-  /**
-   * Validate user roles to ensure given/revoked roles are modified.
-   * @param userId - ID of the user to be validated
-   * @param roles - roles of the user to be validated
-   *
-   * @returns - a list of validated user roles
-   */
-  public async validateUserRoles(id: string, roles: string[]): Promise<string[]> {
-    return this._userManagementPlugin.validateUserRoles(id, roles);
   }
 }

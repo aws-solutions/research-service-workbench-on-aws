@@ -22,7 +22,7 @@ export const defaultAppSettings: AppSettings = {
   language: Language.en,
   logo: '/logo-image.png',
   favicon: '/favicon.ico',
-  name: 'Research Service Workbench',
+  name: 'Service Workbench on AWS (BETA)',
   slogan: '',
   description: ''
 };

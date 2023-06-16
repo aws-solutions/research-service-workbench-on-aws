@@ -10,9 +10,9 @@ import fs from 'fs';
 
 import { join, basename } from 'path';
 import { Readable } from 'stream';
-import { AwsService } from '@aws/workbench-core-base';
 import { _Object } from '@aws-sdk/client-s3';
 import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
+import { AwsService } from '@aws/workbench-core-base';
 
 import md5File from 'md5-file';
 
@@ -163,8 +163,7 @@ export default class ServiceCatalogSetup {
       const putObjectParam = {
         Bucket: s3Bucket,
         Key: `${prefix}${fileName}`,
-        Body: fileContent,
-        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+        Body: fileContent
       };
 
       await this._aws.clients.s3.putObject(putObjectParam);
@@ -181,8 +180,7 @@ export default class ServiceCatalogSetup {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/interfaces/listobjectscommandinput.html#maxkeys
     const listS3ObjectsParam = {
       Bucket: s3Bucket,
-      Prefix: prefix,
-      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+      Prefix: prefix
     };
 
     const listObjectOutput = await this._aws.clients.s3.listObjects(listS3ObjectsParam);
@@ -192,11 +190,7 @@ export default class ServiceCatalogSetup {
         // eslint-disable-next-line security/detect-object-injection
         const content: _Object = listObjectOutput.Contents[i];
         if (content.Key) {
-          const getObjResponse = await this._aws.clients.s3.getObject({
-            Bucket: s3Bucket,
-            Key: content.Key,
-            ExpectedBucketOwner: process.env.MAIN_ACCT_ID
-          });
+          const getObjResponse = await this._aws.clients.s3.getObject({ Bucket: s3Bucket, Key: content.Key });
           const streamToString = (stream: Readable): Promise<string> =>
             new Promise((resolve, reject) => {
               const chunks: Uint8Array[] = [];
@@ -302,7 +296,7 @@ export default class ServiceCatalogSetup {
     const portfolioToCreateParam = {
       DisplayName: portfolioName,
       ProviderName: '_system_',
-      Description: 'Portfolio for managing RSW environments'
+      Description: 'Portfolio for managing SWB environments'
     };
 
     const response = await this._aws.clients.serviceCatalog.createPortfolio(portfolioToCreateParam);

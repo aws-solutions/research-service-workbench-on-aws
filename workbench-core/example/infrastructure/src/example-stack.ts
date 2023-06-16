@@ -336,8 +336,7 @@ export class ExampleStack extends Stack {
           partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
-      ],
-      timeToLiveAttribute: 'expirationTime'
+      ]
     });
 
     // eslint-disable-next-line no-new

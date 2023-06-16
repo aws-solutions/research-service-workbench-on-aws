@@ -4,33 +4,27 @@
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import { DataSetPermission } from '@aws/swb-app/lib/dataSets/dataSetPermissionParser';
+import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
-import {
-  ENVIRONMENT_START_MAX_WAITING_SECONDS,
-  ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
-  ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
-} from '../../support/utils/constants';
-import HttpError from '../../support/utils/HttpError';
+import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../support/utils/constants';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { dsUuidRegExp } from '../../support/utils/regExpressions';
 import Settings from '../../support/utils/settings';
-import { checkHttpError, poll } from '../../support/utils/utilities';
+import { poll } from '../../support/utils/utilities';
 
 describe('multiStep dataset integration test', () => {
-  const paabHelper: PaabHelper = new PaabHelper(2);
+  const paabHelper: PaabHelper = new PaabHelper();
   const setup: Setup = Setup.getSetup();
   const settings: Settings = setup.getSettings();
 
-  let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let project1Id: string;
   let project2Id: string;
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources(__filename);
-    adminSession = paabResources.adminSession;
+    const paabResources = await paabHelper.createResources();
     project1Id = paabResources.project1Id;
     pa1Session = paabResources.pa1Session;
     project2Id = paabResources.project2Id;
@@ -51,7 +45,16 @@ describe('multiStep dataset integration test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      type: 'internal'
+      owner: getProjectAdminRole(project1Id),
+      ownerType: 'GROUP',
+      type: 'internal',
+      permissions: [
+        {
+          identity: getResearcherRole(project1Id),
+          identityType: 'GROUP',
+          accessLevel: 'read-write'
+        }
+      ]
     });
 
     console.log('CREATE');
@@ -110,75 +113,12 @@ describe('multiStep dataset integration test', () => {
     });
 
     console.log('ASSOCIATE WITH PROJECT');
+
     await pa1Session.resources.projects
       .project(project1Id)
       .dataSets()
       .dataset(dataSet.id)
       .associateWithProject(project2Id, 'read-only');
-
-    console.log('ENSURE DUPLICATE ASSOCIATION WITH PROJECT THROWS');
-    try {
-      await pa1Session.resources.projects
-        .project(project1Id)
-        .dataSets()
-        .dataset(dataSet.id)
-        .associateWithProject(project2Id, 'read-only');
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(409, {
-          error: 'Conflict',
-          message: `Project ${project2Id} is already associated with Dataset ${dataSet.id}`
-        })
-      );
-    }
-
-    console.log('ASSOCIATE WITH OWNING PROJECT THROWS');
-    try {
-      await pa1Session.resources.projects
-        .project(project1Id)
-        .dataSets()
-        .dataset(dataSet.id)
-        .associateWithProject(project1Id, 'read-only');
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(409, {
-          error: 'Conflict',
-          message: `${project1Id} already owns this dataset`
-        })
-      );
-    }
-
-    console.log('DELETING A DATASET STILL ASSOCIATED WITH A PROJECT FAILS');
-    try {
-      await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(409, {
-          error: 'Conflict',
-          message: `DataSet ${dataSet.id} cannot be removed because it is still associated with roles in the provided project(s)`
-        })
-      );
-    }
-
-    console.log('DISASSOCIATING WITH OWNING PROJECT THROWS');
-    try {
-      await pa1Session.resources.projects
-        .project(project1Id)
-        .dataSets()
-        .dataset(dataSet.id)
-        .disassociateFromProject(project1Id);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(409, {
-          error: 'Conflict',
-          message: `${project1Id} cannot remove access from ${dataSet.id} for the ProjectAdmin because it owns that dataset.`
-        })
-      );
-    }
 
     console.log('CHECK PROJECT PERMISSIONS FOR DATASET');
     const { data: responseData } = await pa1Session.resources.projects
@@ -193,11 +133,6 @@ describe('multiStep dataset integration test', () => {
       {
         accessLevel: 'read-only',
         identity: `${project2Id}#ProjectAdmin`,
-        identityType: 'GROUP'
-      },
-      {
-        accessLevel: 'read-only',
-        identity: `${project2Id}#Researcher`,
         identityType: 'GROUP'
       },
       {
@@ -221,19 +156,6 @@ describe('multiStep dataset integration test', () => {
       .dataset(dataSet.id)
       .disassociateFromProject(project2Id);
 
-    console.log('DELETE DATASET BEFORE ENDPOINT IS DELETED FAILS');
-    try {
-      await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(409, {
-          error: 'Conflict',
-          message: `External endpoints found on Dataset must be removed before DataSet can be removed.`
-        })
-      );
-    }
-
     console.log('TERMINATE ENVIRONMENT & REMOVE DATASET');
     await poll(
       async () => {
@@ -248,24 +170,20 @@ describe('multiStep dataset integration test', () => {
       (data) => data?.status === 'COMPLETED' || data?.status === 'FAILED',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-    try {
-      await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
-      await poll(
-        async () => {
-          const { data: envData } = await pa1Session.resources.projects
-            .project(project1Id)
-            .environments()
-            .environment(env.id)
-            .get();
-          console.log(`env status: ${envData.status}`);
-          return envData;
-        },
-        (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
-        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
-      );
-    } catch (e) {
-      console.error(JSON.stringify(e));
-    }
+    await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).stop();
+    await poll(
+      async () => {
+        const { data: envData } = await pa1Session.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(env.id)
+          .get();
+        console.log(`env status: ${envData.status}`);
+        return envData;
+      },
+      (data) => data?.status === 'STOPPED' || data?.status === 'FAILED',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    );
     await pa1Session.resources.projects.project(project1Id).environments().environment(env.id).terminate();
     await poll(
       async () => {
@@ -278,27 +196,8 @@ describe('multiStep dataset integration test', () => {
         return envData;
       },
       (data) => data?.status === 'TERMINATED' || data?.status === 'FAILED',
-      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
     );
-
-    console.log('CREATE ENVIRONMENT WITH UNAUTHORIZED DATASET THROWS ERROR');
-    await adminSession.resources.projects
-      .project(project2Id)
-      .assignUserToProject(pa1Session.getUserId()!, { role: 'ProjectAdmin' });
-    try {
-      await pa1Session.resources.projects.project(project2Id).environments().create(envBody);
-    } catch (e) {
-      await adminSession.resources.projects
-        .project(project2Id)
-        .removeUserFromProject(pa1Session.getUserId()!);
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'Forbidden',
-          message: `${project2Id} does not have access to the provided dataset(s)`
-        })
-      );
-    }
-    await adminSession.resources.projects.project(project2Id).removeUserFromProject(pa1Session.getUserId()!);
+    await pa1Session.resources.projects.project(project2Id).dataSets().dataset(dataSet.id).delete();
   });
 });

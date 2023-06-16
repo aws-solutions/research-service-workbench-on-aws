@@ -491,10 +491,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "rate-limiter-flexible",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },

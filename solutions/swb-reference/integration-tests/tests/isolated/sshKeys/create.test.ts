@@ -9,17 +9,15 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('cannot create SSH key', () => {
-  const paabHelper = new PaabHelper(2);
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
-  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id, anonymousSession } =
-      await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
@@ -153,13 +151,5 @@ describe('cannot create SSH key', () => {
         );
       }
     });
-  });
-
-  test('unauthenticated user cannot create ssh key', async () => {
-    try {
-      await anonymousSession.resources.projects.project(project1Id).sshKeys().create();
-    } catch (e) {
-      checkHttpError(e, new HttpError(403, {}));
-    }
   });
 });

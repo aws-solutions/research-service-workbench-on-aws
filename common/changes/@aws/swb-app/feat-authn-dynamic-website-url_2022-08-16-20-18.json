@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Removed `websiteUrl` parameter from `cognitoPluginOptions` object",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

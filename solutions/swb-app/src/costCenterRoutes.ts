@@ -15,10 +15,9 @@ import {
   DeleteCostCenterRequestParser,
   ProjectService
 } from '@aws/workbench-core-accounts';
-import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
+import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { z } from 'zod';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpCostCenterRoutes(
@@ -66,19 +65,14 @@ export function setUpCostCenterRoutes(
         UpdateCostCenterRequestParser,
         updateCostCenterRequest
       );
-      res.status(200).send(await costCenterService.updateCostCenter(validatedRequest));
+      res.send(await costCenterService.updateCostCenter(validatedRequest));
     })
   );
 
   router.get(
     '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedData = z.string().costCenterId().safeParse(req.params.id);
-      if (!validatedData.success) {
-        throw Boom.notFound();
-      }
-
-      res.status(200).send(await costCenterService.getCostCenter(validatedData.data));
+      res.send(await costCenterService.getCostCenter(req.params.id));
     })
   );
 
@@ -89,19 +83,7 @@ export function setUpCostCenterRoutes(
         ListCostCentersRequestParser,
         req.query
       );
-      try {
-        res.status(200).send(await costCenterService.listCostCenters(validatedRequest));
-      } catch (e) {
-        if (Boom.isBoom(e)) {
-          throw e;
-        }
-
-        if (isInvalidPaginationTokenError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-
-        throw Boom.badImplementation(`There was a problem listing cost centers`);
-      }
+      res.send(await costCenterService.listCostCenters(validatedRequest));
     })
   );
 }

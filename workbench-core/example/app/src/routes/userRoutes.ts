@@ -52,7 +52,7 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const users = await service.listUsers({});
+        const users = await service.listUsers();
         res.status(200).json(users);
       } catch (e) {
         if (isTooManyRequestsError(e)) {

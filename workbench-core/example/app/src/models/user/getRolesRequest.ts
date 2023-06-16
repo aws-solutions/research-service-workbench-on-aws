@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const GetRolesRequestParser = z
   .object({
-    userId: z.string().userId().required()
+    userId: z.string().min(1)
   })
   .strict();
 

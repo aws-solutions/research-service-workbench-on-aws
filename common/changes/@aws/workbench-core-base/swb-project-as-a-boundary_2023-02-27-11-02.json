@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "Adding retry strategy to aws sdk clients",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

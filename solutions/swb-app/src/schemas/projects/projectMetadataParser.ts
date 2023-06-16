@@ -12,7 +12,8 @@ export const ProjectDatasetMetadataParser = z
     id: z.string(),
     pk: z.string(),
     sk: z.string(),
-    permission: z.string(),
+    name: z.string(),
+    permission: z.array(z.string()),
     createdAt: z.string(),
     updatedAt: z.string()
   })

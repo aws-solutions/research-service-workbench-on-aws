@@ -10,7 +10,6 @@ export const ListUserSshKeysForProjectResponseParser = z
   .object({
     sshKeys: z.array(SshKeyParser)
   })
-  .required()
   .strict();
 
 export type ListUserSshKeysForProjectResponse = z.infer<typeof ListUserSshKeysForProjectResponseParser>;

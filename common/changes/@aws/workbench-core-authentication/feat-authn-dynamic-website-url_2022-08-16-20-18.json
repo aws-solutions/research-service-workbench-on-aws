@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Added `websiteUrl` param to AuthenticationService to allow for dynamic redirection after login/logout",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

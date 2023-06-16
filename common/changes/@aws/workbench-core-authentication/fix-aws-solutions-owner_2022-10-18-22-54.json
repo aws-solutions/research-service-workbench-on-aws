@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "change github owner to aws-solutions",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

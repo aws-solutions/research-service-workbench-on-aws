@@ -20,7 +20,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: research-service-workbench-on-aws
+          repo: solution-spark-on-aws
           allow_merge_commit: true
           allow_auto_merge: true
         env:
@@ -37,7 +37,7 @@ jobs:
         with:
           route: PATCH /repos/{owner}/{repo}
           owner: aws-solutions
-          repo: research-service-workbench-on-aws
+          repo: solution-spark-on-aws
           allow_merge_commit: false
           allow_auto_merge: false
         env:

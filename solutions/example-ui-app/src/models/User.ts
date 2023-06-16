@@ -16,7 +16,7 @@ export interface User {
 export const unknownUser: User = {
   id: 'sample-id',
   name: 'Sample User',
-  email: 'sample.user@example.com',
+  email: 'sample.user@amazon.com',
   avatar: { name: 'user-profile' },
   claims: []
 };

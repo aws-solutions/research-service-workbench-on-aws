@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "add isAuthorizedOnSubject and isAuthorizedOnRoute to DynamicAuthorizationService",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

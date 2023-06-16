@@ -33,7 +33,7 @@ parameters:
   Namespace:
     type: String
     description: 'The namespace to be used for creating the CfN stack resources'
-    default: 'rsw-Sagemaker'
+    default: 'swbv2-Sagemaker'
     allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   InstanceName:
     type: String

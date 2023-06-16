@@ -4,16 +4,8 @@
  */
 
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
-import { aws, dynamicAuthAws } from './awsService';
-
-export const cognitoUserManagementPlugin: CognitoUserManagementPlugin = new CognitoUserManagementPlugin(
-  process.env.USER_POOL_ID!,
-  aws,
-  {
-    ddbService: dynamicAuthAws.helpers.ddb
-  }
-);
+import { aws } from './awsService';
 
 export const userManagementService: UserManagementService = new UserManagementService(
-  cognitoUserManagementPlugin
+  new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
 );

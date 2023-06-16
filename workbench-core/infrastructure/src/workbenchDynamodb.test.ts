@@ -180,7 +180,7 @@ describe('workbenchDynamodb Test', () => {
     const stack = new Stack();
 
     const lambda = new Function(stack, 'TestLambda', {
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_16_X,
       code: new InlineCode('foo'),
       handler: 'index.handler'
     });

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
+import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -62,7 +62,7 @@ export function setUpProjectEnvTypeConfigRoutes(
           `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
         );
       }
-      res.status(204).send();
+      res.status(201).send();
     })
   );
 
@@ -105,16 +105,11 @@ export function setUpProjectEnvTypeConfigRoutes(
       );
       try {
         const relationships = await projectEnvTypeConfigService.listProjectEnvTypeConfigs(request);
-        res.status(200).send(relationships);
+        res.status(201).send(relationships);
       } catch (e) {
         if (Boom.isBoom(e)) {
           throw e;
         }
-
-        if (isInvalidPaginationTokenError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-
         console.error(e);
         throw Boom.badImplementation(
           `There was a problem list ETCs associated with project ${req.body.projectId}`
@@ -132,12 +127,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         envTypeConfigId: req.params.envTypeConfigId
       });
       const relationship = await projectEnvTypeConfigService.getEnvTypeConfig(request);
-
-      if (!relationship) {
-        throw Boom.notFound('Resource not found');
-      }
-
-      res.status(200).send(relationship);
+      res.status(201).send(relationship);
     })
   );
 
@@ -148,23 +138,8 @@ export function setUpProjectEnvTypeConfigRoutes(
         ListEnvTypeConfigProjectsRequestParser,
         { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.query }
       );
-
-      try {
-        const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
-        res.status(200).send(relationships);
-      } catch (e) {
-        if (Boom.isBoom(e)) {
-          throw e;
-        }
-
-        if (isInvalidPaginationTokenError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-
-        throw Boom.badImplementation(
-          `There was a problem listing projects for environment type configuration ${request.envTypeConfigId}`
-        );
-      }
+      const relationships = await projectEnvTypeConfigService.listEnvTypeConfigProjects(request);
+      res.status(201).send(relationships);
     })
   );
 }

@@ -54,27 +54,19 @@ const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITI
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
-  userAgent: process.env.USER_AGENT_STRING,
   ddbTableName: process.env.STACK_NAME!
 });
 
 // Dynamic Auth
 const dynamicAuthAws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
-  userAgent: process.env.USER_AGENT_STRING,
   ddbTableName: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
 });
-const cognitoUserManagementPlugin: CognitoUserManagementPlugin = new CognitoUserManagementPlugin(
-  process.env.USER_POOL_ID!,
-  aws,
-  {
-    ddbService: dynamicAuthAws.helpers.ddb,
-    ttl: 60 * 60
-  }
-);
-const userManagementService: UserManagementService = new UserManagementService(cognitoUserManagementPlugin);
+
 const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
-  userManagementService,
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  ),
   ddbService: dynamicAuthAws.helpers.ddb,
   userGroupKeyType: authorizationGroupPrefix
 });
@@ -138,7 +130,9 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentPlugin: new SWBEnvironmentService(environmentService),
   environmentTypeService: envTypeService,
   environmentTypeConfigService: new EnvTypeConfigService(envTypeConfigService, metadataService),
-  userManagementService: userManagementService,
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
   metadataService: metadataService,
   projectEnvPlugin: new ProjectEnvService(dynamicAuthorizationService, environmentService, projectService),

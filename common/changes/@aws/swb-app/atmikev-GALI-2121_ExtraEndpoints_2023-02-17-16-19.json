@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "added Remove Dataset functionality",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

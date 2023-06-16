@@ -34,12 +34,11 @@ export default class AuthorizationSetup {
 
     //IT Admin Permissions
     const projectPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT);
-    const projectListPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_PROJECT_LIST, ['READ']);
     const userPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_USER);
     const projectToUserAssociationPermissions = this._mapActions(
       itAdmin,
       SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-      ['CREATE', 'READ', 'DELETE']
+      ['CREATE', 'DELETE']
     );
     const environmentPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT, [
       'READ',
@@ -48,11 +47,6 @@ export default class AuthorizationSetup {
     ]);
     const environmentTypePermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ENVIRONMENT_TYPE);
     const environmentTypeConfigPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_ETC);
-    const environmentTypeConfigListPermissions = this._mapActions(
-      itAdmin,
-      SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC,
-      ['READ']
-    );
     const datasetPermissions = this._mapActions(itAdmin, SwbAuthZSubject.SWB_DATASET, ['READ']);
     const awsAccountTemplateUrlsPermissions = this._mapActions(
       itAdmin,
@@ -65,11 +59,9 @@ export default class AuthorizationSetup {
     await this.createIdentityPermissions(
       [
         ...projectPermissions,
-        ...projectListPermissions,
         ...environmentPermissions,
         ...environmentTypePermissions,
         ...environmentTypeConfigPermissions,
-        ...environmentTypeConfigListPermissions,
         ...datasetPermissions,
         ...userPermissions,
         ...costCenterPermissions,
@@ -153,7 +145,7 @@ export default class AuthorizationSetup {
   /**
    * Map list of actions to list of {@link IdentityPermission}
    * @param identityId - group id
-   * @param subjectType - subject, e.g. Project, CostCenter, etc.
+   * @param identityId - subject, e.g. Project, CostCenter, etc.
    * @param actions - list of actions allowed for group
    * @returns list of {@link IdentityPermission}
    */

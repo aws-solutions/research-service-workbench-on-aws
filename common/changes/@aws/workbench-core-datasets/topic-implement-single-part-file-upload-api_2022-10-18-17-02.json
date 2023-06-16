@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Implemented presignedSinglePartUploadUrl endpoint.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

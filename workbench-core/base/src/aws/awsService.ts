@@ -23,7 +23,6 @@ import { STS } from '@aws-sdk/client-sts';
 import { Credentials } from '@aws-sdk/types';
 import AppRegistryService from './helpers/appRegistryService';
 import CloudformationService from './helpers/cloudformationService';
-import CognitoService from './helpers/cognitoService';
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 import S3Service from './helpers/s3Service';
 import ServiceCatalogService from './helpers/serviceCatalogService';
@@ -54,24 +53,17 @@ export default class AwsService {
     ddb: DynamoDBService;
     serviceCatalog: ServiceCatalogService;
     appRegistryService: AppRegistryService;
-    cognito: CognitoService;
   };
 
-  public constructor(options: {
-    region: string;
-    ddbTableName?: string;
-    userAgent?: string;
-    credentials?: Credentials;
-  }) {
+  public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
     const customBackoff = (retryCount: number): number => {
       console.log(`retry count: ${retryCount}, waiting: 100ms`);
       return 100;
     };
-    const { region, ddbTableName, userAgent } = options;
+    const { region, ddbTableName } = options;
     const sdkOptions = {
       maxRetries: 5,
       retryDelayOptions: { customBackoff },
-      customUserAgent: userAgent || '',
       ...options
     };
 
@@ -104,8 +96,7 @@ export default class AwsService {
         this.clients.appRegistry,
         this.clients.cloudformation,
         this.clients.serviceQuotas
-      ),
-      cognito: new CognitoService(this.clients.cognito)
+      )
     };
   }
 

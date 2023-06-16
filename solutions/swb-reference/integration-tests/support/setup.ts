@@ -52,7 +52,7 @@ export default class Setup {
       }
     }
     const userPoolId = this._settings.get('cognitoUserPoolId');
-    const clientId = this._settings.get('cognitoProgrammaticAccessUserPoolClientId');
+    const clientId = this._settings.get('cognitoUserPoolClientId');
     const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
     const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
     const awsRegion = this._settings.get('awsRegion');
@@ -101,7 +101,7 @@ export default class Setup {
 
   private async _getCognitoTokenForUser(userName: string, password: string): Promise<string> {
     const userPoolId = this._settings.get('cognitoUserPoolId');
-    const clientId = this._settings.get('cognitoProgrammaticAccessUserPoolClientId');
+    const clientId = this._settings.get('cognitoUserPoolClientId');
     const awsRegion = this._settings.get('awsRegion');
     const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
@@ -120,7 +120,7 @@ export default class Setup {
   }
 
   public getStackName(): string {
-    return `rsw-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
+    return `swb-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
   }
 
   public getMainAwsClient(): AwsService {
@@ -154,13 +154,17 @@ export default class Setup {
   }
 
   private async _loadSecrets(secretsService: SecretsService): Promise<void> {
-    if (this._settings.optional('awsAccountIdParamStorePath', undefined) === undefined) {
-      return;
-    }
-    const [awsAccountId] = await Promise.all([
-      secretsService.getSecret(this._settings.get('awsAccountIdParamStorePath'))
-    ]);
+    const [hostAwsAccountId, hostingAccountHandlerRoleArn, envMgmtRoleArn, encryptionKeyArn] =
+      await Promise.all([
+        secretsService.getSecret(this._settings.get('hostAwsAccountIdParamStorePath')),
+        secretsService.getSecret(this._settings.get('hostingAccountHandlerRoleArnParamStorePath')),
+        secretsService.getSecret(this._settings.get('envMgmtRoleArnParamStorePath')),
+        secretsService.getSecret(this._settings.get('encryptionKeyArnParamStorePath'))
+      ]);
 
-    this._settings.set('awsAccountId', awsAccountId);
+    this._settings.set('hostAwsAccountId', hostAwsAccountId);
+    this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
+    this._settings.set('envMgmtRoleArn', envMgmtRoleArn);
+    this._settings.set('encryptionKeyArn', encryptionKeyArn);
   }
 }

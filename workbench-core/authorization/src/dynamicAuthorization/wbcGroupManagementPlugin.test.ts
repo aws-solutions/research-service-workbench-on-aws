@@ -3,17 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService } from '@aws/workbench-core-base';
-import {
-  UserManagementService,
-  UserManagementPlugin,
-  PluginConfigurationError,
-  IdpUnavailableError,
-  RoleAlreadyExistsError,
-  TooManyRequestsError,
-  UserNotFoundError,
-  RoleNotFoundError
-} from '@aws/workbench-core-user-management';
 import {
   ConditionalCheckFailedException,
   DeleteItemCommand,
@@ -26,6 +15,17 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
+import { DynamoDBService } from '@aws/workbench-core-base';
+import {
+  UserManagementService,
+  UserManagementPlugin,
+  PluginConfigurationError,
+  IdpUnavailableError,
+  RoleAlreadyExistsError,
+  TooManyRequestsError,
+  UserNotFoundError,
+  RoleNotFoundError
+} from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
@@ -69,14 +69,13 @@ describe('WBCGroupManagemntPlugin', () => {
       addUserToRole: jest.fn(),
       removeUserFromRole: jest.fn(),
       createRole: jest.fn(),
-      deleteRole: jest.fn(),
-      validateUserRoles: jest.fn()
+      deleteRole: jest.fn()
     };
     ddbMock = mockClient(DynamoDBClient);
   });
 
   beforeEach(() => {
-    groupId = 'proj-00f1682c-4d74-4747-ac1a-2d176d081ba6#ProjectAdmin';
+    groupId = 'groupId';
     userId = 'userId';
     status = 'active';
     mockUser = {
@@ -243,7 +242,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('getGroupUsers', () => {
     it('returns an array of userID in the data object for the requested group', async () => {
-      mockUserManagementPlugin.listUsersForRole = jest.fn().mockResolvedValue({ data: [userId] });
+      mockUserManagementPlugin.listUsersForRole = jest.fn().mockResolvedValue([userId]);
       const response = await wbcGroupManagementPlugin.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
       expect(response).toStrictEqual<GetGroupUsersResponse>({ data: { userIds: [userId] } });

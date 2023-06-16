@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { UsernameExistsException } from '@aws-sdk/client-cognito-identity-provider';
+import { AwsService } from '@aws/workbench-core-base';
 import passwordGenerator from 'generate-password';
 
 export default class CognitoSetup {

@@ -3,16 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, nonEmptyMessage } from '@aws/workbench-core-base';
 import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { UpdateProjectRequestParser } from './updateProjectRequest';
 
 describe('UpdateProjectRequestParser', () => {
   let requestObject: Record<string, JSONValue>;
-  const mockUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
-  const mockProjectId = `${resourceTypeToKey.project.toLowerCase()}-${mockUuid}`;
+
   beforeEach(() => {
-    requestObject = { projectId: mockProjectId };
+    requestObject = { projectId: 'proj-123' };
   });
 
   describe('when name', () => {
@@ -31,24 +29,18 @@ describe('UpdateProjectRequestParser', () => {
         if (!parsed.success) {
           const expectedIssues = [
             {
-              code: 'too_small',
-              minimum: 1,
-              type: 'string',
-              inclusive: true,
-              message: nonEmptyMessage,
-              exact: false,
+              code: 'custom',
+              message: 'name must be non empty',
               path: ['updatedValues', 'name']
             }
           ];
-          console.log('issues', parsed.error.issues);
-          console.log('error', parsed.error);
           expect(parsed.error.issues).toEqual(expectedIssues);
         }
       });
     });
     describe('is non empty', () => {
       beforeEach(() => {
-        expectedName = 'newName';
+        expectedName = 'new name';
         requestObject.updatedValues = { name: expectedName };
       });
 
@@ -97,12 +89,8 @@ describe('UpdateProjectRequestParser', () => {
         if (!parsed.success) {
           const expectedIssues = [
             {
-              code: 'too_small',
-              minimum: 1,
-              type: 'string',
-              inclusive: true,
-              message: nonEmptyMessage,
-              exact: false,
+              code: 'custom',
+              message: 'description must be non empty',
               path: ['updatedValues', 'description']
             }
           ];

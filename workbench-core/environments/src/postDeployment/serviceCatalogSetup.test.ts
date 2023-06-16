@@ -28,27 +28,27 @@ describe('ServiceCatalogSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     S3_ARTIFACT_BUCKET_SC_PREFIX: 'service-catalog-cfn-templates/',
-    SC_PORTFOLIO_NAME: 'rsw-dev-va',
+    SC_PORTFOLIO_NAME: 'swb-dev-va',
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: 'S3BucketArtifactsArnOutput',
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: 'LaunchConstraintIamRoleNameOutput',
-    STACK_NAME: 'rsw-dev-va'
+    STACK_NAME: 'swb-dev-va'
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
         {
-          StackName: 'rsw-dev-va',
+          StackName: 'swb-dev-va',
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
             {
               OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
-              OutputValue: 'arn:aws:s3:::rsw-dev-va-s3artifacts'
+              OutputValue: 'arn:aws:s3:::swb-dev-va-s3artifacts'
             },
             {
               OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
-              OutputValue: 'rsw-dev-va-LaunchConstraint'
+              OutputValue: 'swb-dev-va-LaunchConstraint'
             }
           ]
         }
@@ -88,7 +88,7 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'rsw-dev-va',
+            DisplayName: 'swb-dev-va',
             Id: 'port-abc'
           }
         ]
@@ -110,7 +110,7 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'rsw-dev-va',
+            DisplayName: 'swb-dev-va',
             Id: 'port-abc'
           }
         ]
@@ -242,7 +242,7 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'rsw-dev-va',
+            DisplayName: 'swb-dev-va',
             Id: 'port-abc'
           }
         ]

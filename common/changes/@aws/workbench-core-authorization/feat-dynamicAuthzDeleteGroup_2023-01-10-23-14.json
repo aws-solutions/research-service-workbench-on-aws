@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "Adding implementation of dynamicAuthorization.deleteGroup",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

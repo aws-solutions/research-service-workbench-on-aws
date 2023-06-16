@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "Add zod to environments API",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

@@ -17,7 +17,6 @@
     "<rootDir>/src/models/environmentTypes/environmentType.ts",
     "<rootDir>/src/models/environmentTypes/listEnvironmentTypesRequest.ts",
     "<rootDir>/src/models/environmentTypes/updateEnvironmentTypeRequest.ts",
-    "<rootDir>/src/models/environmentTypes/getEnvironmentTypesRequest.ts",
 
     "<rootDir>/src/models/environments/environment.ts",
     "<rootDir>/src/models/environments/environmentItem.ts",
@@ -27,9 +26,9 @@
   "coverageThreshold": {
     "global": {
       "branches": 70,
-      "functions": 80,
-      "lines": 75,
-      "statements": 75
+      "functions": 70,
+      "lines": 70,
+      "statements": 70
     }
   },
   "coverageReporters": ["json-summary", "json"]

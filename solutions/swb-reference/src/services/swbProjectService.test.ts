@@ -41,7 +41,7 @@ describe('SWBProjectService', () => {
     mockDynamicAuthZService = {} as DynamicAuthorizationService;
 
     mockUser = {
-      id: '12345678-1234-1234-1234-123456789012',
+      id: 'user-123',
       roles: [`${fakeProjectId}#ProjectAdmin`]
     };
 
@@ -221,7 +221,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
   const paRole: string = `${projectId}#ProjectAdmin`;
 
   // Dataset permissions
-  for (const action of ['CREATE']) {
+  for (const action of ['CREATE', 'READ']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -229,20 +229,6 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       identityType: identityType,
       subjectId: allSubjectId,
       subjectType: SwbAuthZSubject.SWB_DATASET,
-      conditions: {
-        projectId: { $eq: projectId }
-      }
-    });
-  }
-  // List Datasets permission
-  for (const action of ['READ']) {
-    identityPermissions.push({
-      action: action as Action,
-      effect: allowEffect,
-      identityId: paRole,
-      identityType: identityType,
-      subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
       conditions: {
         projectId: { $eq: projectId }
       }
@@ -295,7 +281,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       identityId: paRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_PROJECT_LIST
+      subjectType: SwbAuthZSubject.SWB_PROJECT
     });
   }
   // Project permissions
@@ -310,7 +296,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
     });
   }
   // Project User Association permissions
-  for (const action of ['CREATE', 'READ', 'DELETE']) {
+  for (const action of ['CREATE', 'READ']) {
     identityPermissions.push({
       action: action as Action,
       effect: allowEffect,
@@ -337,17 +323,7 @@ function _getPAIdentityPermissions(projectId: string): IdentityPermission[] {
       }
     });
   }
-  // User permissions
-  for (const action of ['READ']) {
-    identityPermissions.push({
-      action: action as Action,
-      effect: allowEffect,
-      identityId: paRole,
-      identityType: identityType,
-      subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_USER
-    });
-  }
+
   return identityPermissions;
 }
 
@@ -358,7 +334,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
   const allowEffect: Effect = 'ALLOW';
   const researcherRole: string = `${projectId}#Researcher`;
 
-  // List Dataset permissions
+  // Dataset permissions
   for (const action of ['READ']) {
     identityPermissions.push({
       action: action as Action,
@@ -366,7 +342,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       identityId: researcherRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
+      subjectType: SwbAuthZSubject.SWB_DATASET,
       conditions: {
         projectId: { $eq: projectId }
       }
@@ -419,7 +395,7 @@ function _getResearcherIdentityPermissions(projectId: string): IdentityPermissio
       identityId: researcherRole,
       identityType: identityType,
       subjectId: allSubjectId,
-      subjectType: SwbAuthZSubject.SWB_PROJECT_LIST
+      subjectType: SwbAuthZSubject.SWB_PROJECT
     });
   }
   // Project permissions

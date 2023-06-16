@@ -5,12 +5,12 @@
 
 /* eslint-disable security/detect-object-injection */
 
+import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
-  buildConcatenatedSk,
   buildDynamoDBPkSk,
   buildDynamoDbKey,
   DEFAULT_API_PAGE_SIZE,
@@ -22,7 +22,6 @@ import {
   getFilterQueryParams,
   PaginatedResponse
 } from '@aws/workbench-core-base';
-import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
@@ -383,6 +382,7 @@ export class EnvironmentService {
         addPutItems: items
       });
     } catch (e) {
+      console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
       console.error('Failed to create environment', e);
       throw Boom.internal('Failed to create environment');
     }
@@ -405,49 +405,6 @@ export class EnvironmentService {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
     await this._dynamoDBService.updateExecuteAndFormat({ key, params: { item: data } });
-  }
-
-  /**
-   * Store metadata in DDB relating the environment's project with the dataset and endpoint that gets mounted on the env
-   * @param projectId - Environment's projectId
-   * @param datasetId - Dataset that is mounted on the Environment
-   * @param endpointId - Endpoint for the Dataset that was mounted on the Environment
-   */
-  public async storeProjectDatasetEndpointRelationship(
-    projectId: string,
-    datasetId: string,
-    endpointId: string
-  ): Promise<void> {
-    const key = {
-      pk: buildDynamoDbKey(projectId, resourceTypeToKey.project),
-      sk: buildConcatenatedSk([
-        buildDynamoDbKey(datasetId, resourceTypeToKey.dataset),
-        buildDynamoDbKey(endpointId, resourceTypeToKey.endpoint)
-      ])
-    };
-
-    await this._dynamoDBService.updateExecuteAndFormat({ key, params: { item: {} } });
-  }
-
-  /**
-   * Deletes metadata in DDB that relates environment's project with the dataset and endpoint that gets mounted on the env
-   * @param projectId - Environment's projectId
-   * @param datasetId - Dataset that is mounted on the Environment
-   * @param endpointId - Endpoint for the Dataset that was mounted on the Environment
-   */
-  public async removeProjectDatasetEndpointRelationship(
-    projectId: string,
-    datasetId: string,
-    endpointId: string
-  ): Promise<void> {
-    const key = {
-      pk: buildDynamoDbKey(projectId, resourceTypeToKey.project),
-      sk: buildConcatenatedSk([
-        buildDynamoDbKey(datasetId, resourceTypeToKey.dataset),
-        buildDynamoDbKey(endpointId, resourceTypeToKey.endpoint)
-      ])
-    };
-    await this._dynamoDBService.deleteItem({ key });
   }
 
   /**

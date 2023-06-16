@@ -7,6 +7,7 @@ jest.mock('@aws/workbench-core-audit');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 jest.mock('./wbcDataSetsAuthorizationPlugin');
+
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
   CASLAuthorizationPlugin,
@@ -20,14 +21,12 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { AccountNotFoundError } from './errors/accountNotFoundError';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { DataSetInvalidParameterError } from './errors/dataSetInvalidParameterError';
 import { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
 import { EndpointExistsError } from './errors/endpointExistsError';
 import { EndpointNotFoundError } from './errors/endpointNotFoundError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
-import { StorageNotFoundError } from './errors/storageNotFoundError';
 import { AddDataSetExternalEndpointResponse } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { DataSet } from './models/dataSet';
@@ -400,14 +399,6 @@ describe('DataSetService', () => {
   });
 
   describe('provisionDataset', () => {
-    const ORIGINAL_ENV = process.env;
-    beforeEach(() => {
-      process.env.S3_DATASETS_BUCKET_NAME = mockDataSetStorageName;
-      process.env.MAIN_ACCT_ID = mockAwsAccountId;
-    });
-    afterAll(() => {
-      process.env = ORIGINAL_ENV;
-    });
     it('calls createStorage and addDataSet', async () => {
       await expect(
         dataSetService.provisionDataSet({
@@ -640,24 +631,25 @@ describe('DataSetService', () => {
       );
       expect(authzPlugin.addAccessPermission).not.toBeCalled();
     });
-    it('throws error for storageName that does not match dataset bucket name', async () => {
+    it('generates an audit event when an error is thrown', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet')
+        .mockRejectedValueOnce(new Error('intentional test error'));
+
       await expect(
         dataSetService.provisionDataSet({
           name: mockDataSetName,
-          storageName: 'wrong-storage-name',
+          storageName: mockDataSetStorageName,
           path: mockDataSetPath,
           awsAccountId: mockAwsAccountId,
           region: mockAwsBucketRegion,
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).rejects.toThrowError(
-        new StorageNotFoundError("Please use data set S3 bucket name from main account for 'storageName'.")
-      );
+      ).rejects.toThrowError(new Error('intentional test error'));
       expect(audit.write).toHaveBeenCalledTimes(1);
-      expect(authzPlugin.addAccessPermission).not.toHaveBeenCalled();
     });
-    it('throws error for accountId that doe snot match main account ID', async () => {
+    it('does not update permissions if creation fails.', async () => {
       jest
         .spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet')
         .mockRejectedValueOnce(new Error('intentional test error'));
@@ -666,13 +658,12 @@ describe('DataSetService', () => {
           name: mockDataSetName,
           storageName: mockDataSetStorageName,
           path: mockDataSetPath,
-          awsAccountId: 'wrong-account-id',
+          awsAccountId: mockAwsAccountId,
           region: mockAwsBucketRegion,
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).rejects.toThrow(new AccountNotFoundError("Please use main account ID for 'awsAccountId'."));
-      expect(audit.write).toHaveBeenCalledTimes(1);
+      ).rejects.toThrow(Error);
       expect(authzPlugin.addAccessPermission).not.toHaveBeenCalled();
     });
   });

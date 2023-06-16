@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "delete key pairs API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

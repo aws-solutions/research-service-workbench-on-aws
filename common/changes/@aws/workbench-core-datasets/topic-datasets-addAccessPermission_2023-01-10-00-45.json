@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Expand auditing and correctly include 'actor'",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

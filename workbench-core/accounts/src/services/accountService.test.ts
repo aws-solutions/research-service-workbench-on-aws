@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
+
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -14,6 +14,8 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account, AccountParser } from '../models/accounts/account';
@@ -26,9 +28,8 @@ describe('AccountService', () => {
   let accountMetadata: { [id: string]: string } = {};
   let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let accountService: AccountService;
-  const mockUuid = '1234abcd-1234-abcd-1234-abcd1234abcd';
-  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-${mockUuid}`;
-  const mockCostCenterId = `${resourceTypeToKey.costCenter.toLowerCase()}-${mockUuid}`;
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+
   beforeEach(() => {
     jest.resetModules();
     mockDDB = mockClient(DynamoDBClient);
@@ -49,7 +50,7 @@ describe('AccountService', () => {
     accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
 
     accountMetadata = {
-      id: mockAccountId,
+      id: accountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -124,17 +125,19 @@ describe('AccountService', () => {
         status: { S: 'CURRENT' },
         updatedAt: { S: '2023-01-09T19:45:12.397Z' },
         createdAt: { S: '2023-01-09T19:45:12.397Z' },
-        awsAccountId: { S: '111122223333' },
+        awsAccountId: { S: 'someOtherAwsAccountId' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },
-        id: { S: mockAccountId }
+        id: { S: 'sampleAccId' },
+        accountId: { S: 'sampleAccId' }
       }
     });
 
     // OPERATE & CHECK
     await expect(
       accountService.update({
-        id: mockAccountId,
+        id: 'sampleAccId',
+        accountId: 'sampleAccId',
         awsAccountId: '123456789012',
         externalId: 'workbench'
       })
@@ -145,12 +148,13 @@ describe('AccountService', () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({});
 
-    accountMetadata.id = mockAccountId;
+    accountMetadata.id = 'sampleAccId';
+    accountMetadata.accountId = 'sampleAccId';
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
     await expect(accountService.update(accountMetadata)).rejects.toThrow(
-      `Could not find account ${accountMetadata.id}`
+      `Could not find account ${accountMetadata.accountId}`
     );
   });
 
@@ -190,7 +194,6 @@ describe('AccountService', () => {
 
   test('getAllAccounts returns list of onboarded accounts', async () => {
     const account: Account = {
-      id: mockAccountId,
       name: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
@@ -202,6 +205,7 @@ describe('AccountService', () => {
       subnetId: '',
       vpcId: '',
       awsAccountId: '123456789012',
+      id: 'sampleAccId',
       updatedAt: '',
       createdAt: ''
     };
@@ -230,7 +234,7 @@ describe('AccountService', () => {
 
     beforeEach(() => {
       accountJson = {
-        name: 'fakeName',
+        name: '',
         cidr: '',
         encryptionKeyArn: '',
         envMgmtRoleArn: '',
@@ -242,7 +246,7 @@ describe('AccountService', () => {
         subnetId: '',
         vpcId: '',
         awsAccountId: '123456789012',
-        id: 'acc-1234abcd-1234-abcd-1234-abcd1234abcd',
+        id: 'sampleAccId',
         updatedAt: '',
         createdAt: ''
       };
@@ -284,7 +288,7 @@ describe('AccountService', () => {
       let dynamoAccountItem: Account & { pk: string; sk: string };
 
       beforeEach(() => {
-        expectedAccountId = mockAccountId;
+        expectedAccountId = 'acc-expectedAccountId';
         account = AccountParser.parse({
           envMgmtRoleArn: '',
           vpcId: '',
@@ -293,8 +297,8 @@ describe('AccountService', () => {
           environmentInstanceFiles: '',
           stackName: '',
           status: 'CURRENT',
-          name: 'abc',
-          awsAccountId: '123456789012',
+          name: '',
+          awsAccountId: '',
           externalId: '',
           id: expectedAccountId,
           hostingAccountHandlerRoleArn: '',
@@ -327,15 +331,15 @@ describe('AccountService', () => {
         let expectedCCId: string;
 
         beforeEach(() => {
-          expectedCCId = mockCostCenterId;
+          expectedCCId = 'cc-12345';
           costCenterPK = `CC#${expectedCCId}`;
 
           costCenter = {
-            accountId: mockAccountId,
+            accountId: '',
             dependency: '',
-            awsAccountId: '123456789012',
+            awsAccountId: '',
             createdAt: '',
-            description: 'fakeDescription',
+            description: '',
             encryptionKeyArn: '',
             envMgmtRoleArn: '',
             environmentInstanceFiles: '',

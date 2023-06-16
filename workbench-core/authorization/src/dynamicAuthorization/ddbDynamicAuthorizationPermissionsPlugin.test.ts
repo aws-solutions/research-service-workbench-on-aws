@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, DEFAULT_API_PAGE_SIZE, JSONValue, MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import {
   DynamoDBClient,
   ServiceInputTypes,
@@ -14,6 +13,7 @@ import {
   AttributeValue
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { AwsService, DEFAULT_API_PAGE_SIZE, JSONValue, MAX_API_PAGE_SIZE } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import _ from 'lodash';

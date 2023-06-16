@@ -4,7 +4,6 @@
  */
 
 import { ProjectStatus } from './constants/projectStatus';
-import { isInvalidAwsAccountIdError } from './errors/InvalidAwsAccountIdError';
 import AccountHandler from './handlers/accountHandler';
 import {
   AwsAccountTemplateUrlsRequest,
@@ -39,6 +38,10 @@ import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/proje
 import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
 import { GetProjectsRequest, GetProjectsRequestParser } from './models/projects/getProjectsRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import {
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
+} from './models/projects/listUsersForRoleRequest';
 import { Project } from './models/projects/project';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import AccountService from './services/accountService';
@@ -88,5 +91,6 @@ export {
   AssignUserToProjectRequest,
   Project,
   ProjectStatus,
-  isInvalidAwsAccountIdError
+  ListUsersForRoleRequest,
+  ListUsersForRoleRequestParser
 };

@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateCostCenterRequestParser = z
   .object({
-    id: z.string().costCenterId().required(),
-    name: z.string().swbName().optionalNonEmpty(),
-    description: z.string().swbDescription().optionalNonEmpty()
+    id: z.string(),
+    name: z.string().optional(),
+    description: z.string().optional()
   })
   .strict();
 

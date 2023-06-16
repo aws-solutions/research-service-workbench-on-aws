@@ -89,7 +89,7 @@
      * PNPM documentation: https://pnpm.io/package_json#pnpmoverrides
      */
     "globalOverrides": {
-      "trim-newlines": "=3.0.1",
+      "trim-newlines": ">=3.0.1",
       "got": ">=11.8.5",
       "jsonwebtoken": ">=9.0.0",
       "json5": ">=2.2.2",
@@ -98,9 +98,7 @@
       "jszip": ">=3.8.0",
       "http-cache-semantics": ">=4.1.1",
       "cacheable-request": ">=10.2.7",
-      "xml2js": ">=0.5.0",
-      "yaml":  ">=2.2.2",
-      "fast-xml-parser": ">=4.2.4"
+      "xml2js": ">=0.5.0"
     },
 
     /**

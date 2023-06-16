@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Added VPC compatibility to S3 access points",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Add export for ProjectStatus",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

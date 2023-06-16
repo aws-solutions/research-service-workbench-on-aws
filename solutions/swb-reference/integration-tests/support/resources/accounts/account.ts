@@ -17,7 +17,7 @@ export default class Account extends Resource {
     const accountHelper = new AccountHelper();
     const settings = this._setup.getSettings();
     const existingAccounts = await accountHelper.listOnboardedAccounts();
-    const resource = _.find(existingAccounts, { awsAccountId: settings.get('awsAccountId') });
+    const resource = _.find(existingAccounts, { awsAccountId: settings.get('hostAwsAccountId') });
 
     if (resource) {
       const { id, awsAccountId } = resource;

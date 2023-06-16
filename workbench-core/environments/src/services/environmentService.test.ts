@@ -6,7 +6,6 @@
 const rndUuid = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 const envId = `env-${rndUuid}`;
 jest.mock('uuid', () => ({ v4: () => rndUuid }));
-import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import {
   BatchGetItemCommand,
   BatchGetItemCommandOutput,
@@ -19,6 +18,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Environment, EnvironmentParser } from '../models/environments/environment';
@@ -839,7 +839,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(envService.listEnvironments({ pageSize: limit, paginationToken })).rejects.toThrow(
-        'Invalid Pagination Token: eaJzayI6IkVOViNhM2VmZjdjZC1kNTM5LTRlZWMtODdiYy05MTcwMGJiZjZkZDIiLCJyZXNvdXJjZVR5cGUiOiJlbnZpcm9ubWVudCIsInBrIjoiRU5WI2EzZWZmN2NkLWQ1MzktNGVlYy04N2JjLTkxNzAwYmJmNmRkMiIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMDFUMTg6NTI6MTguMTkyWiJ9'
+        'Invalid paginationToken'
       );
     });
   });

@@ -250,28 +250,24 @@ export function logoutUser(
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
     const websiteUrl = getRequestOrigin(req);
-    const accessToken = req.cookies.access_token;
 
     if (!websiteUrl) {
       res.sendStatus(400);
       return;
     }
 
-    try {
-      if (typeof refreshToken === 'string') {
+    if (typeof refreshToken === 'string') {
+      try {
         await authenticationService.revokeToken(refreshToken);
-      }
-      if (typeof accessToken === 'string') {
-        await authenticationService.revokeAccessToken(accessToken);
-      }
-    } catch (error) {
-      // token was not a refresh token or there was an authentication service configuration issue.
-      if (loggingService) {
-        loggingService.error(error);
-      }
-      if (isIdpUnavailableError(error)) {
-        res.sendStatus(503);
-        return;
+      } catch (error) {
+        // token was not a refresh token or there was an authentication service configuration issue.
+        if (loggingService) {
+          loggingService.error(error);
+        }
+        if (isIdpUnavailableError(error)) {
+          res.sendStatus(503);
+          return;
+        }
       }
     }
 
@@ -310,13 +306,11 @@ export function refreshAccessToken(
   return async function (req: Request, res: Response) {
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
-    const oldAccessToken = req.cookies.access_token;
 
     if (typeof refreshToken === 'string') {
       try {
         const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
-        // Revoke previous session
-        if (typeof oldAccessToken === 'string') await authenticationService.revokeAccessToken(oldAccessToken);
+
         // set access cookie
         res.cookie('access_token', accessToken.token, {
           ...defaultCookieOptions,

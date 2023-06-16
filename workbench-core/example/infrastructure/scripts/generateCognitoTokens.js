@@ -46,6 +46,7 @@ async function run() {
       rootUserName,
       rootPassword
     });
+    const { accessToken, idToken, refreshToken } = tokens;
     console.log({
       tokens,
       csrfCookie: secret,
