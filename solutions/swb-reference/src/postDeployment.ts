@@ -116,8 +116,7 @@ async function uploadOnboardAccountCfnToS3(awsService: AwsService): Promise<void
   console.log('Uploading template files to S3');
   await Promise.all([
     uploadTemplateFileToS3(awsService, 'onboard-account.cfn.yaml'),
-    uploadTemplateFileToS3(awsService, 'onboard-account-byon.cfn.yaml'),
-    uploadTemplateFileToS3(awsService, 'onboard-account-tgw.cfn.yaml')
+    uploadTemplateFileToS3(awsService, 'onboard-account-byon.cfn.yaml')
   ]);
   console.log('Finished uploading template files to S3');
 }

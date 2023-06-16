@@ -58,12 +58,12 @@ Wed, 07 Jun 2023 21:47:22 GMT
 - add prefixes to resource ids to allow easier resource identification
 - revert
 - Add export for ProjectStatus
-- Update account handler to check onboard-account-byon.cfn.yml, onboard-account-tgw.cfn.yml, and onboard-account.cfn.yml so if users have a hosting account that isn't onboard-account.cfn.yml, their account status is correct.
+- Update account handler to check onboard-account-byon.cfn.yml and onboard-account.cfn.yml so if users have a hosting account that isn't onboard-account.cfn.yml, their account status is correct.
 - added Zod parser for account services
 - update error message
 - error validation for create account
 - Updated @aws-sdk/* dependencies to ^3.186.0
-- return template URLs for byon and tgw deployments along with vanilla.
+- return template URLs for byon deployments along with vanilla.
 - update rush dependencies
 - update rush dependencies
 - Verify that Cost Center was not deleted before creating new Project
