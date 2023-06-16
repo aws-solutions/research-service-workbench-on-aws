@@ -22,9 +22,44 @@ export const TempRoleAccessEntryParser = z.object({
     /**
      * The given time for expiration in DynamoDB(MUST ENABLE TTL)
      */
-    expirationTime: z.number()
+    expirationTime: z.number(),
+
+    /**
+     * The identity represents a compound key of the TempRoleAccessPrefix and roleId 
+     */
+    identity: z.string()
 });
 
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const TempRoleAccessItemParser = z.object({
+    /**
+     * Partition Key is a compound key of the TempRoleAccessPrefix and userId
+     */
+    pk: z.string(),
+
+    /**
+     * Sort Key is a compound key of the TempRoleAccessPrefix and roleId
+     */
+    sk: z.string(),
+    /**
+     * Role that will temporarily be revoked/granted access
+     */
+    roleId: z.string(),
+    /**
+     * The access which should apply to the role
+     */
+    access: AccessTypeParser,
+    /**
+     * The given time for expiration in DynamoDB(MUST ENABLE TTL)
+     */
+    expirationTime: z.number(),
+
+    /**
+     * The identity represents a compound key of the TempRoleAccessPrefix and roleId 
+     */
+    identity: z.string()
+});
 /**
  * The access which should apply to the role
  */

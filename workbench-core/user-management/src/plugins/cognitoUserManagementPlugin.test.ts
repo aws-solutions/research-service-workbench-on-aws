@@ -40,7 +40,8 @@ import {
   ServiceInputTypes as DDBServiceInputTypes,
   ServiceOutputTypes as DDBServiceOutputTypes,
   UpdateItemCommand,
-  QueryCommand
+  QueryCommand,
+  BatchWriteItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
@@ -67,7 +68,7 @@ describe('CognitoUserManagementPlugin tests', () => {
   let aws: AwsService;
   let plugin: CognitoUserManagementPlugin;
   let roles: string[];
-
+  let tempRoleAccessPrefix: string;
   beforeAll(() => {
     cognitoMock = mockClient(CognitoIdentityProviderClient);
     ddbMock = mockClient(DynamoDBClient);
@@ -96,6 +97,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     roles = ['Researcher', 'ProjectAdmin'];
     paginationToken =
       'IkNBSVNxQUlJQVJLQkFnZ0RFdndCQUgwVkljdU9TWFc1TWhieDliN2xZZWRQK3BQVzJ2NzRKbXF6YysySzVycUFleUpBYmlJNklsQmhaMmx1WVhScGIyNURiMjUwYVc1MVlYUnBiMjVFVkU4aUxDSnVaWGgwUzJWNUlqb2lRVUZCUVVGQlFVRkRUakJNUVZGRlFsbFhaV1JyWWpCUVUzQnBVVU40Vm5CV1oxZEtTWGxpSzBWUk5VMUhWVE5oYVRaRGFsRjROR1pWZGpWc1ltMVpOMDVVU1RCT2VsVjZUMGRGZEUxVVFtdFplVEF3VDFSRk0weFVaekZPVkZWMFRVZEthazlYU20xWlYxSnFUMGRLYTA5M1BUMGlMQ0p3WVdkcGJtRjBhVzl1UkdWd2RHZ2lPakVzSW5CeVpYWnBiM1Z6VW1WeGRXVnpkRlJwYldVaU9qRTJPRFV3TnpReE5qSXdOelI5R2lDRnpmNlU4OExHVFlSVU9wdWxCRFQ4Qlh6ZGkyVk55MDVObFVPY2Irci9qQT09Ig==';
+    tempRoleAccessPrefix = 'TempRoleAccess';
   });
 
   describe('getUser tests', () => {
@@ -1297,6 +1299,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
   describe('deleteRole tests', () => {
     it('should delete the requested group when the group exists', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       const deleteGroupMock = cognitoMock.on(DeleteGroupCommand).resolves({});
 
       await plugin.deleteRole(roles[0]);
@@ -1305,18 +1308,22 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
+
       cognitoMock.on(DeleteGroupCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deleteRole(roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       cognitoMock.on(DeleteGroupCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deleteRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       cognitoMock
         .on(DeleteGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
@@ -1325,6 +1332,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       cognitoMock
         .on(DeleteGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: 'Group not found.' }));
@@ -1333,6 +1341,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       cognitoMock
         .on(DeleteGroupCommand)
         .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
@@ -1341,9 +1350,60 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
+      ddbMock.on(QueryCommand).resolvesOnce({});
       cognitoMock.on(DeleteGroupCommand).rejects(new Error());
 
       await expect(plugin.deleteRole(roles[0])).rejects.toThrow(Error);
+    });
+
+    describe('clear temp role access', () => {
+      let mockGroupId: string;
+      let expiredTimeString: string;
+      beforeEach(() => {
+        mockGroupId = 'sampleGroupId';
+        expiredTimeString = (Math.round(Date.now() / 1000) + 15 * 60).toString();
+      });
+      it('must clear temp role access if entries exist', async () => {
+        ddbMock.on(QueryCommand).resolvesOnce({
+          Items: [
+            {
+              pk: { S: `${tempRoleAccessPrefix}#${userInfo.id}` },
+              sk: { S: `${tempRoleAccessPrefix}#${mockGroupId}` },
+              access: { S: `ALLOW` },
+              expirationTime: { N: expiredTimeString },
+              identity: { S: `${tempRoleAccessPrefix}#${roles[0]}` },
+              roleId: { S: roles[0] }
+            }
+          ]
+        });
+        ddbMock.on(BatchWriteItemCommand).resolvesOnce({});
+        cognitoMock.on(DeleteGroupCommand).resolves({});
+
+        await expect(plugin.deleteRole(roles[0])).resolves.not.toThrow();
+      });
+
+      it('if pagination token is valid, retrieve additional values', async () => {
+        ddbMock.on(QueryCommand).resolvesOnce({
+          Items: [
+            {
+              pk: { S: `${tempRoleAccessPrefix}#${userInfo.id}` },
+              sk: { S: `${tempRoleAccessPrefix}#${mockGroupId}` },
+              access: { S: `ALLOW` },
+              expirationTime: { N: expiredTimeString },
+              identity: { S: `${tempRoleAccessPrefix}#${roles[0]}` },
+              roleId: { S: roles[0] }
+            }
+          ],
+          LastEvaluatedKey: { sk: { S: `${tempRoleAccessPrefix}#${userInfo.id}` } }
+        });
+        ddbMock.on(QueryCommand).resolvesOnce({
+          Items: []
+        });
+        ddbMock.on(BatchWriteItemCommand).resolvesOnce({});
+        cognitoMock.on(DeleteGroupCommand).resolves({});
+
+        await expect(plugin.deleteRole(roles[0])).resolves.not.toThrow();
+      });
     });
   });
 
@@ -1366,7 +1426,8 @@ describe('CognitoUserManagementPlugin tests', () => {
           {
             roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
-            expirationTime: { N: expiredTimeString }
+            expirationTime: { N: expiredTimeString },
+            identity: { S: `${tempRoleAccessPrefix}#Researcher` }
           }
         ]
       });
@@ -1381,6 +1442,7 @@ describe('CognitoUserManagementPlugin tests', () => {
           {
             roleId: { S: 'Role3' },
             access: { S: 'ALLOW' },
+            identity: { S: `${tempRoleAccessPrefix}#Role3` },
             expirationTime: { N: expiredTimeString }
           }
         ]
@@ -1396,11 +1458,13 @@ describe('CognitoUserManagementPlugin tests', () => {
           {
             roleId: { S: 'Role3' },
             access: { S: 'ALLOW' },
+            identity: { S: `${tempRoleAccessPrefix}#Role3` },
             expirationTime: { N: expiredTimeString }
           },
           {
             roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
+            identity: { S: `${tempRoleAccessPrefix}#Researcher` },
             expirationTime: { N: expiredTimeString }
           }
         ]
@@ -1417,6 +1481,7 @@ describe('CognitoUserManagementPlugin tests', () => {
           {
             roleId: { S: 'Researcher' },
             access: { S: 'DENY' },
+            identity: { S: `${tempRoleAccessPrefix}#Researcher` },
             expirationTime: { N: expiredTimeString }
           }
         ]
