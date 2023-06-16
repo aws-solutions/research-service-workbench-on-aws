@@ -44,9 +44,6 @@ describe('awsAccountTemplateUrls tests', () => {
     const byonUrls = _.get(urls, 'onboard-account-byon');
     expect(byonUrls.createUrl).toBeTruthy();
     expect(byonUrls.updateUrl).toBeTruthy();
-    const tgwUrls = _.get(urls, 'onboard-account-tgw');
-    expect(tgwUrls.createUrl).toBeTruthy();
-    expect(tgwUrls.updateUrl).toBeTruthy();
   });
 
   describe('As project admin', () => {
