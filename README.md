@@ -32,16 +32,19 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | Folder | Package | README |
 | ------ | ------- | ------ |
 | [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
-| [solutions/swb-reference](./solutions/swb-reference/) | [@aws/swb-reference] | [README](./solutions/swb-reference/README.md)
 | [workbench-core/accounts](./workbench-core/accounts/) | [@aws/workbench-core-accounts] | [README](./workbench-core/accounts/README.md)
+| [workbench-core/accounts-ui](./workbench-core/accounts-ui/) | [@aws/workbench-core-accounts-ui] | [README](./workbench-core/accounts-ui/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/authorization](./workbench-core/authorization/) | [@aws/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@aws/workbench-core-base] | [README](./workbench-core/base/README.md)
 | [workbench-core/datasets](./workbench-core/datasets/) | [@aws/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
+| [workbench-core/datasets-ui](./workbench-core/datasets-ui/) | [@aws/workbench-core-datasets-ui] | [README](./workbench-core/datasets-ui/README.md)
 | [workbench-core/environments](./workbench-core/environments/) | [@aws/workbench-core-environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/environments-ui](./workbench-core/environments-ui/) | [@aws/workbench-core-environments-ui] | [README](./workbench-core/environments-ui/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/swb-common-ui](./workbench-core/swb-common-ui/) | [@aws/workbench-core-swb-common-ui] | [README](./workbench-core/swb-common-ui/README.md)
 | [workbench-core/user-management](./workbench-core/user-management/) | [@aws/workbench-core-user-management] | [README](./workbench-core/user-management/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
