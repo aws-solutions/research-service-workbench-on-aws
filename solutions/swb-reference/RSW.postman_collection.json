@@ -1179,54 +1179,6 @@
           "response": []
         },
         {
-          "name": "List envTypeConfigs for Project",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
-              "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
-              "query": [
-                {
-                  "key": "paginationToken",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "pageSize",
-                  "value": "1",
-                  "disabled": true
-                }
-              ],
-              "variable": [
-                {
-                  "key": "projectId",
-                  "value": "",
-                  "description": "ID of project to associate"
-                },
-                {
-                  "key": "envTypeId",
-                  "value": "",
-                  "description": "ID of environment type associated with this config"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Get EnvTypeConfig associated with Project",
           "request": {
             "method": "GET",
