@@ -26,7 +26,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"cost center name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
+              "raw": "{\n    \"name\": \"cost-center-name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -987,7 +987,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config-1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1457,7 +1457,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
+              "raw": "{\n    \"name\": \"Example-Project-1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1521,7 +1521,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"New name\",\n    \"description\": \"New description\"\n}",
+              "raw": "{\n    \"name\": \"New-name\",\n    \"description\": \"New description\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
