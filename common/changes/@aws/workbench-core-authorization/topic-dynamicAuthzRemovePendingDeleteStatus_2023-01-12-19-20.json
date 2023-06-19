@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "Remove delete_pending status information",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

@@ -8,6 +8,9 @@
 #projectId: ''  #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
 #envType: ''
 
+## Negative Testing
+#terminatedEnvId: ''   # id of an environment that has already been terminated
+
 ## Cognito Integ Test Client
 #rootUserNameParamStorePath: ''
 #rootPasswordParamStorePath: ''
@@ -25,5 +28,8 @@
 #defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
 
 ## Pre-requisite for running aws-accounts integration test
-## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
-#awsAccountIdParamStorePath: ''
+## Create the onboard_account stack in an external AWS account, and populate the following values below:
+# hostAwsAccountIdParamStorePath: ''
+# hostingAccountHandlerRoleArnParamStorePath: ''
+# envMgmtRoleArnParamStorePath: ''
+# encryptionKeyArnParamStorePath: ''

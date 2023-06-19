@@ -123,7 +123,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_DATASET_LIST,
+          subjectType: SwbAuthZSubject.SWB_DATASET,
           subjectId: '*',
           projectId: '${projectId}'
         }
@@ -396,7 +396,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC,
+          subjectType: SwbAuthZSubject.SWB_PROJECT,
           subjectId: '*'
         }
       }
@@ -407,7 +407,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT_LIST,
+          subjectType: SwbAuthZSubject.SWB_PROJECT,
           subjectId: '*'
         }
       }
@@ -521,8 +521,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'CREATE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-          subjectId: '*',
-          projectId: '${projectId}'
+          subjectId: '${projectId}' // Not using userId because no boundary on which users can be used
         }
       }
     ],
@@ -531,8 +530,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         action: 'DELETE',
         subject: {
           subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
-          subjectId: '*',
-          projectId: '${projectId}'
+          subjectId: '${projectId}' // Not using userId because no boundary on which users can be used
         }
       }
     ]
@@ -542,7 +540,7 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
       {
         action: 'READ',
         subject: {
-          subjectType: SwbAuthZSubject.SWB_PROJECT_USER_ASSOCIATION,
+          subjectType: SwbAuthZSubject.SWB_USER,
           subjectId: '*',
           projectId: '${projectId}'
         }
@@ -629,18 +627,6 @@ export const dynamicRoutesMap: DynamicRoutesMap = {
         subject: {
           subjectType: SwbAuthZSubject.SWB_SSH_KEY,
           subjectId: '${sshKeyId}',
-          projectId: '${projectId}'
-        }
-      }
-    ]
-  },
-  '/projects/:projectId/environments/:environmentId/sshKeys': {
-    GET: [
-      {
-        action: 'READ',
-        subject: {
-          subjectType: SwbAuthZSubject.SWB_SSH_KEY,
-          subjectId: '*',
           projectId: '${projectId}'
         }
       }

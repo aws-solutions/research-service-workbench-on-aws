@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "fix dependencies",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

@@ -4,7 +4,7 @@
  */
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import { InvalidPaginationTokenError } from '../errors/invalidPaginationTokenError';
+import * as Boom from '@hapi/boom';
 import QueryParams from '../interfaces/queryParams';
 
 export function addPaginationToken(
@@ -15,7 +15,11 @@ export function addPaginationToken(
   // If paginationToken is defined, add param
   // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
   if (paginationToken) {
-    params.start = fromPaginationToken(paginationToken);
+    try {
+      params.start = fromPaginationToken(paginationToken);
+    } catch (error) {
+      throw Boom.badRequest('Invalid paginationToken');
+    }
   }
 
   return params;
@@ -44,11 +48,7 @@ export function toPaginationToken(key: Record<string, string>): string {
  * @returns object of key-value string pairs
  */
 export function fromPaginationToken(token: string): Record<string, string> {
-  try {
-    return JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
-  } catch {
-    throw new InvalidPaginationTokenError(`Invalid Pagination Token: ${token}`);
-  }
+  return JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
 }
 
 export const DEFAULT_API_PAGE_SIZE: number = 50;

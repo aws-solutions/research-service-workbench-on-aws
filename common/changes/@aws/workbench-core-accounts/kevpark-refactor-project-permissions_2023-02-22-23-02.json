@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Remove DynamicAuthZ logic from ProjectService",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

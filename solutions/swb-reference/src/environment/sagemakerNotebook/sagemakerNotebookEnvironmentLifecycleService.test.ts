@@ -25,7 +25,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.AWS_REGION = 'us-east-1';
-    process.env.STACK_NAME = 'rsw-rsw-va';
+    process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
     mockUuid.v4.mockImplementationOnce(() => 'sampleEnvId');
     environment = {

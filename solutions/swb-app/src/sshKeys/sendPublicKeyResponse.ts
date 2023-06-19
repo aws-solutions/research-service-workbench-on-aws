@@ -3,17 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const SendPublicKeyResponseParser = z
   .object({
-    publicDnsName: z.string().required(),
-    publicIp: z.string().required(),
-    privateDnsName: z.string().required(),
-    privateIp: z.string().required()
+    publicDnsName: z.string(),
+    publicIp: z.string(),
+    privateDnsName: z.string(),
+    privateIp: z.string()
   })
-  .required()
   .strict();
 
 export type SendPublicKeyResponse = z.infer<typeof SendPublicKeyResponseParser>;

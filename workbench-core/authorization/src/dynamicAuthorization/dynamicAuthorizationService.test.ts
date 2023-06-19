@@ -73,8 +73,7 @@ describe('DynamicAuthorizationService', () => {
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
       setGroupStatus: jest.fn(),
-      doesGroupExist: jest.fn(),
-      validateUserGroups: jest.fn()
+      doesGroupExist: jest.fn()
     };
 
     mockDynamicAuthorizationPermissionsPlugin = {
@@ -106,7 +105,7 @@ describe('DynamicAuthorizationService', () => {
     groupId = 'groupId';
     userId = 'userId';
     mockUser = {
-      id: '12345678-1234-1234-1234-123456789012',
+      id: 'sampleId',
       roles: []
     };
 
@@ -153,7 +152,7 @@ describe('DynamicAuthorizationService', () => {
     let params: IsAuthorizedOnSubjectRequest;
     beforeEach(() => {
       mockUser = {
-        id: '12345678-1234-1234-1234-123456789012',
+        id: 'sampleId',
         roles: ['sampleGroupId']
       };
       mockDynamicOperation = {
@@ -168,9 +167,6 @@ describe('DynamicAuthorizationService', () => {
         authenticatedUser: mockUser,
         dynamicOperation: mockDynamicOperation
       };
-      mockGroupManagementPlugin.validateUserGroups = jest.fn().mockResolvedValue({
-        validGroupIds: mockUser.roles
-      });
     });
     test('is authorized on subject', async () => {
       mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
@@ -344,7 +340,7 @@ describe('DynamicAuthorizationService', () => {
     let mockParams: Record<string, string>;
     beforeEach(() => {
       mockUser = {
-        id: '12345678-1234-1234-1234-123456789012',
+        id: 'sampleId',
         roles: ['sampleGroupId']
       };
       auditAction = 'isAuthorizedOnRoute';
@@ -377,9 +373,6 @@ describe('DynamicAuthorizationService', () => {
         parentId: 'sampleParentId',
         subjectId: 'sampleSubjectId'
       };
-      mockGroupManagementPlugin.validateUserGroups = jest.fn().mockResolvedValue({
-        validGroupIds: mockUser.roles
-      });
     });
 
     test('user is authorized on a simple route, that is protected', async () => {

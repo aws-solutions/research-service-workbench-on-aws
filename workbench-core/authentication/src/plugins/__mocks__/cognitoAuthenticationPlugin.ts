@@ -29,8 +29,6 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     });
   }
   public async revokeToken(refreshToken: string): Promise<void> {}
-
-  public async revokeAccessToken(accessToken: string): Promise<void> {}
   public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
     return 'id';
   }

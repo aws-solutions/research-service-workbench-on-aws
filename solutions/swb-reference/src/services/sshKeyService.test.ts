@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const mockSshKeyId = '1234567812345678123456781234567812345678123456781234567812345678';
+const mockSshKeyId = 'mockvalues';
 jest.mock('crypto', () => {
   return {
     createHash: jest.fn().mockReturnThis(),
@@ -12,9 +12,10 @@ jest.mock('crypto', () => {
   };
 });
 
+import { DescribeInstancesCommandOutput, EC2, KeyPairInfo } from '@aws-sdk/client-ec2';
+import { EC2InstanceConnect, SendSSHPublicKeyCommandOutput } from '@aws-sdk/client-ec2-instance-connect';
 import {
   AwsServiceError,
-  ConflictError,
   ConnectionInfoNotDefinedError,
   CreateSshKeyRequest,
   DeleteSshKeyRequest,
@@ -31,8 +32,6 @@ import { ProjectStatus } from '@aws/workbench-core-accounts/lib/constants/projec
 import { ForbiddenError } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
 import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
-import { DescribeInstancesCommandOutput, EC2, KeyPairInfo } from '@aws-sdk/client-ec2';
-import { EC2InstanceConnect, SendSSHPublicKeyCommandOutput } from '@aws-sdk/client-ec2-instance-connect';
 import SshKeyService from './sshKeyService';
 
 describe('SshKeyService', () => {
@@ -41,10 +40,6 @@ describe('SshKeyService', () => {
   const projectService = {} as ProjectService;
   const environmentService = {} as EnvironmentService;
   const sshKeyService: SshKeyService = new SshKeyService(aws, projectService, environmentService);
-  const validUuid = '1234abcd-1111-abcd-1234-abcd1234abcd';
-  const validProjectId = `proj-${validUuid}`;
-  const validUserId = validUuid;
-  const validEnvId = `env-${validUuid}`;
 
   beforeAll(() => {
     process.env.AWS_REGION = region;
@@ -53,13 +48,12 @@ describe('SshKeyService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
   describe('listUserSshKeysForProject', () => {
     let listUserSshKeysForProjectRequest: ListUserSshKeysForProjectRequest;
     beforeEach(() => {
       listUserSshKeysForProjectRequest = {
-        projectId: validProjectId,
-        userId: validUserId
+        projectId: 'proj-123',
+        userId: 'user-123'
       };
     });
 
@@ -239,9 +233,9 @@ describe('SshKeyService', () => {
 
     beforeEach(() => {
       deleteSshKeyRequest = {
-        projectId: validProjectId,
-        sshKeyId: `sshkey-${mockSshKeyId}`,
-        currentUserId: validUserId
+        projectId: 'proj-123',
+        sshKeyId: 'sshkey-user-123#proj-123',
+        currentUserId: 'user-123'
       };
     });
 
@@ -400,10 +394,7 @@ describe('SshKeyService', () => {
     let createSshKeyRequest: CreateSshKeyRequest;
 
     beforeEach(() => {
-      createSshKeyRequest = {
-        projectId: validProjectId,
-        userId: validUserId
-      };
+      createSshKeyRequest = { projectId: 'proj-123', userId: '1234' };
     });
 
     describe('when project does not exist', () => {
@@ -512,9 +503,8 @@ describe('SshKeyService', () => {
 
     beforeEach(() => {
       sendPublicKeyRequest = {
-        projectId: validProjectId,
-        environmentId: validEnvId,
-        userId: validUserId
+        environmentId: 'env-123',
+        userId: '1234'
       };
     });
 
@@ -535,15 +525,17 @@ describe('SshKeyService', () => {
 
     describe('when environment exists', () => {
       let environment: Environment;
+      let projectId: string;
 
       beforeEach(() => {
+        projectId = 'proj-123';
         environment = {
           id: sendPublicKeyRequest.environmentId,
           instanceId: 'i-123',
           cidr: '',
           description: '',
           name: '',
-          projectId: sendPublicKeyRequest.projectId,
+          projectId: projectId,
           status: 'COMPLETED',
           provisionedProductId: '',
           envTypeConfigId: '',
@@ -552,19 +544,6 @@ describe('SshKeyService', () => {
           owner: sendPublicKeyRequest.userId
         };
         environmentService.getEnvironment = jest.fn(() => Promise.resolve(environment));
-      });
-
-      describe('but projectId does not match requested project id', () => {
-        beforeEach(() => {
-          environment.projectId = 'proj-incorrect-project-id';
-        });
-
-        test('it throws ConflictError', async () => {
-          // OPERATE n CHECK
-          await expect(() => sshKeyService.sendPublicKey(sendPublicKeyRequest)).rejects.toThrow(
-            ConflictError
-          );
-        });
       });
 
       describe('but instanceId is not defined', () => {
@@ -596,14 +575,14 @@ describe('SshKeyService', () => {
       describe('but project does not exist', () => {
         beforeEach(() => {
           projectService.getProject = jest.fn(() => {
-            throw new Error(`Could not find project ${sendPublicKeyRequest.projectId}`);
+            throw new Error(`Could not find project ${projectId}`);
           });
         });
 
         test('it throws', async () => {
           // OPERATE n CHECK
           await expect(() => sshKeyService.sendPublicKey(sendPublicKeyRequest)).rejects.toThrow(
-            `Could not find project ${sendPublicKeyRequest.projectId}`
+            `Could not find project ${projectId}`
           );
         });
       });
@@ -615,7 +594,7 @@ describe('SshKeyService', () => {
 
         beforeEach(() => {
           project = {
-            id: sendPublicKeyRequest.projectId,
+            id: projectId,
             name: '',
             description: '',
             costCenterId: '',

@@ -38,10 +38,6 @@ import {
 } from './models/environmentTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { EnvironmentType } from './models/environmentTypes/environmentType';
 import {
-  GetEnvironmentTypeRequest,
-  GetEnvironmentTypeRequestParser
-} from './models/environmentTypes/getEnvironmentTypesRequest';
-import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
 } from './models/environmentTypes/listEnvironmentTypesRequest';
@@ -94,7 +90,5 @@ export {
   UpdateEnvironmentTypeRequestParser,
   EnvironmentTypeConfig,
   ListEnvironmentsServiceRequestParser,
-  ListEnvironmentsServiceRequest,
-  GetEnvironmentTypeRequestParser,
-  GetEnvironmentTypeRequest
+  ListEnvironmentsServiceRequest
 };

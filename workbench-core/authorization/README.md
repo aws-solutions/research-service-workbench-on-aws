@@ -1,12 +1,18 @@
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 # Workbench Core Authorization
 ## `main branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=workbench-core-authorization)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=workbench-core-authorization)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
 ## `develop branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-authorization)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-authorization)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 ## Description
 The authorization component is a flexible and extensible RBAC(role base access control) typescript library. It is designed using the plugin-architecture to allow for developers to easily implement and extend this library. This authorization component currently functions at the route based level.
+
+## How to use
+
+### Components
 
 #### Permission
 
@@ -124,7 +130,7 @@ const authorizationService:AuthorizationService = new AuthorizationService(
 );
 ```
 ### 6. Utilize isAuthorizedOnRoute from AuthorizationService
-`isAuthorizedOnRoute` requires a [AuthenticatedUser](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) and the route and method they are trying to access. This request will throw an `Error` if a user is not authorized.
+`isAuthorizedOnRoute` requires a [AuthenticatedUser](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) and the route and method they are trying to access. This request will throw an `Error` if a user is not authorized.
 ```ts
 const guestUser:AuthenticatedUser = {
 	id: 'sampleId',
@@ -139,7 +145,7 @@ try {
 ```
 
 ## Integrating with ExpressJS using Middleware
-Authorization implemented as a middleware is a common use case. This library contains an authorization middleware that integrates with ExpressJS. The middleware expects an [AuthenticatedUser](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) to be made availabe to it by using the [local variables](https://expressjs.com/en/api.html#res.locals) of ExpressJS. 
+Authorization implemented as a middleware is a common use case. This library contains an authorization middleware that integrates with ExpressJS. The middleware expects an [AuthenticatedUser](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) to be made availabe to it by using the [local variables](https://expressjs.com/en/api.html#res.locals) of ExpressJS. 
 ```ts
 const app = express();
 

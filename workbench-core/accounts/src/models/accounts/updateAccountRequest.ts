@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateAccountRequestParser = z.object({
-  id: z.string().accountId().required(),
-  name: z.string().swbName().optional()
+  id: z.string(),
+  name: z.string().optional()
 });
 
 export type UpdateAccountRequest = z.infer<typeof UpdateAccountRequestParser>;

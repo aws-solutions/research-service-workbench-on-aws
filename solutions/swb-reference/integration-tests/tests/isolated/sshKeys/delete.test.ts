@@ -9,18 +9,16 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Delete Key Pair negative tests', () => {
-  const paabHelper = new PaabHelper(2);
+  const paabHelper = new PaabHelper();
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
-  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let sshKeyId: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id, anonymousSession } =
-      await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
   });
 
   beforeEach(async () => {
@@ -31,7 +29,8 @@ describe('Delete Key Pair negative tests', () => {
     await paabHelper.cleanup();
   });
 
-  describe('for project that does exist', () => {
+  describe('when key does not exist', () => {
+    let invalidSshKeyId: string;
     const testBundle = [
       {
         username: 'projectAdmin1',
@@ -45,52 +44,28 @@ describe('Delete Key Pair negative tests', () => {
       }
     ];
 
-    describe('when key does not exist', () => {
-      let invalidSshKeyId: string;
-      beforeEach(() => {
-        invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
-      });
-
-      test.each(testBundle)('it throws 404', async (testCase) => {
-        const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
-        const session = sessionFunc();
-        const projectId = projectIdFunc();
-
-        console.log(`as ${username}`);
-
-        try {
-          await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(404, {
-              error: 'Not Found',
-              message: `Key ${invalidSshKeyId} does not exist`
-            })
-          );
-        }
-      });
+    beforeEach(() => {
+      invalidSshKeyId = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
     });
 
-    describe('when provided key id is invalid', () => {
-      let invalidSshKeyId: string;
-      beforeEach(() => {
-        invalidSshKeyId = `sshkey-malformed`;
-      });
+    test.each(testBundle)('within a valid project', async (testCase) => {
+      const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
+      const session = sessionFunc();
+      const projectId = projectIdFunc();
 
-      test.each(testBundle)('it throws 400', async (testCase) => {
-        const { username, session: sessionFunc, projectId: projectIdFunc } = testCase;
-        const session = sessionFunc();
-        const projectId = projectIdFunc();
+      console.log(`as ${username}`);
 
-        console.log(`as ${username}`);
-
-        try {
-          await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
-        } catch (e) {
-          checkHttpError(e, new HttpError(400, { error: 'Bad Request', message: 'sshKeyId: Invalid ID' }));
-        }
-      });
+      try {
+        await session.resources.projects.project(projectId).sshKeys().sshKey(invalidSshKeyId).purge();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Key ${invalidSshKeyId} does not exist`
+          })
+        );
+      }
     });
   });
 
@@ -184,15 +159,5 @@ describe('Delete Key Pair negative tests', () => {
         );
       }
     });
-  });
-
-  test('unauthenticated user cannot delete ssh key', async () => {
-    const sampleSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
-
-    try {
-      await anonymousSession.resources.projects.project(project1Id).sshKeys().sshKey(sampleSshKeyId).purge();
-    } catch (e) {
-      checkHttpError(e, new HttpError(403, {}));
-    }
   });
 });

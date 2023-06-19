@@ -3,14 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  AwsService,
-  DynamoDBService,
-  buildDynamoDbKey,
-  ListUsersForRoleRequest,
-  PaginatedResponse
-} from '@aws/workbench-core-base';
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
+import { AwsService } from '@aws/workbench-core-base';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -19,39 +13,25 @@ import { RoleNotFoundError } from '../errors/roleNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
-import { UserRolesExceedLimitError } from '../errors/userRolesExceedLimitError';
 import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
-import { ListUsersRequest } from '../users/listUsersRequest';
-import { ListUsersResponse } from '../users/listUsersResponse';
-import { AccessType, TempRoleAccessEntry, TempRoleAccessEntryParser } from './tempRoleAccessEntry';
 
 /**
  * A CognitoUserManagementPlugin instance that interfaces with Cognito to provide user management services.
  */
 export class CognitoUserManagementPlugin implements UserManagementPlugin {
-  // default 15 minutes time to live for each temp access/revoke set in seconds
-  private readonly _defaultTempRoleAccesssTTL: number = 15 * 60;
-  private readonly _tempRoleAccessEntryPrefix: string = 'TempRoleAccess';
-
   private _userPoolId: string;
   private _aws: AwsService;
-  private _tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number };
-  public readonly userRoleLimit: number = 100;
 
   /**
    *
    * @param userPoolId - the user pool id to update with the plugin
    * @param aws - a {@link AwsService} instance with permissions to perform Cognito actions
    */
-  public constructor(
-    userPoolId: string,
-    aws: AwsService,
-    tempRoleAccessSettings?: { ddbService: DynamoDBService; ttl?: number }
-  ) {
+  public constructor(userPoolId: string, aws: AwsService) {
     this._userPoolId = userPoolId;
+
     this._aws = aws;
-    this._tempRoleAccessSettings = tempRoleAccessSettings;
   }
 
   /**
@@ -119,7 +99,10 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async getUserRoles(id: string): Promise<string[]> {
     try {
-      const groups = await this._aws.helpers.cognito.getUserGroups(this._userPoolId, id);
+      const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
+        UserPoolId: this._userPoolId,
+        Username: id
+      });
 
       if (!groups) {
         return [];
@@ -394,27 +377,21 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the users within the user pool.
    *
-   * @param request - the request object according to {@link ListUsersRequest}
-   * @returns a {@link ListUsersResponse} object
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
-   * @throws {@link InvalidPaginationTokenError} if the passed pagination token is invalid
    */
-  public async listUsers(request: ListUsersRequest): Promise<ListUsersResponse> {
+  public async listUsers(): Promise<User[]> {
     try {
       const response = await this._aws.clients.cognito.listUsers({
-        UserPoolId: this._userPoolId,
-        Limit: request.pageSize,
-        PaginationToken: request.paginationToken
-          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
-          : undefined
+        UserPoolId: this._userPoolId
       });
 
       if (!response.Users) {
-        return { data: [] };
+        return [];
       }
 
       const users = await Promise.all(
@@ -432,13 +409,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         })
       );
 
-      const data = users.filter((user) => user.id);
-
-      if (!response.PaginationToken) {
-        return { data };
-      }
-
-      return { data, paginationToken: Buffer.from(response.PaginationToken).toString('base64') };
+      return users.filter((user) => user.id);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -453,9 +424,6 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);
       }
-      if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid parameter');
-      }
       throw error;
     }
   }
@@ -463,7 +431,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the user ids associated with a given group.
    *
-   * @param request - a ListUsersForRoleRequest object
+   * @param role - the group to list the users associated with it
    * @returns an array containing the user ids that are associated with the group
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -472,40 +440,14 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
-  public async listUsersForRole(request: ListUsersForRoleRequest): Promise<PaginatedResponse<string>> {
+  public async listUsersForRole(role: string): Promise<string[]> {
     try {
-      const groupId = `${request.projectId}#${request.role}`;
-      const response = await this._aws.clients.cognito.listUsersInGroup({
+      const { Users: users } = await this._aws.clients.cognito.listUsersInGroup({
         UserPoolId: this._userPoolId,
-        GroupName: groupId,
-        Limit: request.pageSize,
-        NextToken: request.paginationToken
-          ? Buffer.from(request.paginationToken, 'base64').toString('utf8')
-          : undefined
+        GroupName: role
       });
 
-      const users = response.Users;
-
-      if (!users || users.length === 0) {
-        return {
-          data: []
-        };
-      }
-
-      const userNames: string[] = [];
-
-      for (const user of users) {
-        if (!user.Username) {
-          continue;
-        }
-
-        userNames.push(user.Username);
-      }
-
-      return {
-        data: userNames,
-        paginationToken: response.NextToken ? Buffer.from(response.NextToken).toString('base64') : undefined
-      };
+      return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -518,9 +460,6 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
           throw new RoleNotFoundError('Role does not exist.');
         }
         throw new PluginConfigurationError(error.message);
-      }
-      if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid parameter');
       }
       if (error.name === 'TooManyRequestsException') {
         throw new TooManyRequestsError(error.message);
@@ -576,28 +515,13 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
-   * @throws {@link UserRolesExceedLimitError} if user has reached Cognito group limit
    */
   public async addUserToRole(id: string, role: string): Promise<void> {
     try {
-      // check if user has reached role limits
-      const existingRoles = await this.getUserRoles(id);
-      if (existingRoles.length >= this.userRoleLimit) {
-        throw new UserRolesExceedLimitError(
-          `This user has reached Cognito group limit: ${this.userRoleLimit}`
-        );
-      }
-
       await this._aws.clients.cognito.adminAddUserToGroup({
         UserPoolId: this._userPoolId,
         Username: id,
         GroupName: role
-      });
-      // Temporarily allow user access to the group
-      await this._modifyTempRoleAccess({
-        userId: id,
-        roleId: role,
-        access: 'ALLOW'
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -641,12 +565,6 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         UserPoolId: this._userPoolId,
         Username: id,
         GroupName: role
-      });
-      // Temporarily deny user access to the group
-      await this._modifyTempRoleAccess({
-        userId: id,
-        roleId: role,
-        access: 'DENY'
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -744,69 +662,5 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       throw error;
     }
-  }
-
-  /**
-   * Validate user roles to ensure given/revoked roles are modified.
-   * @param userId - ID of the user to be validated
-   * @param roles - roles of the user to be validated
-   *
-   * @returns - a list of validated user roles
-   */
-  public async validateUserRoles(userId: string, roles: string[]): Promise<string[]> {
-    // No settings for temp role access
-    if (!this._tempRoleAccessSettings) return roles;
-    //retrieve the access list and remove and add roles if necessary
-    const setOfRoleIds = new Set(roles);
-    const key = {
-      name: 'pk',
-      value: buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix)
-    };
-
-    const tempRoleAccessResults = await this._tempRoleAccessSettings.ddbService
-      .query({
-        key
-      })
-      .execute();
-
-    if (tempRoleAccessResults.Items) {
-      tempRoleAccessResults.Items.forEach((item) => {
-        const tempRoleAccessEntry = TempRoleAccessEntryParser.parse(item);
-        const expired = Math.round(Date.now() / 1000) > tempRoleAccessEntry.expirationTime;
-        if (!expired) {
-          if (tempRoleAccessEntry.access === 'ALLOW') setOfRoleIds.add(tempRoleAccessEntry.roleId);
-          else if (tempRoleAccessEntry.access === 'DENY') setOfRoleIds.delete(tempRoleAccessEntry.roleId);
-        }
-      });
-    }
-    return Array.from(setOfRoleIds.values());
-  }
-
-  private async _modifyTempRoleAccess(params: {
-    userId: string;
-    roleId: string;
-    access: AccessType;
-  }): Promise<void> {
-    // No settings for temp role access
-    if (!this._tempRoleAccessSettings) return;
-    const { userId, roleId, access } = params;
-    //add the roles permissions to the ddb service
-    const tempRoleAccessEntryKey = {
-      pk: buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix),
-      sk: buildDynamoDbKey(roleId, this._tempRoleAccessEntryPrefix)
-    };
-    const ttl = this._tempRoleAccessSettings.ttl ?? this._defaultTempRoleAccesssTTL;
-    const tempRoleAccessEntry: TempRoleAccessEntry = {
-      roleId: roleId,
-      access: access,
-      expirationTime: Math.round(Date.now() / 1000) + ttl
-    };
-
-    await this._tempRoleAccessSettings.ddbService.updateExecuteAndFormat({
-      key: tempRoleAccessEntryKey,
-      params: {
-        item: tempRoleAccessEntry
-      }
-    });
   }
 }

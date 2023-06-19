@@ -6,16 +6,13 @@
 import { CreateUser, Status } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
+import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('create user negative tests', () => {
-  const paabHelper = new PaabHelper(1);
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
-  let pa1Session: ClientSession;
-  let rs1Session: ClientSession;
-  let anonymousSession: ClientSession;
   let user: CreateUser;
 
   beforeEach(() => {
@@ -29,16 +26,14 @@ describe('create user negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
-      __filename
-    ));
+    adminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
-  it('ITAdmin should return a created user', async () => {
+  it('should return a created user', async () => {
     const response = await adminSession.resources.users.create(user);
 
     expect(response.data).toMatchObject({
@@ -74,7 +69,7 @@ describe('create user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: 'email: Invalid Email'
+          message: 'Invalid parameter: Invalid email address format.'
         })
       );
     }
@@ -128,23 +123,6 @@ describe('create user negative tests', () => {
     }
   });
 
-  it('should return a 400 error when the firstName parameter is empty', async () => {
-    const invalidParam: Record<string, unknown> = { ...user };
-    invalidParam.firstName = '';
-    try {
-      await adminSession.resources.users.create(invalidParam, false);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message:
-            'firstName: must contain only letters, spaces, numbers, hyphens, and periods. firstName: Required'
-        })
-      );
-    }
-  });
-
   it('should return a 400 error when the firstName parameter is the wrong type', async () => {
     const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.firstName = 123;
@@ -177,23 +155,6 @@ describe('create user negative tests', () => {
     }
   });
 
-  it('should return a 400 error when the lastName parameter is empty', async () => {
-    const invalidParam: Record<string, unknown> = { ...user };
-    invalidParam.lastName = '';
-    try {
-      await adminSession.resources.users.create(invalidParam, false);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(400, {
-          error: 'Bad Request',
-          message:
-            'lastName: must contain only letters, spaces, numbers, hyphens, and periods. lastName: Required'
-        })
-      );
-    }
-  });
-
   it('should return a 400 error when the lastName parameter is the wrong type', async () => {
     const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.lastName = 123;
@@ -207,40 +168,6 @@ describe('create user negative tests', () => {
           message: `lastName: Expected string, received number`
         })
       );
-    }
-  });
-
-  it('ProjectAdmin: should return 403 error when try to create a user', async () => {
-    try {
-      await pa1Session.resources.users.create(user);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
-
-  it('Researcher: should return 403 error when try to create a user', async () => {
-    try {
-      await rs1Session.resources.users.create(user);
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(403, {
-          error: 'User is not authorized'
-        })
-      );
-    }
-  });
-
-  it('Unauthenticated user: should return 403 error when try to create a user', async () => {
-    try {
-      await anonymousSession.resources.users.create(user);
-    } catch (e) {
-      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

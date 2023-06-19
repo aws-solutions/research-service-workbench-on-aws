@@ -10,8 +10,8 @@ import { AuthenticatedUserParser } from '../users/authenticatedUser';
 export const ProjectAddAccessRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
-    dataSetId: z.string().datasetId().required(),
-    projectId: z.string().projId().required(),
+    dataSetId: z.string(),
+    projectId: z.string(),
     accessLevel: z.enum(['read-write', 'read-only'])
   })
   .strict();

@@ -2,57 +2,6 @@
   "name": "@aws/workbench-core-logging",
   "entries": [
     {
-      "version": "1.0.0",
-      "tag": "@aws/workbench-core-logging_v1.0.0",
-      "date": "Wed, 07 Jun 2023 21:47:22 GMT",
-      "comments": {
-        "none": [
-          {
-            "comment": "codecov update"
-          },
-          {
-            "comment": "add license-check-and-add to package.json"
-          },
-          {
-            "comment": "add license-checker"
-          },
-          {
-            "comment": "change github owner to aws-solutions"
-          },
-          {
-            "comment": "revert to 2ae2a9a"
-          },
-          {
-            "comment": "eslint fixes"
-          }
-        ],
-        "minor": [
-          {
-            "comment": "Updates for separating UI packages"
-          }
-        ],
-        "patch": [
-          {
-            "comment": "solution renaming"
-          },
-          {
-            "comment": "update rush dependencies"
-          },
-          {
-            "comment": "update rush dependencies"
-          },
-          {
-            "comment": "nodejs version update"
-          }
-        ],
-        "major": [
-          {
-            "comment": "Add new Template getting API, upgrade packages"
-          }
-        ]
-      }
-    },
-    {
       "version": "0.1.1",
       "tag": "@aws/workbench-core-logging_v0.1.1",
       "date": "Fri, 29 Jul 2022 19:02:48 GMT",

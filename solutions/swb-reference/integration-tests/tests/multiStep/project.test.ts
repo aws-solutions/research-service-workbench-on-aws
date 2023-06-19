@@ -3,36 +3,32 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../support/clientSession';
-import { PaabHelper } from '../../support/complex/paabHelper';
 import Setup from '../../support/setup';
-import { generateRandomString, validSwbName } from '../../support/utils/utilities';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
 describe('multiStep project tests', () => {
-  const paabHelper = new PaabHelper(1);
-  let pa1Session: ClientSession;
   const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
   let costCenterId: string;
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let projectName: string;
-  let project1Id: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, project1Id } = await paabHelper.createResources(__filename));
+    adminSession = await setup.getDefaultAdminSession();
   });
 
   beforeEach(async () => {
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: 'project-integration-test-cost-center',
+      name: 'project integration test cost center',
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
 
     costCenterId = costCenter.id;
-    projectName = generateRandomString(10, validSwbName);
+    projectName = randomTextGenerator.getFakeText('test-project-name');
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
     await setup.cleanup();
   });
 
@@ -45,16 +41,8 @@ describe('multiStep project tests', () => {
     });
 
     console.log('Getting Project');
-    const { data: getProjectAsITAdmin } = await adminSession.resources.projects
-      .project(createdProject.id)
-      .get();
-    expect(getProjectAsITAdmin).toMatchObject(createdProject);
-
-    const { data: getProjectAsPA } = await pa1Session.resources.projects.project(project1Id).get();
-    expect(getProjectAsPA.id).toEqual(project1Id);
-
-    const { data: getProjectAsResearcher } = await adminSession.resources.projects.project(project1Id).get();
-    expect(getProjectAsResearcher.id).toEqual(project1Id);
+    const { data: getProject } = await adminSession.resources.projects.project(createdProject.id).get();
+    expect(getProject).toMatchObject(createdProject);
 
     console.log('Listing Projects');
     const { data: listProject } = await adminSession.resources.projects.get({
@@ -63,20 +51,16 @@ describe('multiStep project tests', () => {
     expect(listProject.data).toEqual([createdProject]);
 
     console.log('Updating Project');
-    const newName = generateRandomString(10, validSwbName);
-    const newDescription = 'Happy path--Not a Project studying dragons';
+    const newName = randomTextGenerator.getFakeText('test-project-name');
+    const newDescription = 'Happy path--Not a Project studying dragons!';
     const { data: updatedProject } = await adminSession.resources.projects
       .project(createdProject.id)
       .update({ name: newName, description: newDescription }, true);
     expect(updatedProject).toMatchObject({ name: newName, description: newDescription });
-    const { data: updatedProjectAsPA } = await adminSession.resources.projects
-      .project(project1Id)
-      .update({ description: newDescription }, true);
-    expect(updatedProjectAsPA).toMatchObject({ name: getProjectAsPA.name, description: newDescription });
 
     console.log('Deleting Project');
-    await adminSession.resources.projects.project(createdProject.id).delete();
-    await pa1Session.resources.projects.project(project1Id).delete();
+    // eslint-disable-next-line no-unused-expressions
+    expect(await adminSession.resources.projects.project(createdProject.id).delete()).resolves;
 
     console.log("Listing projects doesn't return deleted project");
     const { data: listProjectAfterDelete } = await adminSession.resources.projects.get({
@@ -87,7 +71,7 @@ describe('multiStep project tests', () => {
 
   test('createProject', async () => {
     console.log('Creating Project');
-    const projectName = generateRandomString(10, validSwbName);
+    const projectName = randomTextGenerator.getFakeText('test-project-name');
     const { data: createdProject1 } = await adminSession.resources.projects.create({
       name: projectName,
       description: 'My uniquely name project',
@@ -119,7 +103,7 @@ describe('multiStep project tests', () => {
       costCenterId
     });
 
-    const otherName = generateRandomString(10, validSwbName);
+    const otherName = randomTextGenerator.getFakeText('test-project-name');
     const { data: createdProject2 } = await adminSession.resources.projects.create({
       name: otherName,
       description: 'Backlog project',

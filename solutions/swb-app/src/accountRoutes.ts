@@ -15,11 +15,8 @@ import {
   UpdateAccountRequest,
   UpdateAccountRequestParser,
   GetAccountRequest,
-  GetAccountRequestParser,
-  isInvalidAwsAccountIdError
+  GetAccountRequestParser
 } from '@aws/workbench-core-accounts';
-import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
@@ -29,19 +26,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListAccountRequest>(ListAccountsRequestParser, req.query);
-      try {
-        res.send(await hostingAccountService.list(validatedRequest));
-      } catch (e) {
-        if (Boom.isBoom(e)) {
-          throw e;
-        }
-
-        if (isInvalidPaginationTokenError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-
-        throw Boom.badImplementation(`There was a problem listing accounts`);
-      }
+      res.send(await hostingAccountService.list(validatedRequest));
     })
   );
 
@@ -70,15 +55,9 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
-      try {
-        const createdAccount = await hostingAccountService.create(validatedRequest);
-        res.status(201).send(createdAccount);
-      } catch (e) {
-        if (isInvalidAwsAccountIdError(e)) {
-          throw Boom.badRequest(e.message);
-        }
-        throw e;
-      }
+
+      const createdAccount = await hostingAccountService.create(validatedRequest);
+      res.status(201).send(createdAccount);
     })
   );
 

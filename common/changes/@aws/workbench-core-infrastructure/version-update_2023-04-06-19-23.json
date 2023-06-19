@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "cdk and nodejs version update",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

@@ -1,5 +1,5 @@
 # Adding a new environment type
-Research Service Workbench (RSW) allows users to upload and provision custom AWS compute environments and manage them via SWB APIs. This document provides instruction for adding new custom environment types.
+Service Workbench (SWB) allows users to upload and provision custom AWS compute environments and manage them via SWB APIs. This document provides instruction for adding new custom environment types.
 
 At a high level, we'll need to do the following steps
 * Define environment AWS resources using CFN templates
@@ -7,12 +7,12 @@ At a high level, we'll need to do the following steps
 * Set up API routes and provide IAM permissions for managing the environment
 * Set up environment status updates
 
-[Code Sample](https://github.com/aws-solutions/research-service-workbench-on-aws/compare/develop...feat/sagemakerExample) for adding `sagemakerExample` environment. This is the code to add `sagemakerExample` for step 1 through 4.
+[Code Sample](https://github.com/aws-solutions/solution-spark-on-aws/compare/develop...feat/sagemakerExample) for adding `sagemakerExample` environment. This is the code to add `sagemakerExample` for step 1 through 4.
 
 ## Step 1: Define environment AWS resources
 In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
 1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerExample`.
-2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemakerNotebook.cfn.yaml](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/feat/environments/solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebook.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
+2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemakerNotebook.cfn.yaml](https://github.com/aws-solutions/solution-spark-on-aws/blob/feat/environments/solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebook.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
     ```yaml
     Parameters:
       InstanceType:
@@ -232,13 +232,13 @@ Note: Executing `run-postDeployment` command will create an Environment Type whe
 ## Step 7 (Optional): Test Launch new Environment
 Do the following steps if you would like to launch your new environment type, and assuming your new envType is named `sagemakerExample`
 
-Follow instructions in [Get access token Step](../swb-reference/README.md#get-access-token) and [POSTMAN Setup Step](../swb-reference/README.md#postman-setup) to make API requests to RSW using postman.
+Follow instructions in [Get access token Step](../swb-reference/README.md#get-access-token) and [POSTMAN Setup Step](../swb-reference/README.md#postman-setup) to make API requests to SWBv2 using postman.
 
 1. Follow instructions in [Setup EnvironmentTypeConfig Step](../swb-reference/README.md#setup-environmenttypeconfig) to create an Environment Type Config and take note of the `ENV_TYPE_ID` and `ENV_TYPE_CONFIG_ID` values.
 
 1. Follow these steps to launch an environment using the new environment type created.
 
-    - In **RSW Official** Postman Collection under **environments** folder choose **Launch Environment** API.
+    - In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
     - In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](../swb-reference/README.md#setup-project).
 

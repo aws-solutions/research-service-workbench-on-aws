@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "get key pair API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

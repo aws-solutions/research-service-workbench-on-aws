@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "user management api",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

@@ -3,38 +3,47 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
-import { PaabHelper } from '../../../support/complex/paabHelper';
+import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('remove user from project negative tests', () => {
-  const paabHelper = new PaabHelper(2);
+  const setup: Setup = Setup.getSetup();
   let adminSession: ClientSession;
-  let pa1Session: ClientSession;
-  let rs1Session: ClientSession;
-  let anonymousSession: ClientSession;
-  let project1Id: string;
-  let project2Id: string;
-  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
+  let project: { id: string };
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, anonymousSession, project1Id, project2Id } =
-      await paabHelper.createResources(__filename));
+    adminSession = await setup.getDefaultAdminSession();
+
+    const { data: costCenter } = await adminSession.resources.costCenters.create({
+      name: 'test cost center',
+      accountId: setup.getSettings().get('defaultHostingAccountId'),
+      description: 'a test object'
+    });
+
+    const { data } = await adminSession.resources.projects.create({
+      name: `TestProject-${uuidv4()}`,
+      description: 'Project for remove user from project negative tests',
+      costCenterId: costCenter.id
+    });
+
+    project = data;
   });
 
   afterAll(async () => {
-    await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   test('user does not exist', async () => {
     const fakeUserId = '00000000-0000-0000-0000-000000000000';
     try {
-      await adminSession.resources.projects.project(project1Id).removeUserFromProject(fakeUserId);
+      await adminSession.resources.projects.project(project.id).removeUserFromProject(fakeUserId);
     } catch (e) {
       checkHttpError(
         e,
@@ -60,36 +69,6 @@ describe('remove user from project negative tests', () => {
           message: `Could not find project ${projectId}`
         })
       );
-    }
-  });
-
-  test('Project Admin passing in project it does not belong to gets 403', async () => {
-    try {
-      await pa1Session.resources.projects
-        .project(project2Id)
-        .removeUserFromProject(rs1Session.getUserId() ?? '');
-    } catch (e) {
-      checkHttpError(e, forbiddenHttpError);
-    }
-  });
-
-  test('Researcher gets 403', async () => {
-    try {
-      await rs1Session.resources.projects
-        .project(project1Id)
-        .removeUserFromProject(adminSession.getUserId() ?? '');
-    } catch (e) {
-      checkHttpError(e, forbiddenHttpError);
-    }
-  });
-
-  test('unauthenticated user gets 403', async () => {
-    try {
-      await anonymousSession.resources.projects
-        .project(project1Id)
-        .removeUserFromProject(rs1Session.getUserId() ?? '');
-    } catch (e) {
-      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

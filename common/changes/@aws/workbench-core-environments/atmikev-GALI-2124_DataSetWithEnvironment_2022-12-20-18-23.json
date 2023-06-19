@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "Create reciprical Database With Env item on environment creation",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

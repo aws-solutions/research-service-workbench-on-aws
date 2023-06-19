@@ -39,7 +39,7 @@ As is, these templates depend on a subscription to an EC2 firewall appliance. We
 1. Launch the onboarding stack (`onboard-account-tgw.cfn.yaml`) in the hosting account with the relevant outputs from the central network account stack.
 1. Since this stack creates its own network components, associate its subnets to Transit Gateway by adding them to the SecurityVPC route table. This helps centrally inspect egress traffic inspection.
 1. If you are using public hosting account subnets, create Gateway Load Balancer endpoints in the hosting account. Each endpoint needs a subnet per Availability Zone. The Internet Gateway route table needs to have these endpoints added for ingress traffic inspection.
-1. Use the outputs from the onboarding stack to onboard the account with the main account per the instructions in the [setup instructions](../../README.md#setup-instructions-for-rsw).
+1. Use the outputs from the onboarding stack to onboard the account with the main account per the instructions in the [setup instructions](../../README.md#setup-instructions-for-swbv2).
 
 Egress Network Flow:
 - Subnet (Hosting Acc) -> Security VPC Route Table (Central N/W Acc) -> TGW and Firewall (Central N/W Acc) -> NAT Gateway (Central N/W Acc) -> Internet / Main Acc

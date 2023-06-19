@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateExternalEndpointParser = z
@@ -12,7 +12,7 @@ export const CreateExternalEndpointParser = z
     /** One of `groupId` and `userId` must be defined, but not both */
     groupId: z.string().optional(),
     /** One of `groupId` and `userId` must be defined, but not both */
-    userId: z.string().userId().required(),
+    userId: z.string().optional(),
     externalRoleName: z.string().optional(),
     kmsKeyArn: z.string().optional(),
     vpcId: z.string().optional(),

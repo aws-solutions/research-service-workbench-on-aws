@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import {
   DynamoDBService,
   JSONValue,
@@ -13,8 +15,6 @@ import {
   MAX_API_PAGE_SIZE,
   fromPaginationToken
 } from '@aws/workbench-core-base';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import { createRouter, RadixRouter } from 'radix3';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';

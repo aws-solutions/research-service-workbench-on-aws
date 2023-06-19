@@ -12,7 +12,7 @@ import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
-describe('dynamic authorization identity permission integration tests', () => {
+describe('dynamic authorization identity permission integration tests ', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
   let mockUser: AuthenticatedUser;
@@ -323,6 +323,7 @@ describe('dynamic authorization identity permission integration tests', () => {
     let subjectId: string;
     let parentId: string;
     let randomTextGenerator: RandomTextGenerator;
+    let newAdminSession: ClientSession;
     let groupId: string;
     beforeAll(async () => {
       const { data } = await adminSession.resources.groups.create();
@@ -364,10 +365,11 @@ describe('dynamic authorization identity permission integration tests', () => {
       await adminSession.resources.groups
         .group(groupId)
         .addUser({ userId: adminSession.getSettings().get('rootUserId') });
+      newAdminSession = await setup.createAdminSession();
     });
     //These routes are defined in dynamicRouteConfig and sampleRoutes
     test('is authorized on to PUT /parentResource/:parentId/resource/:resourceId with correct permissions', async () => {
-      const response = await adminSession
+      const response = await newAdminSession
         .getAxiosInstance()
         .put(`/parentResource/${parentId}/resource/${subjectId}`);
       expect(response.status).toBe(200);
@@ -376,15 +378,17 @@ describe('dynamic authorization identity permission integration tests', () => {
       const unauthorizedSubjectId = randomTextGenerator.getFakeText('sampleSubjectId');
 
       await expect(
-        adminSession.getAxiosInstance().put(`/parentResource/${parentId}/resource/${unauthorizedSubjectId}`)
+        newAdminSession
+          .getAxiosInstance()
+          .put(`/parentResource/${parentId}/resource/${unauthorizedSubjectId}`)
       ).rejects.toThrowError(new HttpError(403, {}));
     });
     test('is authorized on to GET /listResources/:parentId with correct permissions', async () => {
-      const response = await adminSession.getAxiosInstance().get(`/listResources/${parentId}`);
+      const response = await newAdminSession.getAxiosInstance().get(`/listResources/${parentId}`);
       expect(response.status).toBe(200);
     });
     test('is authorized on to GET /listAllResources with incorrect permissions should recieve 403', async () => {
-      await expect(adminSession.getAxiosInstance().get('/listAllResources')).rejects.toThrowError(
+      await expect(newAdminSession.getAxiosInstance().get('/listAllResources')).rejects.toThrowError(
         new HttpError(403, {})
       );
     });
@@ -589,35 +593,6 @@ describe('dynamic authorization identity permission integration tests', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrowError(new HttpError(403, {}));
-    });
-
-    test('remove and add user from group should be immediate and user is forbidden/allowed', async () => {
-      // Remove user should be immediate
-      await adminSession.resources.groups.group(groupId).removeUser({ userId: mockAuthenticatedUser.id });
-      //READ sampleField on subject
-      const dynamicOperation: DynamicOperation = {
-        action: 'READ',
-        subject: {
-          subjectId,
-          subjectType,
-          parentId
-        },
-        field: 'sampleField'
-      };
-      await expect(
-        adminSession.resources.identityPermissions.isAuthorizedOnSubject({
-          dynamicOperation,
-          authenticatedUser: mockAuthenticatedUser
-        })
-      ).rejects.toThrowError(new HttpError(403, {}));
-
-      // Add user should be immediate
-      await adminSession.resources.groups.group(groupId).addUser({ userId: mockAuthenticatedUser.id });
-      const response = await adminSession.resources.identityPermissions.isAuthorizedOnSubject({
-        dynamicOperation,
-        authenticatedUser: mockAuthenticatedUser
-      });
-      expect(response.status).toBe(204);
     });
   });
 

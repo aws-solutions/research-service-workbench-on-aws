@@ -4,13 +4,13 @@
  */
 
 import { AuthenticatedUserParser } from '@aws/workbench-core-authorization';
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteProjectRequestParser = z
   .object({
     authenticatedUser: AuthenticatedUserParser,
-    projectId: z.string().projId().required()
+    projectId: z.string()
   })
   .strict();
 

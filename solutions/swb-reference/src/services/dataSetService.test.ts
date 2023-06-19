@@ -4,14 +4,12 @@
  */
 
 import {
-  ConflictError,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetExternalEndpointRequest,
   DataSetStoragePlugin,
   PermissionsResponse
 } from '@aws/swb-app';
-import { IsProjectAuthorizedForDatasetsParser } from '@aws/swb-app/lib/dataSets/isProjectAuthorizedForDatasetsParser';
 import { ListDataSetAccessPermissionsRequestParser } from '@aws/swb-app/lib/dataSets/listDataSetAccessPermissionsRequestParser';
 import { ProjectAddAccessRequest } from '@aws/swb-app/lib/dataSets/projectAddAccessRequestParser';
 import { ProjectRemoveAccessRequest } from '@aws/swb-app/lib/dataSets/projectRemoveAccessRequestParser';
@@ -28,7 +26,6 @@ import {
   IdentityPermission,
   IdentityType
 } from '@aws/workbench-core-authorization';
-import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   AddRemoveAccessPermissionRequest,
   DataSetParser,
@@ -38,7 +35,6 @@ import {
 import { SwbAuthZSubject } from '../constants';
 import { MockDatabaseService } from '../mocks/mockDatabaseService';
 import { getProjectAdminRole } from '../utils/roleUtils';
-import { Associable } from './databaseService';
 import { DataSetService } from './dataSetService';
 
 describe('DataSetService', () => {
@@ -62,7 +58,7 @@ describe('DataSetService', () => {
     mockDynamicAuthService = {} as DynamicAuthorizationService;
 
     mockUser = {
-      id: '12345678-1234-1234-1234-123456789012',
+      id: 'sampleId',
       roles: []
     };
     projectId = 'proj-projectId';
@@ -126,7 +122,6 @@ describe('DataSetService', () => {
     let subjectType: string;
     let effect: Effect;
     let actions: Action[];
-    let conditions: Record<string, JSONValue>;
 
     describe('requests permissions for', () => {
       let createDatasetRequest: CreateProvisionDatasetRequest;
@@ -164,7 +159,6 @@ describe('DataSetService', () => {
             subjectType = SwbAuthZSubject.SWB_DATASET;
             effect = 'ALLOW';
             actions = ['READ', 'UPDATE', 'DELETE'];
-            conditions = { projectId: { $eq: projectId } };
 
             identityPermissions = actions.map((action: Action) => {
               return {
@@ -173,8 +167,7 @@ describe('DataSetService', () => {
                 identityId: identityId,
                 identityType: identityType,
                 subjectId: subjectId,
-                subjectType: subjectType,
-                conditions: conditions
+                subjectType: subjectType
               };
             });
           });
@@ -256,8 +249,7 @@ describe('DataSetService', () => {
                   identityId: `${externalProjectId}#ProjectAdmin`,
                   identityType: 'GROUP',
                   subjectId: mockDataSet.id!,
-                  subjectType: SwbAuthZSubject.SWB_DATASET,
-                  conditions: { projectId: { $eq: projectId } }
+                  subjectType: SwbAuthZSubject.SWB_DATASET
                 }
               ]
             }
@@ -269,7 +261,7 @@ describe('DataSetService', () => {
 
         test('it throws an error', async () => {
           await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
-            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the provided project(s)`
+            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the following project(s) ['${externalProjectId}']`
           );
         });
       });
@@ -397,75 +389,36 @@ describe('DataSetService', () => {
           }
         };
 
-        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValueOnce(mockDataSet);
         mockDataSetsAuthPlugin.addAccessPermission = jest.fn().mockReturnValueOnce(permissionsResponse);
       });
 
-      test('it passes the request through to the datasets auth plugin', async () => {
+      test('pass the request through to the datasets auth plugin', async () => {
         await dataSetService.addAccessForProject(projectAddAccessRequest);
         const permissionRequest: AddRemoveAccessPermissionRequest = {
           authenticatedUser: projectAddAccessRequest.authenticatedUser,
           dataSetId: projectAddAccessRequest.dataSetId,
-          permission: [
-            {
-              identity: 'projectId#ProjectAdmin',
-              identityType: 'GROUP',
-              accessLevel: projectAddAccessRequest.accessLevel!
-            },
-            {
-              identity: 'projectId#Researcher',
-              identityType: 'GROUP',
-              accessLevel: projectAddAccessRequest.accessLevel!
-            }
-          ]
+          permission: {
+            identity: 'projectId#ProjectAdmin',
+            identityType: 'GROUP',
+            accessLevel: projectAddAccessRequest.accessLevel!
+          }
         };
         expect(mockDataSetsAuthPlugin.addAccessPermission).toHaveBeenCalledWith(permissionRequest);
       });
 
-      describe('the Dataset is already associate with the Project', () => {
-        beforeEach(async () => {
-          const project: Associable = {
-            type: resourceTypeToKey.project,
-            id: projectId,
-            data: {
-              id: dataSetId,
-              permission: accessLevel
-            }
-          };
-
-          const dataset: Associable = {
-            type: resourceTypeToKey.dataset,
-            id: dataSetId,
-            data: {
-              id: projectId,
-              permission: accessLevel
-            }
-          };
-
-          await mockDatabaseService.storeAssociations(dataset, [project]);
-        });
-
-        test('it throws a Conflict Error', async () => {
-          const error = new ConflictError('Project projectId is already associated with Dataset dataSetId');
-          await expect(dataSetService.addAccessForProject(projectAddAccessRequest)).rejects.toThrowError(
-            error
-          );
-        });
-      });
-
-      describe('when the Project and Dataset have not yet been associated', () => {
+      describe('when building the relationship between the Project and Dataset', () => {
         describe('it adds entries for', () => {
           test('Project with Dataset', async () => {
             await dataSetService.addAccessForProject(projectAddAccessRequest);
 
             const associations = await mockDatabaseService.getAssociations(
-              resourceTypeToKey.project,
+              SwbAuthZSubject.SWB_PROJECT,
               projectId
             );
 
             expect(associations).toEqual([
               {
-                type: resourceTypeToKey.dataset,
+                type: SwbAuthZSubject.SWB_DATASET,
                 id: dataSetId,
                 data: {
                   id: 'projectId',
@@ -479,13 +432,13 @@ describe('DataSetService', () => {
             await dataSetService.addAccessForProject(projectAddAccessRequest);
 
             const associations = await mockDatabaseService.getAssociations(
-              resourceTypeToKey.dataset,
+              SwbAuthZSubject.SWB_DATASET,
               dataSetId
             );
 
             expect(associations).toEqual([
               {
-                type: resourceTypeToKey.project,
+                type: SwbAuthZSubject.SWB_PROJECT,
                 id: projectId,
                 data: {
                   id: dataSetId,
@@ -509,8 +462,7 @@ describe('DataSetService', () => {
                 identityId: 'projectId#ProjectAdmin',
                 identityType: 'GROUP',
                 subjectId: 'dataSetId',
-                subjectType: SwbAuthZSubject.SWB_DATASET,
-                conditions: { projectId: { $eq: projectId } }
+                subjectType: SwbAuthZSubject.SWB_DATASET
               },
               {
                 action: 'READ',
@@ -518,8 +470,7 @@ describe('DataSetService', () => {
                 identityId: 'projectId#Researcher',
                 identityType: 'GROUP',
                 subjectId: 'dataSetId',
-                subjectType: SwbAuthZSubject.SWB_DATASET,
-                conditions: { projectId: { $eq: projectId } }
+                subjectType: SwbAuthZSubject.SWB_DATASET
               }
             ]
           });
@@ -561,18 +512,6 @@ describe('DataSetService', () => {
         };
 
         mockDataSetsAuthPlugin.removeAccessPermissions = jest.fn().mockReturnValueOnce(permissionsResponse);
-
-        mockDataSet = DataSetParser.parse({
-          id: 'dataSetId',
-          owner: `${projectId}#ProjectAdmin`,
-          name: 'mockDataSet',
-          path: 'path',
-          storageName: 'storageName',
-          storageType: 'storageType',
-          createdAt: '2023-02-14T19:18:46'
-        });
-        mockWorkbenchDataSetService.getDataSet = jest.fn().mockReturnValue(mockDataSet);
-        mockDatabaseService.listAssociations = jest.fn().mockReturnValue({ data: [] });
       });
 
       describe('when a projectAdmin removes access', () => {
@@ -588,13 +527,11 @@ describe('DataSetService', () => {
               dataSetId,
               projectId
             };
-
-            mockDataSet.owner = getProjectAdminRole(projectId);
           });
 
           test('it throws an error', async () => {
             await expect(dataSetService.removeAccessForProject(projectRemoveAccessRequest)).rejects.toThrow(
-              new ConflictError(
+              new Error(
                 `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
               )
             );
@@ -602,18 +539,11 @@ describe('DataSetService', () => {
         });
 
         describe('to a project they do not administer', () => {
-          const otherProjectId = 'proj-otherProjectId';
           beforeEach(async () => {
-            projectRemoveAccessRequest = {
-              authenticatedUser: mockUser,
-              dataSetId,
-              projectId: otherProjectId
-            };
-
             const projectAddAccessRequest: ProjectAddAccessRequest = {
               authenticatedUser: mockUser,
               dataSetId,
-              projectId: otherProjectId,
+              projectId,
               accessLevel: 'read-only'
             };
 
@@ -640,12 +570,12 @@ describe('DataSetService', () => {
               dataSetId: projectRemoveAccessRequest.dataSetId,
               permission: [
                 {
-                  identity: `${otherProjectId}#ProjectAdmin`,
+                  identity: 'projectId#ProjectAdmin',
                   identityType: 'GROUP',
                   accessLevel: 'read-write'
                 },
                 {
-                  identity: `${otherProjectId}#Researcher`,
+                  identity: 'projectId#Researcher',
                   identityType: 'GROUP',
                   accessLevel: 'read-write'
                 }
@@ -657,14 +587,14 @@ describe('DataSetService', () => {
           describe('it removes database relationship entries for', () => {
             beforeEach(async () => {
               const projectAssociations = await mockDatabaseService.getAssociations(
-                resourceTypeToKey.project,
-                otherProjectId
+                SwbAuthZSubject.SWB_PROJECT,
+                projectId
               );
 
               expect(projectAssociations.length).toEqual(1);
 
               const datasetAssociation = await mockDatabaseService.getAssociations(
-                resourceTypeToKey.dataset,
+                SwbAuthZSubject.SWB_DATASET,
                 dataSetId
               );
 
@@ -675,8 +605,8 @@ describe('DataSetService', () => {
               await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
 
               const associations = await mockDatabaseService.getAssociations(
-                resourceTypeToKey.project,
-                otherProjectId
+                SwbAuthZSubject.SWB_PROJECT,
+                projectId
               );
 
               expect(associations).toEqual([]);
@@ -686,7 +616,7 @@ describe('DataSetService', () => {
               await dataSetService.removeAccessForProject(projectRemoveAccessRequest);
 
               const associations = await mockDatabaseService.getAssociations(
-                resourceTypeToKey.dataset,
+                SwbAuthZSubject.SWB_DATASET,
                 dataSetId
               );
 
@@ -703,18 +633,18 @@ describe('DataSetService', () => {
                   {
                     action: 'READ',
                     effect: 'ALLOW',
-                    identityId: `${otherProjectId}#ProjectAdmin`,
+                    identityId: 'projectId#ProjectAdmin',
                     identityType: 'GROUP',
                     subjectId: 'dataSetId',
-                    subjectType: SwbAuthZSubject.SWB_DATASET_UPLOAD
+                    subjectType: SwbAuthZSubject.SWB_DATASET
                   },
                   {
                     action: 'READ',
                     effect: 'ALLOW',
-                    identityId: `${otherProjectId}#Researcher`,
+                    identityId: 'projectId#Researcher',
                     identityType: 'GROUP',
                     subjectId: 'dataSetId',
-                    subjectType: SwbAuthZSubject.SWB_DATASET_UPLOAD
+                    subjectType: SwbAuthZSubject.SWB_DATASET
                   }
                 ]
               });
@@ -744,7 +674,7 @@ describe('DataSetService', () => {
 
     test('it delegates to the workbench-core DataSetService method', async () => {
       const request = ListDataSetAccessPermissionsRequestParser.parse({
-        dataSetId: 'dataset-12345678-1234-1234-1234-123456789012',
+        dataSetId: mockDataSet.id!,
         authenticatedUser: mockUser,
         paginationToken: ''
       });
@@ -973,50 +903,6 @@ describe('DataSetService', () => {
           expect(actualResponse.paginationToken).toEqual(customToken);
         });
       });
-    });
-  });
-
-  describe('isProjectAuthorizedForDatasets', () => {
-    test('GIVEN empty DatasetIds list SHOULD return true', async () => {
-      const request = IsProjectAuthorizedForDatasetsParser.parse({
-        authenticatedUser: mockUser,
-        datasetIds: [],
-        projectId: projectId
-      });
-      const response = await dataSetService.isProjectAuthorizedForDatasets(request);
-      expect(response).toEqual(true);
-    });
-
-    test('GIVEN datasetIds with access permissions SHOULD return true', async () => {
-      const mockResponse = {
-        data: {
-          permissions: ['accessPermission']
-        }
-      };
-      dataSetService.getAccessPermissions = jest.fn().mockReturnValueOnce(mockResponse);
-      const request = IsProjectAuthorizedForDatasetsParser.parse({
-        authenticatedUser: mockUser,
-        datasetIds: ['dataset1'],
-        projectId: projectId
-      });
-      const response = await dataSetService.isProjectAuthorizedForDatasets(request);
-      expect(response).toEqual(true);
-    });
-
-    test('GIVEN datasetIds with no access permissions SHOULD return false', async () => {
-      const mockResponse = {
-        data: {
-          permissions: []
-        }
-      };
-      dataSetService.getAccessPermissions = jest.fn().mockReturnValueOnce(mockResponse);
-      const request = IsProjectAuthorizedForDatasetsParser.parse({
-        authenticatedUser: mockUser,
-        datasetIds: ['dataset1'],
-        projectId: projectId
-      });
-      const response = await dataSetService.isProjectAuthorizedForDatasets(request);
-      expect(response).toEqual(false);
     });
   });
 });

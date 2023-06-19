@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Fixed bug in authenticationMiddleware where verifyToken used Authorization header instead of access_token cookie",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

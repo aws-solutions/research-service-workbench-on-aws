@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "implement doesGroupExist",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}

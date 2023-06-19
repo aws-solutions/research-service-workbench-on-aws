@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
-import { DataSetsAccessLevel } from '@aws/workbench-core-datasets';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-service-catalog';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
+import { AwsService } from '@aws/workbench-core-base';
+import { DataSetsAccessLevel } from '@aws/workbench-core-datasets';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper, { Operation } from './environmentLifecycleHelper';
 
@@ -101,7 +101,6 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
     helper.environmentService.addMetadata = jest.fn();
-    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE
     const response = await helper.getDatasetsToMount(datasetIds, envMetadata, ['sampleKeyARN1']);
@@ -173,7 +172,6 @@ describe('EnvironmentLifecycleHelper', () => {
       };
     });
     helper.environmentService.addMetadata = jest.fn();
-    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE & CHECK
     await expect(
@@ -189,7 +187,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        SecretAccessKey: 'sampleSecretAccessKey',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -249,7 +247,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        SecretAccessKey: 'sampleSecretAccessKey',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -292,7 +290,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        SecretAccessKey: 'sampleSecretAccessKey',
         SessionToken: 'blah',
         Expiration: undefined
       }

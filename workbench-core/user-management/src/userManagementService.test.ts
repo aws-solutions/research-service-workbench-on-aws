@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ListUsersForRoleRequestParser } from '@aws/workbench-core-base';
 import { Status, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 import { UserManagementService } from './userManagementService';
@@ -24,15 +23,12 @@ describe('User Management Service', () => {
       activateUser: jest.fn().mockImplementation(() => {}),
       deactivateUser: jest.fn().mockImplementation(() => {}),
       listUsers: jest.fn().mockImplementation(() => [mockUser.id]),
-      listUsersForRole: jest.fn().mockImplementation(() => {
-        return { data: [mockUser.id] };
-      }),
+      listUsersForRole: jest.fn().mockImplementation(() => [mockUser.id]),
       listRoles: jest.fn().mockImplementation(() => [mockUser.roles]),
       addUserToRole: jest.fn().mockImplementation(() => {}),
       removeUserFromRole: jest.fn().mockImplementation(() => {}),
       createRole: jest.fn().mockImplementation(() => {}),
-      deleteRole: jest.fn().mockImplementation(() => {}),
-      validateUserRoles: jest.fn().mockImplementation(() => mockUser.roles)
+      deleteRole: jest.fn().mockImplementation(() => {})
     };
   });
 
@@ -45,7 +41,7 @@ describe('User Management Service', () => {
       lastName: 'sampleLastName',
       email: 'sampleEmail',
       status: Status.ACTIVE,
-      roles: ['Researcher']
+      roles: ['sampleRole']
     };
   });
 
@@ -85,17 +81,13 @@ describe('User Management Service', () => {
   });
 
   test('listUsers', async () => {
-    const users = await userManagementService.listUsers({});
+    const users = await userManagementService.listUsers();
     expect(users).toEqual([mockUser.id]);
   });
 
   test('listUsersForRole', async () => {
-    const request = ListUsersForRoleRequestParser.parse({
-      role: mockUser.roles[0],
-      projectId: 'fakeProjectId'
-    });
-    const response = await userManagementService.listUsersForRole(request);
-    expect(response.data).toEqual([mockUser.id]);
+    const users = await userManagementService.listUsersForRole(mockUser.roles[0]);
+    expect(users).toEqual([mockUser.id]);
   });
 
   test('listRoles', async () => {
@@ -119,10 +111,5 @@ describe('User Management Service', () => {
 
   test('deleteRole', async () => {
     await expect(userManagementService.deleteRole(mockUser.roles[0])).resolves.not.toThrow();
-  });
-
-  test('validateUserRoles', async () => {
-    const roles = await userManagementService.validateUserRoles(mockUser.id, mockUser.roles);
-    expect(roles).toStrictEqual(mockUser.roles);
   });
 });

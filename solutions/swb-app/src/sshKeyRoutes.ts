@@ -9,7 +9,6 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { isAwsServiceError } from './errors/awsServiceError';
-import { isConflictError } from './errors/conflictError';
 import { isConnectionInfoNotDefinedError } from './errors/connectionInfoNotDefinedError';
 import { isDuplicateKeyError } from './errors/duplicateKeyError';
 import { isEc2Error } from './errors/ec2Error';
@@ -128,10 +127,9 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
 
   // Send SSH Public Key
   router.get(
-    '/projects/:projectId/environments/:environmentId/sshKeys',
+    '/environments/:environmentId/sshKeys',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedResult = validateAndParse<SendPublicKeyRequest>(SendPublicKeyRequestParser, {
-        projectId: req.params.projectId,
         environmentId: req.params.environmentId,
         userId: res.locals.user.id
       });
@@ -149,7 +147,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw Boom.badImplementation(e.message);
         }
 
-        if (isConflictError(e) || isNoInstanceFoundError(e) || isConnectionInfoNotDefinedError(e)) {
+        if (isNoInstanceFoundError(e) || isConnectionInfoNotDefinedError(e)) {
           throw Boom.badRequest(e.message);
         }
 

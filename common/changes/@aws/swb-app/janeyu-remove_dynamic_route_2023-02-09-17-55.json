@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "remove dynamic route from ApiRouteConfig",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

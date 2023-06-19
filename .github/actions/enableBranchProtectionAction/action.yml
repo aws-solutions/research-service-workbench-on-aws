@@ -48,7 +48,7 @@ runs:
       with:
         route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
         owner: aws-solutions
-        repo: research-service-workbench-on-aws
+        repo: solution-spark-on-aws
         branch: ${{ github.ref_name }}
         enforce_admins: true
         required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'

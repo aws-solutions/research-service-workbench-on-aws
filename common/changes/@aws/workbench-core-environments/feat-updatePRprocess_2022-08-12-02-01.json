@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "add license-checker",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

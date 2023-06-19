@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AddUserToGroupRequestParser = z
@@ -11,7 +11,7 @@ export const AddUserToGroupRequestParser = z
     /**
      * User id associated to user to be added to the group
      */
-    userId: z.string().userId().required()
+    userId: z.string()
   })
   .strict();
 

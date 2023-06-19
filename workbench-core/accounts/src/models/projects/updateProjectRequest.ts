@@ -3,15 +3,26 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from '@aws/workbench-core-base';
+import _ from 'lodash';
+import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateProjectRequestParser = z
   .object({
-    projectId: z.string().projId().required(),
+    projectId: z.string(),
     updatedValues: z.object({
-      name: z.string().swbName().optionalNonEmpty(),
-      description: z.string().swbDescription().optionalNonEmpty()
+      name: z
+        .string()
+        .refine((val) => !_.isEmpty(val), {
+          message: 'name must be non empty'
+        })
+        .optional(),
+      description: z
+        .string()
+        .refine((val) => !_.isEmpty(val), {
+          message: 'description must be non empty'
+        })
+        .optional()
     })
   })
   .strict();

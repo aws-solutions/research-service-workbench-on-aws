@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "BREAKING CHANGE: added `status` to User interface, replaced `User` with `CreateUser` interface in `createUser` function",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

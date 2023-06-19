@@ -23,9 +23,9 @@ interface Setting {
   projectName: string;
 
   // Main CFN template outputs
-  cognitoProgrammaticAccessUserPoolClientId: string;
-  S3DatasetsEncryptionKeyOutput05C7794D: string;
-  S3ArtifactEncryptionKeyOutputCC25B0CD: string;
+  cognitoUserPoolClientId: string;
+  MainAccountS3ArtifactEncryptionKeyOutput: string;
+  MainAccountS3DatasetsEncryptionKeyOutput: string;
   SagemakerNotebookTerminateSSMDocOutput: string;
   awsRegion: string;
   DataSetsBucketName: string;
@@ -52,8 +52,14 @@ interface Setting {
   defaultHostingAccountId: string;
 
   // Configs for AWS Account onboard test
-  awsAccountId: string;
-  awsAccountIdParamStorePath: string;
+  hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
+  envMgmtRoleArn: string;
+  envMgmtRoleArnParamStorePath: string;
+  hostingAccountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArnParamStorePath: string;
+  encryptionKeyArn: string;
+  encryptionKeyArnParamStorePath: string;
 
   // Derived
   mainAccountId: string;

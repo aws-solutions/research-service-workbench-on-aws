@@ -2,10 +2,10 @@
 
 # MA Foundation Starter App - POC
 ## `main branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
 
 ## `develop branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
+[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=example-ui-app)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
 
 This is a prototype app and you should expect to modify the source code to reflect your project needs.
 

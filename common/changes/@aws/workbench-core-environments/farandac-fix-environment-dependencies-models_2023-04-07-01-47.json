@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "Remove pk sk from envrionments response",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

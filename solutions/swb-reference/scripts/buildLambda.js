@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const path = require('path');
+path = require('path');
 
 require('esbuild')
   .build({

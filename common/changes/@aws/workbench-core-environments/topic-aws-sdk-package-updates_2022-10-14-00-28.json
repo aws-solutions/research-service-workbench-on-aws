@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "Updated @aws-sdk/* dependencies to ^3.186.0",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

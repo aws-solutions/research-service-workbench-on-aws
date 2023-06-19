@@ -24,7 +24,7 @@ describe('projectEnvTypeConfigService', () => {
   const projectId = 'proj-id';
   const envTypeId = 'et-id';
   const envTypeConfigId = 'etc-id';
-  const user = { roles: ['ITAdmin'], id: '12345678-1234-1234-1234-123456789012' };
+  const user = { roles: ['ITAdmin'], id: 'owner-123' };
   const disassociateRequest = { projectId, envTypeId, envTypeConfigId, user };
   const associateRequest = { projectId, envTypeId, envTypeConfigId, user };
 

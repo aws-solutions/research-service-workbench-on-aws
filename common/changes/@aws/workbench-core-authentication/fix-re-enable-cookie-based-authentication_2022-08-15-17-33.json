@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Added option to middleware to set the sameSite cookie option if 'strict' is too restrictive, removed Authorization header based authentication, now using maxAge instead of expires for auth cookies, changed getTimeInSeconds to getTimeInMS, cognitoAuthenticationPlugin now uses ms internally, validateToken now only validates access tokens",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
