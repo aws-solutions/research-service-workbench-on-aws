@@ -9,15 +9,17 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('listUserSshKeysForProject negative tests', () => {
-  const paabHelper = new PaabHelper();
+  const paabHelper = new PaabHelper(2);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources());
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id, anonymousSession } =
+      await paabHelper.createResources(__filename));
   });
 
   beforeEach(async () => {
@@ -108,6 +110,16 @@ describe('listUserSshKeysForProject negative tests', () => {
             error: `User is not authorized`
           })
         );
+      }
+    });
+  });
+
+  describe('with unauthenticated user that cannot list keys for a valid project', () => {
+    test('it throws 401 error', async () => {
+      try {
+        await anonymousSession.resources.projects.project(project1Id).sshKeys().get();
+      } catch (e) {
+        checkHttpError(e, new HttpError(401, {}));
       }
     });
   });

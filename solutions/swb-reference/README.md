@@ -1,13 +1,9 @@
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
 # swb-reference
 ## `main branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/main)
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
 ## `develop branch coverage`
-[![codecov](https://codecov.io/github/aws-solutions/solution-spark-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/solution-spark-on-aws/tree/develop)
-
-The 0.1.0 beta release is available for customers to test the newly re-architected Service Workbench solution from AWS.
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=swb-reference)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
 This release includes:
 
@@ -19,18 +15,18 @@ This release includes:
 * Improved performance on workspace page with pagination
 
 
-# Setup Instructions for SWBv2
+# Setup Instructions for RWB
 
-Follow the instructions below to deploy SWBv2 with Sagemaker Notebook lifecycle support. You'll be able to 
+Follow the instructions below to deploy RWB with Sagemaker Notebook lifecycle support. You'll be able to 
 launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 
 ## Prerequisite
-* An AWS account for deploying SWBv2 API. This account will be called the `Main Account`.
+* An AWS account for deploying RWB API. This account will be called the `Main Account`.
    * On the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `Main Account` as the `default` profile 
-* An AWS account for hosting environments. This account will be called the `Hosting Account`.
+* An AWS account for hosting environments. This account will be called the `Hosting Account`. The `Hosting Account` must be different from `Main Account`.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
-  * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/rush.json#L9)
+  * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/rush.json#L9)
   * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN is not needed if you already have a preferred API client. 
 * The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
@@ -41,10 +37,10 @@ launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 1. Navigate to `solutions/swb-reference`.
 1. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
-1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
-1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<stage>/rootUser/email`.
+1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region RWB is deployed in.
+1. Uncomment `rootUserEmailParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/rsw/<stage>/rootUser/email`.
 1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `rootUserEmailParamStorePath` and the value as the main account user's email address.
-1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your SWB API, e.g. ['http://localhost:3000','http://localhost:3002'].
+1. Uncomment `allowedOrigins` and provide a list of URLs that will be allowed to access your RSW API, e.g. ['http://localhost:3000','http://localhost:3002'].
 1. Uncomment `cognitoDomain` and provide a **globally unique** string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. If your SWB instance is going to use a custom network, uncomment `vpcId` and `albSubnetIds` and provide their respective values from your network.
@@ -66,7 +62,7 @@ STAGE=<STAGE> rushx cdk bootstrap
 
 After bootstrap is completed you'll see a message like this
 ```bash
-Found configuration in /Users/<user>/workplace/solution-spark-on-aws/rush.json
+Found configuration in /Users/<user>/workplace/research-service-workbench-on-aws/rush.json
 
 Rush Multi-Project Build Tool 5.62.1 - Node.js 14.17.0 (LTS)
 > "cdk bootstrap"
@@ -106,12 +102,12 @@ After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. 
 1. Upload the corresponding .yaml file from [templates](./src/templates) depending on your installation type. Default installation uses [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml), for more customizable network options, refer to [Hosting Account Templates](./src/templates/README.md)
-1. For the stack name, use the following value: `swb-<stage>-<awsRegionShortName>-hosting-account`, for example `swb-dev-va-hosting-account`
+1. For the stack name, use the following value: `rsw-<stage>-<awsRegionShortName>-hosting-account`, for example `rsw-dev-va-hosting-account`
 1. For the parameters provide the following values
 ```yaml
-Namespace: swb-<stage>-<awsRegionShortName>      # These values should be the same as in your config file
+Namespace: rsw-<stage>-<awsRegionShortName>      # These values should be the same as in your config file
 MainAccountId: <12 digit Account ID of Main Account>
-ExternalId: <externalIdValue>
+ExternalId: <externalIdValue>  # An arbitrary unique ID used to identify this account
 VpcCidr: 10.0.0.0/16
 PublicSubnetCidr: 10.0.0.0/19
 AccountHandlerRoleArn: <CFN_OUTPUT.AccountHandlerLambdaRoleOutput> 
@@ -130,21 +126,25 @@ EnvMgmtRoleArn
 VPC
 VpcSubnet
 ```
-### Configuring App Registry applications limits
+### Configuring App Registry applications limits(Optional)
 
-Service Workbench v2.0 on AWS uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to created resources.
-By using App Registry, Service Workbench is able to organize its resources and track their dependencies more efficiently.
-Every resource created in Service Workbench is associated to an App Registry application including all workspaces.
+If you are estimating to have less than 999 Workspaces created in your Service Workbench instance, you can skip this step. 
+
+Research Service Workbench on AWS uses [AWS App Registry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) applications to group and add metadata and attributes to created resources.
+By using App Registry, Research Service Workbench is able to organize its resources and track their dependencies more efficiently.
+Every resource created in Research Service Workbench is associated to an App Registry application including all workspaces.
 App Registry currently has a default limit of 1000 resources per application.
 
-If you are estimating to have more than 999 Workspaces created in your Service Workbench instance a service quota increase will be needed.
+If you are estimating to have more than 999 Workspaces created in your Research Service Workbench instance a service quota increase will be needed.
 Follow these steps to request a quota increase for App Registry application resources:
 
 1. Sign in to your **Hosting Account** in the [AWS Management Console](https://console.aws.amazon.com/console/home?nc2=h_ct&src=header-signin).
 
 1. Open the [**Service Quotas console**](https://console.aws.amazon.com/servicequotas/home).
 
-1. In the search, enter `AWS Service Catalog` and choose **Service Catalog** from the results.
+2. Click **AWS Services** in the menu bar on the left side to enter the search screen. 
+
+1. In the search screen, enter `AWS Service Catalog` and choose **AWS Service Catalog** from the results.
 
 1. Under **Services Quota**, choose **Resources per application**.
 
@@ -167,7 +167,7 @@ Your environment should have four variables. Name the first one `API_URL` and th
 
 Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
 
-Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+Import [RSW Postman Collection](./RWB.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 1. Follow these steps to assign a value to `terminatedEnvId` parameter in `./integration-tests/config/<STAGE>.yaml` file
     1. Follow instructions in [Launch Sagemaker Notebook Environment](#launch-sagemaker-notebook-instance) to create a new Sagemaker environment and wait for COMPLETED status.
@@ -179,7 +179,7 @@ Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions
 
 ## Setup Account Resources
 ### Onboard hosting account
-In **SWBv2 Official** Postman Collection under **hosting account** folder choose **Create Hosting Account** API to onboard a hosting account. 
+In **RSW Official** Postman Collection under **hosting account** folder choose **Create Hosting Account** API to onboard a hosting account. 
 Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
@@ -222,7 +222,7 @@ Take note of the `id` that was returned. We'll need it for the next step. We'll 
 
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status is listed as `CURRENT`.
 
-To monitor the account status, in **SWBv2 Official** Postman Collection under **hosting account** folder choose **Get Hosting Account** API.
+To monitor the account status, in **RSW Official** Postman Collection under **hosting account** folder choose **Get Hosting Account** API.
 
 In the params tab set accountId parameter to the `ACCOUNT_ID` value from previous step and send request.
 
@@ -239,7 +239,7 @@ A response with the status property will be displayed
 You can also find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
 ### Setup Cost Center
-In **SWBv2 Official** Postman Collection under **costCenters** folder choose **Create Cost Center** API. 
+In **RSW Official** Postman Collection under **costCenters** folder choose **Create Cost Center** API. 
 
 In the body tab set `accountId` parameter to the `ACCOUNT_ID` value from [Onboard hosting account step](#onboard-hosting-account).
 
@@ -256,7 +256,7 @@ POST `{{API_URL}}/costCenters/`
 Take note of the `id` from the **Create Cost Center** response. We'll need it for the next step. We'll refer to this value as `COST_CENTER_ID`.
 
 ### Setup Project
-In **SWBv2 Official** Postman Collection under **projects** folder choose **Create project** API. 
+In **RSW Official** Postman Collection under **projects** folder choose **Create project** API. 
 
 In the body tab set `costCenterId` parameter to the `COST_CENTER_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -274,7 +274,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 
 ## Setup EnvironmentTypeConfig
 ### Retrieve Environment Type Id
-In **SWBv2 Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
+In **RSW Official** Postman Collection under **envType** folder choose **List envTypes** API and send request.
 If there aren't any environment types displaying in the response, check whether the post deployment step ran correctly.
 
 Running the **List envTypes** request in postman should return a json with the following format
@@ -354,13 +354,13 @@ Running the **List envTypes** request in postman should return a json with the f
             }
     }
     ]
-    
+
 }
 ```
 In the response take note of the `id` of the environment type you are looking for, the `name` will have the format `<product name>-<provisioning artifact name>`, e.g. `sageMakerNotebook-v1`. We'll need it for the next step. We'll refer to this `id` value as `ENV_TYPE_ID`.
 
 ### Approve Environment Type
-In **SWBv2 Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environemnt type.
+In **RSW Official** Postman Collection under **envType** folder choose **Update envType** API to change the `status` of environment type.
 
 In the params tab set `id` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -374,7 +374,7 @@ PATCH `{{API_URL}}/environmentTypes/:id`
 ```
 
 ### Create Environment Type Config
-In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **Create envTypeConfig** API.
+In **RSW Official** Postman Collection under **envTypeConfig** folder choose **Create envTypeConfig** API.
 
 In the params tab set `envTypeId` parameter to the `ENV_TYPE_ID` value from [Retrieve Environment Type Id step](#retrieve-environment-type-id).
 
@@ -412,7 +412,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
 
 ### Associate Project to Environment Type Configuration
-In **SWBv2 Official** Postman Collection under **project** folder choose **Associate project with EnvTypeConfig** API.
+In **RSW Official** Postman Collection under **project** folder choose **Associate project with EnvTypeConfig** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -426,7 +426,7 @@ PUT `{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/
 
 
 ## Create new DataSets
-In **SWBv2 Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
+In **RSW Official** Postman Collection under **datasets** folder choose **Create Internal DataSet** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -452,7 +452,7 @@ At this point you'll receive a JSON response. That response will have an `id` va
 Once registered a DataSet using this API, you could also upload files to its bucket folder directly so they're available at environment boot time.
 
 ## Launch Sagemaker Notebook Instance
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Launch Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Launch Environment** API.
 
 In the params tab set `projectId` parameter to the `PROJECT_ID` value from [Setup Project step](#setup-project).
 
@@ -479,7 +479,7 @@ POST `{{API_URL}}/projects/:projectId/environments`
 In the response take note of the `id` and `projectId` that were returned. We'll refer to the `id` value as `ENV_ID` and the `projectId` value as `ENV_PROJECT_ID`.
 
 ## Check Environment Status
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Get Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -495,7 +495,7 @@ In the response you'll see the status of the environment.
 `PENDING` means the environment is being provisioned. `COMPLETED` means the environment is ready to be used.
 
 ## Connect to Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Get Connection** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Get Connection** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -510,7 +510,7 @@ GET `{{API_URL}}/projects/:projectId/environments/:id/connections`
 In the response you'll find a `url`. Copy and paste that `url` into the browser to view your Sagemaker Notebook instance.
 
 ## Stop an Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Stop Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Stop Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -523,7 +523,7 @@ Send **Stop Environment** request.
 PUT `{{API_URL}}/projects/:projectId/environments/:id/stop`
 
 ## Start an Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Start Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Start Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -536,7 +536,7 @@ Send **Start Environment** request.
 PUT `{{API_URL}}/projects/:projectId/environments/:id/start`
 
 ## Terminate the Environment
-In **SWBv2 Official** Postman Collection under **environments** folder choose **Terminate Environment** API.
+In **RSW Official** Postman Collection under **environments** folder choose **Terminate Environment** API.
 
 In the params tab set `id` parameter to the `ENV_ID` value from [Launch Sagemaker Notebook Instance step](#launch-sagemaker-notebook-instance).
 
@@ -551,12 +551,12 @@ PUT `{{API_URL}}/projects/:projectId/environments/:id/terminate`
 # User Management
 In order to create new Admins:
 1. You must go to the Cognito console in your AWS Console.
-1. Under **User pools**, look for and click on `swb-userpool-<stage>-<abbreviation>`.
+1. Under **User pools**, look for and click on `rsw-userpool-<stage>-<abbreviation>`.
 1. Under the **Users tab**, choose **Create user**.
 1. Once the user is created, click on the username and under **Group memberships**, choose **Add user to group** to add the user to the ITAdmin group.
 
 ## Create Users
-In **SWBv2 Official** Postman Collection under **users** folder choose **Create User** API.
+In **RSW Official** Postman Collection under **users** folder choose **Create User** API.
 
 Send **Create User** request.
 
@@ -574,7 +574,7 @@ In the response take note of the `id` that was returned. We'll refer to this val
 ## Assign Project to User
 Note: Only `Researchers` and `ProjectAdmin` require project association.
 
-In **SWBv2 Official** Postman Collection under **projects** folder choose **Add User To Project** API.
+In **RSW Official** Postman Collection under **projects** folder choose **Add User To Project** API.
 
 In the params tab set `userId` parameter to the `USER_ID` value from [Create User step](#create-user).
 
@@ -603,6 +603,28 @@ Note: Integration tests will create resources in the environment they are execut
 
 Follow instructions [here](##installation) to setup installation of API and Postman collection.
 
+OR
+
+Complete the following sections and then run the automation script to setup the environment:
+1. [Setup Config File](#setup-config-file)
+1. [Setup CDK](#setup-cdk)
+1. [Deploy the code](#deploy-the-code)
+1. [Deploy to the Hosting Account](#deploy-to-the-hosting-account)
+1. Run the automation script:
+    ```bash
+    # Set the credentials for the main account
+    # Configure AWS cli to the region your stack is deployed in main account 
+    # Then run the script
+    cd solutions/swb-reference/scripts
+    ./setupIntegTestEnv.sh -h #This will display the help screen along with an example on how to run this script
+    ```
+1. Run the integration tests:
+    ```bash
+    cd solutions/swb-reference
+    `STAGE=<STAGE> rushx integration-tests`
+    ```
+
+Note: `setupIntegTestEnv.sh` script also creates the `Config file for integration test`, you can directly run the integration test after the successful completion of this script.
 
 ### Setup Integration Test Config File
 
@@ -611,25 +633,17 @@ Follow instructions [here](##installation) to setup installation of API and Post
 1. For `envTypeId` and `envType`, follow instructions in [Retrieve environment type id step](#retrieve-environment-type-id) and choose the Environment Type that integration test will use as default when creating any Environment, copy the values from properties `id` and `type` from request and assign `id` value to `envTypeId` property and `type` value to `envType` property in `./integration-tests/config/<STAGE>.yaml` file
 
 1. Follow these steps to assign a value to the `envTypeConfigId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. In **SWBv2 Official** Postman Collection under **envTypeConfig** folder choose **List envTypeConfigs** API.
+    1. In **RSW Official** Postman Collection under **envTypeConfig** folder choose **List envTypeConfigs** API.
     1. In the params tab set `envTypeId` parameter to the `envTypeId` value from your `./integration-tests/config/<STAGE>.yaml`.
     1. Send **List envTypeConfigs** request. If there are no environment type configs displayed please follow instructions in [Setup Environment Type Config step](#setup-environmenttypeconfig) to create a new environment type config for selected environment type.
     1. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
     1. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
 
 1. Follow these steps to assign a value to `projectId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. In **SWBv2 Official** Postman Collection under **projects** folder choose **List projects** API.
+    1. In **RSW Official** Postman Collection under **projects** folder choose **List projects** API.
     1. Send **List projects** request. If there are no projects displayed please follow instructions in [Setup Project step](#setup-project) to create a new project.
     1. Choose the Project that integration test will use as default when creating any Environment and testing project functionality and copy the `id` value from the response.
     1. In `./integration-tests/config` directory assign `id` to `projectId` in `<STAGE>.yaml` file 
-
-1. Follow these steps to assign a value to `terminatedEnvId` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Follow instructions in [Launch Sagemaker Notebook Environment](#launch-sagemaker-notebook-instance) to create a new Sagemaker environment and wait for COMPLETED status.
-    1. Copy the `id` value from the response
-    1. Use the `id` of the new environment to [Stop the environment](#stop-an-environment) and wait for STOPPED status.
-    1. Use the `id` of the new environment to [Terminate the environment](#terminate-the-environment).
-    1. Use new instance information to [Terminate](#terminate-the-environment)
-    1. In `./integration-tests/config` directory assign the `id` of the new environment to the `terminatedEnvId` in `<STAGE>.yaml` file  
 
 1. Follow these steps to assign a value to `rootUserNameParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
     1. Uncomment `rootUserNameParamStorePath` and provide a name for a SSM parameter that will contain the main account user's email address, e.g. `/swb/<STAGE>/rootUser/email`.
@@ -669,21 +683,9 @@ Follow instructions [here](##installation) to setup installation of API and Post
     1. Follow instructions in [Reset User Password Step](#reset-user-password) to assign a password to the Researcher assigned to `researcher1UserNameParamStorePath`.
     1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `researcher1PasswordParamStorePath` and the value as the Researcher's new password.
 
-1. Follow these steps to assign a value to `hostAwsAccountIdParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `researcher1PasswordParamStorePath` and provide a name for a SSM parameter that will contain the 12 Digit Hosting Account Id, e.g. `/swb/<STAGE>/accountsTest/awsAccountId`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostAwsAccountIdParamStorePath` and the value as the the 12 Digit Hosting Account Id.
-
-1. Follow these steps to assign a value to `hostingAccountHandlerRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `hostingAccountHandlerRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account handler role ARN, e.g. `/swb/<STAGE>/accountsTest/hostingAccountHandlerRoleArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `hostingAccountHandlerRoleArnParamStorePath` and the value as the `HostingAccountHandlerRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
-
-1. Follow these steps to assign a value to `envMgmtRoleArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `envMgmtRoleArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account event management role ARN, e.g. `/swb/<STAGE>/accountsTest/envMgmtRoleArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `envMgmtRoleArnParamStorePath` and the value as the `EnvMgmtRoleArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
-
-1. Follow these steps to assign a value to `encryptionKeyArnParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file
-    1. Uncomment `encryptionKeyArnParamStorePath` and provide a name for a SSM parameter that will contain the hosting account encryption key ARN, e.g. `/swb/<STAGE>/accountsTest/encryptionKeyArn`.
-    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `encryptionKeyArnParamStorePath` and the value as the `EncryptionKeyArn` parameter from [Deploy Hosting Account Step](#deploy-to-the-hosting-account).
+1. Follow these steps to assign a value to `awsAccountIdParamStorePath` parameter in `./integration-tests/config/<STAGE>.yaml` file. This value is necessary to run teh AWS Accounts multi-step integration test. If the value remains commented out, this test will not run.
+    1. Uncomment `awsAccountIdParamStorePath` and provide a name for a SSM parameter that will contain the 12 Digit Account Id of an AWS Account you own that is not the main nor hosting account ID, e.g. `/swb/<STAGE>/accountsTest/awsAccountId`.
+    1. Follow instructions to [create a SSM Parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) in your main account and set the name as the assigned value in `awsAccountIdParamStorePath` and the value as the the 12 Digit Hosting Account Id.
 
 1. Uncomment `defaultHostingAccountId` and in `./integration-tests/config/<STAGE>.yaml` file and assign value `ACCOUNT_ID` from [Onboard Hosting Account Step](#onboard-hosting-account).
 
@@ -691,7 +693,7 @@ Follow instructions [here](##installation) to setup installation of API and Post
 
 ### Implement Integreation tests
 
-To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
+To use the framework for calling the RSW API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
 
 Example code for creating new user
 
@@ -725,7 +727,7 @@ const { data: response } = await adminSession.resources.users.get();
 ## Reset User Password
 1. Go to the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home) in your main account. If prompted, enter your AWS credentials.
 1. Choose **User Pools**.
-1. Choose your SWB user pool with name `swb-userpool-<STAGE>-<Region>`.
+1. Choose your SWB user pool with name `rsw-userpool-<STAGE>-<Region>`.
 1. Choose the **App integration** tab.
 1. Under **App client list** choose SWB app client with name `swb-client-<STAGE>-<Region>`.
 1. Under **Hosted UI** choose **View Hosted UI**.
@@ -737,7 +739,7 @@ const { data: response } = await adminSession.resources.users.get();
 1. Go to `swb-reference/scripts` folder
 1. Pull down all required dependencies by running `rushx build`
 1. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
-1. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests.
+1. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests. (Note: csrf token is only required for state changing requests)
 
 
 ## Running Code Locally
@@ -747,8 +749,8 @@ const { data: response } = await adminSession.resources.users.get();
 
 If you have made changes to the `environment` package or the `swb-reference` package follow these steps
 
-1. In `solution-spark-on-aws` root directory run `rush build`
-1. In `solution-spark-on-aws/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
+1. In `research-service-workbench-on-aws` root directory run `rush build`
+1. In `research-service-workbench-on-aws/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
 
 
 ## Troubleshooting Guides
@@ -757,9 +759,9 @@ If you have made changes to the `environment` package or the `swb-reference` pac
 
 ## Appendix
 ### Cloudwatch Logs
-* `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to SWB APIs. 
-* `swb-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
-* `swb-<stage>-<awsRegionShortName>-statusHandlerLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
+* `rsw-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to rsw APIs. 
+* `rsw-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
+* `rsw-<stage>-<awsRegionShortName>-statusHandlerLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
 * 
 ## FAQ
 

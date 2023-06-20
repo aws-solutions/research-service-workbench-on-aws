@@ -5,7 +5,8 @@
 
 import { Readable } from 'stream';
 
-import { PolicyDocument } from '@aws-cdk/aws-iam';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -28,7 +29,8 @@ import {
   S3Client,
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
-  NoSuchBucket
+  NoSuchBucket,
+  S3ServiceException
 } from '@aws-sdk/client-s3';
 import {
   AcceptPortfolioShareCommand,
@@ -38,11 +40,11 @@ import {
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { SdkStream } from '@aws-sdk/types';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
-import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
+import { PolicyDocument } from 'aws-cdk-lib/aws-iam';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import _ from 'lodash';
+import { InvalidAwsAccountIdError } from '../errors/InvalidAwsAccountIdError';
 import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 
@@ -51,6 +53,7 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
+  const mockAccountId = `${resourceTypeToKey.account.toLowerCase()}-1234abcd-1234-abcd-1234-abcd1234abcd`;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
   let accountMetadata = {};
 
@@ -83,7 +86,7 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     accountMetadata = {
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      id: mockAccountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -173,7 +176,7 @@ describe('HostingAccountLifecycleService', () => {
 
     await expect(
       hostingAccountLifecycleService.updateAccount({
-        id: 'abc-xyz',
+        id: mockAccountId,
         name: 'someName'
       })
     ).resolves.not.toThrowError();
@@ -318,18 +321,38 @@ describe('HostingAccountLifecycleService', () => {
     scMock.on(AcceptPortfolioShareCommand).resolves({});
 
     //Mock comparing hosting account template
-    const readableStream = new Readable({
+    const readableStreamWithIncorrectTemplateBody = new Readable({
       read() {}
     });
 
-    readableStream.push('ABC');
-    readableStream.push(null);
+    readableStreamWithIncorrectTemplateBody.push('XYZ');
+    readableStreamWithIncorrectTemplateBody.push(null);
+
+    const readableStreamWithCorrectTemplateBody = new Readable({
+      read() {}
+    });
+
+    readableStreamWithCorrectTemplateBody.push('ABC');
+    readableStreamWithCorrectTemplateBody.push(null);
 
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
-    s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream as SdkStream<Readable>
-    });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
+      });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account-byon.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithCorrectTemplateBody as SdkStream<Readable>
+      });
 
     // Mocking actual template pulled from CFN Stack
     cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });
@@ -613,6 +636,76 @@ describe('HostingAccountLifecycleService', () => {
     ).resolves.not.toThrowError();
   });
 
+  test('updateArtifactsBucketPolicy throws error when awsAccountId is invalid', async () => {
+    const fakeAwsAccountId = '123456789012';
+    const sampleBucketName = 'randomBucketName';
+    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`;
+
+    // Mock S3 calls
+    const s3Mock = mockClient(S3Client);
+    s3Mock.on(GetBucketPolicyCommand).resolves({
+      Policy: `
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            },
+            {
+                "Sid": "List:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::someOtherAccount:root"
+                },
+                "Action": "s3:ListBucket",
+                "Resource": "${sampleBucketArn}",
+                "Condition": {
+                    "StringLike": {
+                        "s3:prefix": "environment-files*"
+                    }
+                }
+            },
+            {
+                "Sid": "Get:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::someOtherAccount:root"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "${sampleBucketArn}/environment-files*"
+            }
+        ]
+    }`
+    });
+    const s3ServiceException = new S3ServiceException({
+      $fault: 'client',
+      $metadata: {},
+      name: 'MalformedPolicy'
+    });
+
+    // @ts-ignore
+    s3ServiceException.Detail = `"AWS" : "arn:aws:iam::${fakeAwsAccountId}:root"`;
+
+    s3Mock.on(PutBucketPolicyCommand).rejects(s3ServiceException);
+
+    await expect(
+      hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, fakeAwsAccountId)
+    ).rejects.toMatchObject(
+      new InvalidAwsAccountIdError("Please provide a valid 'awsAccountId' for the hosting account")
+    );
+  });
+
   test('updateMainAccountEncryptionKeyPolicy works when adding new account ID', async () => {
     const sampleKeyId = 'randomKey';
     const sampleEncryptionKeyArn = `sampleEncryptionKeyArn/${sampleKeyId}`;
@@ -759,14 +852,6 @@ describe('HostingAccountLifecycleService', () => {
           expect(expirationMinutes).toEqual(15 * 60);
           return Promise.resolve(testUrl);
         }
-      )
-      .mockImplementationOnce(
-        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
-          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
-          expect(key).toEqual('onboard-account-tgw.cfn.yaml');
-          expect(expirationMinutes).toEqual(15 * 60);
-          return Promise.resolve(testUrl);
-        }
       );
 
     const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-statusHandlerLambdaServiceRoleXXXXXXX-XXXXXXXXXXXX&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
@@ -784,7 +869,5 @@ describe('HostingAccountLifecycleService', () => {
     expect(_.get(actual, 'onboard-account')?.updateUrl).toEqual(expectedUpdateUrl);
     expect(_.get(actual, 'onboard-account-byon')?.createUrl).toEqual(expectedCreateUrl);
     expect(_.get(actual, 'onboard-account-byon')?.updateUrl).toEqual(expectedUpdateUrl);
-    expect(_.get(actual, 'onboard-account-tgw')?.createUrl).toEqual(expectedCreateUrl);
-    expect(_.get(actual, 'onboard-account-tgw')?.updateUrl).toEqual(expectedUpdateUrl);
   });
 });

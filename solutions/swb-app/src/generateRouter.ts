@@ -9,7 +9,8 @@ import {
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
-  CognitoAuthenticationPlugin
+  CognitoAuthenticationPlugin,
+  TokenRevocationService
 } from '@aws/workbench-core-authentication';
 import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
@@ -50,6 +51,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(cookieParser());
   app.use(csurf('none'));
 
+  const tokenRevocationService: TokenRevocationService = new TokenRevocationService({
+    dynamoDBSettings: {
+      region: process.env.AWS_REGION!,
+      table: process.env.REVOKED_TOKENS_DDB_TABLE_NAME!
+    }
+  });
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
@@ -57,7 +64,8 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
       clientId: process.env.WEB_UI_CLIENT_ID!,
       clientSecret: process.env.WEB_UI_CLIENT_SECRET!
     },
-    allowedClientIds: [process.env.PROGRAMMATIC_ACCESS_CLIENT_ID!]
+    allowedClientIds: [process.env.PROGRAMMATIC_ACCESS_CLIENT_ID!],
+    tokenRevocationService
   };
 
   const authenticationService = new AuthenticationService(
@@ -98,7 +106,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.metadataService,
     apiRouteConfig.userManagementService
   );
-  setUpProjectEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.projectEnvPlugin);
+  setUpProjectEnvRoutes(
+    router,
+    apiRouteConfig.environments,
+    apiRouteConfig.projectEnvPlugin,
+    apiRouteConfig.dataSetService
+  );
   setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 

@@ -2,33 +2,30 @@
 ## Please deploy the swb-reference package before running the integration test suite.
 ## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
-## Default Env Config for launching a new environment
-envTypeId: 'et-prod-z7ewodct5cwyi,pa-y6nrbdpaqu5we'
-envTypeConfigId: 'etc-b890410f-a182-4391-bad3-2f4507b71ec2'
+# Default Env Config for launching a new environment
+envTypeId: 'et-prod-jypbcxiwiyzme,pa-h7yqoxvewekv6'
+envTypeConfigId: 'etc-b7592e94-578b-44fc-87c6-0198fe77d404'
+projectId: 'proj-c42bb869-76b9-453f-a985-5fe2e233d327'
 envType: 'sagemakerNotebook'
 
-## Negative Testing
-terminatedEnvId: 'env-d9fe7382-23e7-4bcb-a7a5-6aeacb2b0334' # id of an environment that has already been terminated
-
-## Cognito Integ Test Client
+#Cognito Integ Test Client
 rootUserNameParamStorePath: '/swb/release-candidate/rootUser/email'
 rootPasswordParamStorePath: '/swb/release-candidate/rootUser/password'
 
-projectAdmin1UserNameParamStorePath: '/swb/release-candidate/projectAdmin1/email'
-projectAdmin1PasswordParamStorePath: '	/swb/release-candidate/projectAdmin1/password'
+projectAdmin1UserNameParamStorePath: '/swb/release-candidate/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/release-candidate/pa1/password'
 
-projectAdmin2UserNameParamStorePath: '/swb/release-candidate/projectAdmin2/email'
-projectAdmin2PasswordParamStorePath: '/swb/release-candidate/projectAdmin2/password'
+projectAdmin2UserNameParamStorePath: '/swb/release-candidate/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/release-candidate/pa2/password'
 
 researcher1UserNameParamStorePath: '/swb/release-candidate/researcher1/email'
-researcher1PasswordParamStorePath: '	/swb/release-candidate/researcher1/password'
+researcher1PasswordParamStorePath: '/swb/release-candidate/researcher1/password'
 
 ## Default Hosting Account
-defaultHostingAccountId: 'acc-0d29294a-4161-460a-bcee-123fc2dabb80' # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+defaultHostingAccountId: 'acc-abb7962c-e584-4657-b8dc-2d2770b5a06d'
 
-## Pre-requisite for running aws-accounts integration test
-## Create the onboard_account stack in an external AWS account, and populate the following values below:
-hostAwsAccountIdParamStorePath: '/swb/release-candidate/hostAwsAccountId'
-hostingAccountHandlerRoleArnParamStorePath: '/swb/release-candidate/hostingAccountHandlerRoleArn'
-envMgmtRoleArnParamStorePath: '/swb/release-candidate/envMgmtRoleArn'
-encryptionKeyArnParamStorePath: '	/swb/release-candidate/encryptionKeyArn'
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '/swb/release-candidate/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/release-candidate/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/release-candidate/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/release-candidate/accountsTest/encryptionKeyArn'

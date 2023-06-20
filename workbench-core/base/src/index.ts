@@ -9,11 +9,18 @@ import {
   CFNTemplateParameters,
   CFNTemplateParametersParser
 } from './aws/helpers/cloudFormationTemplate';
-import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
+import {
+  buildConcatenatedSk,
+  buildDynamoDbKey,
+  buildDynamoDBPkSk,
+  removeDynamoDbKeys
+} from './aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
+import { isInvalidPaginationTokenError } from './errors/invalidPaginationTokenError';
 import { FilterRequest } from './interfaces/filterRequest';
+import { ListUsersForRoleRequest, ListUsersForRoleRequestParser } from './interfaces/listUsersForRoleRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
 import { QueryParameterFilter } from './interfaces/queryParameterFilter';
@@ -50,15 +57,28 @@ import {
   provisionArtifactIdRegExpString,
   groupIDRegExpAsString,
   validRolesRegExpAsString,
-  validSshKeyUuidRegExpAsString
+  validSshKeyUuidRegExpAsString,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  invalidEmailMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
+  swbDescriptionMaxLength,
+  lengthValidationMessage,
+  betweenFilterMessage
 } from './utilities/textUtil';
-import { getPaginationParser, validateAndParse } from './utilities/validatorHelper';
+import { getPaginationParser, validateAndParse, z } from './utilities/validatorHelper';
 
 export {
   AwsService,
   CognitoTokenService,
   QueryParams,
   IamRoleCloneService,
+  buildConcatenatedSk,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
   removeDynamoDbKeys,
@@ -102,5 +122,21 @@ export {
   fromPaginationToken,
   runInBatches,
   validSshKeyUuidRegExpAsString,
-  getPaginationParser
+  getPaginationParser,
+  z,
+  swbNameMaxLength,
+  nonEmptyMessage,
+  invalidIdMessage,
+  invalidEmailMessage,
+  requiredMessage,
+  urlFilterMaxLength,
+  swbDescriptionMessage,
+  swbNameMessage,
+  nonHTMLMessage,
+  swbDescriptionMaxLength,
+  lengthValidationMessage,
+  betweenFilterMessage,
+  isInvalidPaginationTokenError,
+  ListUsersForRoleRequestParser,
+  ListUsersForRoleRequest
 };

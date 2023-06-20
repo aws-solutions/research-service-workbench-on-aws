@@ -9,7 +9,6 @@
 // STAGE=<STAGE> node generateCognitoToken.js <userName> '<password>'
 
 const { join } = require('path');
-const yaml = require('js-yaml');
 const fs = require('fs');
 const { CognitoTokenService } = require('@aws/workbench-core-base');
 const Csrf = require('csrf');
@@ -27,7 +26,7 @@ try {
   );
 }
 
-const clientId = outputs.ExampleCognitoUserPoolClientId;
+const clientId = outputs.ExampleProgrammaticAccessUserPoolClientId;
 const userPoolId = outputs.ExampleCognitoUserPoolId;
 const region = outputs.AwsRegion;
 const rootUserName = process.argv[2];
@@ -46,7 +45,6 @@ async function run() {
       rootUserName,
       rootPassword
     });
-    const { accessToken, idToken, refreshToken } = tokens;
     console.log({
       tokens,
       csrfCookie: secret,

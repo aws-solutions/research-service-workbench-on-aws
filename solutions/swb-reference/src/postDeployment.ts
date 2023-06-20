@@ -30,7 +30,8 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    DYNAMIC_AUTH_TABLE_NAME
+    DYNAMIC_AUTH_TABLE_NAME,
+    USER_AGENT_STRING
   } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -80,6 +81,7 @@ async function run(): Promise<void> {
 
   const awsService = new AwsService({
     region: AWS_REGION,
+    userAgent: USER_AGENT_STRING,
     ddbTableName: STACK_NAME
   });
 
@@ -114,8 +116,7 @@ async function uploadOnboardAccountCfnToS3(awsService: AwsService): Promise<void
   console.log('Uploading template files to S3');
   await Promise.all([
     uploadTemplateFileToS3(awsService, 'onboard-account.cfn.yaml'),
-    uploadTemplateFileToS3(awsService, 'onboard-account-byon.cfn.yaml'),
-    uploadTemplateFileToS3(awsService, 'onboard-account-tgw.cfn.yaml')
+    uploadTemplateFileToS3(awsService, 'onboard-account-byon.cfn.yaml')
   ]);
   console.log('Finished uploading template files to S3');
 }
