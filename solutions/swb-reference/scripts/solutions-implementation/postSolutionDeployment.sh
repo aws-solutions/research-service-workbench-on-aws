@@ -1,26 +1,26 @@
 #!/bin/bash
 
 read -p "Please enter your email address: " EMAIL
-export regionShortName=test
-export region=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
-export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-export cognitoUserPoolClientId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolClientId`].OutputValue')
-export dynamicAuthDDBTableName=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`dynamicAuthDDBTableName`].OutputValue')
-aws ssm put-parameter --name "/swb/dev/rootUser/email/$regionShortName" --value $EMAIL --type 'SecureString' > /dev/null
+export regionShortName=release
+export region=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
+export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+export cognitoUserPoolClientId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolClientId`].OutputValue')
+export dynamicAuthDDBTableName=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`dynamicAuthDDBTableName`].OutputValue')
+aws ssm put-parameter --name "/swb/prod/rootUser/email/$regionShortName" --value $EMAIL --type 'SecureString' > /dev/null
 
-rm -rf ./solutions/swb-reference/src/config/dev.yaml
-rm -rf ./solutions/swb-reference/src/config/dev.json
+rm -rf ./solutions/swb-reference/src/config/prod.yaml
+rm -rf ./solutions/swb-reference/src/config/prod.json
 
 echo "
 stage: dev
 awsRegion: $region
 awsRegionShortName: $regionShortName
-rootUserEmailParamStorePath: '/swb/dev/rootUser/email/$regionShortName'
+rootUserEmailParamStorePath: '/swb/prod/rootUser/email/$regionShortName'
 userPoolId: $cognitoUserPoolId
-" >> ./solutions/swb-reference/src/config/dev.yaml
+" >> ./solutions/swb-reference/src/config/prod.yaml
 
 echo "
-{\"rsw-dev-test\": 
+{\"rsw-prod-release\": 
    {\"dynamicAuthDDBTableName\": \"$dynamicAuthDDBTableName\",
    \"cognitoUserPoolClientId\": \"$cognitoUserPoolClientId\",
     \"cognitoUserPoolId\": \"$cognitoUserPoolId\",

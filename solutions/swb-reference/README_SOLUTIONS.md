@@ -10,9 +10,9 @@
 Note: An Application Load Balancer has been created in your main account with access logging disabled by default for Solutions deployment. If you'd like to enable it please follow these [instructions](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html).
 
 ### Breaking down your stack name
-While following along steps you encounter further, please note that since you're working with a pre-formed template the region short name is set to be `test`. For example if your stack name is `rsw-dev-test` then:
-- `dev` is the stage name
-- `test` is the region short name
+While following along steps you encounter further, please note that since you're working with a pre-formed template the region short name is set to be `test`. For example if your stack name is `rsw-prod-release` then:
+- `prod` is the stage name
+- `release` is the region short name
 ----
 
 ## Link Hosting Account

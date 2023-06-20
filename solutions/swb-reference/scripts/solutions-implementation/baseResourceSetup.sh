@@ -8,8 +8,8 @@ read -p "Enter the EnvMgmtRoleArn output from the hosting account stack: " envMg
 read -p "Enter the HostingAccountHandlerRoleArn output from the hosting account stack: " hostingAccountHandlerRoleArn
 read -p "Enter the ExternalId value from the hosting account stack parameters: " externalId
 
-export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-export swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
+export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+export swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
 aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $EMAIL --password $newPassword --permanent > /dev/null
 
 STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
