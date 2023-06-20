@@ -249,8 +249,8 @@ export function logoutUser(
   return async function (req: Request, res: Response) {
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
-    const websiteUrl = getRequestOrigin(req);
     const accessToken = req.cookies.access_token;
+    const websiteUrl = getRequestOrigin(req);
 
     if (!websiteUrl) {
       res.sendStatus(400);

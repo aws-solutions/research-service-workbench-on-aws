@@ -16,7 +16,7 @@ stage: dev
 awsRegion: $region
 awsRegionShortName: $regionShortName
 rootUserEmailParamStorePath: '/swb/dev/rootUser/email/$regionShortName'
-userPoolId: $cognitoProgrammaticAccessUserPoolClientId
+userPoolId: $cognitoUserPoolId
 " >> ./solutions/swb-reference/src/config/dev.yaml
 
 echo "

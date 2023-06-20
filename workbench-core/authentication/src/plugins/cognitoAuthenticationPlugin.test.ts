@@ -50,8 +50,8 @@ describe('CognitoAuthenticationPlugin tests', () => {
   let cognitoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
 
   let userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput>;
-
   let tokenRevocationService: TokenRevocationService;
+
   beforeEach(() => {
     cognitoPluginOptions = {
       cognitoDomain: 'fake-domain',
