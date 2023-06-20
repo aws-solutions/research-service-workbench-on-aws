@@ -12,7 +12,7 @@ rm -rf ./solutions/swb-reference/src/config/prod.yaml
 rm -rf ./solutions/swb-reference/src/config/prod.json
 
 echo "
-stage: dev
+stage: prod
 awsRegion: $region
 awsRegionShortName: $regionShortName
 rootUserEmailParamStorePath: '/swb/prod/rootUser/email/$regionShortName'
@@ -26,10 +26,10 @@ echo "
     \"cognitoUserPoolId\": \"$cognitoUserPoolId\",
     \"awsRegion\": \"$region\"
    }
-}" >> ./solutions/swb-reference/src/config/dev.json
+}" >> ./solutions/swb-reference/src/config/prod.json
 
 npm install -g @microsoft/rush
 rush update
 cd solutions/swb-reference
-STAGE=dev rushx run-postDeployment
-STAGE=dev rushx run-postDeployment  # Need to run this twice currently
+STAGE=prod rushx run-postDeployment
+STAGE=prod rushx run-postDeployment  # Need to run this twice currently
