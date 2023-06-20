@@ -47,7 +47,7 @@ describe('datasets delete integration test', () => {
       const deleteResponse = await adminSession.resources.datasets.children.get(dataSet.id!)!.delete();
       const deleted: DataSet = deleteResponse.data;
 
-      expect(deleted).toMatchObject<DataSet>(dataSet);
+      expect(deleted).toStrictEqual<DataSet>(dataSet);
 
       await expect(adminSession.resources.datasets.get({ id: dataSet.id! })).rejects.toThrowError(
         new HttpError(404, 'Not Found')

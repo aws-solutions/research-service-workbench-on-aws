@@ -21,31 +21,42 @@ async function init() {
   // the global initialization logic multiple times.
   if (settings) return;
 
-  const stage = 'testEnv';
+  const testEnvStage = 'testEnv';
+  const hostingEnvStage = 'hostingEnv';
 
   const config = yaml.load(
-    fs.readFileSync(join(__dirname, `integration-tests/config/${stage}.yaml`), 'utf8')
+    fs.readFileSync(join(__dirname, `integration-tests/config/${testEnvStage}.yaml`), 'utf8')
   );
 
-  let outputs;
+  let testEnvOutputs;
   try {
     const apiStackOutputs = JSON.parse(
-      fs.readFileSync(join(__dirname, `src/config/${stage}.json`), 'utf8') // nosemgrep
+      fs.readFileSync(join(__dirname, `src/config/${testEnvStage}.json`), 'utf8') // nosemgrep
     );
     const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
-    outputs = apiStackOutputs[apiStackName];
+    testEnvOutputs = apiStackOutputs[apiStackName];
   } catch (e) {
     throw new Error(
       'There was a problem reading the main stage file. Please run cdk-deploy prior to running the integration test suite'
     );
   }
 
-  const mainAccountId = outputs.ExampleDataSetDDBTableArn.split(':')[4];
-
+  let hostEnvOutputs;
+  try {
+    const apiStackOutputs = JSON.parse(
+      fs.readFileSync(join(__dirname, `src/config/${hostingEnvStage}.json`), 'utf8') // nosemgrep
+    );
+    const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+    hostEnvOutputs = apiStackOutputs[apiStackName];
+  } catch (e) {
+    throw new Error(
+      'There was a problem reading the hosting stage file. Please run cdk-deploy prior to running the integration test suite'
+    );
+  }
   settings = {
     ...config,
-    ...outputs,
-    mainAccountId,
+    ...testEnvOutputs,
+    ...hostEnvOutputs,
     runId: `${Date.now()}`
   };
 }

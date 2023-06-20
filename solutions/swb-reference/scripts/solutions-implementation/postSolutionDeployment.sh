@@ -4,7 +4,7 @@ read -p "Please enter your email address: " EMAIL
 export regionShortName=test
 export region=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
 export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-export cognitoUserPoolClientId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolClientId`].OutputValue')
+export cognitoProgrammaticAccessUserPoolClientId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoProgrammaticAccessUserPoolClientId`].OutputValue')
 export dynamicAuthDDBTableName=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`dynamicAuthDDBTableName`].OutputValue')
 aws ssm put-parameter --name "/swb/dev/rootUser/email/$regionShortName" --value $EMAIL --type 'SecureString' > /dev/null
 
@@ -22,7 +22,7 @@ userPoolId: $cognitoUserPoolId
 echo "
 {\"rsw-dev-test\": 
    {\"dynamicAuthDDBTableName\": \"$dynamicAuthDDBTableName\",
-   \"cognitoUserPoolClientId\": \"$cognitoUserPoolClientId\",
+   \"cognitoProgrammaticAccessUserPoolClientId\": \"$cognitoProgrammaticAccessUserPoolClientId\",
     \"cognitoUserPoolId\": \"$cognitoUserPoolId\",
     \"awsRegion\": \"$region\"
    }

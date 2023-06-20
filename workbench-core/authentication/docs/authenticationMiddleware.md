@@ -22,8 +22,11 @@ The provided middleware and route handlers assume that the Express application i
 const cognitoAuthenticationPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: '<Cognito Hosted UI Domain>',
   userPoolId: '<Cognito User Pool ID>',
-  clientId: '<Cognito User Pool Client ID>',
-  clientSecret: '<Cognito User Pool Client Secret>'
+  webUiClient: {
+    clientId: '<Cognito User Pool Client ID for WebUI>',
+    clientSecret: '<Cognito User Pool Client Secret for WebUI>',
+  },
+  allowedClientIds: ['<Optional Cognito User Pool ID for programmatic access>'],
 };
 
 // Create an AuthenticationService instance

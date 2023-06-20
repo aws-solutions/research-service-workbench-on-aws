@@ -16,6 +16,11 @@ describe('userManagement activate/deactivate user integration test', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
   let userId: string;
+  const mockUserData = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: `success+activate-deactivate-user-${uuidv4()}@simulator.amazonses.com`
+  };
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -24,11 +29,7 @@ describe('userManagement activate/deactivate user integration test', () => {
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
 
-    const { data } = await adminSession.resources.users.create({
-      firstName: 'Test',
-      lastName: 'User',
-      email: `success+activate-deactivate-user-${uuidv4()}@simulator.amazonses.com`
-    });
+    const { data } = await adminSession.resources.users.create(mockUserData);
     userId = data.id;
   });
 
@@ -42,7 +43,10 @@ describe('userManagement activate/deactivate user integration test', () => {
 
     const { data: activeUser } = await adminSession.resources.users.user(userId).get();
 
-    expect(activeUser).toMatchObject({
+    expect(activeUser).toStrictEqual({
+      ...mockUserData,
+      id: expect.any(String),
+      roles: [],
       status: Status.ACTIVE
     });
   });
@@ -53,7 +57,10 @@ describe('userManagement activate/deactivate user integration test', () => {
 
     const { data: inactiveUser } = await adminSession.resources.users.user(userId).get();
 
-    expect(inactiveUser).toMatchObject({
+    expect(inactiveUser).toStrictEqual({
+      ...mockUserData,
+      id: expect.any(String),
+      roles: [],
       status: Status.INACTIVE
     });
   });
@@ -64,7 +71,10 @@ describe('userManagement activate/deactivate user integration test', () => {
 
     const { data: activeUser } = await adminSession.resources.users.user(userId).get();
 
-    expect(activeUser).toMatchObject({
+    expect(activeUser).toStrictEqual({
+      ...mockUserData,
+      id: expect.any(String),
+      roles: [],
       status: Status.ACTIVE
     });
   });
@@ -75,8 +85,11 @@ describe('userManagement activate/deactivate user integration test', () => {
 
     const { data: activeUser } = await adminSession.resources.users.user(userId).get();
 
-    expect(activeUser).toMatchObject({
-      status: Status.INACTIVE
+    expect(activeUser).toStrictEqual({
+      id: expect.any(String),
+      ...mockUserData,
+      status: Status.INACTIVE,
+      roles: []
     });
   });
 

@@ -20,6 +20,7 @@ describe('list environments', () => {
   let paSession: ClientSession;
   let researcherSession: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let projectId1: string;
   let projectId2: string;
   const validEnvStatuses = [
@@ -75,6 +76,7 @@ describe('list environments', () => {
     projectId1 = paabResources.project1Id;
     projectId2 = paabResources.project2Id;
     rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -325,5 +327,13 @@ describe('list environments', () => {
         }
       });
     });
+  });
+
+  test('Unauthenticated user not authorized to call list environments', async () => {
+    try {
+      await anonymousSession.resources.environments.get({});
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

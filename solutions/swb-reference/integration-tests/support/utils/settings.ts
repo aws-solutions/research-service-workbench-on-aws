@@ -23,7 +23,7 @@ interface Setting {
   projectName: string;
 
   // Main CFN template outputs
-  cognitoUserPoolClientId: string;
+  cognitoProgrammaticAccessUserPoolClientId: string;
   S3DatasetsEncryptionKeyOutput05C7794D: string;
   S3ArtifactEncryptionKeyOutputCC25B0CD: string;
   SagemakerNotebookTerminateSSMDocOutput: string;

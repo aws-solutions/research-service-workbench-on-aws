@@ -11,10 +11,11 @@ import HttpError from '../../../support/utils/HttpError';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('create user negative tests', () => {
-  const paabHelper = new PaabHelper(0);
+  const paabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let user: CreateUser;
 
   beforeEach(() => {
@@ -28,7 +29,9 @@ describe('create user negative tests', () => {
   });
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session } = await paabHelper.createResources(__filename));
+    ({ adminSession, pa1Session, rs1Session, anonymousSession } = await paabHelper.createResources(
+      __filename
+    ));
   });
 
   afterAll(async () => {
@@ -230,6 +233,14 @@ describe('create user negative tests', () => {
           error: 'User is not authorized'
         })
       );
+    }
+  });
+
+  it('Unauthenticated user: should return 403 error when try to create a user', async () => {
+    try {
+      await anonymousSession.resources.users.create(user);
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

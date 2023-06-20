@@ -11,10 +11,11 @@ import { checkHttpError } from '../../../support/utils/utilities';
 describe('list environment type configs', () => {
   const setup: Setup = Setup.getSetup();
   const envTypeId = setup.getSettings().get('envTypeId');
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let itAdminSession: ClientSession;
   let paSession: ClientSession;
   let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   let projectId: string;
 
   beforeEach(() => {
@@ -26,11 +27,13 @@ describe('list environment type configs', () => {
     itAdminSession = paabResources.adminSession;
     paSession = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('ITAdmin tests', () => {
@@ -162,5 +165,13 @@ describe('list environment type configs', () => {
         }
       });
     });
+  });
+
+  test('Unauthenticated user cannot call list environments type configs (non-project route)', async () => {
+    try {
+      await anonymousSession.resources.environmentTypes.environmentType(envTypeId).configurations().get({});
+    } catch (e) {
+      checkHttpError(e, new HttpError(401, {}));
+    }
   });
 });

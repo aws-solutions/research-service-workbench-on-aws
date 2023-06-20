@@ -83,7 +83,7 @@ describe('remove user from project negative tests', () => {
     }
   });
 
-  test('unauthorized user gets 403', async () => {
+  test('unauthenticated user gets 403', async () => {
     try {
       await anonymousSession.resources.projects
         .project(project1Id)

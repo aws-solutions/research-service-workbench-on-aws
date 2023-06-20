@@ -7,11 +7,12 @@ import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('Update Cost Center negative tests', () => {
   const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
   let itAdminSession: ClientSession;
   let pa1Session: ClientSession;
   let researcherSession: ClientSession;
-  const paabHelper: PaabHelper = new PaabHelper();
+  let anonymousSession: ClientSession;
   const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
 
   beforeEach(() => {
@@ -23,6 +24,7 @@ describe('Update Cost Center negative tests', () => {
     itAdminSession = paabResources.adminSession;
     pa1Session = paabResources.pa1Session;
     researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
@@ -66,6 +68,12 @@ describe('Update Cost Center negative tests', () => {
       await expect(
         researcherSession.resources.costCenters.costCenter(costCenterId).update({ name }, true)
       ).rejects.toThrow(unauthorizedHttpError);
+    });
+
+    test('Unauthenticated user cannot update a CostCenter', async () => {
+      await expect(
+        anonymousSession.resources.costCenters.costCenter(costCenterId).update({ name }, true)
+      ).rejects.toThrow(new HttpError(403, {}));
     });
   });
 

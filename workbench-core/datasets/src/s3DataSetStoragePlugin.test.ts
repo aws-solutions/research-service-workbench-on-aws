@@ -184,7 +184,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -249,7 +249,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -352,7 +352,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -422,7 +422,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -487,7 +487,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -562,7 +562,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -609,7 +609,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-write',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -655,7 +655,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -715,7 +715,7 @@ describe('S3DataSetStoragePlugin', () => {
           externalRoleName: externalRoleArn,
           vpcId
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -775,7 +775,7 @@ describe('S3DataSetStoragePlugin', () => {
           accessLevel: 'read-only',
           externalRoleName: externalRoleArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -821,7 +821,7 @@ describe('S3DataSetStoragePlugin', () => {
           externalRoleName: externalRoleArn,
           kmsKeyArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -887,7 +887,7 @@ describe('S3DataSetStoragePlugin', () => {
           externalRoleName: externalRoleArn,
           kmsKeyArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -970,7 +970,7 @@ describe('S3DataSetStoragePlugin', () => {
           externalRoleName: externalRoleArn,
           kmsKeyArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,
@@ -1033,7 +1033,7 @@ describe('S3DataSetStoragePlugin', () => {
           externalRoleName: externalRoleArn,
           kmsKeyArn
         })
-      ).resolves.toMatchObject<AddStorageExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddStorageExternalEndpointResponse>({
         data: {
           connections: {
             endPointUrl: `s3://${accessPointArn}`,

@@ -95,6 +95,7 @@ export default class CognitoTokenService {
     rootPassword?: string;
     rootUserNameParamStorePath?: string;
     rootPasswordParamStorePath?: string;
+    accountType?: 'USER' | 'ADMIN';
   }): Promise<CognitoToken> {
     const {
       userPoolId,
@@ -102,7 +103,8 @@ export default class CognitoTokenService {
       rootUserName,
       rootPassword,
       rootUserNameParamStorePath,
-      rootPasswordParamStorePath
+      rootPasswordParamStorePath,
+      accountType
     } = params;
     let password: string = rootPassword || '';
     if (rootPasswordParamStorePath && rootPassword) {
@@ -125,7 +127,13 @@ export default class CognitoTokenService {
       userName = await this._secretsService.getSecret(rootUserNameParamStorePath);
     }
 
-    return this.generateCognitoTokenWithCredentials(userPoolId, clientId, userName, password, 'ADMIN');
+    return this.generateCognitoTokenWithCredentials(
+      userPoolId,
+      clientId,
+      userName,
+      password,
+      accountType ?? 'ADMIN'
+    );
   }
 
   private async _getClientSecret(userPoolId: string, clientId: string): Promise<string> {

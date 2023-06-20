@@ -52,7 +52,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-only'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -79,7 +79,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-write'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -103,7 +103,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-only'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -196,7 +196,7 @@ describe('datasets access permissions integration tests', () => {
           accessLevel: 'read-write'
         }
       });
-      await expect(dataSet.getAllAccess()).resolves.toMatchObject({
+      await expect(dataSet.getAllAccess()).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -232,7 +232,7 @@ describe('datasets access permissions integration tests', () => {
           accessLevel: 'read-only'
         }
       });
-      // using await expect(...).toMatchObject(...) requires permissions order to be
+      // using await expect(...).toStrictEqual(...) requires permissions order to be
       // deterministic. This is not.
       const response: PermissionsResponse = await dataSet.getAllAccess();
       expect(response.data).toBeDefined();
@@ -242,11 +242,11 @@ describe('datasets access permissions integration tests', () => {
       const defaultPermission = response.data.permissions.filter(
         (p: DataSetPermission) => p.identity === permissions[0].identity
       );
-      expect(defaultPermission).toMatchObject(permissions);
+      expect(defaultPermission).toStrictEqual(permissions);
       const userPermission = response.data.permissions.filter(
         (p: DataSetPermission) => p.identity === userId
       );
-      expect(userPermission).toMatchObject([
+      expect(userPermission).toStrictEqual([
         {
           identityType: 'USER',
           identity: userId,
@@ -256,7 +256,7 @@ describe('datasets access permissions integration tests', () => {
       const groupPermission = response.data.permissions.filter(
         (p: DataSetPermission) => p.identity === groupId
       );
-      expect(groupPermission).toMatchObject([
+      expect(groupPermission).toStrictEqual([
         {
           identityType: 'GROUP',
           identity: groupId,
@@ -286,7 +286,7 @@ describe('datasets access permissions integration tests', () => {
           accessLevel: 'read-only'
         }
       });
-      // using await expect(...).toMatchObject(...) requires permissions order to be
+      // using await expect(...).toStrictEqual(...) requires permissions order to be
       // deterministic. This is not.
       const response: PermissionsResponse = await dataSet.getAllAccess({
         pageSize: '2'
@@ -309,9 +309,9 @@ describe('datasets access permissions integration tests', () => {
       const defaultPermission = allPermissions.filter(
         (p: DataSetPermission) => p.identity === permissions[0].identity
       );
-      expect(defaultPermission).toMatchObject(permissions);
+      expect(defaultPermission).toStrictEqual(permissions);
       const userPermission = allPermissions.filter((p: DataSetPermission) => p.identity === userId);
-      expect(userPermission).toMatchObject([
+      expect(userPermission).toStrictEqual([
         {
           identityType: 'USER',
           identity: userId,
@@ -319,7 +319,7 @@ describe('datasets access permissions integration tests', () => {
         }
       ]);
       const groupPermission = allPermissions.filter((p: DataSetPermission) => p.identity === groupId);
-      expect(groupPermission).toMatchObject([
+      expect(groupPermission).toStrictEqual([
         {
           identityType: 'GROUP',
           identity: groupId,
@@ -356,7 +356,7 @@ describe('datasets access permissions integration tests', () => {
           accessLevel: 'read-write'
         }
       });
-      await expect(dataSet.getAccess('GROUP', groupId)).resolves.toMatchObject({
+      await expect(dataSet.getAccess('GROUP', groupId)).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -380,7 +380,7 @@ describe('datasets access permissions integration tests', () => {
           accessLevel: 'read-only'
         }
       });
-      await expect(dataSet.getAccess('USER', userId)).resolves.toMatchObject({
+      await expect(dataSet.getAccess('USER', userId)).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -416,7 +416,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-only'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -449,7 +449,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-write'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [
@@ -480,7 +480,7 @@ describe('datasets access permissions integration tests', () => {
             accessLevel: 'read-only'
           }
         })
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         data: {
           dataSetId: dataSetId,
           permissions: [

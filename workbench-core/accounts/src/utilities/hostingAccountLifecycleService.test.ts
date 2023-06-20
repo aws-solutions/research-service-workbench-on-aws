@@ -353,14 +353,6 @@ describe('HostingAccountLifecycleService', () => {
       .resolves({
         Body: readableStreamWithCorrectTemplateBody as SdkStream<Readable>
       });
-    s3Mock
-      .on(GetObjectCommand, {
-        Bucket: 'artifactBucket',
-        Key: 'onboard-account-tgw.cfn.yaml'
-      })
-      .resolves({
-        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
-      });
 
     // Mocking actual template pulled from CFN Stack
     cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });
@@ -860,14 +852,6 @@ describe('HostingAccountLifecycleService', () => {
           expect(expirationMinutes).toEqual(15 * 60);
           return Promise.resolve(testUrl);
         }
-      )
-      .mockImplementationOnce(
-        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
-          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
-          expect(key).toEqual('onboard-account-tgw.cfn.yaml');
-          expect(expirationMinutes).toEqual(15 * 60);
-          return Promise.resolve(testUrl);
-        }
       );
 
     const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-statusHandlerLambdaServiceRoleXXXXXXX-XXXXXXXXXXXX&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
@@ -885,7 +869,5 @@ describe('HostingAccountLifecycleService', () => {
     expect(_.get(actual, 'onboard-account')?.updateUrl).toEqual(expectedUpdateUrl);
     expect(_.get(actual, 'onboard-account-byon')?.createUrl).toEqual(expectedCreateUrl);
     expect(_.get(actual, 'onboard-account-byon')?.updateUrl).toEqual(expectedUpdateUrl);
-    expect(_.get(actual, 'onboard-account-tgw')?.createUrl).toEqual(expectedCreateUrl);
-    expect(_.get(actual, 'onboard-account-tgw')?.updateUrl).toEqual(expectedUpdateUrl);
   });
 });

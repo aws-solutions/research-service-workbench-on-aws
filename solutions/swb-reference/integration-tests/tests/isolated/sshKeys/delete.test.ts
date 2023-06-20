@@ -13,14 +13,14 @@ describe('Delete Key Pair negative tests', () => {
   let adminSession: ClientSession;
   let pa1Session: ClientSession;
   let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
   let project2Id: string;
   let sshKeyId: string;
 
   beforeAll(async () => {
-    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id } = await paabHelper.createResources(
-      __filename
-    ));
+    ({ adminSession, pa1Session, rs1Session, project1Id, project2Id, anonymousSession } =
+      await paabHelper.createResources(__filename));
   });
 
   beforeEach(async () => {
@@ -184,5 +184,15 @@ describe('Delete Key Pair negative tests', () => {
         );
       }
     });
+  });
+
+  test('unauthenticated user cannot delete ssh key', async () => {
+    const sampleSshKeyId: string = `sshkey-0000000000000000000000000000000000000000000000000000000000000000`;
+
+    try {
+      await anonymousSession.resources.projects.project(project1Id).sshKeys().sshKey(sampleSshKeyId).purge();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 });

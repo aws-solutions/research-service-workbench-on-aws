@@ -110,7 +110,7 @@
             "comment": "Add export for ProjectStatus"
           },
           {
-            "comment": "Update account handler to check onboard-account-byon.cfn.yml, onboard-account-tgw.cfn.yml, and onboard-account.cfn.yml so if users have a hosting account that isn't onboard-account.cfn.yml, their account status is correct."
+            "comment": "Update account handler to check onboard-account-byon.cfn.yml and onboard-account.cfn.yml so if users have a hosting account that isn't onboard-account.cfn.yml, their account status is correct."
           },
           {
             "comment": "added Zod parser for account services"
@@ -125,7 +125,7 @@
             "comment": "Updated @aws-sdk/* dependencies to ^3.186.0"
           },
           {
-            "comment": "return template URLs for byon and tgw deployments along with vanilla."
+            "comment": "return template URLs for byon deployments along with vanilla."
           },
           {
             "comment": "update rush dependencies"

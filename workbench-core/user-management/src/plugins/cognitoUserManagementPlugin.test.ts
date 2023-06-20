@@ -114,7 +114,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         roles
       });
@@ -134,7 +134,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         firstName: '',
         roles
@@ -155,7 +155,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         lastName: '',
         roles
@@ -176,7 +176,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         email: '',
         roles
@@ -198,7 +198,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         status: Status.INACTIVE,
         roles
@@ -219,7 +219,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         status: Status.INACTIVE,
         roles
@@ -239,7 +239,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         roles: []
       });
@@ -253,7 +253,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         firstName: '',
         lastName: '',
@@ -275,7 +275,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.getUser(userInfo.id);
 
-      expect(user).toMatchObject<User>({
+      expect(user).toStrictEqual<User>({
         ...userInfo,
         roles: []
       });
@@ -330,7 +330,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const userRoles = await plugin.getUserRoles(userInfo.id);
 
-      expect(userRoles).toMatchObject([...roles]);
+      expect(userRoles).toStrictEqual([...roles]);
     });
 
     it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
@@ -338,7 +338,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const userRoles = await plugin.getUserRoles(userInfo.id);
 
-      expect(userRoles).toMatchObject([]);
+      expect(userRoles).toStrictEqual([]);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -404,7 +404,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       const user = await plugin.createUser(userInfo);
 
-      expect(user).toMatchObject({ ...userInfo, roles: [] });
+      expect(user).toStrictEqual({ ...userInfo, roles: [] });
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -933,7 +933,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(1);
-      expect(users).toMatchObject<string[]>([userInfo.id]);
+      expect(users).toStrictEqual<string[]>([userInfo.id]);
     });
 
     it('should return an empty array when no users are in group', async () => {
@@ -942,7 +942,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
-      expect(users).toMatchObject<string[]>([]);
+      expect(users).toStrictEqual<string[]>([]);
     });
 
     it('should return an empty array when the users dont have user ids', async () => {
@@ -951,7 +951,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const users = (await plugin.listUsersForRole(request)).data;
 
       expect(users.length).toBe(0);
-      expect(users).toMatchObject<string[]>([]);
+      expect(users).toStrictEqual<string[]>([]);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -1008,7 +1008,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const groups = await plugin.listRoles();
 
       expect(groups.length).toBe(roles.length);
-      expect(groups).toMatchObject<string[]>(roles);
+      expect(groups).toStrictEqual<string[]>(roles);
     });
 
     it('should return an empty array when no groups are in the user pool', async () => {
@@ -1017,7 +1017,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const groups = await plugin.listRoles();
 
       expect(groups.length).toBe(0);
-      expect(groups).toMatchObject<string[]>([]);
+      expect(groups).toStrictEqual<string[]>([]);
     });
 
     it('should return an empty array when the groups dont have names', async () => {
@@ -1026,7 +1026,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       const groups = await plugin.listRoles();
 
       expect(groups.length).toBe(0);
-      expect(groups).toMatchObject<string[]>([]);
+      expect(groups).toStrictEqual<string[]>([]);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {

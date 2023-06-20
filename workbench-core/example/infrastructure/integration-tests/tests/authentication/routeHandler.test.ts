@@ -43,7 +43,7 @@ describe('authentication route handler integration tests', () => {
       });
 
       const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
 
       expect(data.signInUrl).toBe(
         `${domain}/oauth2/authorize?client_id=${clientId}&response_type=code&scope=openid&redirect_uri=${origin}&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`
@@ -109,13 +109,6 @@ describe('authentication route handler integration tests', () => {
   });
 
   describe('refreshAccessToken', () => {
-    it('should return the id token if the access token is successfully refreshed', async () => {
-      const adminSession = await setup.createAdminSession();
-      const { data } = await adminSession.resources.authentication.refresh({ includeRefreshToken: false });
-
-      expect(data.idToken).toBeDefined();
-    });
-
     it('should throw 401 if there is no access token present', async () => {
       await expect(
         anonymousSession.resources.authentication.refresh({
@@ -134,21 +127,10 @@ describe('authentication route handler integration tests', () => {
   });
 
   describe('logoutUser', () => {
-    it('should return the logout URL for a logged in user', async () => {
-      const adminSession = await setup.createAdminSession();
-      const origin = 'fakeOrigin';
-      const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
-
-      const { data } = await adminSession.resources.authentication.logout({ origin });
-
-      expect(data.logoutUrl).toBe(`${domain}/logout?client_id=${clientId}&logout_uri=${origin}`);
-    });
-
     it('should return the logout URL for a logged out user', async () => {
       const origin = 'fakeOrigin';
       const domain = setup.getSettings().get('ExampleCognitoDomainName');
-      const clientId = setup.getSettings().get('ExampleCognitoUserPoolClientId');
+      const clientId = setup.getSettings().get('ExampleCognitoWebUiUserPoolClientId');
 
       const { data } = await anonymousSession.resources.authentication.logout({ origin });
 

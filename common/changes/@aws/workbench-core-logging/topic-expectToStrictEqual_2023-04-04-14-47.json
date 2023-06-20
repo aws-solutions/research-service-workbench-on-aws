@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-logging",
+      "comment": "Replacing toMatchObject with toStrictEqual",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-logging"
+}

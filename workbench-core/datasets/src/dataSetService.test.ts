@@ -419,7 +419,7 @@ describe('DataSetService', () => {
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -443,7 +443,7 @@ describe('DataSetService', () => {
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -481,7 +481,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           permissions: [mockReadWriteUserPermission]
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -519,7 +519,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           permissions: [mockReadWriteGroupPermission]
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -558,7 +558,7 @@ describe('DataSetService', () => {
           owner: mockOwnerUserId,
           ownerType: 'USER'
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -597,7 +597,7 @@ describe('DataSetService', () => {
           owner: mockGroupId,
           ownerType: 'GROUP'
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -689,7 +689,7 @@ describe('DataSetService', () => {
           storageProvider: s3Plugin,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -742,7 +742,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           permissions: [mockReadWriteUserPermission]
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -780,7 +780,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           permissions: [mockReadWriteGroupPermission]
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -819,7 +819,7 @@ describe('DataSetService', () => {
           owner: mockOwnerUserId,
           ownerType: 'USER'
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -858,7 +858,7 @@ describe('DataSetService', () => {
           owner: mockGroupId,
           ownerType: 'GROUP'
         })
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         createdAt: mockCreatedAt,
         name: mockDataSetName,
@@ -915,14 +915,15 @@ describe('DataSetService', () => {
         .mockImplementationOnce(async () => dataSetPermissionsResponse);
       await expect(
         dataSetService.removeDataSet(mockDataSetId, () => Promise.resolve(), mockAuthenticatedUser)
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
         awsAccountId: mockAwsAccountId,
         storageType: mockDataSetStorageType,
         storageName: mockDataSetStorageName,
-        permissions: dataSetPermissionsResponse.data.permissions
+        permissions: dataSetPermissionsResponse.data.permissions,
+        createdAt: mockCreatedAt
       });
     });
     it('throws when an external endpoint exists on the DataSet.', async () => {
@@ -975,7 +976,7 @@ describe('DataSetService', () => {
           endpointId: mockExistingEndpointId,
           authenticatedUser: mockAuthenticatedUser
         })
-      ).resolves.toMatchObject<GetDataSetMountPointResponse>({
+      ).resolves.toStrictEqual<GetDataSetMountPointResponse>({
         data: {
           mountObject: {
             name: mockDataSetName,
@@ -1018,7 +1019,7 @@ describe('DataSetService', () => {
           endpointId: mockExistingEndpointId,
           authenticatedUser: { id: mockUserId, roles: [mockGroupId] }
         })
-      ).resolves.toMatchObject<GetDataSetMountPointResponse>({
+      ).resolves.toStrictEqual<GetDataSetMountPointResponse>({
         data: {
           mountObject: {
             name: mockDataSetName,
@@ -1158,7 +1159,7 @@ describe('DataSetService', () => {
       });
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'isAuthorizedOnDataSet').mockResolvedValue();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toMatchObject<
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toStrictEqual<
         PaginatedResponse<DataSet>
       >({
         data: [
@@ -1185,7 +1186,7 @@ describe('DataSetService', () => {
         .mockRejectedValueOnce(new ForbiddenError()) // no permissions on dataset 2
         .mockResolvedValueOnce();
 
-      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toMatchObject<
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser, 3, undefined)).resolves.toStrictEqual<
         PaginatedResponse<DataSet>
       >({
         data: [
@@ -1267,7 +1268,7 @@ describe('DataSetService', () => {
     it('returns a the details of a DataSet.', async () => {
       await expect(
         dataSetService.getDataSet(mockDataSetName, mockAuthenticatedUser)
-      ).resolves.toMatchObject<DataSet>({
+      ).resolves.toStrictEqual<DataSet>({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -1303,14 +1304,15 @@ describe('DataSetService', () => {
             permissions: [mockReadWriteGroupPermission]
           }
         });
-      await expect(dataSetService.getDataSet(mockDataSetName, mockAuthenticatedUser)).resolves.toMatchObject({
+      await expect(dataSetService.getDataSet(mockDataSetName, mockAuthenticatedUser)).resolves.toStrictEqual({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
         awsAccountId: mockAwsAccountId,
         storageType: mockDataSetStorageType,
         storageName: mockDataSetStorageName,
-        permissions: [mockReadOnlyUserPermission, mockReadWriteGroupPermission]
+        permissions: [mockReadOnlyUserPermission, mockReadWriteGroupPermission],
+        createdAt: mockCreatedAt
       });
       expect(authzPlugin.getAllDataSetAccessPermissions).toHaveBeenCalledTimes(2);
     });
@@ -1333,7 +1335,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
-      ).resolves.toMatchObject<AddDataSetExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddDataSetExternalEndpointResponse>({
         data: {
           mountObject: {
             name: mockDataSetName,
@@ -1403,7 +1405,7 @@ describe('DataSetService', () => {
           authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
-      ).resolves.toMatchObject<AddDataSetExternalEndpointResponse>({
+      ).resolves.toStrictEqual<AddDataSetExternalEndpointResponse>({
         data: {
           mountObject: {
             name: mockDataSetName,
@@ -1672,7 +1674,7 @@ describe('DataSetService', () => {
     it('returns an array of known StorageLocations.', async () => {
       await expect(
         dataSetService.listStorageLocations(mockAuthenticatedUser, 3, undefined)
-      ).resolves.toMatchObject<PaginatedResponse<StorageLocation>>({
+      ).resolves.toStrictEqual<PaginatedResponse<StorageLocation>>({
         data: [
           {
             name: mockDataSetStorageName,
@@ -1752,7 +1754,7 @@ describe('DataSetService', () => {
     it('returns permssions on a dataset.', async () => {
       await expect(
         dataSetService.getAllDataSetAccessPermissions(mockDataSetId, mockAuthenticatedUser)
-      ).resolves.toMatchObject(mockAddAccessResponse);
+      ).resolves.toStrictEqual(mockAddAccessResponse);
     });
 
     it('returns permssions on a dataset with pageToken.', async () => {
@@ -1770,7 +1772,7 @@ describe('DataSetService', () => {
         });
       await expect(
         dataSetService.getAllDataSetAccessPermissions(mockDataSetId, mockAuthenticatedUser, undefined, 1)
-      ).resolves.toMatchObject({
+      ).resolves.toStrictEqual({
         ...mockAddAccessResponse,
         pageToken
       });
@@ -1798,7 +1800,7 @@ describe('DataSetService', () => {
           },
           mockAuthenticatedUser
         )
-      ).resolves.toMatchObject(mockAddAccessResponse);
+      ).resolves.toStrictEqual(mockAddAccessResponse);
     });
     it('throws when an invalid dataset Id is given.', async () => {
       try {
@@ -1843,7 +1845,7 @@ describe('DataSetService', () => {
     it('gets the external endpoint', async () => {
       await expect(
         dataSetService.getExternalEndPoint(mockDataSetId, mockExistingEndpointId, mockAuthenticatedUser)
-      ).resolves.toMatchObject<ExternalEndpoint>({
+      ).resolves.toStrictEqual<ExternalEndpoint>({
         id: mockExistingEndpointId,
         name: mockExistingEndpointName,
         dataSetId: mockDataSetId,
