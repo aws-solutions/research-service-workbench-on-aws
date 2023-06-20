@@ -1,5 +1,5 @@
-import { AccessPoint } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
+import { AccessPoint } from '@aws-sdk/client-s3-control';
 import _ from 'lodash';
 import Setup from '../setup';
 
@@ -20,11 +20,12 @@ export class DatasetHelper {
 
   public async deleteS3Resources(bucket: string, dir: string): Promise<void> {
     const listedObjects = await this._awsSdk.clients.s3.listObjectsV2({ Bucket: bucket, Prefix: dir })!;
-    if (listedObjects.Contents!.length === 0) return;
+    if (!listedObjects.Contents || listedObjects.Contents!.length === 0) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const deleteParams: { Bucket: string; Delete: { Objects: any } } = {
+    const deleteParams: { Bucket: string; ExpectedBucketOwner: string; Delete: { Objects: any } } = {
       Bucket: bucket,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID!,
       Delete: { Objects: [] }
     };
     listedObjects.Contents!.forEach((key) => {

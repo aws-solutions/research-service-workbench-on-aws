@@ -8,8 +8,8 @@ read -p "Enter the EnvMgmtRoleArn output from the hosting account stack: " envMg
 read -p "Enter the HostingAccountHandlerRoleArn output from the hosting account stack: " hostingAccountHandlerRoleArn
 read -p "Enter the ExternalId value from the hosting account stack parameters: " externalId
 
-export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-export swbDomainName=$(aws cloudformation describe-stacks --stack-name swb-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
+export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+export swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
 aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $EMAIL --password $newPassword --permanent > /dev/null
 
 STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
@@ -85,7 +85,7 @@ export envTypeId=$(echo $envTypes | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\
 approveEnvType=$(curl --location --request PATCH "https://$swbDomainName/api/environmentTypes/$envTypeId" --header "Cookie: access_token=$accessToken;_csrf=$csrfCookie" --header "csrf-token: $csrfToken" --header 'Content-Type: application/json' \
 --data "{
     \"description\": \"An Amazon SageMaker Jupyter Notebook\",
-    \"name\": \"Jupyter Notebook\",
+    \"name\": \"JupyterNotebook\",
     \"status\": \"APPROVED\"
 }")
 echo "Env type is getting updated..."
@@ -96,7 +96,7 @@ envTypeConfig=$(curl --location "https://$swbDomainName/api/environmentTypes/$en
 --data "{
     \"type\": \"sagemakerNotebook\",
     \"description\": \"Example config 1\",
-    \"name\": \"config 1\",
+    \"name\": \"config-1\",
     \"estimatedCost\": \"estimated cost\",
     \"params\": [
         {

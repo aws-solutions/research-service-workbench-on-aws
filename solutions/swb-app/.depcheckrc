@@ -7,7 +7,9 @@ ignores: [
     'eslint-plugin-security',
     'npm-package-json-lint-config-default',
     '@types/node',
-    'nodemon'
+    'nodemon',
+    '@types/jest',
+    'fast-check'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored

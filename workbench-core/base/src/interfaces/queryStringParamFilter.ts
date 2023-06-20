@@ -3,28 +3,35 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { z } from 'zod';
+import { lengthValidationMessage, urlFilterMaxLength, betweenFilterMessage } from '../utilities/textUtil';
+import { z } from '../utilities/validatorHelper';
 
 /************
  *
  * Only one operator can be defined by property, if multiple operators are defined, dynamo service will throw an exception.
  *
  ************/
+const parameterFilterParser: z.ZodString = z
+  .string()
+  .max(urlFilterMaxLength, { message: lengthValidationMessage(urlFilterMaxLength) });
 // eslint-disable-next-line @rushstack/typedef-var
 export const QueryStringParamFilterParser = z
   .object({
-    eq: z.string().optional(),
-    lt: z.string().optional(),
-    lte: z.string().optional(),
-    gt: z.string().optional(),
-    gte: z.string().optional(),
+    eq: parameterFilterParser.optionalNonEmpty(),
+    lt: parameterFilterParser.optionalNonEmpty(),
+    lte: parameterFilterParser.optionalNonEmpty(),
+    gt: parameterFilterParser.optionalNonEmpty(),
+    gte: parameterFilterParser.optionalNonEmpty(),
     between: z
       .object({
-        value1: z.string(),
-        value2: z.string()
+        value1: parameterFilterParser.required(),
+        value2: parameterFilterParser.required()
+      })
+      .refine((data) => data.value1 <= data.value2, {
+        message: betweenFilterMessage
       })
       .optional(),
-    begins: z.string().optional()
+    begins: parameterFilterParser.optionalNonEmpty()
   })
   .strict();
 

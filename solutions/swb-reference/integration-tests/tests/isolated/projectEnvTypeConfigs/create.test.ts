@@ -8,12 +8,15 @@ import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import Settings from '../../../support/utils/settings';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, generateRandomString, validSwbName } from '../../../support/utils/utilities';
 
 describe('Associate Project with EnvTypeConfig', () => {
   const setup: Setup = Setup.getSetup();
-  const paabHelper: PaabHelper = new PaabHelper();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
   const envTypeId = setup.getSettings().get('envTypeId');
   const envTypeConfigId = setup.getSettings().get('envTypeConfigId');
   const nonExistentProjectId = 'proj-12345678-1234-1234-1234-123456789012';
@@ -26,13 +29,68 @@ describe('Associate Project with EnvTypeConfig', () => {
   });
 
   beforeAll(async () => {
-    const paabResources = await paabHelper.createResources();
+    const paabResources = await paabHelper.createResources(__filename);
     adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
     projectId = paabResources.project1Id;
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+  });
+
+  test('Project Admin cannot associate project with ETC', async () => {
+    try {
+      await paSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .associate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Researcher cannot associate project with ETC', async () => {
+    try {
+      await researcherSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .associate();
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(403, {
+          error: 'User is not authorized'
+        })
+      );
+    }
+  });
+
+  test('Unauthenticated user cannot associate project with ETC', async () => {
+    try {
+      await anonymousSession.resources.projects
+        .project(projectId)
+        .environmentTypes()
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
+        .associate();
+    } catch (e) {
+      checkHttpError(e, new HttpError(403, {}));
+    }
   });
 
   test('fails when using invalid format project Id', async () => {
@@ -47,9 +105,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find project invalid-project-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `projectId: Invalid ID`
         })
       );
     }
@@ -82,12 +140,12 @@ describe('Associate Project with EnvTypeConfig', () => {
       'projectEnvTypeConfig-isolatedTest-create-failsWhenUsingDeletedProject'
     );
     const { data: costCenter } = await adminSession.resources.costCenters.create({
-      name: `${testName} cost center`,
+      name: generateRandomString(10, validSwbName),
       accountId: setup.getSettings().get('defaultHostingAccountId'),
       description: 'a test object'
     });
     const { data: createdProject } = await adminSession.resources.projects.create({
-      name: `${testName} project`,
+      name: `${testName}Project`,
       description: 'test description',
       costCenterId: costCenter.id
     });
@@ -127,9 +185,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeId: Invalid ID`
         })
       );
     }
@@ -167,9 +225,9 @@ describe('Associate Project with EnvTypeConfig', () => {
     } catch (e) {
       checkHttpError(
         e,
-        new HttpError(404, {
-          error: 'Not Found',
-          message: `Could not find environment type config invalid-etc-id`
+        new HttpError(400, {
+          error: 'Bad Request',
+          message: `envTypeConfigId: Invalid ID`
         })
       );
     }

@@ -11,6 +11,7 @@ import {
   DataSetPlugin,
   DataSetStoragePlugin,
   GetAccessPermissionRequest,
+  IsProjectAuthorizedForDatasetsRequest,
   PermissionsResponse,
   PermissionsResponseParser
 } from '@aws/swb-app';
@@ -25,7 +26,7 @@ import {
   IdentityPermission,
   IdentityPermissionParser
 } from '@aws/workbench-core-authorization';
-import { PaginatedResponse } from '@aws/workbench-core-base';
+import { PaginatedResponse, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
@@ -36,8 +37,7 @@ import { SwbAuthZSubject } from '../constants';
 import { getProjectAdminRole, getResearcherRole } from '../utils/roleUtils';
 import { Associable, DatabaseServicePlugin } from './databaseService';
 
-const timeToLiveSeconds: number = 60 * 15; // 15 min
-
+const timeToLiveSeconds: number = 60 * 2; // 2 min
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
   private _dataSetsAuthService: DataSetsAuthorizationPlugin;
@@ -65,9 +65,7 @@ export class DataSetService implements DataSetPlugin {
     const associatedProjects = await this._associatedProjects(dataset);
     if (associatedProjects.length > 0) {
       throw new ConflictError(
-        `DataSet ${dataSetId} cannot be removed because it is still associated with roles in the following project(s) [${associatedProjects.join(
-          ','
-        )}]`
+        `DataSet ${dataSetId} cannot be removed because it is still associated with roles in the provided project(s)`
       );
     }
 
@@ -234,7 +232,8 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET,
       dataset.id!,
       [projectAdmin],
-      ['READ', 'UPDATE', 'DELETE']
+      ['READ', 'UPDATE', 'DELETE'],
+      { projectId: { $eq: projectId } }
     );
 
     await this._addAuthZPermissionsForDataset(
@@ -242,7 +241,8 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET,
       dataset.id!,
       [projectResearcher],
-      ['READ']
+      ['READ'],
+      { projectId: { $eq: projectId } }
     );
 
     await this._addAuthZPermissionsForDataset(
@@ -258,7 +258,8 @@ export class DataSetService implements DataSetPlugin {
       SwbAuthZSubject.SWB_DATASET_UPLOAD,
       dataset.id!,
       [projectAdmin, projectResearcher],
-      ['READ']
+      ['READ'],
+      { projectId: { $eq: projectId } }
     );
 
     return dataset;
@@ -311,23 +312,59 @@ export class DataSetService implements DataSetPlugin {
   public async addAccessForProject(request: ProjectAddAccessRequest): Promise<PermissionsResponse> {
     const projectAdmin = getProjectAdminRole(request.projectId);
     const projectResearcher = getResearcherRole(request.projectId);
+    const requestedDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
+    if (requestedDataset.owner === projectAdmin) {
+      throw new ConflictError(`${request.projectId} already owns this dataset`);
+    }
+
+    const dataset: Associable = {
+      type: resourceTypeToKey.dataset,
+      id: request.dataSetId,
+      data: {
+        id: request.projectId,
+        permission: request.accessLevel
+      }
+    };
+
+    const project: Associable = {
+      type: resourceTypeToKey.project,
+      id: request.projectId,
+      data: {
+        id: request.dataSetId,
+        permission: request.accessLevel
+      }
+    };
+
+    const existingAssociation = await this._databaseService.getAssociation(dataset, project);
+
+    if (existingAssociation) {
+      throw new ConflictError(`Project ${project.id} is already associated with Dataset ${dataset.id}`);
+    }
 
     await this._addAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
       request.dataSetId,
       [projectAdmin, projectResearcher],
-      ['READ']
+      ['READ'],
+      { projectId: { $eq: request.projectId } }
     );
 
     const permissionRequest: AddRemoveAccessPermissionRequest = {
       authenticatedUser: request.authenticatedUser,
       dataSetId: request.dataSetId,
-      permission: {
-        identity: projectAdmin,
-        identityType: 'GROUP',
-        accessLevel: request.accessLevel
-      }
+      permission: [
+        {
+          identity: projectAdmin,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        },
+        {
+          identity: projectResearcher,
+          identityType: 'GROUP',
+          accessLevel: request.accessLevel
+        }
+      ]
     };
 
     const response = await this.addAccessPermission(permissionRequest);
@@ -338,27 +375,10 @@ export class DataSetService implements DataSetPlugin {
         SwbAuthZSubject.SWB_DATASET_UPLOAD,
         request.dataSetId,
         [projectAdmin, projectResearcher],
-        ['READ']
+        ['READ'],
+        { projectId: { $eq: request.projectId } }
       );
     }
-
-    const dataset: Associable = {
-      type: SwbAuthZSubject.SWB_DATASET,
-      id: request.dataSetId,
-      data: {
-        id: request.projectId,
-        permission: request.accessLevel
-      }
-    };
-
-    const project: Associable = {
-      type: SwbAuthZSubject.SWB_PROJECT,
-      id: request.projectId,
-      data: {
-        id: request.dataSetId,
-        permission: request.accessLevel
-      }
-    };
 
     await this._databaseService.storeAssociations(dataset, [project]);
 
@@ -366,20 +386,49 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public async removeAccessForProject(request: ProjectRemoveAccessRequest): Promise<PermissionsResponse> {
-    const projectAdmin = getProjectAdminRole(request.projectId);
+    const reqDataset = await this.getDataSet(request.dataSetId, request.authenticatedUser);
+    const projectId = request.projectId;
+    const projectAdmin = getProjectAdminRole(projectId);
 
-    //Make sure you're not removing the access for your project
-    if (request.authenticatedUser.roles.includes(projectAdmin)) {
-      throw new Error(
-        `${request.projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
+    // Make sure you're not removing the access for your project
+    if (projectAdmin === reqDataset.owner) {
+      throw new ConflictError(
+        `${projectId} cannot remove access from ${request.dataSetId} for the ProjectAdmin because it owns that dataset.`
       );
     }
 
-    const projectResearcher = getResearcherRole(request.projectId);
+    const project: Associable = {
+      type: resourceTypeToKey.project,
+      id: projectId
+    };
+
+    // Make sure project has no environments with dataset mounted
+    const projDatasetEndpointAssociations = await this._databaseService.listAssociations(
+      project,
+      `${resourceTypeToKey.dataset}#${request.dataSetId}${resourceTypeToKey.endpoint}`,
+      { pageSize: 1 }
+    );
+
+    if (projDatasetEndpointAssociations.data.length > 0) {
+      throw new ConflictError(
+        `${projectId} still has environments with ${request.dataSetId} mounted. ` +
+          'Terminate environments before removing access.'
+      );
+    }
+
+    const projectResearcher = getResearcherRole(projectId);
 
     await this._removeAuthZPermissionsForDataset(
       request.authenticatedUser,
       SwbAuthZSubject.SWB_DATASET,
+      request.dataSetId,
+      [projectAdmin, projectResearcher],
+      ['READ']
+    );
+
+    await this._removeAuthZPermissionsForDataset(
+      request.authenticatedUser,
+      SwbAuthZSubject.SWB_DATASET_UPLOAD,
       request.dataSetId,
       [projectAdmin, projectResearcher],
       ['READ']
@@ -407,13 +456,8 @@ export class DataSetService implements DataSetPlugin {
     const response = await this.removeAccessPermissions(readWriteDeletionRequest);
 
     const dataset: Associable = {
-      type: SwbAuthZSubject.SWB_DATASET,
+      type: resourceTypeToKey.dataset,
       id: request.dataSetId
-    };
-
-    const project: Associable = {
-      type: SwbAuthZSubject.SWB_PROJECT,
-      id: request.projectId
     };
 
     await this._databaseService.removeAssociations(dataset, [project]);
@@ -421,14 +465,36 @@ export class DataSetService implements DataSetPlugin {
     return response;
   }
 
+  public async isProjectAuthorizedForDatasets(
+    request: IsProjectAuthorizedForDatasetsRequest
+  ): Promise<boolean> {
+    let authorizedDataset = true;
+    await Promise.all(
+      request.datasetIds.map(async (datasetId: string): Promise<void> => {
+        // Using Researcher role to verify project has access to dataset because Researcher and PA permissions
+        // are coupled together in regard to datasets
+        const accessPermissions = await this.getAccessPermissions({
+          dataSetId: datasetId,
+          identity: `${request.projectId}#Researcher`,
+          identityType: 'GROUP'
+        });
+        if (accessPermissions.data.permissions.length === 0) {
+          authorizedDataset = false;
+        }
+      })
+    );
+    return authorizedDataset;
+  }
+
   private async _addAuthZPermissionsForDataset(
     authenticatedUser: AuthenticatedUser,
     subject: string,
     subjectId: string,
     roles: string[],
-    actions: Action[]
+    actions: Action[],
+    conditions?: object
   ): Promise<void> {
-    const partialIdentityPermission = {
+    let partialIdentityPermission = {
       action: undefined,
       effect: 'ALLOW',
       identityId: undefined,
@@ -436,6 +502,10 @@ export class DataSetService implements DataSetPlugin {
       subjectId: subjectId,
       subjectType: subject
     };
+
+    if (conditions) {
+      partialIdentityPermission = { ...partialIdentityPermission, ...{ conditions: conditions } };
+    }
 
     const identityPermissions: IdentityPermission[] = [];
 

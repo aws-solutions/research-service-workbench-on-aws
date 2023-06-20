@@ -1,9 +1,4 @@
-import { DataSet } from '@aws/swb-app';
-import {
-  CreateDataSetRequest,
-  CreateDataSetRequestParser
-} from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getResearcherRole } from '../../../../src/utils/roleUtils';
+import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
 import ClientSession from '../../../support/clientSession';
 import { PaabHelper } from '../../../support/complex/paabHelper';
 import Setup from '../../../support/setup';
@@ -13,29 +8,50 @@ import Settings from '../../../support/utils/settings';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets delete negative tests', () => {
-  const setup: Setup = Setup.getSetup();
-  const settings: Settings = setup.getSettings();
   let pa1Session: ClientSession;
+  let adminSession: ClientSession;
+  let rs1Session: ClientSession;
+  let anonymousSession: ClientSession;
   let project1Id: string;
-  let project2Id: string;
   let paabHelper: PaabHelper;
-  let dataSet: DataSet;
-  let dataSetBody: CreateDataSetRequest;
-  const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
-  let dataSetName: string;
+  let setup: Setup;
+  let settings: Settings;
+  let dataSet1Id: string;
 
   beforeAll(async () => {
-    paabHelper = new PaabHelper();
-    const paabResources = await paabHelper.createResources();
+    setup = Setup.getSetup();
+    paabHelper = new PaabHelper(1);
+    settings = setup.getSettings();
+    const paabResources = await paabHelper.createResources(__filename);
     project1Id = paabResources.project1Id;
-    project2Id = paabResources.project2Id;
     pa1Session = paabResources.pa1Session;
+    adminSession = paabResources.adminSession;
+    rs1Session = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
+    const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
+    const dataset1Name = randomTextGenerator.getFakeText('isolated-datasets-delete-ds1');
+    const dataSetBody = CreateDataSetRequestParser.parse({
+      storageName: settings.get('DataSetsBucketName'),
+      awsAccountId: settings.get('mainAccountId'),
+      path: dataset1Name, // using same name to help potential troubleshooting
+      name: dataset1Name,
+      region: settings.get('awsRegion'),
+      type: 'internal'
+    });
+    const { data: dataSet1 } = await pa1Session.resources.projects
+      .project(project1Id)
+      .dataSets()
+      .create(dataSetBody, false);
+    dataSet1Id = dataSet1.id;
+  });
 
+  beforeEach(() => {
     expect.hasAssertions();
   });
 
   afterAll(async () => {
     await paabHelper.cleanup();
+    await setup.cleanup();
   });
 
   describe('when the dataset does not exist', () => {
@@ -57,114 +73,84 @@ describe('datasets delete negative tests', () => {
     });
   });
 
-  describe('when the dataset is still associated with', () => {
-    beforeEach(async () => {
-      dataSetName = randomTextGenerator.getFakeText('integration-test-dataSet');
+  describe('When the project does not exist', () => {
+    test('It returns a 403', async () => {
+      try {
+        await pa1Session.resources.projects
+          .project('proj-00000000-0000-0000-0000-000000000000')
+          .dataSets()
+          .dataset('dataset-00000000-0000-0000-0000-000000000000')
+          .delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
 
-      dataSetBody = CreateDataSetRequestParser.parse({
-        storageName: settings.get('DataSetsBucketName'),
-        awsAccountId: settings.get('mainAccountId'),
-        path: dataSetName,
-        name: dataSetName,
-        region: settings.get('awsRegion'),
-        type: 'internal',
-        permissions: [
-          {
-            identity: getResearcherRole(project1Id),
-            identityType: 'GROUP',
-            accessLevel: 'read-only'
-          }
-        ]
-      });
-
-      const { data: newDataSet } = await pa1Session.resources.projects
-        .project(project1Id)
-        .dataSets()
-        .create(dataSetBody, false);
-      dataSet = newDataSet;
+  describe('boundary tests', () => {
+    test('ITAdmin should not be able to soft delete datasets', async () => {
+      try {
+        await adminSession.resources.datasets.dataset(dataSet1Id).delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+    test('Researcher should not be able to soft delete datasets', async () => {
+      try {
+        await rs1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet1Id).delete();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
     });
 
-    describe('external endpoints', () => {
-      beforeEach(async () => {
-        const envBody = {
-          envTypeId: settings.get('envTypeId'),
-          envTypeConfigId: settings.get('envTypeConfigId'),
-          envType: settings.get('envType'),
-          datasetIds: [dataSet.id],
-          name: randomTextGenerator.getFakeText('dataset-name'),
-          description: 'Temporary DataSet for integration test'
-        };
-        const { data: env } = await pa1Session.resources.projects
+    describe('user with no project', () => {
+      beforeAll(async () => {
+        //Remove researcher 1 from project 1 to make it a user with no project associated
+        await adminSession.resources.projects
           .project(project1Id)
-          .environments()
-          .create(envBody);
-
-        const { data: envDetails } = await pa1Session.resources.projects
+          .removeUserFromProject(rs1Session.getUserId()!);
+      });
+      afterAll(async () => {
+        await adminSession.resources.projects
           .project(project1Id)
-          .environments()
-          .environment(env.id)
-          .get();
-        console.log('got environment');
-        expect(envDetails).toMatchObject({
-          ENDPOINTS: expect.arrayContaining([
-            expect.objectContaining({
-              dataSetId: dataSet.id
-            })
-          ]),
-          DATASETS: expect.arrayContaining([
-            expect.objectContaining({
-              id: dataSet.id
-            })
-          ])
-        });
-
-        const { data: dataSetDetails } = await pa1Session.resources.projects
-          .project(project1Id)
-          .dataSets()
-          .dataset(dataSet.id!)
-          .get();
-        expect(dataSetDetails).toMatchObject({
-          ...dataSetBody
-        });
+          .assignUserToProject(rs1Session.getUserId()!, {
+            role: 'Researcher'
+          });
       });
 
-      test('it returns a 409', async () => {
+      test('User with no project cannot delete dataset', async () => {
         try {
-          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
+          await rs1Session.resources.datasets.dataset(dataSet1Id).delete();
         } catch (e) {
           checkHttpError(
             e,
-            new HttpError(409, {
-              error: 'Conflict',
-              message: `External endpoints found on Dataset must be removed before DataSet can be removed.`
+            new HttpError(403, {
+              error: 'User is not authorized'
             })
           );
         }
       });
-    });
 
-    describe('projects other than the datasets owning project', () => {
-      let associatedProjectId: string;
-      beforeEach(async () => {
-        await pa1Session.resources.projects
-          .project(project1Id)
-          .dataSets()
-          .dataset(dataSet.id!)
-          .associateWithProject(project2Id, 'read-only');
-        associatedProjectId = project2Id;
-      });
-
-      test('it returns a 409', async () => {
+      test('Unauthenticated user cannot delete dataset', async () => {
         try {
-          await pa1Session.resources.projects.project(project1Id).dataSets().dataset(dataSet.id!).delete();
+          await anonymousSession.resources.datasets.dataset(dataSet1Id).delete();
         } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(409, {
-              error: 'Conflict',
-              message: `DataSet ${dataSet.id} cannot be removed because it is still associated with roles in the following project(s) ['${associatedProjectId}']`
-            })
-          );
+          checkHttpError(e, new HttpError(403, {}));
         }
       });
     });

@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryStringParamFilterParser, getPaginationParser } from '@aws/workbench-core-base';
-import { z } from 'zod';
+import { QueryStringParamFilterParser, getPaginationParser, z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListCostCentersRequestParser = z.object({

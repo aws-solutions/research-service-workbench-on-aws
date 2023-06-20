@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-environments-ui",
   "version": "0.0.1",
   "description": "Package that contains UI components for Environments",
-  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -45,9 +45,9 @@
     "@cloudscape-design/components": "^3.0.27",
     "@next/eslint-plugin-next": "^13.0.3",
     "@rushstack/eslint-config": "^3.0.0",
-    "@rushstack/heft": "^0.47.5",
-    "@rushstack/heft-jest-plugin": "^0.3.28",
-    "@rushstack/heft-node-rig": "^1.10.5",
+    "@rushstack/heft": "^0.50.5",
+    "@rushstack/heft-jest-plugin": "^0.5.11",
+    "@rushstack/heft-node-rig": "^1.12.11",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^18.15.11",
     "@types/react": "17.0.38",

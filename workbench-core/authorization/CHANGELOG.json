@@ -2,6 +2,194 @@
   "name": "@aws/workbench-core-authorization",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@aws/workbench-core-authorization_v1.0.0",
+      "date": "Wed, 07 Jun 2023 21:47:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "added Remove Dataset functionality"
+          },
+          {
+            "comment": "exported parser"
+          },
+          {
+            "comment": "Integrating AuthZ with Projects"
+          },
+          {
+            "comment": "adding pagination to listUsersByRole"
+          },
+          {
+            "comment": "fix validation issue with auth user object"
+          },
+          {
+            "comment": "Add length and format validations"
+          },
+          {
+            "comment": "Adding implementation of dynamicAuthorization.deleteGroup"
+          },
+          {
+            "comment": "fix delete group of non existent group to be idempotent"
+          },
+          {
+            "comment": "Updated `createGroup` and `setGroupStatus` to not allow operations with incorrect statuses."
+          },
+          {
+            "comment": "solution renaming"
+          },
+          {
+            "comment": "add userId zod"
+          },
+          {
+            "comment": "revert"
+          },
+          {
+            "comment": "Add AuditService to addUserToGroup method"
+          },
+          {
+            "comment": "Changing Admin to ITAdmin"
+          },
+          {
+            "comment": "add rate limiter to middleware"
+          },
+          {
+            "comment": "Remove delete_pending status information"
+          },
+          {
+            "comment": "Added implementation of method addUserToGroup"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "update rush dependencies and change ttl type to number"
+          },
+          {
+            "comment": "fix to make DENY take precedence"
+          },
+          {
+            "comment": "AddUserToGroup to verify group is NOT being deleted"
+          },
+          {
+            "comment": "nodejs version update"
+          }
+        ],
+        "none": [
+          {
+            "comment": "codecov update"
+          },
+          {
+            "comment": "add license-check-and-add to package.json"
+          },
+          {
+            "comment": "add license-checker"
+          },
+          {
+            "comment": "change github owner to aws-solutions"
+          },
+          {
+            "comment": "fix dependencies"
+          },
+          {
+            "comment": "revert to 2ae2a9a"
+          },
+          {
+            "comment": "eslint fixes"
+          },
+          {
+            "comment": "mock dynamic authz service"
+          },
+          {
+            "comment": "update jest coverage"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Updates for separating UI packages"
+          },
+          {
+            "comment": "Added `getGroupUsers` API"
+          },
+          {
+            "comment": "add createIdentityPermissions"
+          },
+          {
+            "comment": "deleteIdentityPermissions implemented"
+          },
+          {
+            "comment": "implement doesGroupExist"
+          },
+          {
+            "comment": "Implementing deleteSubjectIdentityPermissions"
+          },
+          {
+            "comment": "add getIdentityPermissionsByIdentity"
+          },
+          {
+            "comment": "getIdentityPermissionsBySubject implemented"
+          },
+          {
+            "comment": "Added GroupManagementPlugin interface and reference implementation."
+          },
+          {
+            "comment": "Exposed `AuthenticatedUserParser` at the top-level."
+          },
+          {
+            "comment": "Added createGroup API to DynamicAuthorizationService"
+          },
+          {
+            "comment": "Implemented `getGroupStatus` and `setGroupStatus` methods in `WBCGroupManagementPlugin`."
+          },
+          {
+            "comment": "Implemented `getUserGroups` function."
+          },
+          {
+            "comment": "Implemented `isUserAssignedToGroup` API."
+          },
+          {
+            "comment": "Implemented removeUserFromGroup API."
+          },
+          {
+            "comment": "add dynamicAuthorizationMiddleware"
+          },
+          {
+            "comment": "add isAuthorizedOnSubject to DynamicAuthorizationService"
+          },
+          {
+            "comment": "add isAuthorizedOnSubject and isAuthorizedOnRoute to DynamicAuthorizationService"
+          },
+          {
+            "comment": "add getOperationsByRoute, isRouteProtected, and isRouteIgnored"
+          },
+          {
+            "comment": "implement limit on number identity permissions retrieved"
+          },
+          {
+            "comment": "add validate user groups"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Add new Template getting API, upgrade packages"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-user-management\" to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.1",
       "tag": "@aws/workbench-core-authorization_v0.1.1",
       "date": "Fri, 29 Jul 2022 19:02:48 GMT",

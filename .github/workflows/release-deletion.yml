@@ -20,7 +20,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection
           owner: aws-solutions
-          repo: solution-spark-on-aws
+          repo: research-service-workbench-on-aws
           branch: ${{ github.head_ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

@@ -1,6 +1,10 @@
+import { AwsService, buildDynamoDbKey, buildDynamoDBPkSk, JSONValue } from '@aws/workbench-core-base';
+import {
+  dataSetPrefix,
+  endpointPrefix,
+  storageLocationPrefix
+} from '@aws/workbench-core-example-app/lib/configs/constants';
 import { AccessPoint } from '@aws-sdk/client-s3-control';
-import { AwsService, buildDynamoDbKey, JSONValue } from '@aws/workbench-core-base';
-import { dataSetPrefix, endpointPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 
 export class DatasetHelper {
   public static async listAccessPoints(
@@ -54,14 +58,26 @@ export class DatasetHelper {
   }
 
   public static async deleteDdbRecords(awsService: AwsService, dataSetId: string): Promise<void> {
-    await awsService.helpers.ddb
-      .delete({ pk: `${dataSetPrefix}#${dataSetId}`, sk: `${dataSetPrefix}#${dataSetId}` })
-      .execute();
+    // delete dataset entry
+    const deletedDataSet = await awsService.helpers.ddb.deleteItem({
+      key: buildDynamoDBPkSk(dataSetId, dataSetPrefix),
+      params: { return: 'ALL_OLD' }
+    });
+
+    // delete storage location entry
+    await awsService.helpers.ddb.deleteItem({
+      key: {
+        pk: dataSetPrefix,
+        sk: buildDynamoDbKey(deletedDataSet.storageName as string, storageLocationPrefix)
+      }
+    });
+
+    // delete endpoint entries
     const data = await awsService.helpers.ddb
       .query({
         key: {
           name: 'pk',
-          value: `${dataSetPrefix}#${dataSetId}`
+          value: buildDynamoDbKey(dataSetId, dataSetPrefix)
         }
       })
       .execute();

@@ -21,12 +21,14 @@ describe('dynamicAuthorizationMiddleware tests', () => {
   let mockAuthorizationPlugin: AuthorizationPlugin;
   let auditService: AuditService;
   let mockUser: AuthenticatedUser;
+  let sampleRequestIP: string;
   let dynamicAuthzMiddleware: (req: Request, res: Response, next: NextFunction) => Promise<void>;
   beforeEach(() => {
     mockUser = {
-      id: 'sampleUserId',
+      id: '12345678-1234-1234-1234-123456789012',
       roles: []
     };
+    sampleRequestIP = '123.345.678';
     mockGroupManagementPlugin = {
       createGroup: jest.fn(),
       deleteGroup: jest.fn(),
@@ -37,7 +39,12 @@ describe('dynamicAuthorizationMiddleware tests', () => {
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
       setGroupStatus: jest.fn(),
-      doesGroupExist: jest.fn()
+      doesGroupExist: jest.fn(),
+      validateUserGroups: jest.fn().mockImplementation((request) => {
+        return {
+          validGroupIds: request.groupIds
+        };
+      })
     };
     mockDynamicAuthorizationPermissionsPlugin = {
       isRouteIgnored: jest.fn(),
@@ -83,7 +90,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     const request: Request = {
       method: 'GET',
       baseUrl: '',
-      path: '/sample'
+      path: '/sample',
+      ip: sampleRequestIP
     } as Request;
     await dynamicAuthzMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -101,7 +109,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     const request: Request = {
       method: 'GET',
       baseUrl: '',
-      path: '/login'
+      path: '/login',
+      ip: sampleRequestIP
     } as Request;
     await dynamicAuthzMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -118,7 +127,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     const request: Request = {
       method: 'GET',
       baseUrl: '',
-      path: '/sample'
+      path: '/sample',
+      ip: sampleRequestIP
     } as Request;
     await dynamicAuthzMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -139,7 +149,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     } as unknown as Response;
     const request: Request = {
       baseUrl: '',
-      path: '/sample'
+      path: '/sample',
+      ip: sampleRequestIP
     } as Request;
     await dynamicAuthzMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -161,7 +172,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     const request: Request = {
       baseUrl: '',
       method: 'GET',
-      path: '/sample'
+      path: '/sample',
+      ip: sampleRequestIP
     } as Request;
     dynamicAuthorizationService.isAuthorizedOnRoute = jest.fn().mockRejectedValue(new ForbiddenError());
     await dynamicAuthzMiddleware(request, response, next);
@@ -186,7 +198,8 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     const request: Request = {
       baseUrl: '',
       method: 'GET',
-      path: '/sample'
+      path: '/sample',
+      ip: sampleRequestIP
     } as Request;
     dynamicAuthorizationService.isAuthorizedOnRoute = jest.fn().mockRejectedValue(new ForbiddenError());
     dynamicAuthzMiddleware = withDynamicAuth(dynamicAuthorizationService, { logger });
@@ -195,5 +208,35 @@ describe('dynamicAuthorizationMiddleware tests', () => {
     expect(loggerErrorSpy).toBeCalled();
     expect(response.status).toBeCalledWith(403);
     expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
+  });
+
+  test('Throw  error if rate limiter reaches limit', async () => {
+    const next = jest.fn();
+    const response: Response = {
+      locals: {
+        user: mockUser
+      },
+      status: jest.fn().mockImplementation((statusCode: number) => {
+        return response;
+      }),
+      json: jest.fn()
+    } as unknown as Response;
+    const request: Request = {
+      baseUrl: '',
+      method: 'GET',
+      path: '/sample',
+      ip: sampleRequestIP
+    } as Request;
+    dynamicAuthorizationService.isAuthorizedOnRoute = jest.fn().mockRejectedValue(new ForbiddenError());
+    dynamicAuthzMiddleware = withDynamicAuth(dynamicAuthorizationService, {
+      rateLimiter: {
+        duration: 1,
+        requests: 0
+      }
+    });
+    await dynamicAuthzMiddleware(request, response, next);
+    expect(next).toBeCalledTimes(0);
+    expect(response.status).toBeCalledWith(429);
+    expect(response.json).toBeCalledWith({ error: 'Too Many Requests' });
   });
 });

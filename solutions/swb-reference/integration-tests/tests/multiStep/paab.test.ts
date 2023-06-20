@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CreateDataSetRequestParser } from '@aws/swb-app/lib/dataSets/createDataSetRequestParser';
-import { getProjectAdminRole, getResearcherRole } from '../../../src/utils/roleUtils';
 import ClientSession from '../../support/clientSession';
 import { PaabHelper } from '../../support/complex/paabHelper';
 import { ListDatasetsResponse } from '../../support/models/datasets';
@@ -20,7 +19,7 @@ import HttpError from '../../support/utils/HttpError';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { envUuidRegExp } from '../../support/utils/regExpressions';
 import Settings from '../../support/utils/settings';
-import { checkHttpError, poll } from '../../support/utils/utilities';
+import { poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
   const paabHelper: PaabHelper = new PaabHelper();
@@ -29,7 +28,9 @@ describe('multiStep environment test', () => {
   const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
   const etId: string = settings.get('envTypeId');
   const type: string = settings.get('envType');
-  const unauthorizedHttpError = new HttpError(403, { error: 'User is not authorized' });
+  const forbiddenHttpError = new HttpError(403, { error: 'User is not authorized' });
+  const notFoundHttpError = (envId: string, projId: string): HttpError =>
+    new HttpError(404, { error: `Couldnt find environment ${envId} with project ${projId}` });
   const defaultSageMakerETCBody = {
     type,
     params: [
@@ -62,7 +63,7 @@ describe('multiStep environment test', () => {
 
   beforeAll(async () => {
     ({ adminSession, pa1Session, pa2Session, project1Id, project2Id, project3Id, rs1Session } =
-      await paabHelper.createResources());
+      await paabHelper.createResources(__filename));
   });
 
   afterAll(async () => {
@@ -144,7 +145,7 @@ describe('multiStep environment test', () => {
       name: randomTextGenerator.getFakeText('paab-test-env3'),
       description: 'Environment3 for paab.test'
     };
-    const { data: env3 } = await pa1Session.resources.projects
+    const { data: env3 } = await rs1Session.resources.projects
       .project(project3Id)
       .environments()
       .create(env3Body, false);
@@ -157,21 +158,81 @@ describe('multiStep environment test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       name: datasetName,
       region: settings.get('awsRegion'),
-      owner: getProjectAdminRole(project1Id),
-      ownerType: 'GROUP',
-      type: 'internal',
-      permissions: [
-        {
-          identity: getResearcherRole(project1Id),
-          identityType: 'GROUP',
-          accessLevel: 'read-write'
-        }
-      ]
+      type: 'internal'
     });
     const { data: ds1 } = await pa1Session.resources.projects
       .project(project1Id)
       .dataSets()
       .create(dataSetBody, false);
+
+    console.log('Test to ensure access is given immediately when a user is added to a project');
+
+    console.log('Verifying PA2 CANNOT see Project3...');
+    const { data: pa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(pa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(0);
+
+    // Get Projects
+    await expect(pa2Session.resources.projects.project(project3Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
+
+    console.log('Verifying PA2 CANNOT see ETC3');
+    await expect(
+      pa2Session.resources.projects
+        .project(project3Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc3.id)
+        .get()
+    ).rejects.toThrowError(forbiddenHttpError);
+
+    console.log('Adding PA2 to Project3 as a Project Admin');
+    await adminSession.resources.projects
+      .project(project3Id)
+      .assignUserToProject(pa2Session.getUserId()!, { role: 'ProjectAdmin' });
+
+    console.log('Verifying PA2 CAN see Project3...');
+    const { data: updatedPa2Projects }: ListProjectsResponse = await pa2Session.resources.projects.get();
+    expect(updatedPa2Projects.data.filter((proj) => proj.id === project3Id).length).toEqual(1);
+    const { data: receivedProject3 } = await pa2Session.resources.projects.project(project3Id).get();
+
+    expect(receivedProject3.id).toStrictEqual(project3Id);
+
+    console.log('Verifying PA2 CAN see ETC3');
+    const { data: receivedEtc3 } = await pa2Session.resources.projects
+      .project(project3Id)
+      .environmentTypes()
+      .environmentType(etId)
+      .configurations()
+      .environmentTypeConfig(etc3.id)
+      .get();
+
+    expect(receivedEtc3).toStrictEqual(etc3);
+
+    console.log('Test to ensure access is revoked immediately when a user is removed from a project');
+
+    console.log('Removing PA2 from Project3');
+    await adminSession.resources.projects.project(project3Id).removeUserFromProject(pa2Session.getUserId()!);
+
+    console.log('Verifying PA2 CANNOT see Project3');
+    // Get Projects
+    await expect(pa2Session.resources.projects.project(project3Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
+
+    console.log('Verifying PA2 CANNOT see ETC3');
+    await expect(
+      pa2Session.resources.projects
+        .project(project3Id)
+        .environmentTypes()
+        .environmentType(etId)
+        .configurations()
+        .environmentTypeConfig(etc3.id)
+        .get()
+    ).rejects.toThrowError(forbiddenHttpError);
+
+    console.log('Successfully completed immediate allowed and revoked project access');
 
     console.log('Verifying PA1 CANNOT see Project2...');
     // List Projects
@@ -179,25 +240,21 @@ describe('multiStep environment test', () => {
     expect(listProjects1.data.filter((proj) => proj.id === project2Id).length).toEqual(0);
 
     // Get Projects
-    try {
-      await pa1Session.resources.projects.project(project2Id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(pa1Session.resources.projects.project(project2Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
 
     console.log('Verify PA1 CANNOT see ETC2...');
     // Get ETC
-    try {
-      await pa1Session.resources.projects
+    await expect(
+      pa1Session.resources.projects
         .project(project2Id)
         .environmentTypes()
         .environmentType(etId)
         .configurations()
         .environmentTypeConfig(etc2.id)
-        .get();
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+        .get()
+    ).rejects.toThrowError(forbiddenHttpError);
     // List ETCs for Project
     const { data: listEtcs1 }: ListETCsResponse = await pa1Session.resources.projects
       .project(project1Id)
@@ -208,33 +265,27 @@ describe('multiStep environment test', () => {
     expect(listEtcs1.data.filter((etc) => etc.id === etc2.id).length).toEqual(0);
 
     console.log('Verifying PA1 CANNOT create an Environment in Project2...');
-    try {
-      await pa1Session.resources.projects.project(project2Id).environments().create();
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+    await expect(
+      pa1Session.resources.projects.project(project2Id).environments().create()
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying PA2 CANNOT see Project1...');
     // List Projects
     const { data: listProjects2 }: ListProjectsResponse = await pa2Session.resources.projects.get();
     expect(listProjects2.data.filter((proj) => proj.id === project1Id).length).toEqual(0);
     // Get Projects
-    try {
-      await pa2Session.resources.projects.project(project1Id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(pa2Session.resources.projects.project(project1Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
 
     console.log('Verifying PA2 CANNOT see Project3...');
     // List Projects
     const { data: listProjects3 }: ListProjectsResponse = await pa2Session.resources.projects.get();
     expect(listProjects3.data.filter((proj) => proj.id === project3Id).length).toEqual(0);
     // Get Projects
-    try {
-      await pa2Session.resources.projects.project(project3Id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(pa2Session.resources.projects.project(project3Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
 
     console.log('Verifying PA2 CANNOT see Dataset1...');
     // List Datasets for Project
@@ -244,23 +295,15 @@ describe('multiStep environment test', () => {
       .get();
     expect(pa2Datasets.data.filter((ds) => ds.id === ds1.id).length).toEqual(0);
     // Get Dataset
-    try {
-      await pa2Session.resources.projects.project(project1Id).dataSets().dataset(ds1.id).get();
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+    await expect(
+      pa2Session.resources.projects.project(project1Id).dataSets().dataset(ds1.id).get()
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying PA2 cannot upload files to Dataset1...');
     const fileName: string = 'file.txt';
-    try {
-      await pa1Session.resources.projects
-        .project(project1Id)
-        .dataSets()
-        .dataset(ds1.id)
-        .getFileUploadUrls(fileName);
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+    await expect(
+      pa2Session.resources.projects.project(project1Id).dataSets().dataset(ds1.id).getFileUploadUrls(fileName)
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying PA2 CANNOT see Environment1');
     // List Environments for Project
@@ -270,48 +313,18 @@ describe('multiStep environment test', () => {
       .listProjectEnvironments();
     expect(pa2Environments.data.filter((env) => env.id === env1.id).length).toEqual(0);
     // Get Environment
-    try {
-      await pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
-
-    console.log('Verifying PA2 CANNOT call any Environment APIs against Environment1');
-    // Connect
-    try {
-      await pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).connect();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
-    // Start
-    try {
-      await pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).start();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
-    // Stop
-    try {
-      await pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).stop();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
-    // Terminate
-    try {
-      await pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).terminate();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      pa2Session.resources.projects.project(project1Id).environments().environment(env1.id).get()
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying Researcher1 CANNOT see Project2...');
     // List Projects
     const { data: researcherProjects }: ListProjectsResponse = await rs1Session.resources.projects.get();
     expect(researcherProjects.data.filter((proj) => proj.id === project2Id).length).toEqual(0);
     // Get Projects
-    try {
-      await rs1Session.resources.projects.project(project2Id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(rs1Session.resources.projects.project(project2Id).get()).rejects.toThrowError(
+      forbiddenHttpError
+    );
 
     console.log('Verifying Researcher1 CAN ONLY see Environment1 on project1 Request');
     // List Environments for Project
@@ -322,12 +335,12 @@ describe('multiStep environment test', () => {
     expect(researcherProj1Environments.data.filter((env) => env.id === env1.id).length).toEqual(1);
     expect(researcherProj1Environments.data.filter((env) => env.id === env3.id).length).toEqual(0);
 
-    console.log('Verifying Researcher1 CANNOT see Environment1 on single get REQUEST using project3');
+    console.log(
+      'Verifying Researcher1 CANNOT see Environment1 on single GET request using project3, even if they have access to both projects'
+    );
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).get()
-    ).rejects.toThrowError(
-      new HttpError(404, { error: `Couldnt find environment ${env1.id} with project ${project3Id}` })
-    );
+    ).rejects.toThrowError(notFoundHttpError(env1.id, project3Id));
 
     console.log('Verifying Researcher1 CAN ONLY see Environment3 on project3 Request');
     // List Environments for Project
@@ -338,7 +351,10 @@ describe('multiStep environment test', () => {
     expect(researcherProj3Environments.data.filter((env) => env.id === env3.id).length).toEqual(1);
     expect(researcherProj3Environments.data.filter((env) => env.id === env1.id).length).toEqual(0);
 
-    console.log('Verifying Researcher1 CANNOT see Environment2...');
+    // ============= Researcher1 negative tests BEGIN =============
+    console.log(
+      'Verifying Researcher1 CANNOT see Environment2, linked to a project that Researcher1 does not have access to...'
+    );
     // List Environments for Project
     const { data: researcherEnvironments }: ListEnvironmentResponse = await rs1Session.resources.projects
       .project(project1Id)
@@ -346,51 +362,96 @@ describe('multiStep environment test', () => {
       .listProjectEnvironments();
     expect(researcherEnvironments.data.filter((env) => env.id === env2.id).length).toEqual(0);
     // Get Environment
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).get();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).get()
+    ).rejects.toThrowError(forbiddenHttpError);
 
-    console.log('Verifying Researcher1 CANNOT call any Environment APIs against Environment2');
+    console.log('Verifying Researcher1 CANNOT call any Environment APIs against Environment2 with Project2');
     // Connect
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).connect();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
     // Start
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).start();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).start()
+    ).rejects.toThrowError(forbiddenHttpError);
     // Stop
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).stop();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).stop()
+    ).rejects.toThrowError(forbiddenHttpError);
     // Terminate
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).terminate();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).terminate()
+    ).rejects.toThrowError(forbiddenHttpError);
+
+    console.log('Verifying Researcher1 CANNOT call any Environment APIs against Environment2 with Project1');
+    // Connect
+    await expect(
+      rs1Session.resources.projects.project(project1Id).environments().environment(env2.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Start
+    await expect(
+      rs1Session.resources.projects.project(project1Id).environments().environment(env2.id).start()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Stop
+    await expect(
+      rs1Session.resources.projects.project(project1Id).environments().environment(env2.id).stop()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Terminate
+    await expect(
+      rs1Session.resources.projects.project(project1Id).environments().environment(env2.id).terminate()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // ============= Researcher1 negative tests END =============
+
+    // ============= PA1 negative tests BEGIN =============
+    console.log('Verifying PA1 CANNOT call any Environment APIs against Environment2 with Project2');
+    // Connect
+    await expect(
+      pa1Session.resources.projects.project(project2Id).environments().environment(env2.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Start
+    await expect(
+      pa1Session.resources.projects.project(project2Id).environments().environment(env2.id).start()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Stop
+    await expect(
+      pa1Session.resources.projects.project(project2Id).environments().environment(env2.id).stop()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Terminate
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().environment(env2.id).terminate()
+    ).rejects.toThrowError(forbiddenHttpError);
+
+    console.log('Verifying PA1 CANNOT call any Environment APIs against Environment2 with Project1');
+    // Connect
+    await expect(
+      pa1Session.resources.projects.project(project1Id).environments().environment(env2.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Start
+    await expect(
+      pa1Session.resources.projects.project(project1Id).environments().environment(env2.id).start()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Stop
+    await expect(
+      pa1Session.resources.projects.project(project1Id).environments().environment(env2.id).stop()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // Terminate
+    await expect(
+      pa1Session.resources.projects.project(project1Id).environments().environment(env2.id).terminate()
+    ).rejects.toThrowError(forbiddenHttpError);
+    // ============= PA1 negative tests END =============
 
     console.log('Verifying Researcher1 CANNOT see ETC2...');
     // Get ETC
-    try {
-      await rs1Session.resources.projects
+    await expect(
+      rs1Session.resources.projects
         .project(project2Id)
         .environmentTypes()
         .environmentType(etId)
         .configurations()
         .environmentTypeConfig(etc2.id)
-        .get();
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+        .get()
+    ).rejects.toThrowError(forbiddenHttpError);
     // List ETCs for Project
     const { data: rs1Etcs }: ListETCsResponse = await rs1Session.resources.projects
       .project(project1Id)
@@ -401,11 +462,9 @@ describe('multiStep environment test', () => {
     expect(rs1Etcs.data.filter((etc) => etc.id === etc2.id).length).toEqual(0);
 
     console.log('Verifying Researcher1 CANNOT create Environment in Project2...');
-    try {
-      await rs1Session.resources.projects.project(project2Id).environments().create();
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+    await expect(
+      rs1Session.resources.projects.project(project2Id).environments().create()
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying ITAdmin CAN see both environments...');
     // List Environments
@@ -428,84 +487,100 @@ describe('multiStep environment test', () => {
     expect(adminEnv2.id).toEqual(env2.id);
 
     console.log('Verifying ITAdmin CANNOT upload file to Dataset1...');
-    try {
-      await adminSession.resources.projects
+    await expect(
+      adminSession.resources.projects
         .project(project1Id)
         .dataSets()
         .dataset(ds1.id)
-        .getFileUploadUrls(fileName);
-    } catch (e) {
-      checkHttpError(e, unauthorizedHttpError);
-    }
+        .getFileUploadUrls(fileName)
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying ITAdmin CANNOT connect to Environment1...');
-    try {
-      await adminSession.resources.projects.project(project2Id).environments().environment(env2.id).connect();
-    } catch (err) {
-      checkHttpError(err, unauthorizedHttpError);
-    }
+    await expect(
+      adminSession.resources.projects.project(project2Id).environments().environment(env2.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
 
-    console.log('Verifying Researcher1 CAN call all Environment APIs against Environment1...');
-    // Start (expecting this to fail since the state is not STOPPED, but not due to unauthorized access)
-    try {
-      await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).start();
-    } catch (e) {
-      expect(e).not.toEqual(unauthorizedHttpError);
-    }
-    await _waitForEnvironmentToReachState(
-      rs1Session,
-      project1Id,
-      env1.id,
-      'PENDING',
-      'COMPLETED',
-      ENVIRONMENT_START_MAX_WAITING_SECONDS
-    );
+    console.log('Wait for all environments to complete creation');
+    await Promise.all([
+      _waitForEnvironmentToReachState(
+        rs1Session,
+        project1Id,
+        env1.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project2Id,
+        env2.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        rs1Session,
+        project3Id,
+        env3.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      )
+    ]);
 
     console.log('Verifying Researcher1 CANNOT stop Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).stop()
-    ).rejects.toThrowError(unauthorizedHttpError);
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying Researcher1 CANNOT connect Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).connect()
-    ).rejects.toThrowError(unauthorizedHttpError);
+    ).rejects.toThrowError(forbiddenHttpError);
     // Connect
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).connect();
     // Stop
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).stop();
 
     console.log('Verifying Researcher1 CAN call all Environment APIs against Environment3...');
-    await _waitForEnvironmentToReachState(
-      rs1Session,
-      project3Id,
-      env3.id,
-      'PENDING',
-      'COMPLETED',
-      ENVIRONMENT_START_MAX_WAITING_SECONDS
-    );
     // Connect
     await rs1Session.resources.projects.project(project3Id).environments().environment(env3.id).connect();
     // Stop
     await rs1Session.resources.projects.project(project3Id).environments().environment(env3.id).stop();
 
-    console.log('Verifying ITAdmin can call all other Environment APIs against Environment1...');
-    // Start (expecting this to fail since the state is not STOPPED, but not due to unauthorized access)
-    try {
-      await adminSession.resources.projects.project(project2Id).environments().environment(env2.id).start();
-    } catch (e) {
-      expect(e).not.toEqual(unauthorizedHttpError);
-    }
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project2Id,
-      env2.id,
-      'PENDING',
-      'COMPLETED',
-      ENVIRONMENT_START_MAX_WAITING_SECONDS
-    );
+    console.log('Verifying ITAdmin CANNOT connect to Environment3');
+    await expect(
+      adminSession.resources.projects.project(project3Id).environments().environment(env3.id).connect()
+    ).rejects.toThrowError(forbiddenHttpError);
+
+    console.log('Verifying PA2 can connect to Environment2...');
+    await pa2Session.resources.projects.project(project2Id).environments().environment(env2.id).connect();
+
+    console.log('Verifying ITAdmin can call other Environment APIs against Environment2...');
     // Stop
     await adminSession.resources.projects.project(project2Id).environments().environment(env2.id).stop();
+
+    console.log('Wait for all environments to be stopped');
+    await Promise.all([
+      _waitForEnvironmentToReachState(
+        rs1Session,
+        project1Id,
+        env1.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project2Id,
+        env2.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project3Id,
+        env3.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      )
+    ]);
 
     console.log('Verifying Researcher1 CAN see Dataset1...');
     const { data: researcherDS } = await rs1Session.resources.projects
@@ -515,75 +590,117 @@ describe('multiStep environment test', () => {
       .get();
     expect(researcherDS.id).toEqual(ds1.id);
 
-    console.log('Verifying Researcher1 can terminate environment1...');
-    await _waitForEnvironmentToReachState(
-      rs1Session,
-      project1Id,
-      env1.id,
-      'STOPPING',
-      'STOPPED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
-    );
-
     console.log('Verifying Researcher1 CANNOT start Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).start()
-    ).rejects.toThrowError(unauthorizedHttpError);
+    ).rejects.toThrowError(forbiddenHttpError);
 
     console.log('Verifying Researcher1 CANNOT terminate Environment1 using project3');
     await expect(
       rs1Session.resources.projects.project(project3Id).environments().environment(env1.id).terminate()
-    ).rejects.toThrowError(unauthorizedHttpError);
+    ).rejects.toThrowError(forbiddenHttpError);
 
+    // Testing environment operations with different users this time
+
+    // Start
+    console.log('Verifying Researcher1 CAN start Environment1 using project1');
+    await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).start();
+    console.log('Verifying PA2 CAN start Environment2 using project2');
+    await pa2Session.resources.projects.project(project2Id).environments().environment(env2.id).start();
+    console.log('Verifying ITAdmin CAN start Environment3 using project3');
+    await adminSession.resources.projects.project(project3Id).environments().environment(env3.id).start();
+
+    console.log('Wait for all environments to complete starting');
+    await Promise.all([
+      _waitForEnvironmentToReachState(
+        rs1Session,
+        project1Id,
+        env1.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        pa2Session,
+        project2Id,
+        env2.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project3Id,
+        env3.id,
+        'COMPLETED',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      )
+    ]);
+
+    // Stop
+    console.log('Verifying Researcher1 CAN stop Environment1 using project1');
+    await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).stop();
+    console.log('Verifying PA2 CAN stop Environment2 using project2');
+    await pa2Session.resources.projects.project(project2Id).environments().environment(env2.id).stop();
+    console.log('Verifying ITAdmin CAN stop Environment3 using project3');
+    await adminSession.resources.projects.project(project3Id).environments().environment(env3.id).stop();
+
+    console.log('Wait for all environments to be stopped');
+    await Promise.all([
+      _waitForEnvironmentToReachState(
+        rs1Session,
+        project1Id,
+        env1.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project2Id,
+        env2.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project3Id,
+        env3.id,
+        'STOPPED',
+        ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+      )
+    ]);
+
+    console.log('Verifying Researcher1 can terminate Environment1 using project1');
     await rs1Session.resources.projects.project(project1Id).environments().environment(env1.id).terminate();
 
-    console.log('Verifying ITAdmin can terminate environment2...');
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project2Id,
-      env2.id,
-      'STOPPING',
-      'STOPPED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
-    );
-    await adminSession.resources.projects.project(project2Id).environments().environment(env2.id).terminate();
+    console.log('Verifying PA2 can terminate environment2...');
+    await pa2Session.resources.projects.project(project2Id).environments().environment(env2.id).terminate();
 
     console.log('Verifying ITAdmin can terminate environment3...');
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project3Id,
-      env3.id,
-      'STOPPING',
-      'STOPPED',
-      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
-    );
     await adminSession.resources.projects.project(project3Id).environments().environment(env3.id).terminate();
 
     console.log('Verifying Env1, Env2 and Env3 are terminated...');
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project1Id,
-      env1.id,
-      'TERMINATING',
-      'TERMINATED',
-      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
-    );
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project2Id,
-      env2.id,
-      'TERMINATING',
-      'TERMINATED',
-      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
-    );
-    await _waitForEnvironmentToReachState(
-      adminSession,
-      project3Id,
-      env3.id,
-      'TERMINATING',
-      'TERMINATED',
-      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
-    );
+    await Promise.all([
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project1Id,
+        env1.id,
+        'TERMINATED',
+        ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project2Id,
+        env2.id,
+        'TERMINATED',
+        ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+      ),
+      _waitForEnvironmentToReachState(
+        adminSession,
+        project3Id,
+        env3.id,
+        'TERMINATED',
+        ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+      )
+    ]);
 
     console.log('Disassociating Environment Type Configs from Projects...');
     await adminSession.resources.projects
@@ -614,14 +731,13 @@ async function _waitForEnvironmentToReachState(
   session: ClientSession,
   projectId: string,
   envId: string,
-  transitionState: string,
   desiredState: string,
   timeout: number
 ): Promise<void> {
   console.log(`Waiting for Environment ${envId} is in state ${desiredState}...`);
   await poll(
     async () => session.resources.projects.project(projectId).environments().environment(envId).get(),
-    (env) => env?.data?.status !== transitionState,
+    (env) => env?.data?.status === desiredState || env?.data?.status.includes('FAIL'),
     timeout
   );
   const { data: env } = await session.resources.projects

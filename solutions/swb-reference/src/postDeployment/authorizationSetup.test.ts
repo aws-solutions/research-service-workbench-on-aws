@@ -33,7 +33,8 @@ describe('AuthorizationSetup', () => {
       removeUserFromGroup: jest.fn(),
       getGroupStatus: jest.fn(),
       setGroupStatus: jest.fn(),
-      doesGroupExist: jest.fn()
+      doesGroupExist: jest.fn(),
+      validateUserGroups: jest.fn()
     };
 
     mockDynamicAuthorizationPermissionsPlugin = {
@@ -86,6 +87,7 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
@@ -112,6 +114,7 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),
@@ -140,6 +143,7 @@ describe('AuthorizationSetup', () => {
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ENVIRONMENT_TYPE }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_ETC }),
+          expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_PROJECT_LIST_BY_ETC }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_DATASET }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_USER }),
           expect.objectContaining({ subjectType: SwbAuthZSubject.SWB_COST_CENTER }),

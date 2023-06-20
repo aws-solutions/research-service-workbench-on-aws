@@ -5,23 +5,32 @@
 
 import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
+import HttpError from '../../../support/utils/HttpError';
+import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('awsAccountTemplateUrls tests', () => {
   const mockExternalId = 'workbench-integration-test';
-  const setup: Setup = Setup.getSetup();
+  const paabHelper: PaabHelper = new PaabHelper(1);
   let adminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    adminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
   it('returns all six expected URLs when called.', async () => {
@@ -35,8 +44,45 @@ describe('awsAccountTemplateUrls tests', () => {
     const byonUrls = _.get(urls, 'onboard-account-byon');
     expect(byonUrls.createUrl).toBeTruthy();
     expect(byonUrls.updateUrl).toBeTruthy();
-    const tgwUrls = _.get(urls, 'onboard-account-tgw');
-    expect(tgwUrls.createUrl).toBeTruthy();
-    expect(tgwUrls.updateUrl).toBeTruthy();
+  });
+
+  describe('As project admin', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await paSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    describe('As researcher', () => {
+      test('it throws 403 error', async () => {
+        try {
+          await researcherSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(403, {
+              error: 'User is not authorized'
+            })
+          );
+        }
+      });
+    });
+  });
+
+  describe('As unauthenticated user', () => {
+    test('it throws 403 error', async () => {
+      try {
+        await anonymousSession.resources.accounts.getHostingAccountTemplate(mockExternalId);
+      } catch (e) {
+        checkHttpError(e, new HttpError(403, {}));
+      }
+    });
   });
 });

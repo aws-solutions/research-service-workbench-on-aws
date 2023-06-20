@@ -48,6 +48,13 @@
 
     "<rootDir>/src/projectEnvironmentRoutes.ts",
     "<rootDir>/src/projectEnvs/projectEnvPlugin.ts",
+    "<rootDir>/src/projectEnvs/connectEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/createEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/getEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/listEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/startEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/stopEnvironmentRequest.ts",
+    "<rootDir>/src/projectEnvs/terminateEnvironmentRequest.ts",
     "<rootDir>/src/projectEnvTypeConfigRoutes.ts",
     "<rootDir>/src/projectEnvTypeConfigs/environmentTypeConfig.ts",
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
@@ -80,19 +87,21 @@
     "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
 
     "<rootDir>/src/users/authenticatedUser.ts",
-    "<rootDir>/src/users/createRoleRequest.ts",
     "<rootDir>/src/users/createUserRequest.ts",
     "<rootDir>/src/users/deleteUserRequest.ts",
     "<rootDir>/src/users/getUserRequest.ts",
-    "<rootDir>/src/users/updateRoleRequest.ts",
-    "<rootDir>/src/users/updateUserRequest.ts"
+    "<rootDir>/src/users/updateUserRequest.ts",
+    "<rootDir>/src/environments/environment.ts",
+    "<rootDir>/src/environments/environmentItem.ts",
+    "<rootDir>/src/environments/environmentPlugin.ts",
+    "<rootDir>/src/environments/listEnvironmentsRequest.ts"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 0,
-      "functions": 70,
-      "lines": 70,
-      "statements": 70
+      "branches": 90,
+      "functions": 85,
+      "lines": 78,
+      "statements": 75
     }
   },
   "coverageReporters": ["json-summary", "json"]
