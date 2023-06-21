@@ -3,8 +3,8 @@
 ## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
 # Default Env Config for launching a new environment
-envTypeId: 'et-prod-yyw2vt5xgkxe2,pa-q3bxjjhldj6sa'
-envTypeConfigId: 'etc-9a52e677-6643-49f5-9a1c-57461285caa3'
+envTypeId: 'et-prod-myqzvzgimloe2,pa-yt42jtbetvbpy'
+envTypeConfigId: 'etc-910645aa-d968-41c8-bcd0-bf4e6c90469a'
 envType: 'sagemakerNotebook'
 
 #Cognito Integ Test Client
@@ -21,7 +21,7 @@ researcher1UserNameParamStorePath: '/swb/privateTestEnv/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/privateTestEnv/researcher1/password'
 
 ## Default Hosting Account
-defaultHostingAccountId: 'acc-f0831923-79a4-4e3c-9e06-c91f0015d0ae'
+defaultHostingAccountId: 'acc-fd3b50d0-2714-460f-a401-28811330caa2'
 
 ## Hosting account used for Account Creation tests
 hostAwsAccountIdParamStorePath: '/swb/privateTestEnv/accountsTest/awsAccountId'
