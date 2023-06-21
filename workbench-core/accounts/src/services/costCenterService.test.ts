@@ -9,8 +9,8 @@ import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from 
 import { marshall } from '@aws-sdk/util-dynamodb';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
-import { InvalidAccountStateError } from '../../lib';
 import { CostCenterStatus } from '../constants/costCenterStatus';
+import { InvalidAccountStateError } from '../errors/InvalidAccountStateError';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { CreateCostCenterRequest } from '../models/costCenters/createCostCenterRequest';
