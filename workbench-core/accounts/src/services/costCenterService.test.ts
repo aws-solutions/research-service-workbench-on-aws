@@ -313,7 +313,7 @@ describe('CostCenterService', () => {
 
         test('returns an error', async () => {
           await expect(costCenterService.create(createCostCenter)).rejects.toThrow(
-            `Failed to get account for cost center creation ${mockAccountId}`
+            `Failed to get account for cost center creation`
           );
         });
       });
