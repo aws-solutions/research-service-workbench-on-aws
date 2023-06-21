@@ -102,7 +102,7 @@ export default class HostingAccountLifecycleService {
 
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
-    const templateTypes = ['', '-byon', '-tgw'];
+    const templateTypes = ['', '-byon'];
     const updateUrls = {};
     await Promise.all(
       templateTypes.map(async (t): Promise<void> => {
@@ -375,11 +375,6 @@ export default class HostingAccountLifecycleService {
       Key: 'onboard-account-byon.cfn.yaml',
       ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     });
-    const onboardAccountTgwResponse = await this._aws.clients.s3.getObject({
-      Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account-tgw.cfn.yaml',
-      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
-    });
     const streamToString = (stream: Readable): Promise<string> =>
       new Promise((resolve, reject) => {
         const chunks: Uint8Array[] = [];
@@ -389,8 +384,7 @@ export default class HostingAccountLifecycleService {
       });
     const expectedTemplates: string[] = await Promise.all([
       streamToString(onboardAccountS3Response.Body! as Readable),
-      streamToString(onboardAccountByonResponse.Body! as Readable),
-      streamToString(onboardAccountTgwResponse.Body! as Readable)
+      streamToString(onboardAccountByonResponse.Body! as Readable)
     ]);
     const actualTemplate = (
       await hostingAccountAwsService.clients.cloudformation.getTemplate({

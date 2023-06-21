@@ -273,19 +273,19 @@ echo "--------------------------------------------------------------------------
 # Note: do not install using global (-g) option. This makes build-s3-dist.sh difficult
 # for customers and developers to use, as it globally changes their environment.
 
-STAGE=dev
+STAGE=prod
 echo Stage set to $STAGE
 
-# Remove dev.yaml if it exists, we'll start with a known config that works
-do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
+# Remove prod.yaml if it exists, we'll start with a known config that works
+do_cmd rm -f $source_dir/swb-reference/src/config/prod.yaml
 
 cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/urandom)
 
 echo "
 # Stage Name
-stage: dev
+stage: prod
 awsRegion: ''           # Keep this empty so that template picks it up automatically at deploy time
-awsRegionShortName: test
+awsRegionShortName: release
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: ''  # This is purposely kept empty. User will be given a change to update before running post deployment
 vpcId: ''
@@ -295,7 +295,7 @@ albInternetFacing: true
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
-" >> $source_dir/swb-reference/src/config/dev.yaml
+" >> $source_dir/swb-reference/src/config/prod.yaml
 
 # Add local install to PATH
 export PATH=$(npm bin):$PATH
