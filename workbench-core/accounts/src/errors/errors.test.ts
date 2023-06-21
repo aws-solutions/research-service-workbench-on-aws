@@ -13,9 +13,17 @@ describe('custom error tests', () => {
     expect(isInvalidAwsAccountIdError(invalidAwsAccountIdError)).toBe(true);
   });
 
-  test('InvalidAccountError', () => {
-    const error = new InvalidAccountStateError();
+  describe('InvalidAccountStateError', () => {
+    test('isInvalidAccountStateError is true when it is an InvalidAccountStateError', () => {
+      const error = new InvalidAccountStateError();
 
-    expect(isInvalidAccountStateError(error)).toBe(true);
+      expect(isInvalidAccountStateError(error)).toBe(true);
+    });
+
+    test('isInvalidAccountStateError is true when it is not an InvalidAccountStateError', () => {
+      const error = new Error();
+
+      expect(isInvalidAccountStateError(error)).toBe(false);
+    });
   });
 });
