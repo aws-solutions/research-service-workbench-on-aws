@@ -38,11 +38,15 @@ export function setUpCostCenterRoutes(
       try {
         res.status(201).send(await costCenterService.create(validatedRequest));
       } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
         if (isInvalidAccountStateError(e)) {
           Boom.badRequest(e.message);
         }
 
-        throw e;
+        Boom.badImplementation('There was an error creating the Cost Center');
       }
     })
   );
