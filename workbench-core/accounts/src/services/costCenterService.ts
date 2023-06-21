@@ -18,6 +18,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
+import { InvalidAccountStateError } from '../errors/InvalidAccountStateError';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { CreateCostCenterRequest } from '../models/costCenters/createCostCenterRequest';
@@ -131,7 +132,20 @@ export default class CostCenterService {
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
-    const account = await this._getAccount(request.accountId);
+    let account: Account;
+
+    const accountService = new AccountService(this._dynamoDbService);
+    try {
+      account = await accountService.getAccount(request.accountId);
+    } catch (e) {
+      console.error(`Failed to get account for cost center creation: ${e.message}`);
+      throw Boom.badRequest(`Failed to get account for cost center creation ${request.accountId}`);
+    }
+
+    if (account.status !== 'CURRENT') {
+      throw new InvalidAccountStateError("Account status must be 'CURRENT' to create a Cost Center");
+    }
+
     const currentDateTime = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
@@ -179,15 +193,5 @@ export default class CostCenterService {
     const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
     // parse will remove pk and sk from the DDB item
     return CostCenterParser.parse(costCenter);
-  }
-
-  private async _getAccount(accountId: string): Promise<Account> {
-    const accountService = new AccountService(this._dynamoDbService);
-    try {
-      return await accountService.getAccount(accountId);
-    } catch (e) {
-      console.error(`Failed to get account for cost center creation: ${e}`);
-      throw Boom.badRequest(`Failed to get account for cost center creation ${accountId}`);
-    }
   }
 }

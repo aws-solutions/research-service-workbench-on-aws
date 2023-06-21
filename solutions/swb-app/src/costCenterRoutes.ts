@@ -13,7 +13,8 @@ import {
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
   DeleteCostCenterRequestParser,
-  ProjectService
+  ProjectService,
+  isInvalidAccountStateError
 } from '@aws/workbench-core-accounts';
 import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -33,7 +34,16 @@ export function setUpCostCenterRoutes(
         CreateCostCenterRequestParser,
         req.body
       );
-      res.status(201).send(await costCenterService.create(validatedRequest));
+
+      try {
+        res.status(201).send(await costCenterService.create(validatedRequest));
+      } catch (e) {
+        if (isInvalidAccountStateError(e)) {
+          Boom.badRequest(e.message);
+        }
+
+        throw e;
+      }
     })
   );
 

@@ -9,6 +9,7 @@ import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from 
 import { marshall } from '@aws-sdk/util-dynamodb';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
+import { InvalidAccountStateError } from '../../lib';
 import { CostCenterStatus } from '../constants/costCenterStatus';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
@@ -231,9 +232,31 @@ describe('CostCenterService', () => {
   });
 
   describe('create', () => {
-    describe('with a valid CreateCostCenter object', () => {
-      let createCostCenter: CreateCostCenterRequest;
+    let createCostCenter: CreateCostCenterRequest;
 
+    describe('when the account is not in the CURRENT status', () => {
+      beforeEach(() => {
+        account.status = 'PENDING';
+        createCostCenter = {
+          name: 'the name',
+          description: 'the description',
+          accountId: mockAccountId
+        };
+        ddbMock.on(GetItemCommand).resolves({
+          Item: marshall(account, {
+            removeUndefinedValues: true
+          })
+        });
+      });
+
+      it('throws an InvalidAccountStateError', async () => {
+        await expect(costCenterService.create(createCostCenter)).rejects.toThrowError(
+          new InvalidAccountStateError("Account status must be 'CURRENT' to create a Cost Center")
+        );
+      });
+    });
+
+    describe('with a valid CreateCostCenter object', () => {
       beforeEach(() => {
         createCostCenter = {
           name: 'the name',

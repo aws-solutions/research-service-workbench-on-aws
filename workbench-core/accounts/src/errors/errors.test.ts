@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { InvalidAccountStateError, isInvalidAccountStateError } from './InvalidAccountStateError';
 import { InvalidAwsAccountIdError, isInvalidAwsAccountIdError } from './InvalidAwsAccountIdError';
 
 describe('custom error tests', () => {
@@ -10,5 +11,11 @@ describe('custom error tests', () => {
     const invalidAwsAccountIdError = new InvalidAwsAccountIdError();
 
     expect(isInvalidAwsAccountIdError(invalidAwsAccountIdError)).toBe(true);
+  });
+
+  test('InvalidAccountError', () => {
+    const error = new InvalidAccountStateError();
+
+    expect(isInvalidAccountStateError(error)).toBe(true);
   });
 });
