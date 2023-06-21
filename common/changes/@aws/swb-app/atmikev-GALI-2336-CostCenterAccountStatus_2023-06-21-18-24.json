@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "cost centers require a current account",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
