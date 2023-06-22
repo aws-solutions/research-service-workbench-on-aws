@@ -21,7 +21,7 @@ researcher1UserNameParamStorePath: '/swb/testEnv/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/testEnv/researcher1/password'
 
 ## Default external ID
-externalId: 'workbench'
+externalIdPath: '/rsw/testEnv/externalId'
 
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-007e0370-ca28-4b49-8f78-5230d943201f'

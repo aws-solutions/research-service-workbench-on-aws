@@ -22,7 +22,7 @@ researcher1UserNameParamStorePath: '/swb/release-candidate-private/researcher1/e
 researcher1PasswordParamStorePath: '/swb/release-candidate-private/researcher1/password'
 
 ## Default external ID
-externalId: 'workbench'
+externalIdPath: '/rsw/release-candidate-private/externalId'
 
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-00448659-13e5-4181-8691-0fb98d42446e'
