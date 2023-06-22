@@ -43,10 +43,10 @@ export function setUpCostCenterRoutes(
         }
 
         if (isInvalidAccountStateError(e)) {
-          Boom.badRequest(e.message);
+          throw Boom.badRequest(e.message);
         }
 
-        Boom.badImplementation('There was an error creating the Cost Center');
+        throw Boom.badImplementation('There was an error creating the Cost Center');
       }
     })
   );
