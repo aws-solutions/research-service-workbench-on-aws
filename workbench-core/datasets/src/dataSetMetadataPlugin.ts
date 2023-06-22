@@ -3,15 +3,26 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet, ExternalEndpoint } from '.';
+import { PaginatedResponse } from '@aws/workbench-core-base';
+import { CreateDataSet, DataSet } from './models/dataSet';
+import { CreateExternalEndpoint, ExternalEndpoint } from './models/externalEndpoint';
+import { StorageLocation } from './models/storageLocation';
 
 export interface DataSetMetadataPlugin {
+  /**
+   * Calculates the pagination token based on the DataSet id
+   * @param dataSetId - the dataSetId
+   *
+   * @returns the pagination token for this item.
+   */
+  getPaginationToken(dataSetId: string): string;
+
   /**
    * Lists the DataSets in the database backend.
    *
    * @returns an array of DataSets.
    */
-  listDataSets(): Promise<DataSet[]>;
+  listDataSets(pageSize: number, paginationToken: string | undefined): Promise<PaginatedResponse<DataSet>>;
 
   /**
    * Gets the metadata associated with an overall dataset. This differs from
@@ -20,6 +31,8 @@ export interface DataSetMetadataPlugin {
    * @param id - the ID of the DataSet for which to get the metadata.
    *
    * @returns the metadata associated with the overall DataSet.
+   *
+   * @throws {@link DataSetNotFoundError} - the dataset doesnt exist
    */
   getDataSetMetadata(id: string): Promise<DataSet>;
 
@@ -48,7 +61,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the DataSet object added to the database.
    */
-  addDataSet(dataSet: DataSet): Promise<DataSet>;
+  addDataSet(dataSet: CreateDataSet): Promise<DataSet>;
 
   /**
    * Update a DataSet
@@ -57,6 +70,12 @@ export interface DataSetMetadataPlugin {
    * @returns the updated DataSet object.
    */
   updateDataSet(dataSet: DataSet): Promise<DataSet>;
+
+  /**
+   * Remove a DataSet
+   * @param dataSetId - the ID of the Dataset to remove.
+   */
+  removeDataSet(dataSetId: string): Promise<void>;
 
   /**
    * Return the details on a specific DataSet endpoint.
@@ -73,8 +92,10 @@ export interface DataSetMetadataPlugin {
    * @param endPoint - the details of the endpoint to add.
    *
    * @returns the details of the endpoint added.
+   *
+   * @throws {@link EndpointExistsError} - the endpoint already exists
    */
-  addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+  addExternalEndpoint(endPoint: CreateExternalEndpoint): Promise<ExternalEndpoint>;
 
   /**
    * Get the endpoint details for a given DataSet.
@@ -93,4 +114,14 @@ export interface DataSetMetadataPlugin {
    * @returns the updated details of the Endpoint.
    */
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  /**
+   * Lists the {@link StorageLocation}s being used by existing datasets.
+   *
+   * @returns - a list of {@link StorageLocation}s
+   */
+  listStorageLocations(
+    pageSize: number,
+    paginationToken: string | undefined
+  ): Promise<PaginatedResponse<StorageLocation>>;
 }

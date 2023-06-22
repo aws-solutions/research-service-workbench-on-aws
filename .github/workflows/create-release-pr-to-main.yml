@@ -1,0 +1,33 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Create-release-branch-pr-to-main
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: PR Title
+        required: true
+
+jobs:
+  create-release-branch-pr-to-main:
+    if: startsWith(github.ref_name, 'release/')
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.MERGE_TOKEN }}
+        fetch-depth: 0
+
+    - name: create-pull-request
+      uses: repo-sync/pull-request@v2
+      with:
+        destination_branch: "main"
+        pr_title: ${{ inputs.title }}
+        pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
+        pr_label: "auto-release-pr"
+        pr_allow_empty: false
+        github_token: ${{ secrets.MERGE_TOKEN }}

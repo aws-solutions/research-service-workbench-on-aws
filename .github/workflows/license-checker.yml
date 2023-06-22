@@ -1,0 +1,22 @@
+name: license checker
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    paths:
+      - '**/package.json'
+
+jobs:
+  license-checker:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+      
+      - name: Rush license-checker
+        run: node common/scripts/install-run-rush.js license-checker

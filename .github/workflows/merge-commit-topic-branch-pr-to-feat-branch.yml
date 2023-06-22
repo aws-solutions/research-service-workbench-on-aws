@@ -1,0 +1,65 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-commit-topic-branch-pr-to-feat-branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to merge
+        required: true
+      target_feat_branch:
+        description: feat branch name to merge to
+        required: true
+
+jobs:
+  merge-commit-topic-branch-pr-to-feat-branches:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get PR info
+        id: pr_info
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/pulls/{pull_number}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          pull_number: ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: enable merge commits
+        if: startsWith(fromJson(steps.pr_info.outputs.data).base.ref, 'feat/') && fromJson(steps.pr_info.outputs.data).base.ref == inputs.target_feat_branch
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: merge commit topic branches pr to feat/*
+        if: startsWith(fromJson(steps.pr_info.outputs.data).base.ref, 'feat/') && fromJson(steps.pr_info.outputs.data).base.ref == inputs.target_feat_branch
+        uses: octokit/request-action@v2.x
+        with:
+          route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          pull_number: ${{ inputs.pr_number }}
+          merge_method: 'merge'
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: disable merge commits
+        if: always()
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

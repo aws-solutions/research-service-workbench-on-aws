@@ -1,0 +1,118 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-release-pr-to-main
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to merge
+        required: true
+
+jobs:
+  ## TODO add integration test for main
+  merge-release-pr-to-main:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions-cool/check-user-permission@v2
+        id: check_admin
+        with:
+          require: 'admin'
+          username: ${{ github.triggering_actor }}
+
+      - name: Get PR info
+        id: pr_info
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/pulls/{pull_number}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          pull_number: ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      # There's no way for github actions to push to a protected branch. This is a workaround
+      # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+      - name: Temporarily disable branch protection on ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          branch: ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Bump versions on release branch
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        run:
+          echo 'Rush version to bump updates'
+          git checkout ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+          node common/scripts/install-run-rush.js version --bump -b ${{fromJson(steps.pr_info.outputs.data).head.ref}} --ignore-git-hooks
+
+      - name: Enable branch protection on ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          branch: ${{fromJson(steps.pr_info.outputs.data).head.ref}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Rush Publish
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch ${{fromJson(steps.pr_info.outputs.data).head.ref}} --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+
+      - name: enable merge commits
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: merge release branch pr to main
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          pull_number: ${{ inputs.pr_number }}
+          merge_method: 'merge'
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: disable merge commits
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

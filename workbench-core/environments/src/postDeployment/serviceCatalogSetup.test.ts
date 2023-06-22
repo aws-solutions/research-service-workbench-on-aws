@@ -5,8 +5,9 @@
 
 jest.mock('md5-file');
 
+import { Readable } from 'stream';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
 import {
   CreateConstraintCommand,
   CreatePortfolioCommand,
@@ -18,6 +19,7 @@ import {
   DescribeProductAsAdminCommand,
   CreateProvisioningArtifactCommand
 } from '@aws-sdk/client-service-catalog';
+import { SdkStream } from '@aws-sdk/types';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import md5File from 'md5-file';
 import ServiceCatalogSetup from './serviceCatalogSetup';
@@ -26,27 +28,27 @@ describe('ServiceCatalogSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     S3_ARTIFACT_BUCKET_SC_PREFIX: 'service-catalog-cfn-templates/',
-    SC_PORTFOLIO_NAME: 'swb-dev-va',
+    SC_PORTFOLIO_NAME: 'rsw-dev-va',
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: 'S3BucketArtifactsArnOutput',
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: 'LaunchConstraintIamRoleNameOutput',
-    STACK_NAME: 'swb-dev-va'
+    STACK_NAME: 'rsw-dev-va'
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
         {
-          StackName: 'swb-dev-va',
+          StackName: 'rsw-dev-va',
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
             {
               OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
-              OutputValue: 'arn:aws:s3:::swb-dev-va-s3artifacts'
+              OutputValue: 'arn:aws:s3:::rsw-dev-va-s3artifacts'
             },
             {
               OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
-              OutputValue: 'swb-dev-va-LaunchConstraint'
+              OutputValue: 'rsw-dev-va-LaunchConstraint'
             }
           ]
         }
@@ -86,7 +88,7 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'swb-dev-va',
+            DisplayName: 'rsw-dev-va',
             Id: 'port-abc'
           }
         ]
@@ -108,7 +110,7 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'swb-dev-va',
+            DisplayName: 'rsw-dev-va',
             Id: 'port-abc'
           }
         ]
@@ -240,23 +242,36 @@ describe('ServiceCatalogSetup', () => {
       scMock.on(ListPortfoliosCommand).resolves({
         PortfolioDetails: [
           {
-            DisplayName: 'swb-dev-va',
+            DisplayName: 'rsw-dev-va',
             Id: 'port-abc'
           }
         ]
       });
 
-      // Mock Get S3 files
+      // Mock Get List of S3 files
       s3Mock.on(ListObjectsCommand).resolves({
         Contents: [
           {
-            Key: `${constants.S3_ARTIFACT_BUCKET_SC_PREFIX}sagemaker.cfn.yaml`,
-            ETag: 'abc123'
+            Key: `${constants.S3_ARTIFACT_BUCKET_SC_PREFIX}sagemaker.cfn.yaml`
           }
         ]
       });
+
+      // Mock Reading S3 File
+      const readableStream = new Readable({
+        read() {}
+      });
+
+      readableStream.push('ABC');
+      readableStream.push(null);
+
+      s3Mock.on(GetObjectCommand).resolves({
+        Body: readableStream as SdkStream<Readable>
+      });
+
+      // MD5 Sum of S3 file
       md5File.sync = jest.fn(() => {
-        return 'abc123';
+        return '902fbdd2b1df0c4f70b4a5d23525e932';
       });
 
       // Mock Create Launch Constraint

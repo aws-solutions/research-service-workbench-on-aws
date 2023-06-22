@@ -1,12 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
-  "rushVersion": "5.62.1",
-  "pnpmVersion": "6.30.0",
-  "pnpmOptions": {
-    "strictPeerDependencies": true,
-    "useWorkspaces": true
-  },
-  "nodeSupportedVersionRange": ">=14.15.0 <15.0.0 || >=16.13.0 <17.0.0",
+  "rushVersion": "5.83.1",
+  "pnpmVersion": "7.13.0",
+  "nodeSupportedVersionRange": ">=16.0.0 <19.0.0",
   "ensureConsistentVersions": true,
   "projectFolderMaxDepth": 3,
   "approvedPackagesPolicy": {
@@ -18,8 +14,8 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git",
-    "defaultBranch": "main"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git",
+    "defaultBranch": "develop"
   },
   "eventHooks": {
     "preRushInstall": [],
@@ -39,13 +35,19 @@
       "packageName": "@aws/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
-      "shouldPublish": false
+      "shouldPublish": true
     },
     {
       "packageName": "@aws/workbench-core-environments",
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "projectFolder": "workbench-core/swb-common-ui",
+      "reviewCategory": "production",
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-logging",
@@ -78,16 +80,16 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-audit",
-      "projectFolder": "workbench-core/audit",
+      "packageName": "@aws/workbench-core-user-management",
+      "projectFolder": "workbench-core/user-management",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/example-ui-app",
-      "projectFolder": "solutions/example-ui-app",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
+      "packageName": "@aws/workbench-core-audit",
+      "projectFolder": "workbench-core/audit",
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@aws/workbench-core-datasets",
@@ -96,8 +98,32 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-example-express",
-      "projectFolder": "workbench-core/example/express",
+      "packageName": "@aws/workbench-core-accounts",
+      "projectFolder": "workbench-core/accounts",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "projectFolder": "workbench-core/datasets-ui",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "projectFolder": "workbench-core/environments-ui",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@aws/workbench-core-accounts-ui",
+      "projectFolder": "workbench-core/accounts-ui",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@aws/workbench-core-example-app",
+      "projectFolder": "workbench-core/example/app",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     },
@@ -105,12 +131,6 @@
       "packageName": "@aws/workbench-core-example-infrastructure",
       "projectFolder": "workbench-core/example/infrastructure",
       "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@aws/swb-ui",
-      "projectFolder": "solutions/swb-ui",
-      "reviewCategory": "production",
       "shouldPublish": false
     },
     {
@@ -124,12 +144,6 @@
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
-    },
-    {
-      "packageName": "@aws/swb-ui-infrastructure",
-      "projectFolder": "solutions/swb-ui/infrastructure",
-      "reviewCategory": "production",
-      "shouldPublish": false
     }
   ]
 }

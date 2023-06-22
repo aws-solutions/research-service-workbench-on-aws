@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts-ui",
+      "comment": "fix: readme update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts-ui"
+}

@@ -6,12 +6,11 @@
 import {
   CognitoIdentityProviderClient,
   DescribeUserPoolClientCommand,
-  DescribeUserPoolClientCommandInput,
-  TimeUnitsType
+  DescribeUserPoolClientCommandInput
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
@@ -21,13 +20,15 @@ import { InvalidJWTError } from '../errors/invalidJwtError';
 import { InvalidTokenError } from '../errors/invalidTokenError';
 import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
+import { TokenRevocationServiceNotProvidedError } from '../errors/tokenRevocationServiceNotProvidedError';
+import { TokenRevocationService } from '../tokenRevocationService';
 import { Tokens } from '../tokens';
-import { getTimeInSeconds } from '../utils';
+import { getTimeInMS, TimeUnits } from '../utils';
 
 interface TokensExpiration {
-  idToken?: number; // in seconds
-  accessToken?: number; // in seconds
-  refreshToken?: number; // in seconds
+  idToken: number; // ms
+  accessToken: number; // ms
+  refreshToken: number; // ms
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -52,12 +53,9 @@ export interface CognitoAuthenticationPluginOptions {
   clientSecret: string;
 
   /**
-   * The website URL to redirect back to once login in is completed on the hosted UI.
-   * The URL must exist in the Cognito app client allowed callback URLs list.
-   *
-   * @example "https://www.exampleURL.com"
+   * Provide a token revocation service for immediate revoking of access tokens
    */
-  websiteUrl: string;
+  tokenRevocationService?: TokenRevocationService;
 }
 
 /**
@@ -66,15 +64,15 @@ export interface CognitoAuthenticationPluginOptions {
  */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _region: string;
-  private _websiteUrl: string;
   private _userPoolId: string;
   private _clientId: string;
   private _clientSecret: string;
+  private _tokenRevocationService?: TokenRevocationService;
 
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
-    tokenUse: null;
+    tokenUse: 'access';
     clientId: string;
   }>;
 
@@ -86,17 +84,16 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public constructor({
     cognitoDomain,
-    websiteUrl,
     userPoolId,
     clientId,
-    clientSecret
+    clientSecret,
+    tokenRevocationService
   }: CognitoAuthenticationPluginOptions) {
-    this._websiteUrl = websiteUrl;
     this._userPoolId = userPoolId;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
     this._baseUrl = cognitoDomain;
-
+    this._tokenRevocationService = tokenRevocationService;
     // eslint-disable-next-line security/detect-unsafe-regex
     const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
     if (!regionMatch) {
@@ -107,7 +104,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     try {
       this._verifier = CognitoJwtVerifier.create({
         userPoolId,
-        tokenUse: null, // can check both access and ID tokens
+        tokenUse: 'access',
         clientId
       });
     } catch (error) {
@@ -141,15 +138,17 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   }
 
   /**
-   * Validates an id or access token and returns the values on the token.
+   * Validates an access token and returns the values on the token.
    *
-   * @param token - an Id or Access token to be validated
+   * @param token - an access token to be validated
    * @returns the decoded jwt
    *
    * @throws {@link InvalidJWTError} if the token is invalid
    */
-  public async validateToken(token: string): Promise<CognitoJwtPayload> {
+  public async validateToken(token: string): Promise<CognitoAccessTokenPayload> {
     try {
+      if (await this._tokenRevocationService?.isRevoked({ token }))
+        throw new InvalidJWTError('token has been revoked');
       return await this._verifier.verify(token);
     } catch (error) {
       throw new InvalidJWTError('token is invalid');
@@ -198,14 +197,23 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       throw error;
     }
   }
-
+  /**
+   * Revokes the given access token.
+   *
+   * @param token - the access token to revoke
+   */
+  public async revokeAccessToken(accessToken: string): Promise<void> {
+    if (!this._tokenRevocationService)
+      throw new TokenRevocationServiceNotProvidedError('TokenRevocationService was not provided');
+    return this._tokenRevocationService.revokeToken({ token: accessToken });
+  }
   /**
    * Gets the Id of the user for whom the id or access token was issued.
    *
    * @param decodedToken - a decoded Id or access token from which to extract the user Id.
    * @returns the user Id found within the token.
    */
-  public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
+  public getUserIdFromToken(decodedToken: CognitoAccessTokenPayload): string {
     return decodedToken.sub;
   }
 
@@ -214,16 +222,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param decodedToken - a decoded Id or access token from which to find the user's role(s)
    * @returns list of roles included in the jwt token
-   *
-   * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
-  public getUserRolesFromToken(decodedToken: CognitoJwtPayload): string[] {
-    const roles = decodedToken['cognito:groups'];
-    if (!roles) {
-      // jwt does not have a cognito:roles claim
-      throw new InvalidJWTError('no cognito:roles claim');
-    }
-    return roles;
+  public getUserRolesFromToken(decodedToken: CognitoAccessTokenPayload): string[] {
+    return decodedToken['cognito:groups'] ?? [];
   }
 
   /**
@@ -231,6 +232,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param code - the authorization code
    * @param codeVerifier - the PKCE code verifier
+   * @param websiteUrl - the url to redirect to after login is completed. Must be the same url used in the {@link getAuthorizationCodeUrl} function
    * @returns a {@link Tokens} object containing the id, access, and refresh tokens and their expiration (in seconds)
    *
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
@@ -238,7 +240,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
    * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
-  public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
+  public async handleAuthorizationCode(
+    code: string,
+    codeVerifier: string,
+    websiteUrl: string
+  ): Promise<Tokens> {
     try {
       const encodedClientId = this._getEncodedClientId();
 
@@ -248,7 +254,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
-          redirect_uri: this._websiteUrl,
+          redirect_uri: websiteUrl,
           code_verifier: codeVerifier
         }),
         {
@@ -259,7 +265,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -303,10 +309,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param state - a temporary value to represent the state parameter
    * @param codeChallenge - a temporary value to represent the code challenge parameter
+   * @param websiteUrl - the url to redirect to after login is completed
    * @returns the endpoint URL string
    */
-  public getAuthorizationCodeUrl(state: string, codeChallenge: string): string {
-    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+  public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
+    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
   /**
@@ -338,7 +345,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -370,10 +377,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   /**
    * Gets the URL of the endpoint used to logout the user.
    *
+   * @param websiteUrl - the url to redirect to after logout is completed
    * @returns the endpoint URL string
    */
-  public getLogoutUrl(): string {
-    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${this._websiteUrl}`;
+  public getLogoutUrl(websiteUrl: string): string {
+    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${websiteUrl}`;
   }
 
   /**
@@ -390,7 +398,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @returns a {@link TokensExpiration} object
    */
-  private async _getTokensExpiration(): Promise<TokensExpiration> {
+  private async _getTokensExpirationinMS(): Promise<TokensExpiration> {
     const client = new CognitoIdentityProviderClient({ region: this._region });
 
     const describeInput: DescribeUserPoolClientCommandInput = {
@@ -400,35 +408,20 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     const describeCommand = new DescribeUserPoolClientCommand(describeInput);
 
     try {
-      const clientInfo = await client.send(describeCommand);
+      const { UserPoolClient } = await client.send(describeCommand);
 
-      const {
-        IdToken: idTokenUnits,
-        AccessToken: accessTokenUnits,
-        RefreshToken: refreshTokenUnits
-      } = clientInfo.UserPoolClient?.TokenValidityUnits || {};
+      const idTokenTime = UserPoolClient!.IdTokenValidity ?? 60;
+      const accessTokenTime = UserPoolClient!.AccessTokenValidity ?? 60;
+      const refreshTokenTime = UserPoolClient!.RefreshTokenValidity ?? 30;
 
-      const refreshTokenTime = clientInfo.UserPoolClient?.RefreshTokenValidity;
-      const idTokenTime = clientInfo.UserPoolClient?.IdTokenValidity;
-      const accessTokenTime = clientInfo.UserPoolClient?.AccessTokenValidity;
-
-      const idTokenExpiresIn =
-        idTokenTime && idTokenUnits
-          ? getTimeInSeconds(idTokenTime, idTokenUnits as TimeUnitsType)
-          : undefined;
-      const accessTokenExpiresIn =
-        accessTokenTime && accessTokenUnits
-          ? getTimeInSeconds(accessTokenTime, accessTokenUnits as TimeUnitsType)
-          : undefined;
-      const refreshTokenExpiresIn =
-        refreshTokenTime && refreshTokenUnits
-          ? getTimeInSeconds(refreshTokenTime, refreshTokenUnits as TimeUnitsType)
-          : undefined;
+      const idTokenUnits = UserPoolClient!.TokenValidityUnits!.IdToken ?? TimeUnits.MINUTES;
+      const accessTokenUnits = UserPoolClient!.TokenValidityUnits!.AccessToken ?? TimeUnits.MINUTES;
+      const refreshTokenUnits = UserPoolClient!.TokenValidityUnits!.RefreshToken ?? TimeUnits.DAYS;
 
       return {
-        idToken: idTokenExpiresIn,
-        accessToken: accessTokenExpiresIn,
-        refreshToken: refreshTokenExpiresIn
+        idToken: getTimeInMS(idTokenTime, idTokenUnits as TimeUnits),
+        accessToken: getTimeInMS(accessTokenTime, accessTokenUnits as TimeUnits),
+        refreshToken: getTimeInMS(refreshTokenTime, refreshTokenUnits as TimeUnits)
       };
     } catch (error) {
       if (error.name === 'NotAuthorizedException') {

@@ -29,13 +29,19 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     });
   }
   public async revokeToken(refreshToken: string): Promise<void> {}
+
+  public async revokeAccessToken(accessToken: string): Promise<void> {}
   public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
     return 'id';
   }
   public getUserRolesFromToken(decodedToken: CognitoJwtPayload): string[] {
     return ['role'];
   }
-  public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
+  public async handleAuthorizationCode(
+    code: string,
+    codeVerifier: string,
+    websiteUrl: string
+  ): Promise<Tokens> {
     return Promise.resolve({
       idToken: {
         token: 'id token',
@@ -51,8 +57,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
     });
   }
-  public getAuthorizationCodeUrl(state: string, codeChallenge: string): string {
-    return `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+  public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
+    return `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
     return Promise.resolve({
@@ -66,7 +72,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
     });
   }
-  public getLogoutUrl(): string {
-    return 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com';
+  public getLogoutUrl(websiteUrl: string): string {
+    return `https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=${websiteUrl}`;
   }
 }

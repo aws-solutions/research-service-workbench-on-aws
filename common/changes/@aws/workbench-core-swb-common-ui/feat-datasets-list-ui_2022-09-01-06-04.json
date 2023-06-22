@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "Additions to Dataset UI package",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

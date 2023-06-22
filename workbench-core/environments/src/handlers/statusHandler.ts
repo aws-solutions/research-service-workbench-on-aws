@@ -3,12 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
-import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { isEnvironmentStatus } from '../constants/environmentStatus';
-import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
 import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 
@@ -34,6 +33,11 @@ export default class StatusHandler {
     const lastDDBUpdate = envDetails!.updatedAt;
     const eventBusTime = event.metadata.time;
 
+    const envStackName = `SC-${event.metadata.account}-${
+      event.metadata.detail.ProvisionedProductId || envDetails.provisionedProductId
+    }`;
+    const appRegistryName = `${process.env.STACK_NAME}-hosting-account-RSWAppReg-${event.metadata.account}`;
+
     // Check if status already applied, or if this is an outdated event, or if instanceId has not been updated for the env.
     // We need to wait for "Launch" event to propagate `instanceId` value in DDB before environment status can be updated
     // Perform status update regardless if operation is "Launch" since SSM doc sends important details
@@ -47,12 +51,22 @@ export default class StatusHandler {
       return;
     }
 
+    // Get hosting account SDK instance
+    const envHelper = this._getEnvHelper();
+    const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
+      operation: `StatusHandler-${event.operation}`,
+      envType: event.metadata.detail.EnvType
+    });
+
     const updateRequest: { status: string; error?: { type: string; value: string }; resourceType?: string } =
       {
         status: event.status
       };
     if (event.status === 'TERMINATED') {
       updateRequest.resourceType = 'terminated_environment';
+      await hostSdk.helpers.appRegistryService.disassociateStackToAppRegistry(appRegistryName, envStackName);
     }
     if (event.errorMsg) {
       updateRequest.error = {
@@ -74,15 +88,6 @@ export default class StatusHandler {
       return;
     }
 
-    // Get hosting account SDK instance
-    const envHelper = this._getEnvHelper();
-    const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
-      operation: `StatusHandler-${event.operation}`,
-      envType: event.metadata.detail.EnvType
-    });
-
     // Get Instance ID and Instance ARN from RecordId provided in event metadata
     const { RecordOutputs } = await hostSdk.clients.serviceCatalog.describeRecord({
       Id: event.metadata.detail.RecordId
@@ -93,7 +98,6 @@ export default class StatusHandler {
       .OutputValue!;
     const instanceRoleArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceRoleName })!
       .OutputValue!;
-
     await envHelper.addRoleToAccessPoint(envDetails, instanceRoleArn);
 
     // We store the provisioned product ID sent in event metadata
@@ -111,9 +115,9 @@ export default class StatusHandler {
     // Create/update instance ID and ARN in DDB
     await envService.addMetadata(
       envId,
-      envResourceTypeToKey.environment,
+      resourceTypeToKey.environment,
       instanceName,
-      envResourceTypeToKey.instance,
+      resourceTypeToKey.instance,
       envInstDetails
     );
 
@@ -126,11 +130,13 @@ export default class StatusHandler {
     // Create/update corresponding instance resource in DDB
     await envService.addMetadata(
       instanceName,
-      envResourceTypeToKey.instance,
+      resourceTypeToKey.instance,
       envId,
-      envResourceTypeToKey.environment,
+      resourceTypeToKey.environment,
       instDetails
     );
+
+    await hostSdk.helpers.appRegistryService.associateStackToAppRegistry(appRegistryName, envStackName);
   }
 
   /** Get environment ID from DDB for given instance ID
@@ -146,7 +152,7 @@ export default class StatusHandler {
       .query({
         key: {
           name: 'pk',
-          value: `${envResourceTypeToKey.instance}#${instanceId}`
+          value: `${resourceTypeToKey.instance}#${instanceId}`
         }
       })
       .execute();
@@ -156,14 +162,18 @@ export default class StatusHandler {
 
     const instance = data.Items![0];
     const instanceSk = instance.sk as unknown as string;
-    return instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
+    return instanceSk.split(`${resourceTypeToKey.environment}#`)[1];
   }
 
   /** Get environment service instance
    * @returns EnvironmentService instance
    */
   private _getEnvService(): EnvironmentService {
-    return new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    const dynamoDBService = new DynamoDBService({
+      region: process.env.AWS_REGION!,
+      table: process.env.STACK_NAME!
+    });
+    return new EnvironmentService(dynamoDBService);
   }
 
   /** Get environment helper instance

@@ -63,6 +63,7 @@ jspm_packages/
 common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
+common/autoinstallers/*/.pnpm-store
 **/.rush/temp/
 **/temp/
 workbench-core/environments/temp/
@@ -88,28 +89,50 @@ build/
 .idea
 
 # Reference package
-solutions/swb-reference/src/environment-files/offline-packages/*
+# solutions/swb-reference/src/environment-files/offline-packages/*  TODO: Uncomment this back once GALI-2093 changes are merged
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
+!solutions/swb-reference/integration-tests/config/testEnv.yaml
+!solutions/swb-reference/integration-tests/config/release-candidate.yaml
+!solutions/swb-reference/integration-tests/config/release-candidate-private.yaml
+!solutions/swb-reference/integration-tests/config/swbv2-private.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
-solutions/swb-reference/src/config/*.js
+!solutions/swb-reference/src/config/release-candidate.yaml
+!solutions/swb-reference/src/config/release-candidate-private.yaml
+!solutions/swb-reference/src/config/swbv2-private.yaml
+!solutions/swb-reference/src/config/demo.yaml
+solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
+
+#exclude binary files
+solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.9.4/*.rpm
+
+
 
 # local environment variables
 .env*.local
 
 # example package
 workbench-core/example/infrastructure/build
+workbench-core/example/infrastructure/src/config/testEnv.json
 
 #next static export
-solutions/swb-ui/out
+solutions/swb-ui/ui/out
 
 #swb-ui cdk-infrastructure
 solutions/swb-ui/infrastructure/src/config/*.yaml
-solutions/swb-ui/infrastructure/src/config/*.js
+solutions/swb-ui/infrastructure/src/config/*.json
 !solutions/swb-ui/infrastructure/src/config/example.yaml
 
+#swb-ui end to end tests
+solutions/swb-ui/ui/end-to-end-tests/config/*.yaml
+!solutions/swb-ui/ui/end-to-end-tests/config/example.yaml
+!solutions/swb-ui/ui/end-to-end-tests/config/testEnv.yaml
+!solutions/swb-ui/ui/end-to-end-tests/config/swbv2-private.yaml
+solutions/swb-ui/ui/end-to-end-tests/cypress/screenshots
+solutions/swb-ui/ui/end-to-end-tests/cypress/videos
+solutions/swb-ui/ui/end-to-end-tests/cypress/downloads

@@ -3,14 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import CreateRoleSchema from './schemas/createRole';
-import CreateUserSchema from './schemas/createUser';
-import UpdateRoleSchema from './schemas/updateRole';
-
 export { AuthenticationPlugin } from './authenticationPlugin';
 export { AuthenticationService } from './authenticationService';
-export { User } from './user';
-export { UserManagementPlugin } from './userManagementPlugin';
 export {
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions
@@ -25,15 +19,12 @@ export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalid
 export { InvalidCodeVerifierError, isInvalidCodeVerifierError } from './errors/invalidCodeVerifierError';
 export { InvalidTokenError, isInvalidTokenError } from './errors/invalidTokenError';
 export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavailableError';
-export { InvalidParameterError, isInvalidParameterError } from './errors/invalidParameterError';
-export { RoleAlreadyExistsError, isRoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
-export { RoleNotFoundError, isRoleNotFoundError } from './errors/roleNotFoundError';
-export { UserAlreadyExistsError, isUserAlreadyExistsError } from './errors/userAlreadyExistsError';
-export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
-export { getTimeInSeconds } from './utils';
+export { getTimeInMS, TimeUnits } from './utils';
+export { TokenRevocationService } from './tokenRevocationService';
 export {
+  csurf,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
   isUserLoggedIn,
@@ -41,6 +32,3 @@ export {
   refreshAccessToken,
   verifyToken
 } from './authenticationMiddleware';
-export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
-export { UserManagementService } from './userManagementService';
-export { CreateRoleSchema, CreateUserSchema, UpdateRoleSchema };

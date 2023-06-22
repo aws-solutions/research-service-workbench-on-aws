@@ -3,16 +3,40 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AwsService } from '@aws/workbench-core-base';
+import { DataSetsAccessLevel } from '@aws/workbench-core-datasets';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-service-catalog';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
-import { AwsService } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper, { Operation } from './environmentLifecycleHelper';
 
 describe('EnvironmentLifecycleHelper', () => {
   const ORIGINAL_ENV = process.env;
+  const defaultProject = {
+    id: '',
+    name: '',
+    subnetId: '',
+    awsAccountId: '',
+    environmentInstanceFiles: '',
+    vpcId: '',
+    envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+    encryptionKeyArn: '',
+    externalId: 'workbench',
+    createdAt: '',
+    updatedAt: '',
+    hostingAccountHandlerRoleArn: ''
+  };
+  const defaultETC = {
+    id: 'id',
+    type: 'type',
+    productId: 'sampleProductId',
+    createdAt: '',
+    updatedAt: '',
+    provisioningArtifactId: 'sampleProvisioningArtifactId',
+    params: []
+  };
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
@@ -54,13 +78,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const datasetIds: string[] = [];
     const envMetadata = {
       id: 'sampleEnvId',
-      PROJ: {
-        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-        externalId: 'workbench'
-      },
-      ETC: {
-        productId: 'sampleProductId'
-      },
+      PROJ: defaultProject,
+      ETC: defaultETC,
       instanceId: '',
       cidr: '',
       description: '',
@@ -69,7 +88,6 @@ describe('EnvironmentLifecycleHelper', () => {
       outputs: [],
       projectId: '',
       status: 'PENDING',
-      datasetIds: [],
       envTypeConfigId: '',
       updatedAt: '',
       updatedBy: '',
@@ -80,12 +98,13 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpoint = jest.fn();
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
     helper.environmentService.addMetadata = jest.fn();
+    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE
-    const response = await helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN');
+    const response = await helper.getDatasetsToMount(datasetIds, envMetadata, ['sampleKeyARN1']);
 
     // CHECK
     await expect(response).toEqual({ iamPolicyDocument: '{}', s3Mounts: '[]' });
@@ -97,13 +116,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const datasetIds = ['exampleDatasetId'];
     const envMetadata = {
       id: 'sampleEnvId',
-      PROJ: {
-        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-        externalId: 'workbench'
-      },
-      ETC: {
-        productId: 'sampleProductId'
-      },
+      PROJ: defaultProject,
+      ETC: defaultETC,
       instanceId: '',
       cidr: '',
       description: '',
@@ -112,7 +126,6 @@ describe('EnvironmentLifecycleHelper', () => {
       outputs: [],
       projectId: '',
       status: 'PENDING',
-      datasetIds: [],
       envTypeConfigId: '',
       updatedAt: '',
       updatedBy: '',
@@ -123,20 +136,27 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => {
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn(async () => {
       return {
-        name: 'dataSetName',
-        bucket: 'endPointURL',
-        prefix: 'path',
-        endpointId: 'endpointId'
+        data: {
+          mountObject: {
+            name: 'dataSetName',
+            bucket: 'endPointURL',
+            prefix: 'path',
+            endpointId: 'endpointId'
+          }
+        }
       };
     });
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
+        id: 'sampleDataSetId',
         storageName: 'sampleStorageName',
+        storageType: 'sampleStorageType',
         path: 'sampleBucketPath',
         name: 'sampleDataset',
-        externalEndpoints: []
+        externalEndpoints: [],
+        createdAt: 'fakeDateIsoString'
       };
     });
     helper.dataSetService.getExternalEndPoint = jest.fn(async () => {
@@ -147,14 +167,17 @@ describe('EnvironmentLifecycleHelper', () => {
         path: 'mockDataSetPath',
         dataSetId: 'mockDataSetId',
         dataSetName: 'mockDataSetName',
-        endPointUrl: 's3://sampleBucket'
+        endPointUrl: 's3://sampleBucket',
+        accessLevel: 'read-only' as DataSetsAccessLevel,
+        createdAt: 'fakeDateIsoString'
       };
     });
     helper.environmentService.addMetadata = jest.fn();
+    helper.environmentService.storeProjectDatasetEndpointRelationship = jest.fn();
 
     // OPERATE & CHECK
     await expect(
-      helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN')
+      helper.getDatasetsToMount(datasetIds, envMetadata, ['sampleKeyARN1', 'sampleKeyARN2', 'sampleKeyARN3'])
     ).resolves.not.toThrowError();
   });
 
@@ -166,7 +189,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -226,7 +249,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }
@@ -269,7 +292,7 @@ describe('EnvironmentLifecycleHelper', () => {
     stsMock.on(AssumeRoleCommand).resolves({
       Credentials: {
         AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
+        SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         SessionToken: 'blah',
         Expiration: undefined
       }

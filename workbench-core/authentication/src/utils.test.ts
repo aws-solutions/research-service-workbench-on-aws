@@ -3,55 +3,54 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { TimeUnitsType } from '@aws-sdk/client-cognito-identity-provider';
-import { getTimeInSeconds } from '.';
+import { getTimeInMS, TimeUnits } from '.';
 
 describe('util tests', () => {
-  describe('getTimeInSeconds tests', () => {
-    it('should return length converted to seconds if units is TimeUnitsType.DAYS', () => {
-      const time = getTimeInSeconds(1, TimeUnitsType.DAYS);
+  describe('getTimeInMS tests', () => {
+    it('should return length converted to ms if units is TimeUnits.DAYS', () => {
+      const time = getTimeInMS(1, TimeUnits.DAYS);
 
-      expect(time).toBe(86400);
+      expect(time).toBe(86400000);
     });
 
-    it('should return 0 when length is 0 and units is TimeUnitsType.DAYS', () => {
-      const time = getTimeInSeconds(0, TimeUnitsType.DAYS);
+    it('should return 0 when length is 0 and units is TimeUnits.DAYS', () => {
+      const time = getTimeInMS(0, TimeUnits.DAYS);
 
       expect(time).toBe(0);
     });
 
-    it('should return length converted to seconds if units is TimeUnitsType.HOURS', () => {
-      const time = getTimeInSeconds(1, TimeUnitsType.HOURS);
+    it('should return length converted to ms if units is TimeUnits.HOURS', () => {
+      const time = getTimeInMS(1, TimeUnits.HOURS);
 
-      expect(time).toBe(3600);
+      expect(time).toBe(3600000);
     });
 
-    it('should return 0 when length is 0 and units is TimeUnitsType.HOURS', () => {
-      const time = getTimeInSeconds(0, TimeUnitsType.HOURS);
+    it('should return 0 when length is 0 and units is TimeUnits.HOURS', () => {
+      const time = getTimeInMS(0, TimeUnits.HOURS);
 
       expect(time).toBe(0);
     });
 
-    it('should return length converted to seconds if units is TimeUnitsType.MINUTES', () => {
-      const time = getTimeInSeconds(1, TimeUnitsType.MINUTES);
+    it('should return length converted to ms if units is TimeUnits.MINUTES', () => {
+      const time = getTimeInMS(1, TimeUnits.MINUTES);
 
-      expect(time).toBe(60);
+      expect(time).toBe(60000);
     });
 
-    it('should return 0 when length is 0 and units is TimeUnitsType.MINUTES', () => {
-      const time = getTimeInSeconds(0, TimeUnitsType.MINUTES);
+    it('should return 0 when length is 0 and units is TimeUnits.MINUTES', () => {
+      const time = getTimeInMS(0, TimeUnits.MINUTES);
 
       expect(time).toBe(0);
     });
 
-    it('should return length converted to seconds if units is TimeUnitsType.SECONDS', () => {
-      const time = getTimeInSeconds(1, TimeUnitsType.SECONDS);
+    it('should return length converted to ms if units is TimeUnits.SECONDS', () => {
+      const time = getTimeInMS(1, TimeUnits.SECONDS);
 
-      expect(time).toBe(1);
+      expect(time).toBe(1000);
     });
 
-    it('should return 0 when length is 0 and units is TimeUnitsType.SECONDS', () => {
-      const time = getTimeInSeconds(0, TimeUnitsType.SECONDS);
+    it('should return 0 when length is 0 and units is TimeUnits.SECONDS', () => {
+      const time = getTimeInMS(0, TimeUnits.SECONDS);
 
       expect(time).toBe(0);
     });

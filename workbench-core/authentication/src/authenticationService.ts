@@ -59,6 +59,14 @@ export class AuthenticationService {
   }
 
   /**
+   * Revokes the given access token.
+   * @param token - the access token to revoke
+   */
+  public async revokeAccessToken(accessToken: string): Promise<void> {
+    await this._authenticationPlugin.revokeAccessToken(accessToken);
+  }
+
+  /**
    * Gets the Id of the user for whom the token was issued.
    *
    * @param decodedToken - a decoded Id or access token from which to extract the user Id
@@ -88,6 +96,7 @@ export class AuthenticationService {
    *
    * @param code - an authorization code
    * @param codeVerifier - the PKCE code verifier
+   * @param websiteUrl - the url to redirect to after login is completed. Must be the same url used in the {@link getAuthorizationCodeUrl} function
    * @returns a {@link Tokens} object containing the id, access, and refresh tokens and their expiration (in seconds)
    *
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
@@ -95,8 +104,12 @@ export class AuthenticationService {
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
    * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
-  public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
-    return this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
+  public async handleAuthorizationCode(
+    code: string,
+    codeVerifier: string,
+    websiteUrl: string
+  ): Promise<Tokens> {
+    return this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier, websiteUrl);
   }
 
   /**
@@ -107,10 +120,11 @@ export class AuthenticationService {
    *
    * @param state - a temporary value to represent the state parameter
    * @param codeChallenge - a temporary value to represent the code challenge parameter
+   * @param websiteUrl - the url to redirect to after login is completed
    * @returns the endpoint URL string
    */
-  public getAuthorizationCodeUrl(state: string, codeChallenge: string): string {
-    return this._authenticationPlugin.getAuthorizationCodeUrl(state, codeChallenge);
+  public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
+    return this._authenticationPlugin.getAuthorizationCodeUrl(state, codeChallenge, websiteUrl);
   }
 
   /**
@@ -130,9 +144,10 @@ export class AuthenticationService {
   /**
    * Gets the URL of the endpoint used to logout the user.
    *
+   * @param websiteUrl - the url to redirect to after logout is completed
    * @returns the endpoint URL string
    */
-  public getLogoutUrl(): string {
-    return this._authenticationPlugin.getLogoutUrl();
+  public getLogoutUrl(websiteUrl: string): string {
+    return this._authenticationPlugin.getLogoutUrl(websiteUrl);
   }
 }

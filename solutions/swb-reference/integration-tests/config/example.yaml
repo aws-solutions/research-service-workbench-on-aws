@@ -1,17 +1,29 @@
-#apiBaseUrl: ''
+## Note:
+## Please deploy the swb-reference package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
-# Default Env Config for launching a new environment
+## Default Env Config for launching a new environment
 #envTypeId: ''
 #envTypeConfigId: ''
-#projectId: ''
+#projectId: ''  #ex: proj-3656712-bvf8-47ds-r3fv-9dsb9sdyfba2
 #envType: ''
 
-# Negative Testing
-#alreadyTerminateEnvId: ''   # id of an environment that has already been terminated
-
-#Cognito Integ Test Client
-#awsRegion: ''
-#userPoolId: ''
-#clientId: ''
-#rootUsername: ''
+## Cognito Integ Test Client
+#rootUserNameParamStorePath: ''
 #rootPasswordParamStorePath: ''
+
+#projectAdmin1UserNameParamStorePath: ''
+#projectAdmin1PasswordParamStorePath: ''
+
+#projectAdmin2UserNameParamStorePath: ''
+#projectAdmin2PasswordParamStorePath: ''
+
+#researcher1UserNameParamStorePath: ''
+#researcher1PasswordParamStorePath: ''
+
+## Default Hosting Account
+#defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+
+## Pre-requisite for running aws-accounts integration test
+## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
+#awsAccountIdParamStorePath: ''

@@ -2,37 +2,47 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-import {
-  CreateEnvironmentTypeConfigSchema,
-  EnvironmentTypeConfigService,
-  UpdateEnvironmentTypeConfigSchema
-} from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
+import { isInvalidPaginationTokenError } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
-import { validate as uuidValidate } from 'uuid';
+import {
+  CreateEnvironmentTypeConfigRequest,
+  CreateEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/createEnvironmentTypeConfigRequest';
+import {
+  DeleteEnvironmentTypeConfigRequest,
+  DeleteEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/deleteEnvironmentTypeConfigRequest';
+import { EnvTypeConfigPlugin } from './envTypeConfigs/envTypeConfigPlugin';
+import {
+  GetEnvironmentTypeConfigRequest,
+  GetEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/getEnvironmentTypeConfigRequest';
+import {
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
+} from './envTypeConfigs/listEnvironmentTypeConfigsRequest';
+import {
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser
+} from './envTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { isConflictError } from './errors/conflictError';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeConfigRoutes(
   router: Router,
-  environmentTypeConfigService: EnvironmentTypeConfigService
+  environmentTypeConfigService: EnvTypeConfigPlugin
 ): void {
   // Create envTypeConfig
   router.post(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-      processValidatorResult(validate(req.body, CreateEnvironmentTypeConfigSchema));
-      const user = res.locals.user;
-      const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
-        user.id,
-        req.params.envTypeId,
-        req.body
+      const envTypeConfigRequest = validateAndParse<CreateEnvironmentTypeConfigRequest>(
+        CreateEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, ...req.body }
       );
+      const envTypeConfig = await environmentTypeConfigService.createEnvTypeConfig(envTypeConfigRequest);
       res.status(201).send(envTypeConfig);
     })
   );
@@ -41,18 +51,36 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-
-      if (!uuidValidate(req.params.envTypeConfigId)) {
-        throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
-      }
-      const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(
-        req.params.envTypeId,
-        req.params.envTypeConfigId
+      const envTypeConfigRequest = validateAndParse<GetEnvironmentTypeConfigRequest>(
+        GetEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId }
       );
-      res.send(envTypeConfig);
+      const envTypeConfig = await environmentTypeConfigService.getEnvTypeConfig(envTypeConfigRequest);
+      res.status(200).send(envTypeConfig);
+    })
+  );
+
+  // Soft Delete envTypeConfig
+  router.delete(
+    '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const envTypeConfigDeleteRequest = {
+        envTypeId: req.params.envTypeId,
+        envTypeConfigId: req.params.envTypeConfigId
+      };
+      const validatedRequest = validateAndParse<DeleteEnvironmentTypeConfigRequest>(
+        DeleteEnvironmentTypeConfigRequestParser,
+        envTypeConfigDeleteRequest
+      );
+      try {
+        const envTypeConfig = await environmentTypeConfigService.deleteEnvTypeConfig(validatedRequest);
+        res.status(204).send(envTypeConfig);
+      } catch (e) {
+        if (isConflictError(e)) {
+          throw Boom.conflict(e.message);
+        }
+        throw e;
+      }
     })
   );
 
@@ -60,45 +88,39 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-      const { paginationToken, pageSize } = req.query;
-      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
-      } else {
-        const envTypeConfig = await environmentTypeConfigService.listEnvironmentTypeConfigs(
-          req.params.envTypeId,
-          pageSize ? Number(pageSize) : undefined,
-          paginationToken
+      const listEnvTypeConfigRequest = validateAndParse<ListEnvironmentTypeConfigsRequest>(
+        ListEnvironmentTypeConfigsRequestParser,
+        { envTypeId: req.params.envTypeId, ...req.query }
+      );
+
+      try {
+        const envTypeConfig = await environmentTypeConfigService.listEnvTypeConfigs(listEnvTypeConfigRequest);
+        res.status(200).send(envTypeConfig);
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
+
+        if (isInvalidPaginationTokenError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+
+        throw Boom.badImplementation(
+          `There was a problem listing configurations for environment type ${listEnvTypeConfigRequest.envTypeId}`
         );
-        res.send(envTypeConfig);
       }
     })
   );
 
   // Update envTypeConfig
-  router.put(
+  router.patch(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-
-      if (!uuidValidate(req.params.envTypeConfigId)) {
-        throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
-      }
-
-      processValidatorResult(validate(req.body, UpdateEnvironmentTypeConfigSchema));
-      const user = res.locals.user;
-      const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
-        user.id,
-        req.params.envTypeId,
-        req.params.envTypeConfigId,
-        req.body
+      const envTypeConfigRequest = validateAndParse<UpdateEnvironmentTypeConfigRequest>(
+        UpdateEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.body }
       );
+      const envTypeConfig = await environmentTypeConfigService.updateEnvTypeConfig(envTypeConfigRequest);
       res.status(200).send(envTypeConfig);
     })
   );

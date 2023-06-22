@@ -1,1 +1,220 @@
+Research Service Workbench on AWS
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+@aws/eslint-config-workbench-core-eslint-custom
+0.0.1 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/swb-app
+2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/swb-reference
+2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-accounts
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-audit
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-authentication
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-authorization
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-base
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-datasets
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-environments
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-infrastructure
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-logging
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws/workbench-core-user-management
+1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+license: Apache-2.0
+authors: Amazon Web Services <http://aws.amazon.com>
+
+******************************
+
+@aws-cdk/aws-servicecatalogappregistry-alpha
+@aws-sdk/client-cloudformation under the Apache License 2.0
+@aws-sdk/client-cognito-identity-provider under the Apache License 2.0
+@aws-sdk/client-dynamodb under the Apache License 2.0
+@aws-sdk/client-ec2 under the Apache License 2.0
+@aws-sdk/client-ec2-instance-connect under the Apache License 2.0
+@aws-sdk/client-eventbridge under the Apache License 2.0
+@aws-sdk/client-iam under the Apache License 2.0
+@aws-sdk/client-kms under the Apache License 2.0
+@aws-sdk/client-lambda under the Apache License 2.0
+@aws-sdk/client-s3 under the Apache License 2.0
+@aws-sdk/client-s3-control under the Apache License 2.0
+@aws-sdk/client-sagemaker under the Apache License 2.0
+@aws-sdk/client-service-catalog under the Apache License 2.0
+@aws-sdk/client-service-catalog-appregistry under the Apache License 2.0
+@aws-sdk/client-service-quotas under the Apache License 2.0
+@aws-sdk/client-ssm under the Apache License 2.0
+@aws-sdk/client-sts under the Apache License 2.0
+@aws-sdk/s3-request-presigner under the Apache License 2.0
+@aws-sdk/types under the Apache License 2.0
+@aws-sdk/util-dynamodb under the Apache License 2.0
+@balena/dockerignore under the Apache License 2.0
+@casl/ability under the Massachusetts Institute of Technology (MIT) license
+@hapi/boom under the BSD-3-Clause license
+@rushstack/eslint-config under the Massachusetts Institute of Technology (MIT) license
+@rushstack/heft under the Massachusetts Institute of Technology (MIT) license
+@rushstack/heft-jest-plugin under the Massachusetts Institute of Technology (MIT) license
+@rushstack/heft-node-rig under the Massachusetts Institute of Technology (MIT) license
+@types/aws-lambda under the Massachusetts Institute of Technology (MIT) license
+@types/cookie-parser under the Massachusetts Institute of Technology (MIT) license
+@types/cors under the Massachusetts Institute of Technology (MIT) license
+@types/csurf under the Massachusetts Institute of Technology (MIT) license
+@types/express under the Massachusetts Institute of Technology (MIT) license
+@types/heft-jest under the Massachusetts Institute of Technology (MIT) license
+@types/jest under the Massachusetts Institute of Technology (MIT) license
+@types/js-yaml under the Massachusetts Institute of Technology (MIT) license
+@types/lodash under the Massachusetts Institute of Technology (MIT) license
+@types/node under the Massachusetts Institute of Technology (MIT) license
+@types/qs under the Massachusetts Institute of Technology (MIT) license
+@types/triple-beam under the Massachusetts Institute of Technology (MIT) license
+@types/uuid under the Massachusetts Institute of Technology (MIT) license
+@typescript-eslint/parser under the BSD-2-Clause license
+@vendia/serverless-express under the Apache License 2.0
+ajv under the Massachusetts Institute of Technology (MIT) license
+ansi-regex under the Massachusetts Institute of Technology (MIT) license
+ansi-styles under the Massachusetts Institute of Technology (MIT) license
+astral-regex under the Massachusetts Institute of Technology (MIT) license
+at-least-node under the ISC license
+aws-cdk under the Apache License 2.0
+aws-cdk-lib under the Apache License 2.0
+aws-jwt-verify under the Apache License 2.0
+aws-sdk-client-mock under the Massachusetts Institute of Technology (MIT) license
+axios under the Massachusetts Institute of Technology (MIT) license
+balanced-match under the Massachusetts Institute of Technology (MIT) license
+brace-expansion under the Massachusetts Institute of Technology (MIT) license
+case under the Massachusetts Institute of Technology (MIT) license
+color-convert under the Massachusetts Institute of Technology (MIT) license
+color-name under the Massachusetts Institute of Technology (MIT) license
+concat-map under the Massachusetts Institute of Technology (MIT) license
+constructs under the Apache License 2.0
+cookie-parser under the Massachusetts Institute of Technology (MIT) license
+cors under the Massachusetts Institute of Technology (MIT) license
+csrf under the Massachusetts Institute of Technology (MIT) license
+csurf under the Massachusetts Institute of Technology (MIT) license
+depcheck under the Massachusetts Institute of Technology (MIT) license
+emoji-regex under the Massachusetts Institute of Technology (MIT) license
+esbuild under the Massachusetts Institute of Technology (MIT) license
+eslint under the Massachusetts Institute of Technology (MIT) license
+eslint-import-resolver-typescript under the ISC license
+eslint-plugin-import under the Massachusetts Institute of Technology (MIT) license
+eslint-plugin-security under the Apache License 2.0
+express under the Massachusetts Institute of Technology (MIT) license
+fast-check under the Massachusetts Institute of Technology (MIT) license
+fast-deep-equal under the Massachusetts Institute of Technology (MIT) license
+fs-extra under the Massachusetts Institute of Technology (MIT) license
+generate-password under the Massachusetts Institute of Technology (MIT) license
+graceful-fs under the ISC license
+ignore under the Massachusetts Institute of Technology (MIT) license
+is-fullwidth-code-point under the Massachusetts Institute of Technology (MIT) license
+jest under the Massachusetts Institute of Technology (MIT) license
+jest-fast-check under the Massachusetts Institute of Technology (MIT) license
+js-yaml under the Massachusetts Institute of Technology (MIT) license
+json-schema-traverse under the Massachusetts Institute of Technology (MIT) license
+jsonfile under the Massachusetts Institute of Technology (MIT) license
+jsonschema under the Massachusetts Institute of Technology (MIT) license
+jwt-decode under the Massachusetts Institute of Technology (MIT) license
+license-check-and-add under the Apache License 2.0
+license-checker under the BSD-3-Clause license
+lodash under the Massachusetts Institute of Technology (MIT) license
+lodash.truncate under the Massachusetts Institute of Technology (MIT) license
+lru-cache under the ISC license
+md5-file under the Massachusetts Institute of Technology (MIT) license
+minimatch under the ISC license
+nodemon under the Massachusetts Institute of Technology (MIT) license
+npm-package-json-lint under the Massachusetts Institute of Technology (MIT) license
+npm-package-json-lint-config-default under the Massachusetts Institute of Technology (MIT) license
+pkce-challenge under the Massachusetts Institute of Technology (MIT) license
+punycode under the Massachusetts Institute of Technology (MIT) license
+qs under the BSD-3-Clause license
+radix3 under the Massachusetts Institute of Technology (MIT) license
+rate-limiter-flexible under the ISC license
+require-from-string under the Massachusetts Institute of Technology (MIT) license
+semver under the ISC license
+slice-ansi under the Massachusetts Institute of Technology (MIT) license
+sort-package-json under the Massachusetts Institute of Technology (MIT) license
+string-width under the Massachusetts Institute of Technology (MIT) license
+strip-ansi under the Massachusetts Institute of Technology (MIT) license
+table under the BSD-3-Clause license
+triple-beam under the Massachusetts Institute of Technology (MIT) license
+ts-jest under the Massachusetts Institute of Technology (MIT) license
+ts-node under the Massachusetts Institute of Technology (MIT) license
+typescript under the Apache License 2.0
+universalify under the Massachusetts Institute of Technology (MIT) license
+uri-js under the BSD-2-Clause license
+uuid under the Massachusetts Institute of Technology (MIT) license
+winston under the Massachusetts Institute of Technology (MIT) license
+winston-transport under the Massachusetts Institute of Technology (MIT) license
+yallist under the ISC license
+yaml under the ISC license
+yaml-cfn under the Apache License 2.0
+zod under the Massachusetts Institute of Technology (MIT) license

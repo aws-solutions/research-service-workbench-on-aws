@@ -75,6 +75,15 @@ Metadata:
 Conditions:
   enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
 
+Mappings:
+  Solution:
+    Data:
+      ID: "SO0231"
+      Version: "2.0.0"
+      AppRegistryApplicationName: 'RSWAppReg'
+      SolutionName: 'Research Service Workbench'
+      ApplicationType: 'AWS-Solutions'
+
 Resources:
   # A role used for launching environments using AWS Service Catalog
   # This is the role that code (ApiHandlerLambda) in main account
@@ -189,6 +198,7 @@ Resources:
                 - ec2:CreateTags
                 - ec2:DeleteTags
                 - ec2:DescribeInternetGateways
+                - ec2:DescribeInstances
               Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
@@ -219,12 +229,47 @@ Resources:
               Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
+        # For SSH Key management and connection
+        - PolicyName: describe-ssh-keys-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:DescribeKeyPairs
+              Resource: '*' # IAM does not support resource-level permissions for this action
+        - PolicyName: ssh-keys-actions-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:CreateKeyPair
+                - ec2:DeleteKeyPair
+              Resource:
+                - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:key-pair/sshkey-*' # limits creation to ssh keys following resource naming schema
+        - PolicyName: ec2-instance-connect-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2-instance-connect:SendSSHPublicKey
+              Resource:
+                - !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*'
+        - PolicyName: servicequotas-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicequotas:GetServiceQuota
+              Resource:
+                - !Sub 'arn:aws:servicequotas:${AWS::Region}:${AWS::AccountId}:servicecatalog/L-360CDF2E'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
     Metadata: 
       cfn_nag:
         rules_to_suppress:
           - id: W11
             reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -246,6 +291,8 @@ Resources:
               - ssm:*
               - config:*
               - servicecatalog:*
+              - servicequotas:*
+              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:
@@ -276,7 +323,7 @@ Resources:
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}*'
               - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*presigned-url-sagemaker-notebook-role'
           - Effect: Allow
             Action:
@@ -287,7 +334,7 @@ Resources:
               - iam:DeletePolicy
               - iam:DeletePolicyVersion
             Resource:
-              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}*'
           - Effect: Allow
             Action:
               - iam:GetGroup
@@ -358,7 +405,7 @@ Resources:
               - iam:UpdateRoleDescription
               - iam:AttachRolePolicy
               - iam:DetachRolePolicy
-            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
+            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint*'
           - Effect: Allow
             Action:
               - iam:GetRole
@@ -387,7 +434,7 @@ Resources:
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in RSWStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -405,6 +452,11 @@ Resources:
       ManagedPolicyArns:
         - !Ref PolicyHostingAccountHandler
       PermissionsBoundary: !Ref PolicyHostingAccountHandler
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
 
   VPC:
     Type: AWS::EC2::VPC
@@ -455,6 +507,11 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public subnet 1
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W33
+            reason: 'TODO:EC2 Subnet should not have MapPublicIpOnLaunch set to true'
 
   FlowLogPublicSubnet:
     Type: AWS::EC2::FlowLog
@@ -588,6 +645,48 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
 
+  Application:
+    Type: AWS::ServiceCatalogAppRegistry::Application
+    Properties:
+      Description: Service Catalog application to track and manage all your resources for the solution Workspaces Cost Optimizer (Replace this with your solution name)
+      Name: #There is a character limit for this name. Please refer to point # 5 in the above section "Use cases not supported with below setup" for more details. 
+        !Join
+          - "-"
+          - - !Ref AWS::StackName
+            - !FindInMap [Solution, Data, "AppRegistryApplicationName"]
+            - !Ref AWS::AccountId
+      Tags: {
+        'Solutions:SolutionID': !FindInMap [Solution, Data, "ID"],
+        'Solutions:SolutionVersion': !FindInMap [Solution, Data, "Version"],
+        'Solutions:SolutionName': !FindInMap [Solution, Data, "SolutionName"],
+        'Solutions:ApplicationType': !FindInMap [Solution, Data, "ApplicationType"]
+      }
+
+  AppRegistryApplicationStackAssociation:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !GetAtt Application.Id
+      Resource:
+        !Ref AWS::StackId
+      ResourceType: CFN_STACK
+
+  DefaultApplicationAttributes:
+    Type: AWS::ServiceCatalogAppRegistry::AttributeGroup
+    Properties:
+      Name: !Join ['-', [!Ref 'AWS::StackName', !Ref AWS::AccountId]]
+      Description: Attribute group for solution information.
+      Attributes:       
+        { "ApplicationType" : !FindInMap [Solution, Data, "ApplicationType"],
+          "Version": !FindInMap [Solution, Data, "Version"],
+          "SolutionID": !FindInMap [Solution, Data, "ID"],
+          "SolutionName": !FindInMap [Solution, Data, "SolutionName"]
+        }
+  AppRegistryApplicationAttributeAssociation:
+    Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation
+    Properties: 
+      Application: !GetAtt Application.Id
+      AttributeGroup: !GetAtt DefaultApplicationAttributes.Id
+
 Outputs:
   EnvMgmtRoleArn:
     Description: The arn of the hosting account role for environment management using AWS Service Catalog
@@ -612,4 +711,7 @@ Outputs:
   PublicRouteTableId:
     Description: The public route table assigned to the workspace VPC
     Value: !Ref PublicRouteTable
-    
+
+  AppRegistryApplicationARN:
+    Description: App Registry Application ARN
+    Value: !GetAtt Application.Id

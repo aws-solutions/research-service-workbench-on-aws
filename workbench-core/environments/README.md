@@ -1,12 +1,9 @@
 # Workbench Core Environments
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=workbench-core-environments)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
-# Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-78.83%25-red.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-71.8%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-81.33%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-78.8%25-red.svg?style=flat) |
-
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-environments)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
 This project provides the library and utilities function for setting up and managing environments. For an example of how this project can be used, please refer to [swb-reference](../../solutions/swb-reference).
 
@@ -28,5 +25,4 @@ This project provides the library and utilities function for setting up and mana
 * **schemas:** JSON schema for API request to manage environment related resources
 * **services:** Manages create/read/update/delete of environment related resources in DDB
 * **utilities:** Helper functions
-
 

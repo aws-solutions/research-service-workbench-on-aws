@@ -210,4 +210,43 @@ describe('getter', () => {
     // CHECK
     expect(generatedParams).toEqual(expectedParams);
   });
+  test('should set consistent read when strong() is called with batch get', async () => {
+    // BUILD
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
+    ]);
+    const expectedParams = {
+      RequestItems: {
+        'sample-table': {
+          Keys: [
+            { pk: { S: 'testId' }, sk: { S: 'testId' } },
+            { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+          ],
+          ConsistentRead: true
+        }
+      }
+    };
+
+    // OPERATE
+    const generatedParams = getter.strong().getBatchParams();
+
+    // CHECK
+    expect(generatedParams).toEqual(expectedParams);
+  });
+  test('should set consistent read when strong() is called with get', async () => {
+    // BUILD
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'testId', sk: 'testId' });
+    const expectedParams = {
+      Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+      ConsistentRead: true,
+      TableName: 'sample-table'
+    };
+
+    // OPERATE
+    const generatedParams = getter.strong().getItemParams();
+
+    // CHECK
+    expect(generatedParams).toEqual(expectedParams);
+  });
 });

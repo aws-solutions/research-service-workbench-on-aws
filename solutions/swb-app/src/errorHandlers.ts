@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Request, Response, NextFunction } from 'express';
 // Followed this tutorial https://scoutapm.com/blog/express-error-handling and https://stackoverflow.com/a/51391081/14310364
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,7 +18,9 @@ export const wrapAsync = (fn: any): any => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const boomErrorHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
+  console.error('Error:', err);
   if (err.isBoom) {
+    delete err.output.payload.statusCode;
     res.status(err.output.statusCode).send(err.output.payload);
   } else {
     next(err);

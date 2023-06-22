@@ -2,20 +2,34 @@
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
   "coveragePathIgnorePatterns": [
-    "<rootDir>/src/hostingAccountService.ts",
     "<rootDir>/src/environmentConnectionService.ts",
     "<rootDir>/src/environmentLifecycleService.ts",
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
-    "<rootDir>/src/accountHandler.ts",
-    "<rootDir>/src/index.ts"
+    "<rootDir>/src/index.ts",
+
+    "<rootDir>/src/models/environmentTypeConfigs/createEnvironmentTypeConfigRequest.ts",
+    "<rootDir>/src/models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest.ts",
+    "<rootDir>/src/models/environmentTypeConfigs/environmentTypeConfig.ts",
+    "<rootDir>/src/models/environmentTypeConfigs/listEnvironmentTypeConfigsRequest.ts",
+    "<rootDir>/src/models/environmentTypeConfigs/updateEnvironmentTypeConfigsRequest.ts",
+
+    "<rootDir>/src/models/environmentTypes/environmentType.ts",
+    "<rootDir>/src/models/environmentTypes/listEnvironmentTypesRequest.ts",
+    "<rootDir>/src/models/environmentTypes/updateEnvironmentTypeRequest.ts",
+    "<rootDir>/src/models/environmentTypes/getEnvironmentTypesRequest.ts",
+
+    "<rootDir>/src/models/environments/environment.ts",
+    "<rootDir>/src/models/environments/environmentItem.ts",
+    "<rootDir>/src/models/environments/listEnvironmentsByProjectRequest.ts",
+    "<rootDir>/src/models/environments/listEnvironmentsServiceRequest.ts"
   ],
   "coverageThreshold": {
     "global": {
       "branches": 70,
-      "functions": 70,
-      "lines": 70,
-      "statements": 70
+      "functions": 80,
+      "lines": 75,
+      "statements": 75
     }
   },
   "coverageReporters": ["json-summary", "json"]

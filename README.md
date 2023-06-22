@@ -1,20 +1,22 @@
+# Overview
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+Research Service Workbench on AWS is a backend API designed to empower AWS partners to more easily build self-service portals for research institutions, allowing their researchers to create and manage secure research computing environments. RSW builds on AWS services including Amazon S3, Service Catalog, and AWS Systems Manager to deliver comprehensive, cutting-edge capabilities in less time while meeting the high bar for security and governance demanded by regulators and funding agencies.
+
+Using a custom built portal provided by a partner, built on Research Service Workbench, research IT departments can more easily work with partners to deliver a self-service portal with a comprehensive catalog of tools tailored to the needs of the researchers they support. Using a portal built using RSW, researchers can create, access, and retire environments without needing to be experts on cloud infrastructure or security. They can work individually or collaborate with others on the same data, with RSW securely orchestrating the connection of research environments to Amazon S3. Furthermore, environments are deployed in specific AWS accounts and Amazon Virtual Private Clouds (VPCs), allowing connectivity to resources on and off campus. Institutions are fully in control of their data, data flows, and AWS footprint. They can scale investments in IT and security across multiple research programs, reducing duplicate effort and freeing up resources to focus on science.
+
+To learn more about FWoA and how to deploy, refer to the Research Service Workbench [Implementation Guide](https://www.docs.aws.a2z.com/solutions/latest/research-service-workbench-on-aws/overview.html).
+
+# Codecov
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
+
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=root)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
 # Workflow Status
-[![Build Status](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
-[![Merge-develop-to-stage](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
-[![Publish-and-merge-to-develop](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
-[![Cfn-nag-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
-[![Secret-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
-[![Lint-PR](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
-[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![Merge-develop-to-stage](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/merge-develop-to-stage.yml/badge.svg?branch=develop)](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/merge-develop-to-stage.yml)
+[![Release integration tests](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/integration-tests-release.yml/badge.svg)](https://github.com/aws-solutions/research-service-workbench-on-aws/actions/workflows/integration-tests-release.yml)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-
-# Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-87.08%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.88%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.44%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-87.59%25-yellow.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -24,7 +26,7 @@ Please read through this document before submitting any issues or pull requests 
 
 ## Code development and testing
 
-In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#solution-spark-on-aws-development-instructions)
+In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#research-service-workbench-on-aws-development-instructions)
 
 <!-- GENERATED PROJECT SUMMARY START -->
 
@@ -35,14 +37,20 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | Folder | Package | README |
 | ------ | ------- | ------ |
 | [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
+| [workbench-core/accounts](./workbench-core/accounts/) | [@aws/workbench-core-accounts] | [README](./workbench-core/accounts/README.md)
+| [workbench-core/accounts-ui](./workbench-core/accounts-ui/) | [@aws/workbench-core-accounts-ui] | [README](./workbench-core/accounts-ui/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/authorization](./workbench-core/authorization/) | [@aws/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@aws/workbench-core-base] | [README](./workbench-core/base/README.md)
 | [workbench-core/datasets](./workbench-core/datasets/) | [@aws/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
+| [workbench-core/datasets-ui](./workbench-core/datasets-ui/) | [@aws/workbench-core-datasets-ui] | [README](./workbench-core/datasets-ui/README.md)
 | [workbench-core/environments](./workbench-core/environments/) | [@aws/workbench-core-environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/environments-ui](./workbench-core/environments-ui/) | [@aws/workbench-core-environments-ui] | [README](./workbench-core/environments-ui/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/swb-common-ui](./workbench-core/swb-common-ui/) | [@aws/workbench-core-swb-common-ui] | [README](./workbench-core/swb-common-ui/README.md)
+| [workbench-core/user-management](./workbench-core/user-management/) | [@aws/workbench-core-user-management] | [README](./workbench-core/user-management/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on
@@ -62,3 +70,6 @@ If you discover a potential security issue in this project we ask that you notif
 ## Licensing
 
 See the [LICENSE](LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+
+## Metrics Collection
+This solution collects anonymous operational metrics to help AWS improve the quality of features of the solution. For more information, including how to disable this capability, please see the [Implementation Guide](https://docs.aws.amazon.com/solutions/latest/research-service-workbench-on-aws/monitoring-the-solution-with-aws-service-catalog-appregistry.html).

@@ -3,39 +3,194 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../../support/clientSession';
-import Setup from '../../../support/setup';
+import { PaabHelper } from '../../../support/complex/paabHelper';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('environment start negative tests', () => {
-  const setup: Setup = new Setup();
-  let adminSession: ClientSession;
+  const paabHelper = new PaabHelper(2);
+  let itAdminSession: ClientSession;
+  let paSession: ClientSession;
+  let researcherSession: ClientSession;
+  let anonymousSession: ClientSession;
+  let project1Id: string;
+  let project2Id: string;
 
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
-    adminSession = await setup.getDefaultAdminSession();
+    const paabResources = await paabHelper.createResources(__filename);
+    itAdminSession = paabResources.adminSession;
+    paSession = paabResources.pa1Session;
+    researcherSession = paabResources.rs1Session;
+    anonymousSession = paabResources.anonymousSession;
+    project1Id = paabResources.project1Id;
+    project2Id = paabResources.project2Id;
   });
 
   afterAll(async () => {
-    await setup.cleanup();
+    await paabHelper.cleanup();
   });
 
-  test('environment does not exist', async () => {
-    const fakeEnvId = '927ff6bd-9d0e-44d0-b754-47ee50e68edb';
+  describe('ITAdmin tests', () => {
+    test('environment does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await itAdminSession.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Could not find environment ${fakeEnvId}`
+          })
+        );
+      }
+    });
+
+    test('project does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+      try {
+        await itAdminSession.resources.projects
+          .project(fakeProjectId)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            error: 'Not Found',
+            message: `Could not find project ${fakeProjectId}`
+          })
+        );
+      }
+    });
+  });
+
+  describe('Project Admin tests', () => {
+    test('environment does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await paSession.resources.projects.project(project1Id).environments().environment(fakeEnvId).start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('project does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+      try {
+        await paSession.resources.projects
+          .project(fakeProjectId)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('ProjectAdmin not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await paSession.resources.projects.project(project2Id).environments().environment(fakeEnvId).start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('Researcher tests', () => {
+    test('environment does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await researcherSession.resources.projects
+          .project(project1Id)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('project does not exist', async () => {
+      const fakeEnvId = getFakeEnvId();
+      const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
+      try {
+        await researcherSession.resources.projects
+          .project(fakeProjectId)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+
+    test('Researcher not assigned to project', async () => {
+      const fakeEnvId = getFakeEnvId();
+      try {
+        await researcherSession.resources.projects
+          .project(project2Id)
+          .environments()
+          .environment(fakeEnvId)
+          .start();
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(403, {
+            error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  test('Unauthenticated user gets error', async () => {
+    const fakeEnvId = getFakeEnvId();
     try {
-      await adminSession.resources.environments.environment(fakeEnvId).start();
+      await anonymousSession.resources.projects
+        .project(project1Id)
+        .environments()
+        .environment(fakeEnvId)
+        .start();
     } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          statusCode: 404,
-          error: 'Not Found',
-          message: `Could not find environment ${fakeEnvId}`
-        })
-      );
+      checkHttpError(e, new HttpError(403, {}));
     }
   });
 });

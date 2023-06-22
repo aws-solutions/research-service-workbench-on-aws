@@ -12,31 +12,45 @@ const { join } = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const { CognitoTokenService } = require('@aws/workbench-core-base');
+const Csrf = require('csrf');
 
-const config = yaml.load(
-  // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-  // correct file
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.readFileSync(join(__dirname, `../integration-tests/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-);
+let outputs;
+try {
+  const apiStackOutputs = JSON.parse(
+    fs.readFileSync(join(__dirname, `../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
+  );
+  const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+  outputs = apiStackOutputs[apiStackName];
+} catch (e) {
+  throw new Error(
+    'There was a problem reading the main stage file. Please run cdk-deploy prior to running this script'
+  );
+}
 
-const clientId = config.clientId;
-const userPoolId = config.userPoolId;
-const region = config.awsRegion;
-const username = process.argv[2];
-const password = process.argv[3];
+const clientId = outputs.cognitoUserPoolClientId;
+const userPoolId = outputs.cognitoUserPoolId;
+const region = outputs.awsRegion;
+const rootUserName = process.argv[2];
+const rootPassword = process.argv[3];
+
+const csrf = new Csrf();
+const secret = csrf.secretSync();
+const token = csrf.create(secret);
 
 async function run() {
   try {
     const cognitoTokenService = new CognitoTokenService(region);
-    const tokens = await cognitoTokenService.generateCognitoToken(
+    const tokens = await cognitoTokenService.generateCognitoToken({
       userPoolId,
       clientId,
-      username,
-      undefined,
-      password
-    );
-    console.log(tokens);
+      rootUserName,
+      rootPassword
+    });
+    console.log({
+      ...tokens,
+      csrfCookie: secret,
+      csrfToken: token
+    });
   } catch (e) {
     console.error('Unable to get cognito tokens', e);
   }

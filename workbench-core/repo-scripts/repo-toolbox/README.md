@@ -1,4 +1,4 @@
-# `repo-toolbox`
+# # Workbench Core Repo-toolbox
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
@@ -8,7 +8,7 @@ Most mono-repositories contain a top-level `README.md` file which outlines the c
 - Package: the `package.json` defined `name` for each package.
 - README: a link to the `README.md` file for that package.
 
-The following example is a snapshot from the [solution-spark-on-aws README.md](https://github.com/awslabs/solution-spark-on-aws/blob/main/README.md).
+The following example is a snapshot from the [research-service-workbench-on-aws README.md](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/README.md).
 
 ### --- Begin Example ---
 <!-- GENERATED PROJECT SUMMARY START -->
@@ -48,7 +48,7 @@ Edit the top-level `README.md` file and add necessary tags for the `repo-toolbox
 <!-- GENERATED PROJECT SUMMARY END -->
 ```
 
-Use the `install-run-rushx.js` script from the `Rush` repository `common` folder to execute the `readme` action from within the project folder. The following script can be used within a CICD mechanism to keep the README up to date. Paths are relative to the root of the `solution-spark-on-aws` repository.
+Use the `install-run-rushx.js` script from the `Rush` repository `common` folder to execute the `readme` action from within the project folder. The following script can be used within a CICD mechanism to keep the README up to date. Paths are relative to the root of the `research-service-workbench-on-aws` repository.
 
 ```bash
 cd workbench-core/repo-scripts/repo-toolbox

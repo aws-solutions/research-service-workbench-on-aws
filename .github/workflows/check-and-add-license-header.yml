@@ -1,0 +1,85 @@
+name: check-and-add-license-header
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches:
+      - develop
+      - 'release/*'
+
+jobs:
+  check-license-header:
+    runs-on: ubuntu-20.04
+    outputs:
+      files-have-license-header: "${{ steps.check-license-header.outcome }}"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{secrets.MERGE_TOKEN}}
+          fetch-depth: 0
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+      - name: Check license header
+        id: check-license-header
+        run: node common/scripts/install-run-rush.js check-license-header
+        continue-on-error: true
+  add-license-header:
+    runs-on: ubuntu-20.04
+    if: ${{ needs.check-license-header.outputs.files-have-license-header == 'failure'}}
+    needs: [check-license-header]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{secrets.MERGE_TOKEN}}
+          fetch-depth: 0
+      
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+    
+      - name: Add license header
+        run: node common/scripts/install-run-rush.js add-license-header
+      
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
+        # There's no way for github actions to push to a protected branch. This is a workaround
+        # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+        # Conditional on if branch is protected or not
+      - name: Temporaily disable branch protection on PR branch
+        if: ${{ github.ref_protected == true }}
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          branch: ${{ steps.branch-name.outputs.head_ref_branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Auto commit updated files with license headers
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "docs: Auto add license headers"
+          commit_options: '--no-verify --gpg-sign'
+          commit_user_name: ${{ secrets.BOT_USER }}
+          commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
+          branch: ${{ steps.branch-name.outputs.head_ref_branch }}
+
+      - name: Enable branch protection on PR branch
+        uses: octokit/request-action@v2.x
+        if: ${{ always() && github.ref_protected == true }}  # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: aws-solutions
+          repo: research-service-workbench-on-aws
+          branch: ${{ steps.branch-name.outputs.head_ref_branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

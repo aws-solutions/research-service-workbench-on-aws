@@ -3,36 +3,74 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Output } from '@aws-sdk/client-cloudformation';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger } from '@aws/workbench-core-base';
+import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
+import {
+  CASLAuthorizationPlugin,
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin
+} from '@aws/workbench-core-authorization';
+import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
-  S3DataSetStoragePlugin
+  S3DataSetStoragePlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
+import { Output } from '@aws-sdk/client-cloudformation';
 import _ from 'lodash';
-import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
-import { Environment, EnvironmentService } from '../services/environmentService';
+import { Environment } from '../models/environments/environment';
+import { EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
 
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
+  public dynamoDbService: DynamoDBService;
   public ssmDocSuffix: string;
   public dataSetService: DataSetService;
   public environmentService: EnvironmentService;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_OUTPUT_KEY_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
+    this.dynamoDbService = new DynamoDBService({
+      region: process.env.AWS_REGION!,
+      table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
+    });
     const logger: LoggingService = new LoggingService();
-    this.dataSetService = new DataSetService(
-      new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
-      logger,
-      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
+    const requiredAuditValues: string[] = ['actor', 'source'];
+    const fieldsToMask: string[] = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
+
+    const auditService: AuditService = new AuditService(
+      new BaseAuditPlugin(new AuditLogger(logger)),
+      true,
+      requiredAuditValues,
+      fieldsToMask
     );
-    this.environmentService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
+      groupManagementPlugin: new WBCGroupManagementPlugin({
+        userManagementService: new UserManagementService(
+          new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, this.aws)
+        ),
+        ddbService: this.dynamoDbService,
+        userGroupKeyType: 'GROUP'
+      }),
+      dynamicAuthorizationPermissionsPlugin: new DDBDynamicAuthorizationPermissionsPlugin({
+        dynamoDBService: this.dynamoDbService
+      }),
+      auditService: auditService,
+      authorizationPlugin: new CASLAuthorizationPlugin()
+    });
+
+    this.dataSetService = new DataSetService(
+      auditService,
+      logger,
+      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT', 'STORAGELOCATION'),
+      new WbcDataSetsAuthorizationPlugin(authzService)
+    );
+    this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
   }
 
   /**
@@ -83,25 +121,33 @@ export default class EnvironmentLifecycleHelper {
    * Get multiple main account CFN stack outputs
    *
    * @returns output values retrieved from main CFN stack:
-   *    datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn
+   *    datasetsBucketArn, mainAccountRegion, mainAccountId, s3ArtifactEncryptionArn, s3DatasetsEncryptionArn
    */
   public async getCfnOutputs(): Promise<{ [id: string]: string }> {
     const cfService = this.aws.helpers.cloudformation;
     const {
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
       [process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!]: datasetsBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
+      [process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctS3ArtifactEncryptionArn,
+      [process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctS3DatasetsEncryptionArn
     } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
+      process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
+      process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     const mainAccountRegion = statusHandlerArn.split(':')[3];
     const mainAccountId = statusHandlerArn.split(':')[4];
 
     // We create these at deploy time so this will be present in the stack
-    return { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn };
+    return {
+      datasetsBucketArn,
+      mainAccountRegion,
+      mainAccountId,
+      mainAcctS3ArtifactEncryptionArn,
+      mainAcctS3DatasetsEncryptionArn
+    };
   }
 
   /**
@@ -146,14 +192,23 @@ export default class EnvironmentLifecycleHelper {
    * @param envMetadata - the environment for which access point(s) were created
    */
   public async removeAccessPoints(envMetadata: Environment): Promise<void> {
-    if (_.isEmpty(envMetadata.datasetIds)) return;
+    if (_.isEmpty(envMetadata.DATASETS)) return;
 
     await Promise.all(
       _.map(envMetadata.ENDPOINTS, async (endpoint) => {
         await this.dataSetService.removeDataSetExternalEndpoint(
           endpoint.dataSetId,
           endpoint.id,
-          new S3DataSetStoragePlugin(this.aws)
+          new S3DataSetStoragePlugin(this.aws),
+          {
+            id: '',
+            roles: []
+          }
+        );
+        await this.environmentService.removeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          endpoint.dataSetId,
+          endpoint.id
         );
       })
     );
@@ -163,7 +218,7 @@ export default class EnvironmentLifecycleHelper {
    * Get the mount strings for all datasets attached to a given workspace.
    * @param dataSetIds - the list of dataset IDs attached.
    * @param envMetadata - the environment on which to mount the dataset(s)
-   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
+   * @param mainAcctEncryptionArnList - the list of encryption key ARN for main account buckets
    *
    * @returns an object containing:
    *  1. datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
@@ -173,7 +228,7 @@ export default class EnvironmentLifecycleHelper {
   public async getDatasetsToMount(
     datasetIds: Array<string>,
     envMetadata: Environment,
-    mainAcctEncryptionArn: string
+    mainAcctEncryptionArnList: string[]
   ): Promise<{ [id: string]: string }> {
     if (_.isEmpty(datasetIds)) return { s3Mounts: '[]', iamPolicyDocument: '{}' };
 
@@ -181,30 +236,43 @@ export default class EnvironmentLifecycleHelper {
     const endpointsCreated: { [key: string]: string }[] = [];
 
     const datasetsToMount = await Promise.all(
-      _.map(datasetIds, async (datasetId) => {
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
-        const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
-          datasetId,
-          datasetEndPointName,
-          new S3DataSetStoragePlugin(this.aws)
-        );
+      _.map(datasetIds, async (dataSetId) => {
+        const datasetEndPointName = `${dataSetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
+        const {
+          data: { mountObject }
+        } = await this.dataSetService.addDataSetExternalEndpointForGroup({
+          dataSetId,
+          externalEndpointName: datasetEndPointName,
+          storageProvider: new S3DataSetStoragePlugin(this.aws),
+          groupId: `${envMetadata.projectId}#Researcher`,
+          authenticatedUser: { id: '', roles: [] }
+        });
 
-        const dataSet = await this.dataSetService.getDataSet(datasetId);
-        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        const dataSet = await this.dataSetService.getDataSet(dataSetId, { id: '', roles: [] });
+        const endpoint = await this.dataSetService.getExternalEndPoint(dataSetId, mountObject.endpointId, {
+          id: '',
+          roles: []
+        });
         const endpointObj = {
           id: endpoint.id!,
           dataSetId: endpoint.dataSetId,
           endPointUrl: endpoint.endPointUrl,
           path: endpoint.path,
-          storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
+          storageArn: `arn:aws:s3:::${dataSet.storageName}`
         };
 
         await this.environmentService.addMetadata(
           envId,
-          envResourceTypeToKey.environment,
+          resourceTypeToKey.environment,
           mountObject.endpointId,
-          envResourceTypeToKey.endpoint,
+          resourceTypeToKey.endpoint,
           endpointObj
+        );
+
+        await this.environmentService.storeProjectDatasetEndpointRelationship(
+          envMetadata.projectId,
+          dataSetId,
+          mountObject.endpointId
         );
 
         endpointsCreated.push(endpointObj);
@@ -220,8 +288,8 @@ export default class EnvironmentLifecycleHelper {
     // Call IAM policy generator here, and return both strings
     const iamPolicyDocument = this.generateIamPolicy(
       endpointsCreated,
-      envMetadata.PROJ.encryptionKeyArn,
-      mainAcctEncryptionArn
+      envMetadata.PROJ!.encryptionKeyArn,
+      mainAcctEncryptionArnList
     );
     const s3Mounts = JSON.stringify(datasetsToMount);
 
@@ -266,7 +334,11 @@ export default class EnvironmentLifecycleHelper {
           endpoint.dataSetId,
           endpoint.id,
           instanceRoleArn,
-          s3DataSetStoragePlugin
+          s3DataSetStoragePlugin,
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
@@ -276,14 +348,14 @@ export default class EnvironmentLifecycleHelper {
    * Get the workspace IAM policy for accessing all datasets attached.
    * @param endpointsCreated - the external endpoints created for this environment
    * @param encryptionKeyArn - the encryption key ARN for env data traffic
-   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
+   * @param mainAcctEncryptionArnList - the encryption key ARNs for main account bucket
    *
    * @returns iamPolicy - A stringified IAM policy
    */
   public generateIamPolicy(
     endpointsCreated: { [id: string]: string }[],
     encryptionKeyArn: string,
-    mainAcctEncryptionArn: string
+    mainAcctEncryptionArnList: string[]
   ): string {
     // Build policy statements for object-level permissions
     const statements = [];
@@ -349,7 +421,7 @@ export default class EnvironmentLifecycleHelper {
         'kms:GenerateDataKey'
       ],
       Effect: 'Allow',
-      Resource: [encryptionKeyArn, mainAcctEncryptionArn]
+      Resource: mainAcctEncryptionArnList.concat([encryptionKeyArn])
     });
 
     // Build final policyDoc
@@ -373,7 +445,7 @@ export default class EnvironmentLifecycleHelper {
     operation: string;
     envType: string;
   }): Promise<AwsService> {
-    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn} with externalId ${payload.externalId}`);
+    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn}.`);
     const params = {
       roleArn: payload.envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,

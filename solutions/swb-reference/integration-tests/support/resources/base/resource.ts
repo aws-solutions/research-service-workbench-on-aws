@@ -38,13 +38,22 @@ export default class Resource {
     return this._axiosInstance.get(this._api);
   }
 
-  public async update(body: { [key: string]: string }): Promise<AxiosResponse> {
+  public async update(
+    body: Record<string, string | unknown>,
+    isPatch: boolean = false
+  ): Promise<AxiosResponse> {
+    if (isPatch) {
+      return this._axiosInstance.patch(this._api, body);
+    }
     return this._axiosInstance.put(this._api, body);
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async delete(): Promise<void> {
-    await this._axiosInstance.delete(this._api);
+  public async delete(): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(this._api);
+  }
+
+  public async purge(): Promise<void> {
+    await this._axiosInstance.delete(`${this._api}/purge`);
   }
 
   // This method should be overridden by the class extending `resource`

@@ -3,12 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationPlugin from './authorizationPlugin';
-import Operation from './operation';
-import Permission from './permission';
+import { ForbiddenError } from './errors/forbiddenError';
+import { AuthenticatedUser } from './models/authenticatedUser';
+import Operation from './models/operation';
+import Permission from './models/permission';
+import { HTTPMethod } from './models/routesMap';
 import PermissionsPlugin from './permissionsPlugin';
-import { HTTPMethod } from './routesMap';
 
 /**
  * Authorization Service.
@@ -45,7 +46,7 @@ export default class AuthorizationService {
 
       await this._authorizationPlugin.isAuthorized(permissions, operations);
     } catch (err) {
-      throw new Error(`User is forbidden: ${err.message}`);
+      throw new ForbiddenError(`User is forbidden: ${err.message}`);
     }
   }
 

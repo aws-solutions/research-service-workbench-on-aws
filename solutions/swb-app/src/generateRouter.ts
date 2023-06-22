@@ -3,113 +3,114 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuditService, BaseAuditPlugin, WithAudit, Writer } from '@aws/workbench-core-audit';
 import {
+  csurf,
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
   CognitoAuthenticationPlugin,
-  UserManagementService,
-  CognitoUserManagementPlugin
+  TokenRevocationService
 } from '@aws/workbench-core-authentication';
-import {
-  withAuth,
-  AuthorizationService,
-  CASLAuthorizationPlugin,
-  PermissionsMap,
-  RoutesIgnored,
-  RoutesMap,
-  StaticPermissionsPlugin
-} from '@aws/workbench-core-authorization';
+import { withDynamicAuth } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express = require('express');
-import { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
-import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import { ApiRouteConfig } from './apiRouteConfig';
+import SwbAuditExtractor from './audit/swbAuditExtractor';
+import SwbAuditLogger from './audit/swbAuditLogger';
+import SwbAuditPlugin from './audit/swbAuditPlugin';
 import { setUpAuthRoutes } from './authRoutes';
-import { setUpDSRoutes } from './datasetRoutes';
+import { setUpCostCenterRoutes } from './costCenterRoutes';
+import { setUpDSRoutes } from './dataSetRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { setUpProjectEnvRoutes } from './projectEnvironmentRoutes';
+import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
-import * as StaticPermissionsConfig from './staticPermissionsConfig';
-import * as StaticRoutesConfig from './staticRouteConfig';
+import { setUpSshKeyRoutes } from './sshKeyRoutes';
 import { setUpUserRoutes } from './userRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   app.disable('x-powered-by');
-  const router: Router = express.Router();
+  const router: Router = Router();
 
   app.use(
     cors({
       origin: apiRouteConfig.allowedOrigins,
-      allowedHeaders: ['Set-Cookie', 'Content-Type'],
       credentials: true
     })
   );
   // parse application/json
-  app.use(express.json());
+  app.use(json());
   app.use(cookieParser());
+  app.use(csurf('none'));
 
+  const tokenRevocationService: TokenRevocationService = new TokenRevocationService({
+    dynamoDBSettings: {
+      region: process.env.AWS_REGION!,
+      table: process.env.REVOKED_TOKENS_DDB_TABLE_NAME!
+    }
+  });
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     clientId: process.env.CLIENT_ID!,
     clientSecret: process.env.CLIENT_SECRET!,
-    websiteUrl: process.env.WEBSITE_URL!
+    tokenRevocationService
   };
 
   const authenticationService = new AuthenticationService(
     new CognitoAuthenticationPlugin(cognitoPluginOptions)
   );
 
-  // Create Authorization Service
-  const staticPermissionsMap: PermissionsMap = StaticPermissionsConfig.permissionsMap;
-  const staticRoutesMap: RoutesMap = StaticRoutesConfig.routesMap;
-  const staticRoutesIgnored: RoutesIgnored = StaticRoutesConfig.routesIgnored;
   const logger: LoggingService = new LoggingService();
-  const staticPermissionsPlugin: StaticPermissionsPlugin = new StaticPermissionsPlugin(
-    staticPermissionsMap,
-    staticRoutesMap,
-    staticRoutesIgnored,
-    logger
+
+  app.use(
+    verifyToken(authenticationService, {
+      ignoredRoutes: apiRouteConfig.routesIgnored,
+      loggingService: logger
+    })
   );
-  const caslAuthorizationsPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
-  const authorizationService: AuthorizationService = new AuthorizationService(
-    caslAuthorizationsPlugin,
-    staticPermissionsPlugin
-  );
+  app.use(withDynamicAuth(apiRouteConfig.authorizationService, { logger: logger }));
 
-  app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
-  app.use(withAuth(authorizationService, { logger: logger }));
-
-  // Dynamic routes
-  apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
-    // Config setting is provided by developer, and not external user request
-    // nosemgrep
-    router[apiRoute.httpMethod](apiRoute.path, async (req: Request, res: Response) => {
-      // Config setting is provided by developer, and not external user request
-      // nosemgrep
-      const response = await apiRoute.service[apiRoute.serviceAction]();
-      res.send(response);
-    });
-  });
-
-  const userManagementService: UserManagementService = new UserManagementService(
-    new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)
-  );
-
-  setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
-  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
+  // Auditing
+  const continueOnError = false;
+  const requiredAuditValues = ['actor', 'source'];
+  const fieldsToMask = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
+  const writer: Writer = new SwbAuditLogger();
+  const swbAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
+  const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
+  const excludePaths: string[] = [];
+  app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
+  setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
+  setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
-  setUpUserRoutes(router, userManagementService);
+  setUpUserRoutes(router, apiRouteConfig.userManagementService);
+  setUpEnvRoutes(router, apiRouteConfig.environmentPlugin);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
-  setUpProjectRoutes(router, apiRouteConfig.projectService);
+  setUpProjectRoutes(
+    router,
+    apiRouteConfig.projectPlugin,
+    apiRouteConfig.environmentService,
+    apiRouteConfig.metadataService,
+    apiRouteConfig.userManagementService
+  );
+  setUpProjectEnvRoutes(
+    router,
+    apiRouteConfig.environments,
+    apiRouteConfig.projectEnvPlugin,
+    apiRouteConfig.dataSetService
+  );
+  setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
+  setUpSshKeyRoutes(router, apiRouteConfig.sshKeyService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

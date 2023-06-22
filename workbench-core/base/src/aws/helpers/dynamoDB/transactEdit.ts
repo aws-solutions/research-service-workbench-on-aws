@@ -9,6 +9,7 @@ import {
   TransactWriteItemsCommandOutput,
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
+import _ from 'lodash';
 
 /**
  * This class helps with batch writes or deletes.
@@ -28,10 +29,10 @@ class TransactEdit {
    *
    * @param items - Object of the items to add
    */
-  public addPutRequests(items: { [key: string]: AttributeValue }[]): TransactEdit {
+  public addPutItems(items: Record<string, AttributeValue>[]): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
-        'TransactEdit<==need to initialize the TransactItems property before adding new request'
+        'TransactEdit needs to initialize the TransactItems property before adding new request'
       );
     }
     const updatedItems = items.map((item) => {
@@ -53,6 +54,74 @@ class TransactEdit {
           Item: item
         }
       });
+    });
+    return this;
+  }
+  /**
+   * Add put requests
+   * @param putRequests - A list of put request to add
+   * @returns
+   */
+  public addPutRequests(
+    putRequests: {
+      item: Record<string, AttributeValue>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, AttributeValue>;
+    }[]
+  ): TransactEdit {
+    putRequests.forEach((putRequest) => {
+      const requriedParams = {
+        Item: putRequest.item,
+        TableName: this._tableName
+      };
+      const conditionalParams = {
+        ConditionExpression: putRequest.conditionExpression,
+        ExpressionAttributeNames: putRequest.expressionAttributeNames,
+        ExpressionAttributeValues: putRequest.expressionAttributeValues
+      };
+      const additonalParams = _.omitBy(conditionalParams, _.isNil);
+
+      this._params.TransactItems!.push({
+        Put: {
+          ...requriedParams,
+          ...additonalParams
+        }
+      });
+    });
+    return this;
+  }
+
+  /**
+   * Add one or more delete request(s) to the command input. Use to delete one or more items from a DynamoDB Table.
+   *
+   * @param keys - list of object(s) of the primary key(s) of item(s) to delete
+   * @returns TransactEdit item with populated params
+   */
+  public addDeleteRequests(keys: Record<string, AttributeValue>[]): TransactEdit {
+    keys.forEach((key) => {
+      this.addDeleteRequest(key);
+    });
+    return this;
+  }
+
+  /**
+   * Add a single delete request to the command input. Use to delete a single item from a DynamoDB Table.
+   *
+   * @param key - object of the primary key of item to delete
+   * @returns TransactEdit item with populated params
+   */
+  public addDeleteRequest(key: Record<string, AttributeValue>): TransactEdit {
+    if (!this._params.TransactItems) {
+      throw new Error(
+        'TransactEdit needs to initialize the TransactItems property before adding new request'
+      );
+    }
+    this._params.TransactItems!.push({
+      Delete: {
+        Key: key,
+        TableName: this._tableName
+      }
     });
     return this;
   }

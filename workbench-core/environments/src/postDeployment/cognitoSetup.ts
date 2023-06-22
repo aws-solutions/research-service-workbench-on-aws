@@ -3,13 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  GroupExistsException,
-  ListUserPoolsCommandInput,
-  UserPoolDescriptionType,
-  UsernameExistsException
-} from '@aws-sdk/client-cognito-identity-provider';
 import { AwsService } from '@aws/workbench-core-base';
+import { Output } from '@aws-sdk/client-cloudformation';
+import { UsernameExistsException } from '@aws-sdk/client-cognito-identity-provider';
 import passwordGenerator from 'generate-password';
 
 export default class CognitoSetup {
@@ -18,9 +14,15 @@ export default class CognitoSetup {
     AWS_REGION: string;
     ROOT_USER_EMAIL: string;
     USER_POOL_NAME: string;
+    STACK_NAME: string;
   };
 
-  public constructor(constants: { AWS_REGION: string; ROOT_USER_EMAIL: string; USER_POOL_NAME: string }) {
+  public constructor(constants: {
+    AWS_REGION: string;
+    ROOT_USER_EMAIL: string;
+    USER_POOL_NAME: string;
+    STACK_NAME: string;
+  }) {
     this._constants = constants;
 
     const { AWS_REGION } = constants;
@@ -30,31 +32,8 @@ export default class CognitoSetup {
   public async run(): Promise<void> {
     const { USER_POOL_NAME, ROOT_USER_EMAIL } = this._constants;
 
-    const userPoolId = await this._getUserPoolId();
+    const userPoolId = await this.getUserPoolId();
     console.log(`User pool id: ${userPoolId}`);
-
-    // Create Admin and Researcher groups in user pool if they do not exist
-    try {
-      await this.createGroup('Admin', userPoolId);
-      console.log('Creating Admin group because group does not exist');
-    } catch (e) {
-      if (e instanceof GroupExistsException) {
-        console.log(`Admin group already exists in user pool ${USER_POOL_NAME}`);
-      } else {
-        throw e;
-      }
-    }
-
-    try {
-      await this.createGroup('Researcher', userPoolId);
-      console.log('Creating Researcher group because group does not exist');
-    } catch (e) {
-      if (e instanceof GroupExistsException) {
-        console.log(`Researcher group already exists in user pool ${USER_POOL_NAME}`);
-      } else {
-        throw e;
-      }
-    }
 
     // Create root user in user pool if user does not exist in pool
     try {
@@ -70,10 +49,6 @@ export default class CognitoSetup {
         throw e;
       }
     }
-
-    // Add user to Admin user group if it has not already been added
-    await this.adminAddUserToGroup('Admin', userPoolId, ROOT_USER_EMAIL);
-    console.log(`User ${ROOT_USER_EMAIL} added to Admin group`);
   }
 
   /**
@@ -83,7 +58,7 @@ export default class CognitoSetup {
    */
   public async createGroup(groupName: string, userPoolId: string | undefined): Promise<void> {
     if (!userPoolId) {
-      userPoolId = await this._getUserPoolId();
+      userPoolId = await this.getUserPoolId();
     }
     const createGroupInput = {
       GroupName: groupName,
@@ -97,7 +72,7 @@ export default class CognitoSetup {
    */
   public async adminCreateUser(): Promise<void> {
     const password = this._generatePassword();
-    const poolId = await this._getUserPoolId();
+    const poolId = await this.getUserPoolId();
     const adminCreateUserInput = {
       ForceAliasCreation: true,
       TemporaryPassword: password,
@@ -120,7 +95,7 @@ export default class CognitoSetup {
     username: string
   ): Promise<void> {
     if (!userPoolId) {
-      userPoolId = await this._getUserPoolId();
+      userPoolId = await this.getUserPoolId();
     }
     const adminAddUserToGroupInput = {
       GroupName: groupName,
@@ -135,32 +110,20 @@ export default class CognitoSetup {
    *
    * @returns user pool id
    */
-  private async _getUserPoolId(): Promise<string | undefined> {
-    // Get list of user pools
-    let userPools: UserPoolDescriptionType[] = [];
-    let nextToken: string | undefined = undefined;
+  public async getUserPoolId(): Promise<string | undefined> {
+    const { STACK_NAME } = this._constants;
+    const describeStackParam = {
+      StackName: STACK_NAME
+    };
 
-    do {
-      // Add all pages of ListUserPoolsOutput to the userPools array until there are no more pages
-      const listUserPoolsInput: ListUserPoolsCommandInput = {
-        MaxResults: 20,
-        NextToken: nextToken
-      };
+    const stackDetails = await this._aws.clients.cloudformation.describeStacks(describeStackParam);
 
-      const listUserPoolsOutput = await this._aws.clients.cognito.listUserPools(listUserPoolsInput);
-      nextToken = listUserPoolsOutput.NextToken;
-      if (listUserPoolsOutput.UserPools) {
-        userPools = userPools.concat(listUserPoolsOutput.UserPools);
-      }
-    } while (nextToken);
-
-    // Find user pool in output with given user pool name
-    const userPool = userPools.find(
-      (userPool: UserPoolDescriptionType) => userPool.Name === this._constants.USER_POOL_NAME
-    );
+    const cognitoUserPoolId = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
+      return output.OutputKey && output.OutputKey === 'cognitoUserPoolId';
+    })?.OutputValue;
 
     // Return user pool id of given user pool
-    return userPool?.Id;
+    return cognitoUserPoolId;
   }
 
   /**

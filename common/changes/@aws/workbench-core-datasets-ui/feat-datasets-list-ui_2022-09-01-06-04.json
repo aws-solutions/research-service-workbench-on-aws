@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "Additions to Dataset UI package",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}

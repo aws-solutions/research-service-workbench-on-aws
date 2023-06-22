@@ -5,11 +5,14 @@
 
 /* eslint-disable security/detect-non-literal-fs-filename */
 
+import crypto from 'crypto';
 import fs from 'fs';
 
-import { join } from 'path';
-import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
+import { join, basename } from 'path';
+import { Readable } from 'stream';
 import { AwsService } from '@aws/workbench-core-base';
+import { _Object } from '@aws-sdk/client-s3';
+import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
 
 import md5File from 'md5-file';
 
@@ -154,13 +157,14 @@ export default class ServiceCatalogSetup {
 
   private async _uploadTemplateToS3(s3Bucket: string, prefix: string, filePaths: string[]): Promise<void> {
     for (const filePath of filePaths) {
-      const fileName = filePath.split('/').pop();
+      const fileName = basename(filePath);
       // nosemgrep
       const fileContent = fs.readFileSync(filePath);
       const putObjectParam = {
         Bucket: s3Bucket,
         Key: `${prefix}${fileName}`,
-        Body: fileContent
+        Body: fileContent,
+        ExpectedBucketOwner: process.env.MAIN_ACCT_ID
       };
 
       await this._aws.clients.s3.putObject(putObjectParam);
@@ -177,30 +181,48 @@ export default class ServiceCatalogSetup {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/interfaces/listobjectscommandinput.html#maxkeys
     const listS3ObjectsParam = {
       Bucket: s3Bucket,
-      Prefix: prefix
+      Prefix: prefix,
+      ExpectedBucketOwner: process.env.MAIN_ACCT_ID
     };
 
     const listObjectOutput = await this._aws.clients.s3.listObjects(listS3ObjectsParam);
-
-    const S3FileNameToEtag: { [key: string]: string } = {};
+    const S3FileNameToMd5Sum: { [key: string]: string } = {};
     if (listObjectOutput.Contents) {
-      listObjectOutput.Contents.forEach((content) => {
-        if (content.Key && content.ETag) {
+      for (let i = 0; i < listObjectOutput.Contents.length; i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const content: _Object = listObjectOutput.Contents[i];
+        if (content.Key) {
+          const getObjResponse = await this._aws.clients.s3.getObject({
+            Bucket: s3Bucket,
+            Key: content.Key,
+            ExpectedBucketOwner: process.env.MAIN_ACCT_ID
+          });
+          const streamToString = (stream: Readable): Promise<string> =>
+            new Promise((resolve, reject) => {
+              const chunks: Uint8Array[] = [];
+              stream.on('data', (chunk) => chunks.push(chunk));
+              stream.on('error', reject);
+              stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+            });
+          const s3FileMd5Sum: string = crypto
+            .createHash('md5')
+            .update(await streamToString(getObjResponse.Body! as Readable))
+            .digest('hex');
           const S3FileName = content.Key.split('/').pop();
           if (S3FileName) {
             // eslint-disable-next-line security/detect-object-injection
-            S3FileNameToEtag[S3FileName] = content.ETag.replace(/"/g, '');
+            S3FileNameToMd5Sum[S3FileName] = s3FileMd5Sum;
           }
         }
-      });
+      }
     }
     const envsToFilePath: { [key: string]: string } = {};
     cfnFilePaths.forEach((filePath: string) => {
-      const fileName = filePath.split('/').pop();
+      const fileName = basename(filePath);
       if (fileName) {
         const localCfnTemplateMd5Sum = md5File.sync(cfnFilePaths[0]);
         // eslint-disable-next-line security/detect-object-injection
-        if (localCfnTemplateMd5Sum !== S3FileNameToEtag[fileName]) {
+        if (localCfnTemplateMd5Sum !== S3FileNameToMd5Sum[fileName]) {
           const envType = fileName.replace('.cfn.yaml', '');
           // eslint-disable-next-line security/detect-object-injection
           envsToFilePath[envType] = filePath;
@@ -280,7 +302,7 @@ export default class ServiceCatalogSetup {
     const portfolioToCreateParam = {
       DisplayName: portfolioName,
       ProviderName: '_system_',
-      Description: 'Portfolio for managing SWB environments'
+      Description: 'Portfolio for managing RSW environments'
     };
 
     const response = await this._aws.clients.serviceCatalog.createPortfolio(portfolioToCreateParam);

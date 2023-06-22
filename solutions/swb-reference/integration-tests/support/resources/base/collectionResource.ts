@@ -2,6 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
+import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';
@@ -55,7 +57,8 @@ export default class CollectionResource {
     return response;
   }
 
-  public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+  // List call
+  public async get(queryParams: Record<string, JSONValue> | undefined = undefined): Promise<AxiosResponse> {
     return this._axiosInstance.get(this._api, { params: queryParams });
   }
 

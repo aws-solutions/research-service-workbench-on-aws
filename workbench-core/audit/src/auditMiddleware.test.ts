@@ -11,7 +11,7 @@ import { AuditConfig, WithAudit } from './auditMiddleware';
 import AuditPlugin from './auditPlugin';
 import AuditService from './auditService';
 import { BaseExtractor } from './baseExtractor';
-import Metadata from './metadata';
+import { Extractor } from './extractor';
 
 describe('Audit Middleware', () => {
   const mockRequest: Request = {} as Request;
@@ -19,7 +19,6 @@ describe('Audit Middleware', () => {
   const next: NextFunction = jest.fn(() => {
     mockResponse.statusCode = 200;
   });
-  const metadata: Metadata = Object.assign(mockMetadata, { statusCode: 200 });
 
   let auditMiddleware: (req: Request, res: Response, next: NextFunction) => Promise<void>;
   let auditConfig: AuditConfig;
@@ -41,7 +40,6 @@ describe('Audit Middleware', () => {
       excludePaths
     };
     auditMiddleware = WithAudit(auditConfig);
-    metadata.statusCode = 200;
     jest.clearAllMocks();
   });
 
@@ -63,5 +61,22 @@ describe('Audit Middleware', () => {
     expect(next).toBeCalledTimes(1);
 
     expect(auditService.write).toBeCalledWith(mockMetadata);
+  });
+
+  test('Use a different extractor', async () => {
+    const extractor: Extractor = {
+      getMetadata: jest.fn().mockResolvedValue(mockMetadata)
+    };
+    auditConfig = {
+      auditService,
+      excludePaths,
+      extractor
+    };
+    auditMiddleware = WithAudit(auditConfig);
+
+    await auditMiddleware(mockRequest, mockResponse, next);
+
+    expect(extractor.getMetadata).toBeCalledWith(mockRequest, mockResponse);
+    expect(next).toBeCalledTimes(1);
   });
 });

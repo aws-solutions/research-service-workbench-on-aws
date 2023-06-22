@@ -1,0 +1,24 @@
+ignores: [
+    '@aws/eslint-config-workbench-core-eslint-custom',
+    '@rushstack/heft-jest-plugin',
+    '@rushstack/heft-node-rig',
+    '@types/heft-jest',
+    'eslint-plugin-import',
+    'eslint-plugin-security',
+    'npm-package-json-lint-config-default',
+    '@types/node',
+    '@next/eslint-plugin-next',
+    'eslint-plugin-react',
+    'eslint-plugin-react-hooks',
+    '@types/react-dom'
+]
+ignore-patterns: [
+    // files matching these patterns will be ignored
+    '.heft',
+    '.rush',
+    'config',
+    'lib',
+    'node_modules',
+    'temp',
+  ]
+skip-missing: true

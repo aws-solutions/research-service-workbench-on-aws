@@ -1,0 +1,38 @@
+{
+  "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
+  "collectCoverage": true,
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/src/constants/hostingAccountStatus.ts",
+    "<rootDir>/src/handlers/accountHandler.ts",
+    "<rootDir>/src/schemas/createAccount.ts",
+    "<rootDir>/src/services/hostingAccountService.ts",
+    "<rootDir>/src/index.ts",
+    "<rootDir>/src/models/accounts/createAccountRequest.ts",
+    "<rootDir>/src/models/accounts/updateAccountRequest.ts",
+    "<rootDir>/src/models/accounts/getAccountRequest.ts",
+    "<rootDir>/src/models/accounts/awsAccountTemplateUrlsRequest.ts",
+    "<rootDir>/src/models/accounts/listAccountsRequest.ts",
+
+    "<rootDir>/src/models/costCenters/costCenter.ts",
+    "<rootDir>/src/models/costCenters/createCostCenterRequest.ts",
+    "<rootDir>/src/models/costCenters/deleteCostCenterRequest.ts",
+    "<rootDir>/src/models/costCenters/listCostCentersRequest.ts",
+
+    "<rootDir>/src/models/projects/assignUserToProjectRequest.ts",
+    "<rootDir>/src/models/projects/createProjectRequest.ts",
+    "<rootDir>/src/models/projects/deleteProjectRequest.ts",
+    "<rootDir>/src/models/projects/getProjectRequest.ts",
+    "<rootDir>/src/models/projects/getProjectsRequest.ts",
+    "<rootDir>/src/models/projects/project.ts",
+    "<rootDir>/src/models/projects/listProjectsRequest.ts"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "branches": 90,
+      "functions": 90,
+      "lines": 90,
+      "statements": 90
+    }
+  },
+  "coverageReporters": ["json-summary", "json", "lcov", "text"]
+}

@@ -1,0 +1,101 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Deploy-and-integration-test-swb-reference-BYON
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      stage:
+        required: true
+        type: string
+    secrets:
+      aws-dev-region:
+        required: true
+      role-to-assume:
+        required: true
+      aws-dev-account-region:
+        required: true
+      slack_webhook_url:
+        required: true
+      CYPRESS_ADMIN_PASSWORD:
+        required: true
+      CYPRESS_ADMIN_USER:
+        required: true
+      COGNITO_DOMAIN:
+        required: true
+      USER_POOL_ID:
+        required: true
+      CLIENT_ID:
+        required: true
+      CLIENT_SECRET:
+        required: true
+      VPC_ID:
+        required: true
+      ALB_SUBNET_1:
+        required: true
+      ALB_SUBNET_2:
+        required: true
+      ECS_SUBNET_1:
+        required: true
+      ECS_SUBNET_2:
+        required: true
+      HOSTED_ZONE_ID:
+        required: true
+
+jobs:
+  deploy-and-integration-test-swb-reference-byon:
+    runs-on: ubuntu-20.04
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: OIDCSessionName
+          role-duration-seconds: 7200
+
+      - name: Enter config settings from GH secrets
+        shell: bash
+        run: |
+          echo "
+          vpcId: ${{ secrets.VPC_ID }}
+          albSubnetIds: [${{ secrets.ALB_SUBNET_1 }}, ${{ secrets.ALB_SUBNET_2 }}]
+          ecsSubnetIds: [${{ secrets.ECS_SUBNET_1 }}, ${{ secrets.ECS_SUBNET_2 }}]
+          hostedZoneId: ${{ secrets.HOSTED_ZONE_ID }}" >> "solutions/swb-reference/src/config/${{inputs.stage}}.yaml"
+
+      - name: Deploy SWB-Reference
+        run: |
+          cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js run-postDeployment
+
+      - name: Run Integration tests
+        env:
+            NODE_OPTIONS: "--max_old_space_size=4096"
+        run: |
+          cd solutions/swb-reference
+          STAGE='${{inputs.stage}}' node ../../common/scripts/install-run-rushx.js integration-tests
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.slack_webhook_url }}

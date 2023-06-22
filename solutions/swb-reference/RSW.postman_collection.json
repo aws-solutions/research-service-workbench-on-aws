@@ -1,0 +1,2403 @@
+{
+  "info": {
+    "_postman_id": "25fa19b0-59e4-464e-99cc-1798a7327954",
+    "name": "RSW Official",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "costCenters",
+      "item": [
+        {
+          "name": "Create Cost Center",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"cost-center-name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cost Center",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Cost Center",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cost Center",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"\",\n    \"description\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Cost Centers",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters"],
+              "query": [
+                {
+                  "key": "filter[name][begins]",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "datasets",
+      "item": [
+        {
+          "name": "Create Internal DataSet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"testDs\",\n    \"region\": \"us-east-1\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Internal DataSet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Files to DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/upload-requests",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "upload-requests"],
+              "query": [
+                {
+                  "key": "filenames[]",
+                  "value": "file1.txt,file2.txt",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/:datasetId",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ":datasetId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Internal DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List DataSets for Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Associate DataSet With Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accessLevel\": \"<'read-only' or 'read-write'>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove DataSet from Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "relationships"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Permissions for Dataset",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/datasets/:datasetId/permissions",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "datasets", ":datasetId", "permissions"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "environments",
+      "item": [
+        {
+          "name": "Terminate Environment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/terminate",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":id", "terminate"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
+                  "key": "id",
+                  "value": null,
+                  "description": "ID of environment to terminate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Launch Environment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemakerNotebook\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Environment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/start",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":id", "start"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
+                  "key": "id",
+                  "value": null,
+                  "description": "ID of environment to start"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stop Environment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/stop",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":id", "stop"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
+                  "key": "id",
+                  "value": null,
+                  "description": "ID of environment to stop"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Environment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":id"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
+                  "key": "id",
+                  "value": null,
+                  "description": "ID of environment to GET metadata"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Environments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                }
+              ],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Environments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["environments"],
+              "query": [
+                {
+                  "key": "filter[name][begins]",
+                  "value": "testEnv",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[status][eq]",
+                  "value": "COMPLETED",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[projectId][eq]",
+                  "value": "project-123",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[owner][eq]",
+                  "value": "user-123",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value1]",
+                  "value": "2022-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value2]",
+                  "value": "2026-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[status]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[projectId]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[owner]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[createdAt]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Connection",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:id/connections",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":id", "connections"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project the environment belongs to"
+                },
+                {
+                  "key": "id",
+                  "value": null,
+                  "description": "ID of environment to get connection information"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "envType",
+      "item": [
+        {
+          "name": "Update envType",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"JupyterNotebook\",\n    \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List envTypes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get envType",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "ID of envType to get metadata"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "envTypeConfig",
+      "item": [
+        {
+          "name": "Create envTypeConfig",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config-1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update envTypeConfig",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get envTypeConfig",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete envTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List envTypeConfigs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get EnvTypeConfig associated with Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List projects by envTypeConfig",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId", "projects"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "projects",
+      "item": [
+        {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": null,
+                  "description": "ID of project to GET"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["projects"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[name][begins]",
+                  "value": "Project",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value1]",
+                  "value": "date1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value2]",
+                  "value": "date2",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[dependency][eq]",
+                  "value": "cc-1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[status][lte]",
+                  "value": "AVAILABLE",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[createdAt]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[dependency]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[status]",
+                  "value": "asc",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example-Project-1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": null,
+                  "description": "ID of project to SOFT DELETE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"New-name\",\n    \"description\": \"New description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "proj-123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Associate project with EnvTypeConfig",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Association between project and EnvTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Environment Type Configs for Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Users By Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "ProjectAdmin",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add User To Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"Researcher\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove User From Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId", "relationships"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId/purge",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId", "purge"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "hostingAccounts",
+      "item": [
+        {
+          "name": "Create Hosting Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"\",\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hosting Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts/:accountId",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts", ":accountId"],
+              "variable": [
+                {
+                  "key": "accountId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hosting Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"sampleName\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts/:accountId",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts", ":accountId"],
+              "variable": [
+                {
+                  "key": "accountId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Hosting Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hosting Account Template Urls",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "default"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"externalId\": \"workbench\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/awsAccountTemplateUrls",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccountTemplateUrls"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "sshKeys",
+      "item": [
+        {
+          "name": "List User SSH Keys for Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete SSH Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys/:sshKeyId/purge",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys", ":sshKeyId", "purge"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "sshKeyId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create SSH Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send SSH Public Key",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environments/:environmentId/sshKeys",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environments", ":environmentId", "sshKeys"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "environmentId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/login",
+              "host": ["{{API_URL}}"],
+              "path": ["login"],
+              "query": [
+                {
+                  "key": "stateVerifier",
+                  "value": "",
+                  "disabled": false
+                },
+                {
+                  "key": "codeChallenge",
+                  "value": "",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange Auth Code for Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"authCode\",\n    \"codeVerifier\": \"codeChallenge\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/token",
+              "host": ["{{API_URL}}"],
+              "path": ["token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/logout",
+              "host": ["{{API_URL}}"],
+              "path": ["logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/refresh",
+              "host": ["{{API_URL}}"],
+              "path": ["refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IsLoggedIn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}};refresh_token={{REFRESH_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              },
+              {
+                "key": "origin",
+                "value": "{{API_URL}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/loggedIn",
+              "host": ["{{API_URL}}"],
+              "path": ["loggedIn"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

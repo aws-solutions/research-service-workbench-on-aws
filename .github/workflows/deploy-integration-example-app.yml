@@ -1,0 +1,60 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Deploy-and-integration-test-example-app
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      aws-region:
+        required: true
+      role-to-assume:
+        required: true
+      aws-account-region:
+        required: true
+      slack_webhook_url:
+        required: true
+
+jobs:
+  deploy-and-integration-test-example:
+    runs-on: ubuntu-20.04
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: TestOIDCSessionName
+
+      - name: Deploy example package to Test environment
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-account-region }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+
+      - name: Example package integration test
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.slack_webhook_url }}

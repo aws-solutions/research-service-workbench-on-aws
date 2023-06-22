@@ -43,7 +43,7 @@ GitHub provides additional document on [forking a repository](https://help.githu
 1. Use the [GitHub Actions OIDC integration](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#prerequisites). You can use [aws-actions/configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials) to obtain credentials from your IAM OIDC provider. 
 2. Update the `deploy-integration-*****.yml` workflows with the `aws-region` and `role-to-assume`.
 
-For example to deploy `swb-reference` package to your AWS account, update the `aws-region` you want to deploy to and the `role-to-assume` you created [here](https://github.com/awslabs/solution-spark-on-aws/blob/main/.github/workflows/deploy-integration-swb-reference.yml#L37-L38)
+For example to deploy `swb-reference` package to your AWS account, update the `aws-region` you want to deploy to and the `role-to-assume` you created [here](https://github.com/aws-solutions/research-service-workbench-on-aws/blob/main/.github/workflows/deploy-integration-swb-reference.yml#L37-L38)
 
 ## Finding contributions to work on
 Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.

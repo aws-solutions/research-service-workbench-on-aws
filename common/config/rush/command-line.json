@@ -181,23 +181,9 @@
       "enableParallelism": true
     },
     {
-      "name": "test:only",
-      "commandKind": "bulk",
-      "summary": "Used to perform tests on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
       "name": "sort-package-json",
       "commandKind": "bulk",
       "summary": "Sort package.json file",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "make-badges",
-      "commandKind": "bulk",
-      "summary": "Used to update README file with code coverage report for the packages",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
@@ -223,28 +209,33 @@
       "enableParallelism": true
     },
     {
+      "name": "license-checker",
+      "commandKind": "bulk",
+      "summary": "Run license checker on dependencies",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "add-license-header",
+      "commandKind": "bulk",
+      "summary": "Add license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "check-license-header",
+      "commandKind": "bulk",
+      "summary": "Check license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
-    },
-    {
-      "name": "common-coverage",
-      "commandKind": "global",
-      "summary": "Updates the common code coverage report in root README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
-    },
-    {
-      "name": "common-coverage-make-badge",
-      "commandKind": "global",
-      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json \"*/**/temp/coverage/coverage-final.json\""
     },
     {
       "name": "commitlint",
@@ -270,6 +261,13 @@
       "shellCommand": "bash .github/workflows/scripts/git-secrets-scan.sh"
     },
     {
+      "name": "viperlight-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a viperlight scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
+    },
+    {
       "name": "prettier",
       "commandKind": "global",
       "summary": "Used by the pre-commit Git hook. This command invokes Prettier to reformat staged changes.",
@@ -283,14 +281,14 @@
       "commandKind": "global",
       "summary": "Run rush install with bypass-policy and perform custom git-hook install",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy && node common/scripts/install-hooks"
+      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy --max-install-attempts 1 && node common/scripts/install-hooks"
     },
     {
       "name": "cupdate",
       "commandKind": "global",
       "summary": "Run rush update with bypass-policy and perform custom git-hook install",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy && node common/scripts/install-hooks"
+      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy --max-install-attempts 1 && node common/scripts/install-hooks"
     }
   ],
 
@@ -311,18 +309,6 @@
       "longName": "--ci",
       "description": "Option to run make install in ci jobs",
       "associatedCommands": ["git-secrets-scan"]
-    },
-    {
-      "parameterKind": "flag",
-      "longName": "--ci",
-      "description": "Throws an error if the badges generated do not match what is already in the README.md",
-      "associatedCommands": ["make-badges"]
-    },
-    {
-      "parameterKind": "flag",
-      "longName": "--ci",
-      "description": "Throws an error if the badges generated do not match what is already in the README.md",
-      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**

@@ -6,7 +6,12 @@ ignores: [
     'eslint-plugin-import',
     'eslint-plugin-security',
     'npm-package-json-lint-config-default',
-    '@types/node'
+    '@types/node',
+    'ts-node',
+    'ts-jest',
+    '@types/aws-lambda',
+    'fast-check',
+    'jest-fast-check'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored

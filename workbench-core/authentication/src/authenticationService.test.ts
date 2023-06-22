@@ -11,8 +11,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret',
-  websiteUrl: 'fake-website-url'
+  clientSecret: 'fake-client-secret'
 } as const;
 
 describe('AuthenticationService tests', () => {
@@ -57,6 +56,13 @@ describe('AuthenticationService tests', () => {
     expect(revokeSpy).lastCalledWith('valid token');
   });
 
+  it('revokeAccessToken should successfully call the plugins revokeAccessToken() method', async () => {
+    const revokeAccessTokenSpy = jest.spyOn(mockPlugin, 'revokeAccessToken');
+    await service.revokeAccessToken('valid token');
+
+    expect(revokeAccessTokenSpy).lastCalledWith('valid token');
+  });
+
   it('getUserIdFromToken should return the tokens user id', () => {
     const result = service.getUserIdFromToken({});
 
@@ -70,7 +76,11 @@ describe('AuthenticationService tests', () => {
   });
 
   it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens and their expiration (in seconds)', async () => {
-    const result = await service.handleAuthorizationCode('access code', 'code verifier');
+    const result = await service.handleAuthorizationCode(
+      'access code',
+      'code verifier',
+      'https://www.fakewebsite.com'
+    );
 
     expect(result).toMatchObject({
       idToken: {
@@ -91,10 +101,11 @@ describe('AuthenticationService tests', () => {
   it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
     const state = 'state';
     const codeChallenge = 'code challenge';
-    const url = service.getAuthorizationCodeUrl(state, codeChallenge);
+    const websiteUrl = 'https://www.fakewebsite.com';
+    const url = service.getAuthorizationCodeUrl(state, codeChallenge, websiteUrl);
 
     expect(url).toBe(
-      `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+      `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
     );
   });
 
@@ -114,10 +125,9 @@ describe('AuthenticationService tests', () => {
   });
 
   it('getLogoutUrl should return the full URL of the authentication servers logout endpoint', () => {
-    const url = service.getLogoutUrl();
+    const websiteUrl = 'https://www.fakewebsite.com';
+    const url = service.getLogoutUrl(websiteUrl);
 
-    expect(url).toBe(
-      'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
-    );
+    expect(url).toBe(`https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=${websiteUrl}`);
   });
 });

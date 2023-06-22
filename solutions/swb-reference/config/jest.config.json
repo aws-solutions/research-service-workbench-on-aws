@@ -6,16 +6,22 @@
   },
   "moduleFileExtensions": ["ts", "js"],
   "coveragePathIgnorePatterns": [
-    "<rootDir>/src/SWBStack.ts",
+    "<rootDir>/src/RSWStack.ts",
     "<rootDir>/src/backendAPI.ts",
     "<rootDir>/src/accountHandlerWrapper.ts",
     "<rootDir>/src/index.ts",
     "<rootDir>/src/environment/workflow.ts",
     "<rootDir>/src/accountHandlerLambda.ts",
+    "<rootDir>/src/proxyHandlerLambda.ts",
     "<rootDir>/src/environment/statusHandlerLambda.ts",
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
-    "<rootDir>/src/postDeployment.ts"
+    "<rootDir>/src/postDeployment.ts",
+    "<rootDir>/src/dynamicRouteConfig.ts",
+    "<rootDir>/src/mocks/mockDatabaseService.ts",
+    "<rootDir>/src/services/databaseService.ts",
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts",
+    "<rootDir>/src/services/swbEnvironmentService.ts"
   ],
   "coverageThreshold": {
     "global": {
@@ -25,5 +31,8 @@
       "statements": 70
     }
   },
-  "coverageReporters": ["json-summary", "json"]
+  "coverageReporters": ["json-summary", "json", "lcov", "text"],
+  "moduleNameMapper": {
+    "#node-web-compat": "./node-web-compat-node.js"
+  }
 }

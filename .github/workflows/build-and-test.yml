@@ -4,7 +4,12 @@
 #
 
 name: Build-and-test
-on: ['pull_request']
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
 
 jobs:
   build-and-test:
@@ -12,12 +17,123 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with: 
+        with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
 
       - name: Base Action
         uses: ./.github/actions/baseAction
-      
+
       - name: Rush test
-        run: node common/scripts/install-run-rush.js test:only --verbose
+        run: node common/scripts/install-run-rush.js test --verbose
+
+      - name: Generate Codecov for @aws/example-ui-app
+        uses: codecov/codecov-action@v3
+        with:
+          files: solutions/example-ui-app/temp/coverage/coverage-final.json
+          flags: example-ui-app
+
+      - name: Generate Codecov for @aws/swb-app
+        uses: codecov/codecov-action@v3
+        with:
+          files: solutions/swb-app/temp/coverage/coverage-final.json
+          flags: swb-app
+
+      - name: Generate Codecov for @aws/swb-reference
+        uses: codecov/codecov-action@v3
+        with:
+          files: solutions/swb-reference/temp/coverage/coverage-final.json
+          flags: swb-reference
+
+      - name: Generate Codecov for @aws/workbench-core-accounts
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/accounts/temp/coverage/coverage-final.json
+          flags: workbench-core-accounts
+
+      - name: Generate Codecov for @aws/workbench-core-accounts-ui
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/accounts-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-accounts-ui
+
+      - name: Generate Codecov for workbench-core-audit
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/audit/temp/coverage/coverage-final.json
+          flags: workbench-core-audit
+
+      - name: Generate Codecov for workbench-core-authentication
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/authentication/temp/coverage/coverage-final.json
+          flags: workbench-core-authentication
+
+      - name: Generate Codecov for workbench-core-authorization
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/authorization/temp/coverage/coverage-final.json
+          flags: workbench-core-authorization
+
+      - name: Generate Codecov for workbench-core-base
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/base/temp/coverage/coverage-final.json
+          flags: workbench-core-base
+
+      - name: Generate Codecov for workbench-core-datasets
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/datasets/temp/coverage/coverage-final.json
+          flags: workbench-core-datasets
+
+      - name: Generate Codecov for workbench-core-datasets-ui
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/datasets-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-datasets-ui
+
+      - name: Generate Codecov for workbench-core-environments
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/environments/temp/coverage/coverage-final.json
+          flags: workbench-core-environments
+
+      - name: Generate Codecov for workbench-core-environments-ui
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/environments-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-environments-ui
+
+      - name: Generate Codecov for workbench-core-infrastructure
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/infrastructure/temp/coverage/coverage-final.json
+          flags: workbench-core-infrastructure
+
+      - name: Generate Codecov for workbench-core-logging
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/logging/temp/coverage/coverage-final.json
+          flags: workbench-core-logging
+
+      - name: Generate Codecov for workbench-core-swb-common-ui
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/swb-common-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-swb-common-ui
+
+      - name: Generate Codecov for workbench-core-user-management
+        uses: codecov/codecov-action@v3
+        with:
+          files: workbench-core/user-management/temp/coverage/coverage-final.json
+          flags: workbench-core-user-management
+
+      - name: Generates common coverage summary reports for all packages in ./coverage dir
+        run: node common/scripts/install-run-rush.js common-coverage-report
+
+      - name: Generate common Codecov for Root
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage/coverage-final.json
+          flags: root

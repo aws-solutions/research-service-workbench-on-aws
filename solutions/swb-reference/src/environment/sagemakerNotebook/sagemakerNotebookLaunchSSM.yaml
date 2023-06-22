@@ -29,11 +29,11 @@ parameters:
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+    allowedPattern: ^env-[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
   Namespace:
     type: String
     description: 'The namespace to be used for creating the CfN stack resources'
-    default: 'swbv2-Sagemaker'
+    default: 'rsw-Sagemaker'
     allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   InstanceName:
     type: String
@@ -76,9 +76,13 @@ parameters:
     type: String
     description: The region of application deployment in main account
     allowedPattern: ^\w{2,3}-\w+-\d{1}$
-  MainAccountKeyArn:
+  MainAccountS3ArtifactKeyArn:
     type: String
-    description: The ARN of main account bucket encryption key
+    description: The ARN of main account S3 Artifact bucket encryption key
+    allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+  MainAccountS3DatasetsKeyArn:
+    type: String
+    description: The ARN of main account S3 Datasets bucket encryption key
     allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
 mainSteps:
   - name: Launch
@@ -119,8 +123,10 @@ mainSteps:
           Value: '{{ MainAccountId }}'
         - Key: MainAccountRegion
           Value: '{{ MainAccountRegion }}'
-        - Key: MainAccountKeyArn
-          Value: '{{ MainAccountKeyArn }}'
+        - Key: MainAccountS3ArtifactKeyArn
+          Value: '{{ MainAccountS3ArtifactKeyArn }}'
+        - Key: MainAccountS3DatasetsKeyArn
+          Value: '{{ MainAccountS3DatasetsKeyArn }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'
@@ -131,7 +137,14 @@ mainSteps:
       - Name: RecordId
         Type: String
         Selector: '$.RecordDetail.RecordId'
-    description: Launch Sagemaker
+    description: |
+      ## Launch
+      Provision Sagemaker Notebook product through service catalog
+      ## Inputs
+      * inputs are provided in `parameters`
+      ## Outputs
+      * ProvisionedProductId: The Id of the provisioned product
+      * RecordId: The Id of this request response
     nextStep: WaitForProvisioning
   - name: WaitForProvisioning
     action: 'aws:waitForAwsResourceProperty'
@@ -146,6 +159,14 @@ mainSteps:
       PropertySelector: '$.ProvisionedProductDetail.Status'
     # aws.waitForAwsResourceProperty does not support outputs so creating another step
     nextStep: GetProvisionedProductDetail
+    description: |
+      ## WaitForProvisioning
+      Allow automation to wait for AVAILABLE/ERROR status of the provision before continuing the automation
+      ## Inputs
+      * Id: The Id of the provisioned product from `Launch`
+      * DesiredValues: The expected status of the provisioned product on which to continue the automation: AVAILABLE/ERROR
+      ## Outputs
+      * None (aws.waitForAwsResourceProperty does not support outputs. Output are put into the next step)
   - name: GetProvisionedProductDetail
     action: 'aws:executeAwsApi'
     inputs:
@@ -160,6 +181,14 @@ mainSteps:
         Type: String
         Selector: '$.ProvisionedProductDetail.StatusMessage'
     nextStep: ChooseByStatus
+    description: |
+      ## GetProvisionedProductDetail
+      Get provisioned product details
+      ## Inputs
+      * Id: The Id of the provisioned product from `Launch`
+      ## Outputs
+      * ProductStatus: The status of the provisioned product
+      * ErrorMessage: Error messages to the request
   - name: ChooseByStatus
     action: 'aws:branch'
     inputs:
@@ -171,6 +200,11 @@ mainSteps:
           Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
           StringEquals: ERROR
       Default: PushFailureStatusToEventBridge
+    description: |
+      ## ChooseByStatus
+      Run conditional steps based on product status
+      If product is AVAILABLE, run`PushMetadataToEventBridge`; if ERROR, run `PushFailureStatusToEventBridge`.
+      default: `PushFailureStatusToEventBridge`
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -182,6 +216,9 @@ mainSteps:
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
+    description: |
+      ## PushMetadataToEventBridge
+      Send metadata of this Launch request to Amazon EventBridge
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -193,3 +230,6 @@ mainSteps:
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
+    description: |
+      ## PushFailureStatusToEventBridge
+      Send error messages of this Launch request to Amazon EventBridge

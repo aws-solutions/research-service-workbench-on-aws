@@ -2,10 +2,10 @@
   "name": "@aws/eslint-config-workbench-core-eslint-custom",
   "version": "0.0.1",
   "description": "Custom eslint rules",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/research-service-workbench-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -15,29 +15,34 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
+    "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint",
+    "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
+    "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
-    "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only",
-    "test:only": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/eslint-config": "^3.0.0",
+    "@typescript-eslint/parser": "^5.43.0",
     "eslint": "^8.7.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-security": "^1.4.0"
   },
   "devDependencies": {
-    "@rushstack/heft": "^0.45.0",
-    "@rushstack/heft-jest-plugin": "^0.2.3",
-    "@rushstack/heft-node-rig": "^1.7.1",
+    "@rushstack/heft": "^0.50.5",
+    "@rushstack/heft-jest-plugin": "^0.5.11",
+    "@rushstack/heft-node-rig": "^1.12.11",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^14",
+    "@types/node": "^18.15.11",
     "depcheck": "^1.4.3",
+    "license-check-and-add": "^4.0.5",
+    "license-checker": "^25.0.1",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",

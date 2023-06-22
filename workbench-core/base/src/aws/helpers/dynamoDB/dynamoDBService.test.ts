@@ -3,6 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import {
+  DynamoDBClient,
+  QueryCommand,
+  UpdateItemCommand,
+  GetItemCommand,
+  DeleteItemCommand
+} from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
+import JSONValue from '../../../types/json';
+import { buildDynamoDBPkSk, MAX_GET_ITEMS_SIZE } from './ddbUtil';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -10,6 +21,84 @@ describe('DynamoDBService', () => {
   const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
+
+  describe('getItems', () => {
+    test('fails when retrieving more than allowed', async () => {
+      // BUILD
+      const keys = Array.from({ length: MAX_GET_ITEMS_SIZE + 1 }, (v, k) => {
+        return { pk: k, sk: k };
+      });
+
+      // CHECK
+      await expect(dbService.getItems(keys)).rejects.toThrow(
+        `Cannot retrieve more than ${MAX_GET_ITEMS_SIZE} items by request.`
+      );
+    });
+  });
+
+  describe('getItem', () => {
+    let unmarshalledData: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+
+      mockDDB.on(GetItemCommand).resolves({
+        Item: marshall(unmarshalledData)
+      });
+    });
+    // Get Item
+    test('returns unmarshalled item', async () => {
+      // BUILD
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
+      // OPERATE
+      const result = await dbService.getItem({ key });
+      // CHECK
+      expect(result).toEqual(unmarshalledData);
+    });
+  });
+
+  describe('getPaginatedItems', () => {
+    let unmarshalledData: Record<string, JSONValue>;
+    let unmarshalledPaginationToken: { pk: string; sk: string };
+    let base64EncodingOfPaginationToken = '';
+
+    beforeEach(() => {
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      unmarshalledPaginationToken = {
+        pk: 'pk',
+        sk: 'sk'
+      };
+      base64EncodingOfPaginationToken = 'eyJwayI6InBrIiwic2siOiJzayJ9';
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(QueryCommand).resolves({
+        Items: [marshall(unmarshalledData)],
+        LastEvaluatedKey: marshall(unmarshalledPaginationToken)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.getPaginatedItems();
+      expect(result.data).toEqual([unmarshalledData]);
+      expect(result.paginationToken).toEqual(base64EncodingOfPaginationToken);
+    });
+  });
+
   describe('batchEdit', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
@@ -154,6 +243,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toMatchObject(expectedParams);
     });
   });
+
+  describe('deleteItem', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(DeleteItemCommand).resolves({
+        Attributes: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.deleteItem({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual(unmarshalledAttributes);
+    });
+  });
+
   describe('deleter', () => {
     test('should suceed with no optional params', async () => {
       // BUILD
@@ -330,6 +446,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toEqual(expectedParams);
     });
   });
+
+  describe('getItem', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(GetItemCommand).resolves({
+        Item: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.getItem({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual(unmarshalledAttributes);
+    });
+  });
+
   describe('getter', () => {
     // Get Item
     test('single get should populate params with no optional params', async () => {
@@ -1496,6 +1639,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toEqual(expectedParams);
     });
   });
+
+  describe('updateExecuteAndFormat', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(UpdateItemCommand).resolves({
+        Attributes: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual({ Attributes: unmarshalledAttributes });
+    });
+  });
+
   describe('updater', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
@@ -1507,7 +1677,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key).getParams();
+      const generatedParams = dbService.update({ key }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1533,7 +1703,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1561,7 +1731,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1589,7 +1759,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1613,7 +1783,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1641,7 +1811,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1657,7 +1827,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1673,7 +1843,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1689,7 +1859,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1705,7 +1875,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1721,7 +1891,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1738,7 +1908,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1755,7 +1925,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1772,7 +1942,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1789,7 +1959,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1806,7 +1976,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);

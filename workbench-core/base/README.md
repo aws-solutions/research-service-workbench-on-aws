@@ -1,12 +1,9 @@
-# Workbench Core ESLint Config Custom
+# Workbench Core Base
+## `main branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/main/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/main)
 
-⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
-
-## Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-79.65%25-red.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-72.78%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-78.08%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-81.44%25-yellow.svg?style=flat) |
-# `base`
+## `develop branch coverage`
+[![codecov](https://codecov.io/github/aws-solutions/research-service-workbench-on-aws/branch/develop/graph/badge.svg?flag=workbench-core-base)](https://app.codecov.io/github/aws-solutions/research-service-workbench-on-aws/tree/develop)
 
 > This package is intended to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires. We use `aws-sdk` V3 to improve the load-time of the modules imported at runtime.
 

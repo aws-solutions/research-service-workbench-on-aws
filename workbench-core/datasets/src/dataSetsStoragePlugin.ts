@@ -3,6 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import {
+  AddStorageExternalEndpointRequest,
+  AddStorageExternalEndpointResponse
+} from './models/addStorageExternalEndpoint';
+import { DataSet } from './models/dataSet';
+
 export interface EndpointConnectionStrings {
   /**
    * a URL which can be used to access the storage endpoint.
@@ -10,9 +16,9 @@ export interface EndpointConnectionStrings {
   endPointUrl: string;
 
   /**
-   * An optional alias which also can be used to access the storage endpoint.
+   * An alias which also can be used to access the storage endpoint.
    */
-  endPointAlias?: string;
+  endPointAlias: string;
 }
 
 /**
@@ -52,28 +58,20 @@ export interface DataSetsStoragePlugin {
   /**
    * Configures an existing dataset to be connected to an external environment.
    *
-   * @param name - the name of the storage destination to be accessed
-   * @param path - a string which locates to root of the dataset within the storage medium
-   * such as a prefix in an S3 bucket.
-   * @param externalEndpointName - a name to uniquely identify the endpoint.
-   * @param ownerAccountId - the AWS Account Id where the storage resides.
-   * @param externalRoleName - an optional role name which the external environment will assume to
-   * access the DataSet
+   * @param request - a {@link AddStorageExternalEndpointRequest} object
    *
-   * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
+   * @returns a {@link AddStorageExternalEndpointResponse} object
+   *
+   * @throws {@link EndpointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(
-    name: string,
-    path: string,
-    externalEndpointName: string,
-    ownerAccountId: string,
-    externalRoleName?: string
-  ): Promise<EndpointConnectionStrings>;
+    request: AddStorageExternalEndpointRequest
+  ): Promise<AddStorageExternalEndpointResponse>;
 
   /**
    * Removes an existing dataset connection which was used for access by an external environment
    *
-   * @param name - the name of the storage destination
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param ownerAccountId - the owning AWS account for the storage destination.
    */
@@ -90,6 +88,8 @@ export interface DataSetsStoragePlugin {
    * @param endPointUrl - a URL which can be used to reach the endpoint.
    * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
+   * @throws {@link InvalidArnError} - the externalRoleName parameter is invalid
+   * @throws {@link InvalidArnError} - the endPointUrl parameter is invalid
    */
   addRoleToExternalEndpoint(
     name: string,
@@ -124,12 +124,13 @@ export interface DataSetsStoragePlugin {
   /**
    * Create a presigned URL to be used to upload a file to a Dataset.
    *
-   * @param name - the name of the Dataset to which to make an upload.
-   * @param timeToLiveMilliseconds - the maximum time before the URL expires.
+   * @param dataset - the Dataset to which to make an upload.
+   * @param fileName - the name of the file to upload.
+   * @param timeToLiveSeconds - the maximum time before the URL expires.
    *
    * @returns a URL which can be used to upload a file directly to the DataSet destination.
    */
-  createPresignedUploadUrl(name: string, timeToLiveMilliseconds: number): Promise<string>;
+  createPresignedUploadUrl(dataset: DataSet, fileName: string, timeToLiveSeconds: number): Promise<string>;
 
   /**
    * Create a set of presigned URLs to be used to make a multipart upload to a DataSet.

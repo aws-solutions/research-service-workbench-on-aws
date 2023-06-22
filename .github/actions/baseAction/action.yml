@@ -9,10 +9,10 @@ description: Generic base action used by workflows - Cache rush and pnpm; rush i
 runs:
   using: "composite"
   steps:
-    - name: Use Node.js 14.x
+    - name: Use Node.js 18.x
       uses: actions/setup-node@v3
       with:
-        node-version: '14.x'
+        node-version: '18.x'
 
     - name: Cache Rush
       uses: actions/cache@v3
@@ -30,6 +30,7 @@ runs:
       with:
         path: |
           common/temp/pnpm-store
+          ~/.cache/Cypress
         key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-
@@ -38,12 +39,11 @@ runs:
     - name: install pnpm
       uses: pnpm/action-setup@v2.2.2
       with:
-        version: 6.32
+        version: 7.13.0
 
     - name: Install dependecies
       shell: bash
       run: node common/scripts/install-run-rush.js install
-      
     - name: Rush check
       shell: bash
       run: node common/scripts/install-run-rush.js check

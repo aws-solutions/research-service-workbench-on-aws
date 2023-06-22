@@ -21,7 +21,7 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
   public constructor() {
     this.helper = new EnvironmentLifecycleHelper();
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
-    this.envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    this.envService = new EnvironmentService(this.aws.helpers.ddb);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
@@ -30,12 +30,23 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
       .value!;
 
-    const { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn } =
-      await this.helper.getCfnOutputs();
+    const {
+      datasetsBucketArn,
+      mainAccountRegion,
+      mainAccountId,
+      mainAcctS3ArtifactEncryptionArn,
+      mainAcctS3DatasetsEncryptionArn
+    } = await this.helper.getCfnOutputs();
+
+    const datasetIds: string[] =
+      envMetadata.DATASETS?.map((dataSet: { id: string }) => {
+        return dataSet.id;
+      }) || [];
+    const mainAcctEncryptionArnList = [mainAcctS3ArtifactEncryptionArn, mainAcctS3DatasetsEncryptionArn];
     const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
-      envMetadata.datasetIds,
+      datasetIds,
       envMetadata,
-      mainAcctEncryptionArn
+      mainAcctEncryptionArnList
     );
 
     const ssmParameters = {
@@ -54,7 +65,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
       IamPolicyDocument: [iamPolicyDocument],
       S3Mounts: [s3Mounts],
-      MainAccountKeyArn: [mainAcctEncryptionArn],
+      MainAccountS3ArtifactKeyArn: [mainAcctS3ArtifactEncryptionArn],
+      MainAccountS3DatasetsKeyArn: [mainAcctS3DatasetsEncryptionArn],
       MainAccountRegion: [mainAccountRegion],
       MainAccountId: [mainAccountId]
     };
@@ -85,8 +97,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       ssmParameters,
       operation: 'Terminate',
       envType: this._envType,
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId
     });
 
     // Delete access point(s) for this workspace
@@ -105,8 +117,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
       operation: 'Start',
       envType: this._envType
     });
@@ -126,8 +138,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
-      externalId: envDetails.PROJ.externalId,
+      envMgmtRoleArn: envDetails.PROJ!.envMgmtRoleArn,
+      externalId: envDetails.PROJ!.externalId,
       operation: 'Stop',
       envType: this._envType
     });

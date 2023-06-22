@@ -3,9 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { SecretValue, Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
+  AdvancedSecurityMode,
   Mfa,
   OAuthScope,
   UserPool,
@@ -23,7 +24,7 @@ import merge from 'lodash/merge';
 const userPoolDefaults: UserPoolProps = {
   accountRecovery: AccountRecovery.EMAIL_ONLY,
   enableSmsRole: false,
-  mfa: Mfa.OFF,
+  mfa: Mfa.OPTIONAL,
   selfSignUpEnabled: false, // only admin can create users
   signInAliases: {
     // only sign in with email
@@ -41,7 +42,12 @@ const userPoolDefaults: UserPoolProps = {
     email: {
       required: true
     }
-  }
+  },
+  mfaSecondFactor: {
+    sms: false,
+    otp: true
+  },
+  advancedSecurityMode: AdvancedSecurityMode.ENFORCED
 };
 
 const userPoolClientDefaults: UserPoolClientOptions = {
@@ -55,18 +61,28 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   authFlows: {
     adminUserPassword: true,
     userSrp: true,
+    userPassword: true,
     custom: true
   },
   preventUserExistenceErrors: true,
-  enableTokenRevocation: true
+  enableTokenRevocation: true,
+  idTokenValidity: Duration.minutes(15),
+  accessTokenValidity: Duration.minutes(15),
+  refreshTokenValidity: Duration.days(7)
 };
 
 export interface WorkbenchCognitoProps {
   domainPrefix: string;
-  websiteUrl: string;
+  websiteUrls: string[];
   userPoolName?: string;
   userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
+  accessTokenValidity?: Duration;
+  idTokenValidity?: Duration;
+  refreshTokenValidity?: Duration;
+  mfa?: Mfa;
+  removalPolicy?: RemovalPolicy;
+  advancedSecurityMode?: AdvancedSecurityMode;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -85,14 +101,22 @@ export class WorkbenchCognito extends Construct {
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
       domainPrefix,
-      websiteUrl,
-      userPoolName,
+      websiteUrls,
       userPoolClientName,
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
 
-    this.userPool = new UserPool(this, 'WorkbenchUserPool', { ...userPoolDefaults, userPoolName });
+    const tempUserPoolProps: UserPoolProps = {
+      mfa: props.mfa,
+      userPoolName: props.userPoolName,
+      removalPolicy: props.removalPolicy,
+      advancedSecurityMode: props.advancedSecurityMode
+    };
+
+    const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);
+
+    this.userPool = new UserPool(this, 'WorkbenchUserPool', userPoolProps);
 
     this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
       userPool: this.userPool,
@@ -112,13 +136,16 @@ export class WorkbenchCognito extends Construct {
       this.userPool.registerIdentityProvider(provider);
     });
 
-    const tempProps: UserPoolClientOptions = {
+    const tempUserPoolClientProps: UserPoolClientOptions = {
       oAuth: {
-        callbackUrls: [websiteUrl],
-        logoutUrls: [websiteUrl]
-      }
+        callbackUrls: websiteUrls,
+        logoutUrls: websiteUrls
+      },
+      accessTokenValidity: props.accessTokenValidity,
+      idTokenValidity: props.idTokenValidity,
+      refreshTokenValidity: props.refreshTokenValidity
     };
-    const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
+    const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
     this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
       ...userPoolClientProps,
       userPool: this.userPool,
@@ -140,7 +167,8 @@ export class WorkbenchCognito extends Construct {
       },
       policy: AwsCustomResourcePolicy.fromSdkCalls({
         resources: [this.userPool.userPoolArn]
-      })
+      }),
+      installLatestAwsSdk: true
     });
 
     const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(

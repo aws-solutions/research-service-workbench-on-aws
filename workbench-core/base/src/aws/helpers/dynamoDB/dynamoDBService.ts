@@ -2,42 +2,29 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
+import {
+  BatchGetItemCommandOutput,
+  DeleteItemCommandOutput,
+  GetItemCommandOutput
+} from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
+import DeleteItemParams from '../../../interfaces/deleteItemParams';
+import GetItemParams from '../../../interfaces/getItemParams';
+import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
+import QueryParams from '../../../interfaces/queryParams';
+import JSONValue from '../../../types/json';
+import { getPaginationToken } from '../../../utilities/paginationHelper';
 import BatchEdit from './batchEdit';
+import { MAX_GET_ITEMS_SIZE } from './ddbUtil';
 import Deleter from './deleter';
 import Getter from './getter';
+import { UpdateParams } from './interfaces/updateParams';
+import { UpdateUnmarshalledOutput } from './interfaces/updateUnmarshalledOutput';
 import Query from './query';
 import Scanner from './scanner';
 import TransactEdit from './transactEdit';
 import Updater from './updater';
-
-interface QueryParams {
-  index?: string;
-  key?: { name: string; value: unknown };
-  sortKey?: string;
-  eq?: AttributeValue;
-  lt?: AttributeValue;
-  lte?: AttributeValue;
-  gt?: AttributeValue;
-  gte?: AttributeValue;
-  between?: { value1: AttributeValue; value2: AttributeValue };
-  begins?: AttributeValue;
-  start?: { [key: string]: unknown };
-  filter?: string;
-  strong?: boolean;
-  names?: { [key: string]: string };
-  values?: { [key: string]: unknown };
-  projection?: string | string[];
-  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
-  limit?: number;
-  forward?: boolean;
-  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-}
-
-export { QueryParams };
 
 export default class DynamoDBService {
   private _awsRegion: string;
@@ -121,6 +108,23 @@ export default class DynamoDBService {
   }
 
   /**
+   * Gets a single item from the DynamoDB table.
+   *
+   * @param params - {@link GetItemParams} object of properties to generate a get item request
+   * @returns Promise of a string, {@link JSONValue} paired object
+   *
+   * @example Use this to get a single item from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.getItem({key: 'pk'});
+   * ```
+   */
+  public async getItem(params: GetItemParams): Promise<Record<string, JSONValue>> {
+    const result = (await this.get(params.key, params.params).execute()) as GetItemCommandOutput;
+
+    return result.Item as unknown as Record<string, JSONValue>;
+  }
+
+  /**
    * Creates a Getter to do single get item or batch get item operations on a DynamoDB table.
    *
    * @param key - single object of key to get for single get item or list of objects of keys to get for batch get item
@@ -167,6 +171,58 @@ export default class DynamoDBService {
   }
 
   /**
+   * retrieves items from DynamoDB table.
+   *
+   * @param keys - array of keys to retrieve
+   * @param params - optional object of optional properties to generate a get item request
+   * @returns Promise\<Record\<string,JSONValue\>\>
+   *
+   * @example Use this method to retrieve an item from ddb by Id
+   * ```ts
+   * const item = await dynamoDBService.getItems([{'pk': 'pk', 'sk': 'sk'}, {'pk': 'pk2', 'sk': 'sk2'}], {projection: 'valueIWant'});
+   * ```
+   */
+  public async getItems(
+    keys: Record<string, unknown>[],
+    params?: {
+      strong?: boolean;
+      names?: { [key: string]: string };
+      projection?: string | string[];
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+    }
+  ): Promise<Record<string, JSONValue>[]> {
+    if (keys.length > MAX_GET_ITEMS_SIZE)
+      throw new Error(`Cannot retrieve more than ${MAX_GET_ITEMS_SIZE} items by request.`);
+    const batchGetResult = (await this.get(keys, params).execute()) as BatchGetItemCommandOutput;
+    return batchGetResult.Responses![this._tableName].map((item) => {
+      return item as unknown as Record<string, JSONValue>;
+    });
+  }
+
+  /**
+   * Queries the DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a query request
+   * @returns Promise<PaginatedJsonResponse>
+   *
+   * @example Use this to get paginated items from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
+   * ```
+   */
+  public async getPaginatedItems(params?: QueryParams): Promise<PaginatedJsonResponse> {
+    const result = await this.query(params).execute();
+
+    const retrievedItems = result.Items || [];
+
+    const data = retrievedItems.map((item) => item as unknown as Record<string, JSONValue>);
+    return {
+      data,
+      paginationToken: getPaginationToken(result)
+    };
+  }
+
+  /**
    * Creates a Query to do query operations on a DynamoDB table.
    *
    * @param params - optional object of optional properties to generate a query request
@@ -191,7 +247,7 @@ export default class DynamoDBService {
         query = query.index(params.index);
       }
       if (params.key) {
-        query = query.key(params.key.name, marshall(params.key.value));
+        query = query.key(params.key.name, marshall(params.key.value, { removeUndefinedValues: true }));
       }
       if (params.sortKey) {
         query = query.sortKey(params.sortKey);
@@ -250,7 +306,7 @@ export default class DynamoDBService {
         query = query.names(params.names);
       }
       if (params.values) {
-        query = query.values(marshall(params.values));
+        query = query.values(marshall(params.values, { removeUndefinedValues: true }));
       }
       if (params.projection) {
         query = query.projection(params.projection);
@@ -272,6 +328,24 @@ export default class DynamoDBService {
   }
 
   /**
+   * Places a DDB Update call and formats the response.
+   *
+   * @param updateParams - {@link UpdateParams} object to pass to the update request
+   * @returns a {@link UpdateUnmarshalledOutput} item where Attributes is unmarshalled
+   */
+  public async updateExecuteAndFormat(updateParams: UpdateParams): Promise<UpdateUnmarshalledOutput> {
+    const result = await this.update(updateParams).execute();
+
+    const unmarshalledResult = {
+      Attributes: result.Attributes ? unmarshall(result.Attributes) : undefined,
+      ConsumedCapacity: result.ConsumedCapacity || undefined,
+      ItemCollectionMetrics: result.ItemCollectionMetrics || undefined
+    };
+
+    return unmarshalledResult;
+  }
+
+  /**
    * Creates an Updater to do update item operations on a DynamoDB table.
    *
    * @param key - object of key to update
@@ -290,63 +364,64 @@ export default class DynamoDBService {
    * const dataFromUpdate = await updater.item({'newAttribute': {S: 'newValue'}}).execute();
    * ```
    */
-  public update(
-    key: { [key: string]: unknown },
-    params?: {
-      disableCreatedAt?: boolean;
-      disableUpdatedAt?: boolean;
-      item?: { [key: string]: unknown };
-      set?: string;
-      add?: string;
-      remove?: string | string[];
-      delete?: string;
-      names?: { [key: string]: string };
-      values?: { [key: string]: unknown };
-      return?: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW';
-      metrics?: 'NONE' | 'SIZE';
-      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-    }
-  ): Updater {
-    let updater = new Updater({ region: this._awsRegion }, this._tableName, marshall(key));
-    if (params) {
-      if (params.disableCreatedAt) {
+  public update(updateParams: UpdateParams): Updater {
+    let updater = new Updater({ region: this._awsRegion }, this._tableName, marshall(updateParams.key));
+    if (updateParams.params) {
+      if (updateParams.params.disableCreatedAt) {
         updater = updater.disableCreatedAt();
       }
-      if (params.disableUpdatedAt) {
+      if (updateParams.params.disableUpdatedAt) {
         updater = updater.disableUpdatedAt();
       }
-      if (params.item) {
-        updater = updater.item(marshall(params.item, { removeUndefinedValues: true }));
+      if (updateParams.params.item) {
+        updater = updater.item(marshall(updateParams.params.item, { removeUndefinedValues: true }));
       }
-      if (params.set) {
-        updater = updater.set(params.set);
+      if (updateParams.params.set) {
+        updater = updater.set(updateParams.params.set);
       }
-      if (params.add) {
-        updater = updater.add(params.add);
+      if (updateParams.params.add) {
+        updater = updater.add(updateParams.params.add);
       }
-      if (params.remove) {
-        updater = updater.remove(params.remove);
+      if (updateParams.params.remove) {
+        updater = updater.remove(updateParams.params.remove);
       }
-      if (params.delete) {
-        updater = updater.delete(params.delete);
+      if (updateParams.params.delete) {
+        updater = updater.delete(updateParams.params.delete);
       }
-      if (params.names) {
-        updater = updater.names(params.names);
+      if (updateParams.params.names) {
+        updater = updater.names(updateParams.params.names);
       }
-      if (params.values) {
-        updater = updater.values(marshall(params.values));
+      if (updateParams.params.values) {
+        updater = updater.values(marshall(updateParams.params.values));
       }
-      if (params.return) {
-        updater = updater.return(params.return);
+      if (updateParams.params.return) {
+        updater = updater.return(updateParams.params.return);
       }
-      if (params.metrics) {
-        updater = updater.metrics(params.metrics);
+      if (updateParams.params.metrics) {
+        updater = updater.metrics(updateParams.params.metrics);
       }
-      if (params.capacity) {
-        updater = updater.capacity(params.capacity);
+      if (updateParams.params.capacity) {
+        updater = updater.capacity(updateParams.params.capacity);
       }
     }
     return updater;
+  }
+
+  /**
+   * Deletes a single item from the DynamoDB table.
+   *
+   * @param params - {@link DeleteItemParams} object of properties to generate a delete item request
+   * @returns Promise of a string, {@link JSONValue} paired object
+   *
+   * @example Use this to delete a single item from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.deleteItem({key: 'pk'});
+   * ```
+   */
+  public async deleteItem(params: DeleteItemParams): Promise<Record<string, JSONValue>> {
+    const result = (await this.delete(params.key, params.params).execute()) as DeleteItemCommandOutput;
+
+    return result.Attributes as unknown as Record<string, JSONValue>;
   }
 
   /**
@@ -445,13 +520,71 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
-  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+  /**
+   * Commits transactions to the table
+   *
+   * @param params - the items for the transaction
+   */
+  public async commitTransaction(params?: {
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+  }): Promise<void> {
+    await this.transactEdit(params).execute();
+  }
+
+  /**
+   * @deprecated Use `commitTransaction` instead
+   * @param params - the items for the transaction
+   * @returns A TransactEdit object
+   */
+  public transactEdit(params?: {
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+  }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
-    if (params?.addPutRequest) {
+    if (params?.addDeleteRequests) {
+      transactEdit = transactEdit.addDeleteRequests(
+        params.addDeleteRequests.map((request) => marshall(request))
+      );
+    }
+    if (params?.addPutItems) {
+      transactEdit = transactEdit.addPutItems(
+        params.addPutItems.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
+    }
+    if (params?.addPutRequests) {
       transactEdit = transactEdit.addPutRequests(
-        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        params.addPutRequests.map((request) => {
+          return {
+            item: marshall(request.item, { removeUndefinedValues: true }),
+            conditionExpression: request.conditionExpression,
+            expressionAttributeNames: request.expressionAttributeNames,
+            expressionAttributeValues: request.expressionAttributeValues
+              ? marshall(request.expressionAttributeValues, { removeUndefinedValues: true })
+              : undefined
+          };
+        })
       );
     }
     return transactEdit;
+  }
+
+  /**
+   * @returns the table name
+   */
+  public getTableName(): string {
+    return this._tableName;
   }
 }

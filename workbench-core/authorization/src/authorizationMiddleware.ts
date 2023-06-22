@@ -5,10 +5,10 @@
 
 import { LoggingService } from '@aws/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
-import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationService from './authorizationService';
 import { AuthenticatedUserNotFoundError } from './errors/authenticatedUserNotFoundError';
-import { HTTPMethod, HTTPMethods } from './routesMap';
+import { AuthenticatedUser } from './models/authenticatedUser';
+import { HTTPMethod, HTTPMethodParser } from './models/routesMap';
 /**
  * Checks to ensure user object is an instance of {@link AuthenticatedUser}.
  * @param user - object that is suppose to represent the user.
@@ -38,7 +38,7 @@ export function retrieveUser(res: Response): AuthenticatedUser {
  * @returns - boolean stating if method is a valid {@link HTTPMethod}
  */
 function checkMethod(method: string): method is HTTPMethod {
-  return HTTPMethods.indexOf(method as HTTPMethod) !== -1;
+  return HTTPMethodParser.safeParse(method).success;
 }
 
 /**

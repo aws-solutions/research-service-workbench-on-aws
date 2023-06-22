@@ -10,7 +10,6 @@ import {
   UpdateItemCommandOutput,
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 
 /**
@@ -237,8 +236,6 @@ class Updater {
       if (value === undefined) return;
       if (this._params.Key && this._params.Key.hasOwnProperty(key)) return; // eslint-disable-line no-prototype-builtins
 
-      if (this._createdAtState.enabled && key === 'createdAt') return;
-      if (this._updatedAtState.enabled && key === 'updatedAt') return;
       if (this._internals.revGiven && key === 'rev') return;
 
       names[`#${key}`] = key;
@@ -255,19 +252,25 @@ class Updater {
 
     this._internals.set.push(assignments.join(', '));
 
-    let createdAt = this._createdAtState.value;
-    if (this._createdAtState.enabled && !this._createdAtState.processed) {
+    const shouldAddCreatedAt =
+      this._createdAtState.enabled && !this._createdAtState.processed && !item.hasOwnProperty('createdAt');
+    if (shouldAddCreatedAt) {
       this._createdAtState.processed = true;
-      createdAt = _.isEmpty(createdAt) ? new Date().toISOString() : createdAt;
+      const createdAt = _.isEmpty(this._createdAtState.value)
+        ? new Date().toISOString()
+        : this._createdAtState.value;
       this._internals.set.push('#createdAt = if_not_exists(#createdAt, :createdAt)');
       names['#createdAt'] = 'createdAt';
       values[':createdAt'] = { S: createdAt };
     }
 
-    let updatedAt = this._updatedAtState.value;
-    if (this._updatedAtState.enabled && !this._updatedAtState.processed) {
+    const shouldAddUpdatedAt =
+      this._updatedAtState.enabled && !this._updatedAtState.processed && !item.hasOwnProperty('updatedAt');
+    if (shouldAddUpdatedAt) {
       this._updatedAtState.processed = true;
-      updatedAt = _.isEmpty(updatedAt) ? new Date().toISOString() : updatedAt;
+      const updatedAt = _.isEmpty(this._updatedAtState.value)
+        ? new Date().toISOString()
+        : this._updatedAtState.value;
       this._internals.set.push('#updatedAt = :updatedAt');
       names['#updatedAt'] = 'updatedAt';
       values[':updatedAt'] = { S: updatedAt };
@@ -526,11 +529,7 @@ class Updater {
    * ```
    */
   public async execute(): Promise<UpdateItemCommandOutput> {
-    const result = await this._ddb.updateItem(this._internals.toParams());
-    if (result.Attributes) {
-      result.Attributes = unmarshall(result.Attributes);
-    }
-    return result;
+    return this._ddb.updateItem(this._internals.toParams());
   }
 }
 

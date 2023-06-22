@@ -3,60 +3,153 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// User management
+import { isInvalidPaginationTokenError, validateAndParse } from '@aws/workbench-core-base';
 import {
-  CreateRoleSchema,
-  CreateUserSchema,
-  UpdateRoleSchema,
-  UserManagementService
-} from '@aws/workbench-core-authentication';
-import Boom from '@hapi/boom';
+  Status,
+  UserManagementService,
+  isUserNotFoundError,
+  isInvalidParameterError,
+  isUserAlreadyExistsError,
+  ListUsersRequest,
+  ListUsersRequestParser
+} from '@aws/workbench-core-user-management';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import _ from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { CreateUserRequest, CreateUserRequestParser } from './users/createUserRequest';
+import { DeleteUserRequest, DeleteUserRequestParser } from './users/deleteUserRequest';
+import { GetUserRequest, GetUserRequestParser } from './users/getUserRequest';
+import { UpdateUserRequest, UpdateUserRequestParser } from './users/updateUserRequest';
 
-export function setUpUserRoutes(router: Router, user: UserManagementService): void {
+export function setUpUserRoutes(router: Router, userService: UserManagementService): void {
   router.post(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateUserSchema));
-      const response = await user.createUser(req.body);
-      res.status(201).send(response);
+      try {
+        const validatedRequest = validateAndParse<CreateUserRequest>(CreateUserRequestParser, {
+          ...req.body
+        });
+
+        const response = await userService.createUser(validatedRequest);
+        res.status(201).send(response);
+      } catch (err) {
+        if (isInvalidParameterError(err)) {
+          throw Boom.badRequest(`Invalid parameter: ${err.message}`);
+        }
+
+        if (isUserAlreadyExistsError(err)) {
+          throw Boom.conflict(`User with this email already exist.`);
+        }
+
+        if (Boom.isBoom(err)) {
+          throw err;
+        }
+
+        throw Boom.badImplementation(`Could not create user`);
+      }
     })
   );
 
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const userIds = await user.listUsers();
-      const users: Array<object> = [];
-      userIds.forEach((userId: string) => {
-        users.push({ id: userId });
+      const validatedRequest = validateAndParse<ListUsersRequest>(ListUsersRequestParser, {
+        ...req.query
       });
-      res.status(200).json({ users: users });
-    })
-  );
+      try {
+        const users = await userService.listUsers(validatedRequest);
+        res.status(200).json({ users });
+      } catch (e) {
+        if (Boom.isBoom(e)) {
+          throw e;
+        }
 
-  router.post(
-    '/roles',
-    wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateRoleSchema));
-      const response = await user.createRole(req.body.roleName);
-      res.status(201).send(response);
-    })
-  );
+        if (isInvalidPaginationTokenError(e) || isInvalidParameterError(e)) {
+          throw Boom.badRequest(e.message);
+        }
 
-  router.put(
-    '/roles/:roleName',
-    wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateRoleSchema));
-      if (!_.isString(req.params.roleName)) {
-        throw Boom.badRequest('roleName must be a string.');
+        throw Boom.badImplementation(`There was a problem listing users.`);
       }
-      const response = await user.addUserToRole(req.body.username, req.params.roleName);
-      res.send(response);
+    })
+  );
+
+  router.get(
+    '/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetUserRequest>(GetUserRequestParser, {
+        userId: req.params.userId
+      });
+      const { userId } = validatedRequest;
+      try {
+        const user = await userService.getUser(userId);
+        res.status(200).json(user);
+      } catch (err) {
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (Boom.isBoom(err)) throw err;
+        throw Boom.badImplementation(`Could not find user ${userId}`);
+      }
+    })
+  );
+
+  router.delete(
+    '/users/:userId/purge',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<DeleteUserRequest>(DeleteUserRequestParser, {
+        userId: req.params.userId
+      });
+      const { userId } = validatedRequest;
+      try {
+        const existingUser = await userService.getUser(userId);
+        if (existingUser.status !== Status.INACTIVE) {
+          throw Boom.badRequest(
+            `Could not delete user ${userId}. Expected status: ${Status[Status.INACTIVE]}; received: ${
+              Status[existingUser.status]
+            }`
+          );
+        }
+
+        await userService.deleteUser(userId);
+        res.status(204).send();
+      } catch (err) {
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (Boom.isBoom(err)) throw err;
+        throw Boom.badImplementation(`Could not delete user ${userId}`);
+      }
+    })
+  );
+
+  router.patch(
+    '/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const updateUserRequest = validateAndParse<UpdateUserRequest>(UpdateUserRequestParser, {
+        ...req.body,
+        userId: req.params.userId
+      });
+
+      const { userId, status, ...rest } = updateUserRequest;
+      try {
+        const existingUser = await userService.getUser(userId);
+
+        if (!_.isUndefined(status)) {
+          if (status === 'ACTIVE' && existingUser.status === Status.INACTIVE)
+            await userService.activateUser(userId);
+          if (status === 'INACTIVE' && existingUser.status === Status.ACTIVE)
+            await userService.deactivateUser(userId);
+        }
+
+        // Since updateUser() requires object of type User
+        await userService.updateUser(userId, { ...existingUser, ...rest });
+        res.status(204).send();
+      } catch (err) {
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isInvalidParameterError(err))
+          throw Boom.notFound(
+            'Please make sure specified email is in valid email format and not already in use in the Cognito User Pool'
+          );
+        if (Boom.isBoom(err)) throw err;
+        throw Boom.badImplementation(`Could not update user ${userId}`);
+      }
     })
   );
 }

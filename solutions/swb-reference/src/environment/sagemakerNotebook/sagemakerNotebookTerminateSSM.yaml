@@ -12,7 +12,7 @@ parameters:
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+    allowedPattern: ^env-[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
 mainSteps:
   - name: Terminate
     action: 'aws:executeAwsApi'
@@ -28,6 +28,14 @@ mainSteps:
         Type: String
         Selector: '$.RecordDetail.RecordId'
     nextStep: WaitForTerminating
+    description: |
+      ## Terminate
+      Terminate the provisioned Sagemaker Notebook product through service catalog
+      ## Inputs
+      * ProvisionedProductId: The Id of the provisioned product.
+      * TerminateToken: An idempotency token that uniquely identifies the termination request.
+      ## Outputs
+      * RecordId: The Id of this request response.
   - name: WaitForTerminating
     action: 'aws:waitForAwsResourceProperty'
     timeoutSeconds: 600
@@ -41,6 +49,14 @@ mainSteps:
       PropertySelector: '$.RecordDetail.Status'
     # aws.waitForAwsResourceProperty does not support outputs so creating another step
     nextStep: GetRecordDetail
+    description: |
+      ## WaitForTerminating
+      Allow automation to wait for SUCCEEDED/FAILED status of the termination before continuing the automation
+      ## Inputs
+      * Id: the Id of the `Terminate` request response
+      * DesiredValues: The expected status of the provisioned product on which to continue the automation: SUCCEEDED/FAILED
+      ## Outputs
+      * None (aws.waitForAwsResourceProperty does not support outputs. Output are put into the next step)
   - name: GetRecordDetail
     action: 'aws:executeAwsApi'
     inputs:
@@ -55,6 +71,14 @@ mainSteps:
         Type: StringList
         Selector: '$.RecordDetail.RecordErrors'
     nextStep: ChooseByStatus
+    description: |
+      ## GetRecordDetail
+      Get request response record details
+      ## Inputs
+      * Id: the Id of the `Terminate` request response
+      ## Outputs
+      * ProductStatus: The status of the provisioned product
+      * ErrorMessage: Error messages to the request
   - name: ChooseByStatus
     action: 'aws:branch'
     inputs:
@@ -66,6 +90,11 @@ mainSteps:
           Variable: '{{ GetRecordDetail.ProductStatus }}'
           StringEquals: FAILED
       Default: PushFailureStatusToEventBridge
+    description: |
+      ## ChooseByStatus
+      Run conditional steps based on request status.
+      If Termination SUCCEEDED, run`PushMetadataToEventBridge`; if FAILED, run `PushFailureStatusToEventBridge`.
+      default: `PushFailureStatusToEventBridge`
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -77,6 +106,9 @@ mainSteps:
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
+    description: |
+      ## PushMetadataToEventBridge
+      Send metadata of this termination request to Amazon EventBridge
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -88,3 +120,6 @@ mainSteps:
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
+    description: |
+      ## PushFailureStatusToEventBridge
+      Send error messages of this termination request to Amazon EventBridge

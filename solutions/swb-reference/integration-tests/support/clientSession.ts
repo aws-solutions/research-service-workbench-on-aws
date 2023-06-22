@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import Csrf from 'csrf';
 import _ from 'lodash';
+import { stringify } from 'qs';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
 import HttpError from './utils/HttpError';
@@ -15,9 +17,11 @@ export default class ClientSession {
   private _isAnonymousSession: boolean;
   private _axiosInstance: AxiosInstance;
   private _setup: Setup;
+  private _userId?: string;
+  public accessToken?: string;
   public resources: Resources;
 
-  public constructor(setup: Setup, accessToken?: string) {
+  public constructor(setup: Setup, accessToken?: string, outputError?: boolean) {
     this._settings = setup.getSettings();
     this._setup = setup;
     this._isAnonymousSession = accessToken === undefined;
@@ -25,18 +29,33 @@ export default class ClientSession {
 
     const headers: {
       'Content-Type': string;
-      Authorization?: string;
+      Cookie?: string;
+      'csrf-token'?: string;
     } = { 'Content-Type': 'application/json' };
 
-    // For anonymous sessions, authorization header is not required
+    // For anonymous sessions, access token cookie is not required
     if (!this._isAnonymousSession) {
-      headers.Authorization = accessToken;
+      this.accessToken = accessToken;
+      const csrf = new Csrf();
+      const secret = csrf.secretSync();
+      const token = csrf.create(secret);
+      headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
+      headers['csrf-token'] = token;
+      this._userId = this._getUserIdFromToken(accessToken ?? '');
     }
 
     this._axiosInstance = axios.create({
-      baseURL: this._settings.get('apiBaseUrl'),
+      baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
+    });
+
+    this._axiosInstance.interceptors.request.use((config) => {
+      config.paramsSerializer = (params) => {
+        return stringify(params);
+      };
+
+      return config;
     });
 
     // Convert AxiosError to HttpError for easier error checking in tests
@@ -46,7 +65,11 @@ export default class ClientSession {
       },
       function (error: AxiosError) {
         if (error.response) {
-          return Promise.reject(new HttpError(error.response.status, error.response.data));
+          if (outputError) {
+            console.error(JSON.stringify(error));
+          }
+          const httpError = new HttpError(error.response.status, error.response.data);
+          return Promise.reject(httpError);
         }
         return Promise.reject(error);
       }
@@ -92,6 +115,17 @@ export default class ClientSession {
 
   public getSetup(): Setup {
     return this._setup;
+  }
+
+  public getUserId(): string | undefined {
+    return this._userId;
+  }
+
+  private _getUserIdFromToken(accessToken: string): string {
+    const mainPart = Buffer.from(accessToken.split('.')[1], 'base64').toString('binary');
+    const parsed = JSON.parse(mainPart);
+
+    return parsed.username;
   }
 }
 
