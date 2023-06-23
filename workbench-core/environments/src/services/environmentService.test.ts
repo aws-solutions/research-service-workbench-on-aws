@@ -150,7 +150,7 @@ describe('EnvironmentService', () => {
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
     name: 'Example project',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
-    externalId: 'workbench',
+    externalId: 'sampleExternalId',
     updatedAt: '2022-05-18T20:33:42.608Z',
     sk: `PROJ#${projectId}`,
     pk: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
