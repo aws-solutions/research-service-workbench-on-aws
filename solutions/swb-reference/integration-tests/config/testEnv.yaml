@@ -20,6 +20,9 @@ projectAdmin2PasswordParamStorePath: '/swb/testEnv/pa2/password'
 researcher1UserNameParamStorePath: '/swb/testEnv/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/testEnv/researcher1/password'
 
+## Default external ID
+externalIdPath: '/rsw/testEnv/externalId'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-007e0370-ca28-4b49-8f78-5230d943201f'
 
@@ -28,3 +31,5 @@ hostAwsAccountIdParamStorePath: '/swb/testEnv/accountsTest/awsAccountId'
 hostingAccountHandlerRoleArnParamStorePath: '/swb/testEnv/accountsTest/hostingAccountHandlerRoleArn'
 envMgmtRoleArnParamStorePath: '/swb/testEnv/accountsTest/envMgmtRoleArn'
 encryptionKeyArnParamStorePath: '/swb/testEnv/accountsTest/encryptionKeyArn'
+## Pre-requisite for running aws-accounts integration test
+awsAccountIdParamStorePath: '/swb/testEnv/accountsTest/awsAccountId'
