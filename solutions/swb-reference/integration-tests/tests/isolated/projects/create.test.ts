@@ -146,7 +146,7 @@ describe('Create Project negative tests', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Could not find cost center cc-1234abcd-1234-abcd-1234-abcd1234abcd`
+              message: `Could not find cost center`
             })
           );
         }
