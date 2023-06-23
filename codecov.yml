@@ -5,10 +5,6 @@ coverage:
         target: 90% #overall project/ repo coverage
         flags:
           - root
-      example-ui-app:
-        target: 90%
-        flags:
-          - example-ui-app
       swb-app:
         target: 78%
         flags:
