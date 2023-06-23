@@ -58,7 +58,7 @@ describe('multiStep awsAccount integration test', () => {
       accountId
     );
     expect(hostingAccountTemplateResponse.status).toEqual(200);
-    expect(Object.keys(hostingAccountTemplateResponse.data).length).toEqual(2); // Should get three sets of template URLs
+    expect(Object.keys(hostingAccountTemplateResponse.data).length).toEqual(2); // Should get two sets of template URLs
 
     const listResponse = await adminSession.resources.accounts.get({ pageSize: `100` });
     expect(listResponse.status).toEqual(200);
