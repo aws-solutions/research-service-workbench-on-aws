@@ -94,7 +94,7 @@ describe('userManagement activate/deactivate user integration test', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find user ${fakeUuid}`
+          message: `Could not find user`
         })
       );
     }
@@ -108,7 +108,7 @@ describe('userManagement activate/deactivate user integration test', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find user ${fakeUuid}`
+          message: `Could not find user`
         })
       );
     }

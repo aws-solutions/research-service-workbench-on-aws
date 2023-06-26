@@ -269,7 +269,7 @@ describe('DataSetService', () => {
 
         test('it throws an error', async () => {
           await expect(dataSetService.removeDataSet(mockDataSet.id!, mockUser)).rejects.toThrowError(
-            `DataSet ${mockDataSet.id!} cannot be removed because it is still associated with roles in the provided project(s)`
+            `DataSet cannot be removed because it is still associated with roles in the provided project(s)`
           );
         });
       });
@@ -446,7 +446,7 @@ describe('DataSetService', () => {
         });
 
         test('it throws a Conflict Error', async () => {
-          const error = new ConflictError('Project projectId is already associated with Dataset dataSetId');
+          const error = new ConflictError('Project is already associated with Dataset');
           await expect(dataSetService.addAccessForProject(projectAddAccessRequest)).rejects.toThrowError(
             error
           );
@@ -595,7 +595,7 @@ describe('DataSetService', () => {
           test('it throws an error', async () => {
             await expect(dataSetService.removeAccessForProject(projectRemoveAccessRequest)).rejects.toThrow(
               new ConflictError(
-                `${projectId} cannot remove access from ${dataSetId} for the ProjectAdmin because it owns that dataset.`
+                `Requested project cannot remove access from dataset for the ProjectAdmin because it owns that dataset.`
               )
             );
           });

@@ -162,7 +162,7 @@ describe('list environments', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find project ${fakeProjectId}`
+            message: `Could not find project`
           })
         );
       }
@@ -279,7 +279,7 @@ describe('list environments', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }
@@ -321,7 +321,7 @@ describe('list environments', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }

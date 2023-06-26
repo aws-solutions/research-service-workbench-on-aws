@@ -76,7 +76,7 @@ describe('update environment type configs', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find envType ${envTypeId} with envTypeConfig etc-12345678-1234-1234-1234-123456789012 to update`
+            message: `Could not find requested envType with requested envTypeConfig to update`
           })
         );
       }

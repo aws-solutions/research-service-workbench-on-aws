@@ -83,12 +83,12 @@ export default class CostCenterService {
       });
     } catch (e) {
       console.error('Unable to update cost center', request);
-      throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+      throw Boom.internal(`Unable to update CostCenter`);
     }
     if (response.Attributes) {
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
-    throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to update CostCenter`);
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
@@ -124,7 +124,7 @@ export default class CostCenterService {
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
-      throw Boom.notFound(`Could not find cost center ${costCenterId}`);
+      throw Boom.notFound(`Could not find cost center`);
     }
 
     return this._mapDDBItemToCostCenter(response.Item);
@@ -186,12 +186,22 @@ export default class CostCenterService {
     if (response.Attributes) {
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
-    throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to create CostCenter`);
   }
 
   private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
     const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
     // parse will remove pk and sk from the DDB item
     return CostCenterParser.parse(costCenter);
+  }
+
+  private async _getAccount(accountId: string): Promise<Account> {
+    const accountService = new AccountService(this._dynamoDbService);
+    try {
+      return await accountService.getAccount(accountId);
+    } catch (e) {
+      console.error(`Failed to get account for cost center creation: ${e}`);
+      throw Boom.badRequest(`Failed to get account for cost center creation`);
+    }
   }
 }

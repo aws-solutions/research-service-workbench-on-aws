@@ -101,7 +101,7 @@ describe('update environment types', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type ${testEnvTypeId} to update`
+          message: `Could not find environment type to update`
         })
       );
     }

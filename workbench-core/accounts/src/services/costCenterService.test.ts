@@ -126,7 +126,7 @@ describe('CostCenterService', () => {
 
         test('it throws an error', async () => {
           await expect(costCenterService.getCostCenter(costCenterId)).rejects.toThrow(
-            `Could not find cost center ${costCenterId}`
+            `Could not find cost center`
           );
         });
       });
@@ -371,15 +371,13 @@ describe('CostCenterService', () => {
         ddbMock.on(GetItemCommand).resolves({ Item: undefined });
         await expect(
           costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjDoesNotExist)
-        ).rejects.toThrowError(Boom.notFound(`Could not find cost center ${costCenterId}`));
+        ).rejects.toThrowError(Boom.notFound(`Could not find cost center`));
       });
     });
     describe('with a projects associated to the cost center', () => {
       it('does not delete the CostCenter and throws an error', async () => {
         async function checkDependencyAndProjExist(costCenterId: string): Promise<void> {
-          throw Boom.conflict(
-            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
-          );
+          throw Boom.conflict(`CostCenter cannot be deleted because it has project(s) associated with it`);
         }
         ddbMock.on(QueryCommand).resolves({
           Items: [
@@ -394,9 +392,7 @@ describe('CostCenterService', () => {
         await expect(
           costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjExist)
         ).rejects.toThrowError(
-          Boom.conflict(
-            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
-          )
+          Boom.conflict(`CostCenter cannot be deleted because it has project(s) associated with it`)
         );
       });
     });
@@ -476,7 +472,7 @@ describe('CostCenterService', () => {
         });
 
         await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).rejects.toThrowError(
-          Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(costCenterUpdateRequest)}`)
+          Boom.internal(`Unable to update CostCenter`)
         );
       });
     });
@@ -533,15 +529,13 @@ describe('CostCenterService', () => {
         ddbMock.on(GetItemCommand).resolves({ Item: undefined });
         await expect(
           costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjDoesNotExist)
-        ).rejects.toThrowError(Boom.notFound(`Could not find cost center ${costCenterId}`));
+        ).rejects.toThrowError(Boom.notFound(`Could not find cost center`));
       });
     });
     describe('with a projects associated to the cost center', () => {
       it('does not delete the CostCenter and throws an error', async () => {
         async function checkDependencyAndProjExist(costCenterId: string): Promise<void> {
-          throw Boom.conflict(
-            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
-          );
+          throw Boom.conflict(`CostCenter cannot be deleted because it has project(s) associated with it`);
         }
         ddbMock.on(QueryCommand).resolves({
           Items: [
@@ -556,9 +550,7 @@ describe('CostCenterService', () => {
         await expect(
           costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjExist)
         ).rejects.toThrowError(
-          Boom.conflict(
-            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
-          )
+          Boom.conflict(`CostCenter cannot be deleted because it has project(s) associated with it`)
         );
       });
     });
@@ -638,7 +630,7 @@ describe('CostCenterService', () => {
         });
 
         await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).rejects.toThrowError(
-          Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(costCenterUpdateRequest)}`)
+          Boom.internal(`Unable to update CostCenter`)
         );
       });
     });

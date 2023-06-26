@@ -45,7 +45,7 @@ export default class EnvironmentTypeService {
       .execute();
     const item = (response as GetItemCommandOutput).Item;
     if (item === undefined) {
-      throw Boom.notFound(`Could not find environment type ${envTypeId}`);
+      throw Boom.notFound(`Could not find environment type`);
     } else {
       const envType = EnvironmentTypeParser.parse(item);
       return Promise.resolve(envType);
@@ -98,7 +98,7 @@ export default class EnvironmentTypeService {
       environmentType = await this.getEnvironmentType(envTypeId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
-        throw Boom.notFound(`Could not find environment type ${envTypeId} to update`);
+        throw Boom.notFound(`Could not find environment type to update`);
       }
       throw e;
     }
@@ -118,7 +118,7 @@ export default class EnvironmentTypeService {
       return EnvironmentTypeParser.parse(response.Attributes);
     }
     console.error('Unable to update environment type', updatedEnvType);
-    throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
+    throw Boom.internal(`Unable to update environment type`);
   }
 
   /**
@@ -168,7 +168,7 @@ export default class EnvironmentTypeService {
       return EnvironmentTypeParser.parse(response.Attributes);
     }
     console.error('Unable to create environment type', newEnvType);
-    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
+    throw Boom.internal(`Unable to create environment type`);
   }
 
   private async _validateStatusChange(status?: string, environmentType?: EnvironmentType): Promise<void> {
@@ -182,7 +182,7 @@ export default class EnvironmentTypeService {
       };
       const dependencies = await this._dynamoDbService.getPaginatedItems(etcQueryParams);
       if (dependencies?.data?.length) {
-        const errorMessage = `Unable to reovke environment type: ${environmentType.id}, Environment Type has active configurations`;
+        const errorMessage = `Unable to reovke environment type, Environment Type has active configurations`;
         console.error(errorMessage);
         throw Boom.conflict(errorMessage);
       }

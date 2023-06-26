@@ -254,9 +254,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE n CHECK
-      await expect(envService.getEnvironment(envId, true)).rejects.toThrow(
-        `Could not find environment ${envId}`
-      );
+      await expect(envService.getEnvironment(envId, true)).rejects.toThrow(`Could not find environment`);
     });
 
     test('env not found w/o includeMetadata', async () => {
@@ -276,7 +274,7 @@ describe('EnvironmentService', () => {
         .resolves(getItemResponse);
 
       // OPERATE n CHECK
-      await expect(envService.getEnvironment(envId)).rejects.toThrow(`Could not find environment ${envId}`);
+      await expect(envService.getEnvironment(envId)).rejects.toThrow(`Could not find environment`);
     });
   });
 
@@ -839,7 +837,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(envService.listEnvironments({ pageSize: limit, paginationToken })).rejects.toThrow(
-        'Invalid Pagination Token: eaJzayI6IkVOViNhM2VmZjdjZC1kNTM5LTRlZWMtODdiYy05MTcwMGJiZjZkZDIiLCJyZXNvdXJjZVR5cGUiOiJlbnZpcm9ubWVudCIsInBrIjoiRU5WI2EzZWZmN2NkLWQ1MzktNGVlYy04N2JjLTkxNzAwYmJmNmRkMiIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMDFUMTg6NTI6MTguMTkyWiJ9'
+        'Invalid Pagination Token'
       );
     });
   });
@@ -967,7 +965,7 @@ describe('EnvironmentService', () => {
         envService.updateEnvironment(envId, {
           status: 'COMPLETED'
         })
-      ).rejects.toThrow(Boom.badRequest(`Cannot update terminated environment ${envId}`));
+      ).rejects.toThrow(Boom.badRequest(`Cannot update terminated environment`));
 
       mockGetEnv.mockRestore();
     });
@@ -1114,7 +1112,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist')
+        Boom.badRequest('Requested envTypeId with requested envTypeConfigId does not exist')
       );
     });
 
@@ -1140,7 +1138,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest(`projectId ${projectId} does not exist`)
+        Boom.badRequest(`projectId does not exist`)
       );
     });
     test('failed because Dataset does not exist', async () => {
@@ -1164,7 +1162,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('datasetIds dataset-123 do not exist')
+        Boom.badRequest('datasetIds do not exist')
       );
     });
   });

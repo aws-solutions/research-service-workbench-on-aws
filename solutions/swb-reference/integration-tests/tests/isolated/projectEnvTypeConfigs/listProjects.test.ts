@@ -128,7 +128,7 @@ describe('list projects associated to environment type config', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${nonExistentEnvTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }
@@ -166,7 +166,7 @@ describe('list projects associated to environment type config', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }
@@ -190,7 +190,7 @@ describe('list projects associated to environment type config', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }

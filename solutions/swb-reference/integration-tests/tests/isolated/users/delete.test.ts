@@ -38,7 +38,7 @@ describe('delete user negative tests', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find user ${fakeUserId}`
+          message: `Could not find user`
         })
       );
     }
@@ -59,7 +59,7 @@ describe('delete user negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `Could not delete user ${userId}. Expected status: ${Status[Status.INACTIVE]}; received: ${
+          message: `Could not delete user. Expected status: ${Status[Status.INACTIVE]}; received: ${
             Status[Status.ACTIVE]
           }`
         })

@@ -40,7 +40,7 @@ describe('list users for project tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find project ${projectId}`
+            message: `Could not find project`
           })
         );
       }

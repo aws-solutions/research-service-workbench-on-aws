@@ -47,7 +47,7 @@ export function fromPaginationToken(token: string): Record<string, string> {
   try {
     return JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
   } catch {
-    throw new InvalidPaginationTokenError(`Invalid Pagination Token: ${token}`);
+    throw new InvalidPaginationTokenError(`Invalid Pagination Token`);
   }
 }
 

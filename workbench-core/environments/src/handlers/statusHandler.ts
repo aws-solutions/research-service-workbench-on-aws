@@ -157,7 +157,7 @@ export default class StatusHandler {
       })
       .execute();
     if (data.Count === 0) {
-      throw Boom.notFound(`Could not find instance ${instanceId}`);
+      throw Boom.notFound(`Could not find instance`);
     }
 
     const instance = data.Items![0];

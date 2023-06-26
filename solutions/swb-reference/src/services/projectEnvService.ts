@@ -49,7 +49,7 @@ export class ProjectEnvService implements ProjectEnvPlugin {
     const project = await this._projectService.getProject({ projectId });
 
     if (project.status === ProjectStatus.DELETED) {
-      throw new ProjectDeletedError(`Project ${projectId} was deleted`);
+      throw new ProjectDeletedError(`Project was deleted`);
     }
 
     const env: Environment = await this._envService.createEnvironment(

@@ -63,7 +63,7 @@ describe('assign user to project negative tests', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find user ${fakeUserId}`
+          message: `Could not find user`
         })
       );
     }
@@ -82,7 +82,7 @@ describe('assign user to project negative tests', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `IT Admin ${adminUserId} cannot be assigned to the project ${projectId}`
+          message: `IT Admin cannot be assigned to the project`
         })
       );
     }
@@ -112,7 +112,7 @@ describe('assign user to project negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find project ${projectId}`
+            message: `Could not find project`
           })
         );
       }
@@ -139,7 +139,7 @@ describe('assign user to project negative tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `User ${userId} is already assigned to the project ${project1Id}`
+            message: `User is already assigned to the project`
           })
         );
       }
