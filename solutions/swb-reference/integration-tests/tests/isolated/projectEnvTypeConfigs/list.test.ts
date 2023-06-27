@@ -79,7 +79,7 @@ describe('list environment type configs associated to project', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find project ${nonExistentProjectId}`
+          message: `Could not find project`
         })
       );
     }
@@ -117,7 +117,7 @@ describe('list environment type configs associated to project', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type ${nonExistentEnvTypeId}`
+          message: `Could not find environment type`
         })
       );
     }
@@ -139,7 +139,7 @@ describe('list environment type configs associated to project', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }
@@ -183,7 +183,7 @@ describe('list environment type configs associated to project', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }

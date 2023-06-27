@@ -1177,7 +1177,7 @@ describe('ProjectService', () => {
 
       // OPERATE & CHECk
       await expect(projService.getProject({ projectId: mockProjId })).rejects.toThrow(
-        `Could not find project ${mockProjId}`
+        `Could not find project`
       );
     });
   });
@@ -1334,7 +1334,7 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(projService.createProject(params)).rejects.toThrow(
-        'Project name "ExampleProject" is in use by a non deleted project. Please use another name.'
+        'Project name is in use by a non deleted project. Please use another name.'
       );
     });
 
@@ -1383,9 +1383,7 @@ describe('ProjectService', () => {
         .resolves({});
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow(
-        `Could not find cost center ${mockCostCenterId}`
-      );
+      await expect(projService.createProject(params)).rejects.toThrow(`Could not find cost center`);
     });
 
     test('fail on create a project with deleted cost center', async () => {
@@ -1437,9 +1435,7 @@ describe('ProjectService', () => {
         .resolves(getCostCenterGetItemResponse);
 
       // OPERATE n CHECK
-      await expect(projService.createProject(params)).rejects.toThrow(
-        `Cost center ${mockCostCenterId} was deleted`
-      );
+      await expect(projService.createProject(params)).rejects.toThrow(`Cost center was deleted`);
     });
 
     test('fail on update to DDB call', async () => {
@@ -1582,9 +1578,7 @@ describe('ProjectService', () => {
         });
 
         test('it should fail', async () => {
-          await expect(() => projService.updateProject(request)).rejects.toThrow(
-            `Could not find project ${request.projectId}`
-          );
+          await expect(() => projService.updateProject(request)).rejects.toThrow(`Could not find project`);
         });
       });
 
@@ -1621,7 +1615,7 @@ describe('ProjectService', () => {
 
           test('it should fail', async () => {
             await expect(() => projService.updateProject(request)).rejects.toThrow(
-              `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
+              `Project name is in use by a non deleted project. Please use another name.`
             );
           });
         });
@@ -1707,9 +1701,7 @@ describe('ProjectService', () => {
         });
 
         test('it should fail', async () => {
-          await expect(() => projService.updateProject(request)).rejects.toThrow(
-            `Could not find project ${request.projectId}`
-          );
+          await expect(() => projService.updateProject(request)).rejects.toThrow(`Could not find project`);
         });
       });
 
@@ -1810,7 +1802,7 @@ describe('ProjectService', () => {
       test('it should fail', async () => {
         // OPERATE n CHECK
         await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-          `Could not find project ${request.projectId}`
+          `Could not find project`
         );
       });
     });
@@ -1833,7 +1825,7 @@ describe('ProjectService', () => {
           beforeEach(() => {
             checkDependency = async function (projectId: string): Promise<void> {
               throw Boom.conflict(
-                `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
+                `Project cannot be deleted because it has environments(s) associated with it`
               );
             };
           });
@@ -1841,7 +1833,7 @@ describe('ProjectService', () => {
           test('it should fail', async () => {
             // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-              `Project ${request.projectId} cannot be deleted because it has environments(s) associated with it`
+              `Project cannot be deleted because it has environments(s) associated with it`
             );
           });
         });
@@ -1849,16 +1841,14 @@ describe('ProjectService', () => {
         describe('of type dataset', () => {
           beforeEach(() => {
             checkDependency = async function (projectId: string): Promise<void> {
-              throw Boom.conflict(
-                `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
-              );
+              throw Boom.conflict(`Project cannot be deleted because it has dataset(s) associated with it`);
             };
           });
 
           test('it should fail', async () => {
             // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-              `Project ${request.projectId} cannot be deleted because it has dataset(s) associated with it`
+              `Project cannot be deleted because it has dataset(s) associated with it`
             );
           });
         });
@@ -1867,7 +1857,7 @@ describe('ProjectService', () => {
           beforeEach(() => {
             checkDependency = async function (projectId: string): Promise<void> {
               throw Boom.conflict(
-                `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+                `Project cannot be deleted because it has environment type config(s) associated with it`
               );
             };
           });
@@ -1875,7 +1865,7 @@ describe('ProjectService', () => {
           test('it should fail', async () => {
             // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-              `Project ${request.projectId} cannot be deleted because it has environment type config(s) associated with it`
+              `Project cannot be deleted because it has environment type config(s) associated with it`
             );
           });
         });

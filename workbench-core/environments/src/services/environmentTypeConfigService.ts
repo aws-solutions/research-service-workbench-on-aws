@@ -69,7 +69,7 @@ export default class EnvironmentTypeConfigService {
   ): Promise<EnvironmentTypeConfig> {
     const item = await this._dynamoDbService.getItem({ key: this._buildEnvTypeConfigPkSk(envTypeConfigId) });
     if (item === undefined || (item.dependency as string) !== envTypeId) {
-      throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
+      throw Boom.notFound(`Could not find environment type config`);
     } else {
       const envTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse(item);
       return Promise.resolve(envTypeConfig);
@@ -142,13 +142,13 @@ export default class EnvironmentTypeConfigService {
       provisioningArtifactId = envType.provisioningArtifactId;
       if (envType.status !== 'APPROVED') {
         throw Boom.badRequest(
-          `Could not create environment type config because environment type ${request.envTypeId} is not approved`
+          `Could not create environment type config because environment type is not approved`
         );
       }
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.badRequest(
-          `Could not create environment type config because environment type ${request.envTypeId} does not exist`
+          `Could not create environment type config because environment type does not exist`
         );
       }
       throw e;
@@ -179,7 +179,7 @@ export default class EnvironmentTypeConfigService {
       return EnvironmentTypeConfigParser.parse({ ...response.Attributes });
     }
     console.error('Unable to create environment type', newEnvTypeConfig);
-    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to create environment type`);
   }
 
   /**
@@ -200,9 +200,7 @@ export default class EnvironmentTypeConfigService {
       await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
-        throw Boom.notFound(
-          `Could not find envType ${envTypeId} with envTypeConfig ${envTypeConfigId} to update`
-        );
+        throw Boom.notFound(`Could not find requested envType with requested envTypeConfig to update`);
       }
       throw e;
     }
@@ -221,7 +219,7 @@ export default class EnvironmentTypeConfigService {
       return EnvironmentTypeConfigParser.parse(response.Attributes);
     }
     console.error('Unable to update environment type config', updatedEnvTypeConfig);
-    throw Boom.internal(`Unable to update environment type config with params: ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to update environment type config`);
   }
 
   private _buildEnvTypeConfigPkSk(envTypeConfigId: string): { pk: string; sk: string } {

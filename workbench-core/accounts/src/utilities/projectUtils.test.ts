@@ -102,7 +102,7 @@ describe('projectUtils', () => {
 
       // OPERATE n CHECK
       expect(() => manualSortProjects(sortRequest, projects)).toThrow(
-        `No notAnAttribute on Project. Please sort by another attribute.`
+        `Requested sort key does not exist on Project. Please sort by another attribute.`
       );
     });
 
@@ -203,7 +203,7 @@ describe('projectUtils', () => {
 
       // OPERATE n CHECK
       expect(() => manualFilterProjects(filterRequest, projects)).toThrow(
-        `No notAnAttribute on Project. Please filter by another attribute.`
+        `Requested filter does not exist on Project. Please filter by another attribute.`
       );
     });
 

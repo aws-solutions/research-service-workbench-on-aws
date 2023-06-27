@@ -128,7 +128,7 @@ describe('multiStep dataset integration test', () => {
         e,
         new HttpError(409, {
           error: 'Conflict',
-          message: `Project ${project2Id} is already associated with Dataset ${dataSet.id}`
+          message: `Project is already associated with Dataset`
         })
       );
     }
@@ -145,7 +145,7 @@ describe('multiStep dataset integration test', () => {
         e,
         new HttpError(409, {
           error: 'Conflict',
-          message: `${project1Id} already owns this dataset`
+          message: `Project already owns this dataset`
         })
       );
     }
@@ -158,7 +158,7 @@ describe('multiStep dataset integration test', () => {
         e,
         new HttpError(409, {
           error: 'Conflict',
-          message: `DataSet ${dataSet.id} cannot be removed because it is still associated with roles in the provided project(s)`
+          message: `DataSet cannot be removed because it is still associated with roles in the provided project(s)`
         })
       );
     }
@@ -175,7 +175,7 @@ describe('multiStep dataset integration test', () => {
         e,
         new HttpError(409, {
           error: 'Conflict',
-          message: `${project1Id} cannot remove access from ${dataSet.id} for the ProjectAdmin because it owns that dataset.`
+          message: `Requested project cannot remove access from dataset for the ProjectAdmin because it owns that dataset.`
         })
       );
     }
@@ -295,7 +295,7 @@ describe('multiStep dataset integration test', () => {
         e,
         new HttpError(403, {
           error: 'Forbidden',
-          message: `${project2Id} does not have access to the provided dataset(s)`
+          message: `Project does not have access to the provided dataset(s)`
         })
       );
     }

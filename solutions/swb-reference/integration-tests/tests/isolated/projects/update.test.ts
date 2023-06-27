@@ -79,7 +79,7 @@ describe('Update Project negative tests', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Project name "${existingProject.name}" is in use by a non deleted project. Please use another name.`
+            message: `Project name is in use by a non deleted project. Please use another name.`
           })
         );
       }

@@ -41,7 +41,7 @@ describe('Soft Delete Project negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find project ${invalidProjectId}`
+            message: `Could not find project`
           })
         );
       }

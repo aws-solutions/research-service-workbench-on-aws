@@ -85,9 +85,9 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         const user = await userService.getUser(userId);
         res.status(200).json(user);
       } catch (err) {
-        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user`);
         if (Boom.isBoom(err)) throw err;
-        throw Boom.badImplementation(`Could not find user ${userId}`);
+        throw Boom.badImplementation(`Could not find user`);
       }
     })
   );
@@ -103,7 +103,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         const existingUser = await userService.getUser(userId);
         if (existingUser.status !== Status.INACTIVE) {
           throw Boom.badRequest(
-            `Could not delete user ${userId}. Expected status: ${Status[Status.INACTIVE]}; received: ${
+            `Could not delete user. Expected status: ${Status[Status.INACTIVE]}; received: ${
               Status[existingUser.status]
             }`
           );
@@ -112,9 +112,9 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         await userService.deleteUser(userId);
         res.status(204).send();
       } catch (err) {
-        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user`);
         if (Boom.isBoom(err)) throw err;
-        throw Boom.badImplementation(`Could not delete user ${userId}`);
+        throw Boom.badImplementation(`Could not delete user`);
       }
     })
   );
@@ -142,13 +142,13 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         await userService.updateUser(userId, { ...existingUser, ...rest });
         res.status(204).send();
       } catch (err) {
-        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user`);
         if (isInvalidParameterError(err))
           throw Boom.notFound(
             'Please make sure specified email is in valid email format and not already in use in the Cognito User Pool'
           );
         if (Boom.isBoom(err)) throw err;
-        throw Boom.badImplementation(`Could not update user ${userId}`);
+        throw Boom.badImplementation(`Could not update user`);
       }
     })
   );

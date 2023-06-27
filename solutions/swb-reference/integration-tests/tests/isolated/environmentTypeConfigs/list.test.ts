@@ -115,7 +115,7 @@ describe('list environment type configs', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }
@@ -159,7 +159,7 @@ describe('list environment type configs', () => {
             e,
             new HttpError(400, {
               error: 'Bad Request',
-              message: `Invalid Pagination Token: ${queryParams.paginationToken}`
+              message: `Invalid Pagination Token`
             })
           );
         }
