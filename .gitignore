@@ -89,27 +89,27 @@ build/
 .idea
 
 # Reference package
-# solutions/swb-reference/src/environment-files/offline-packages/*  TODO: Uncomment this back once GALI-2093 changes are merged
-solutions/swb-reference/build
-solutions/swb-reference/temp
-solutions/swb-reference/src/config/*.yaml
-solutions/swb-reference/integration-tests/config/*.yaml
-!solutions/swb-reference/integration-tests/config/example.yaml
-!solutions/swb-reference/integration-tests/config/testEnv.yaml
-!solutions/swb-reference/integration-tests/config/release-candidate.yaml
-!solutions/swb-reference/integration-tests/config/release-candidate-private.yaml
-!solutions/swb-reference/integration-tests/config/swbv2-private.yaml
-!solutions/swb-reference/src/config/example.yaml
-!solutions/swb-reference/src/config/testEnv.yaml
-!solutions/swb-reference/src/config/release-candidate.yaml
-!solutions/swb-reference/src/config/release-candidate-private.yaml
-!solutions/swb-reference/src/config/swbv2-private.yaml
-!solutions/swb-reference/src/config/demo.yaml
-solutions/swb-reference/src/config/*.json
-solutions/swb-reference/.aws-sam/
+# solutions/rsw-reference/src/environment-files/offline-packages/*  TODO: Uncomment this back once GALI-2093 changes are merged
+solutions/rsw-reference/build
+solutions/rsw-reference/temp
+solutions/rsw-reference/src/config/*.yaml
+solutions/rsw-reference/integration-tests/config/*.yaml
+!solutions/rsw-reference/integration-tests/config/example.yaml
+!solutions/rsw-reference/integration-tests/config/testEnv.yaml
+!solutions/rsw-reference/integration-tests/config/release-candidate.yaml
+!solutions/rsw-reference/integration-tests/config/release-candidate-private.yaml
+!solutions/rsw-reference/integration-tests/config/swbv2-private.yaml
+!solutions/rsw-reference/src/config/example.yaml
+!solutions/rsw-reference/src/config/testEnv.yaml
+!solutions/rsw-reference/src/config/release-candidate.yaml
+!solutions/rsw-reference/src/config/release-candidate-private.yaml
+!solutions/rsw-reference/src/config/swbv2-private.yaml
+!solutions/rsw-reference/src/config/demo.yaml
+solutions/rsw-reference/src/config/*.json
+solutions/rsw-reference/.aws-sam/
 
 #exclude binary files
-solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.9.4/*.rpm
+solutions/rsw-reference/src/environment-files/offline-packages/sagemaker/fuse-2.9.4/*.rpm
 
 
 
@@ -122,21 +122,21 @@ workbench-core/example/infrastructure/src/config/testEnv.json
 workbench-core/example/infrastructure/src/config/hostingEnv.json
 
 #next static export
-solutions/swb-ui/ui/out
+solutions/rsw-ui/ui/out
 
-#swb-ui cdk-infrastructure
-solutions/swb-ui/infrastructure/src/config/*.yaml
-solutions/swb-ui/infrastructure/src/config/*.json
-!solutions/swb-ui/infrastructure/src/config/example.yaml
+#rsw-ui cdk-infrastructure
+solutions/rsw-ui/infrastructure/src/config/*.yaml
+solutions/rsw-ui/infrastructure/src/config/*.json
+!solutions/rsw-ui/infrastructure/src/config/example.yaml
 
-#swb-ui end to end tests
-solutions/swb-ui/ui/end-to-end-tests/config/*.yaml
-!solutions/swb-ui/ui/end-to-end-tests/config/example.yaml
-!solutions/swb-ui/ui/end-to-end-tests/config/testEnv.yaml
-!solutions/swb-ui/ui/end-to-end-tests/config/swbv2-private.yaml
-solutions/swb-ui/ui/end-to-end-tests/cypress/screenshots
-solutions/swb-ui/ui/end-to-end-tests/cypress/videos
-solutions/swb-ui/ui/end-to-end-tests/cypress/downloads
+#rsw-ui end to end tests
+solutions/rsw-ui/ui/end-to-end-tests/config/*.yaml
+!solutions/rsw-ui/ui/end-to-end-tests/config/example.yaml
+!solutions/rsw-ui/ui/end-to-end-tests/config/testEnv.yaml
+!solutions/rsw-ui/ui/end-to-end-tests/config/swbv2-private.yaml
+solutions/rsw-ui/ui/end-to-end-tests/cypress/screenshots
+solutions/rsw-ui/ui/end-to-end-tests/cypress/videos
+solutions/rsw-ui/ui/end-to-end-tests/cypress/downloads
 
 #workbench ccore end to end tests
 workbench-core/example/infrastructure/test-results.xml

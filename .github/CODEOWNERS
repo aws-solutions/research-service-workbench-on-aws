@@ -4,12 +4,12 @@ rush.json                                             @aws-solutions/sb-solution
 common/config/rush/pnpm-lock.yaml                     @aws-solutions/sb-solution-spark-developers
 .viperlightignore                                     @aws-solutions/sb-solution-spark-developers
 
-solutions/swb-ui                                      @aws-solutions/sb-ma-swb
-common/changes/@aws/swb-ui                            @aws-solutions/sb-ma-swb
-solutions/swb-reference                               @aws-solutions/sb-ma-swb
-common/changes/@aws/swb-reference                     @aws-solutions/sb-ma-swb
-solutions/swb-app                                     @aws-solutions/sb-ma-swb
-common/changes/@aws/swb-app                           @aws-solutions/sb-ma-swb
+solutions/rsw-ui                                      @aws-solutions/sb-ma-swb
+common/changes/@aws/rsw-ui                            @aws-solutions/sb-ma-swb
+solutions/rsw-reference                               @aws-solutions/sb-ma-swb
+common/changes/@aws/rsw-reference                     @aws-solutions/sb-ma-swb
+solutions/rsw-app                                     @aws-solutions/sb-ma-swb
+common/changes/@aws/rsw-app                           @aws-solutions/sb-ma-swb
 workbench-core/base                                   @aws-solutions/sb-ma-swb
 common/changes/@aws/workbench-core-base               @aws-solutions/sb-ma-swb
 workbench-core/environments                           @aws-solutions/sb-ma-swb

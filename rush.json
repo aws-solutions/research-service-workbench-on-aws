@@ -26,14 +26,14 @@
   "variants": [],
   "projects": [
     {
-      "packageName": "@aws/swb-app",
-      "projectFolder": "solutions/swb-app",
+      "packageName": "@aws/rsw-app",
+      "projectFolder": "solutions/rsw-app",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/swb-reference",
-      "projectFolder": "solutions/swb-reference",
+      "packageName": "@aws/rsw-reference",
+      "projectFolder": "solutions/rsw-reference",
       "reviewCategory": "production",
       "shouldPublish": true
     },
@@ -44,8 +44,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-swb-common-ui",
-      "projectFolder": "workbench-core/swb-common-ui",
+      "packageName": "@aws/workbench-core-rsw-common-ui",
+      "projectFolder": "workbench-core/rsw-common-ui",
       "reviewCategory": "production",
       "shouldPublish": false
     },

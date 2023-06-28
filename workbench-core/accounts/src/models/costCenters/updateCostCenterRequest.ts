@@ -9,8 +9,8 @@ import { z } from '@aws/workbench-core-base';
 export const UpdateCostCenterRequestParser = z
   .object({
     id: z.string().costCenterId().required(),
-    name: z.string().swbName().optionalNonEmpty(),
-    description: z.string().swbDescription().optionalNonEmpty()
+    name: z.string().rswName().optionalNonEmpty(),
+    description: z.string().rswDescription().optionalNonEmpty()
   })
   .strict();
 

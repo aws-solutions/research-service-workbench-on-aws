@@ -27,17 +27,17 @@ jobs:
       - name: Rush test
         run: node common/scripts/install-run-rush.js test --verbose
 
-      - name: Generate Codecov for @aws/swb-app
+      - name: Generate Codecov for @aws/rsw-app
         uses: codecov/codecov-action@v3
         with:
-          files: solutions/swb-app/temp/coverage/coverage-final.json
-          flags: swb-app
+          files: solutions/rsw-app/temp/coverage/coverage-final.json
+          flags: rsw-app
 
-      - name: Generate Codecov for @aws/swb-reference
+      - name: Generate Codecov for @aws/rsw-reference
         uses: codecov/codecov-action@v3
         with:
-          files: solutions/swb-reference/temp/coverage/coverage-final.json
-          flags: swb-reference
+          files: solutions/rsw-reference/temp/coverage/coverage-final.json
+          flags: rsw-reference
 
       - name: Generate Codecov for @aws/workbench-core-accounts
         uses: codecov/codecov-action@v3
@@ -111,11 +111,11 @@ jobs:
           files: workbench-core/logging/temp/coverage/coverage-final.json
           flags: workbench-core-logging
 
-      - name: Generate Codecov for workbench-core-swb-common-ui
+      - name: Generate Codecov for workbench-core-rsw-common-ui
         uses: codecov/codecov-action@v3
         with:
-          files: workbench-core/swb-common-ui/temp/coverage/coverage-final.json
-          flags: workbench-core-swb-common-ui
+          files: workbench-core/rsw-common-ui/temp/coverage/coverage-final.json
+          flags: workbench-core-rsw-common-ui
 
       - name: Generate Codecov for workbench-core-user-management
         uses: codecov/codecov-action@v3

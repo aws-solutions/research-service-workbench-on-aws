@@ -56,9 +56,9 @@ if [ -f ./package.json ]; then
 fi
 popd
 
-pushd solutions/swb-ui/infrastructure
+pushd solutions/rsw-ui/infrastructure
 if [ -f ./package.json ]; then
-  echo "checking attributions in solutions/swb-ui/infrastructure"
+  echo "checking attributions in solutions/rsw-ui/infrastructure"
   generate-attribution
   mv oss-attribution/attribution.txt NOTICE
   rm -rf oss-attribution

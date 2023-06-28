@@ -10,7 +10,7 @@ import { CostCenterStatus } from '../../constants/costCenterStatus';
 export const CostCenterParser = z.object({
   id: z.string().costCenterId().required(),
   name: z.string().required(),
-  description: z.string().swbDescription().required(),
+  description: z.string().rswDescription().required(),
   subnetId: z.string(),
   vpcId: z.string(),
   envMgmtRoleArn: z.string(),

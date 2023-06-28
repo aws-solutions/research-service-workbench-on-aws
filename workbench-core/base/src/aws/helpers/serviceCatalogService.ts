@@ -40,7 +40,7 @@ export default class ServiceCatalogService {
       }
     } while (pageToken);
 
-    // Find the SWB portfolio
+    // Find the RSW portfolio
     const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
       return portfolio.DisplayName === portfolioName;
     });

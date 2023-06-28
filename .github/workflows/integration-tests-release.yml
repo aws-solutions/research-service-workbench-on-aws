@@ -18,9 +18,9 @@ jobs:
           poll-interval-seconds: 10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  deploy-swb-reference:
+  deploy-rsw-reference:
     needs: [pre-deployment-check]
-    uses: ./.github/workflows/deploy-integration-swb-reference.yml
+    uses: ./.github/workflows/deploy-integration-rsw-reference.yml
     with:
       environment: release-swb
       stage: release-candidate
@@ -33,9 +33,9 @@ jobs:
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_RELEASE }}
       DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_RELEASE }}
-  deploy-swb-reference-byon:
+  deploy-rsw-reference-byon:
     needs: [pre-deployment-check]
-    uses: ./.github/workflows/deploy-integration-swb-reference-byon.yml
+    uses: ./.github/workflows/deploy-integration-rsw-reference-byon.yml
     with:
       environment: release-swb-byon
       stage: release-candidate-private

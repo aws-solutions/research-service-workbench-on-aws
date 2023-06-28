@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { convertToRecord, httpApiGet, httpApiPut, httpApiPost } from '@aws/workbench-core-swb-common-ui';
+import { convertToRecord, httpApiGet, httpApiPut, httpApiPost } from '@aws/workbench-core-rsw-common-ui';
 import useSWR, { KeyedMutator } from 'swr';
 import {
   EnvironmentItem,

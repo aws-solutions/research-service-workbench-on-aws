@@ -4,4 +4,4 @@
 
 ## Description
 
-This project is the routing package for `example/infrastructure`. It is used by `example/infrastructure` to generate routes for SWB API. Please refer  [here](../infrastructure/README.md) for more information on how to use this project.
+This project is the routing package for `example/infrastructure`. It is used by `example/infrastructure` to generate routes for RSW API. Please refer  [here](../infrastructure/README.md) for more information on how to use this project.

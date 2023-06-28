@@ -45,9 +45,9 @@ if [ -f ./package.json ]; then
 fi
 popd
 
-pushd solutions/swb-ui/infrastructure
+pushd solutions/rsw-ui/infrastructure
 if [ -f ./package.json ]; then
-  echo "checking licenses in solutions/swb-ui/infrastructure"
+  echo "checking licenses in solutions/rsw-ui/infrastructure"
   license-checker --production --exclude MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
 fi
 popd

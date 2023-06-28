@@ -1,6 +1,6 @@
 #!/bin/bash
 
-solutions=("swb-ui/infrastructure ")
+solutions=("rsw-ui/infrastructure ")
 solutions+=$(ls solutions)
 workbenchCore=("repo-scripts/repo-toolbox example/express example/infrastructure ")
 workbenchCore+=$(ls workbench-core)

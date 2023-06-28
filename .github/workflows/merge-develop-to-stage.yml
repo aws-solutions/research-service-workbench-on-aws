@@ -34,9 +34,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-swb-reference:
+  deploy-rsw-reference:
     needs: [pre-deployment-check]
-    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-rsw-reference.yml@develop
     with:
       stage: testEnv
       environment: dev
@@ -50,9 +50,9 @@ jobs:
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_TEST }}
       DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_TEST }}
 
-  deploy-swb-reference-byon:
+  deploy-rsw-reference-byon:
     needs: [pre-deployment-check]
-    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-integration-rsw-reference-byon.yml@develop
     with:
       stage: swbv2-private
       environment: dev
@@ -74,9 +74,9 @@ jobs:
       ECS_SUBNET_2: ${{ secrets.ECS_SUBNET_2_BYON }}
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_BYON }}
 
-  deploy-swb-demo:
-    needs: [deploy-swb-reference]
-    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+  deploy-rsw-demo:
+    needs: [deploy-rsw-reference]
+    uses: aws-solutions/research-service-workbench-on-aws/.github/workflows/deploy-rsw-reference-demo.yml@develop
     with:
       environment: dev    
     secrets:
@@ -88,7 +88,7 @@ jobs:
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference, deploy-swb-reference-byon]
+    needs: [readme-commit, deploy-rsw-reference, deploy-rsw-reference-byon]
     env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"

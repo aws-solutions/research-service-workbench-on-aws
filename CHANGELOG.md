@@ -9,5 +9,5 @@ This solution consist of multiple packages. Please click the links in each versi
 ## [2.0.0] - 2023-06-09
 
 ### Added
-- Package swb-reference [CHANGELOG](./solutions/swb-reference/CHANGELOG.md)
-- Package swb-app [CHANGELOG](./solutions/swb-app/CHANGELOG.md)
+- Package rsw-reference [CHANGELOG](./solutions/rsw-reference/CHANGELOG.md)
+- Package rsw-app [CHANGELOG](./solutions/rsw-app/CHANGELOG.md)

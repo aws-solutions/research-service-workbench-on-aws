@@ -9,8 +9,8 @@ import { z } from '@aws/workbench-core-base';
 export const UpdateEnvironmentTypeRequestParser = z
   .object({
     envTypeId: z.string().etId().required(),
-    name: z.string().swbName().optionalNonEmpty(),
-    description: z.string().swbDescription().optional(),
+    name: z.string().rswName().optionalNonEmpty(),
+    description: z.string().rswDescription().optional(),
     status: z.enum(['APPROVED', 'NOT_APPROVED']).optional()
   })
   .strict();

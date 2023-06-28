@@ -10,8 +10,8 @@ export const UpdateProjectRequestParser = z
   .object({
     projectId: z.string().projId().required(),
     updatedValues: z.object({
-      name: z.string().swbName().optionalNonEmpty(),
-      description: z.string().swbDescription().optionalNonEmpty()
+      name: z.string().rswName().optionalNonEmpty(),
+      description: z.string().rswDescription().optionalNonEmpty()
     })
   })
   .strict();

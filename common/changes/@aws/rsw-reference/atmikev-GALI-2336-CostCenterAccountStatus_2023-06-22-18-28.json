@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/rsw-reference",
+      "comment": "cost centers require a current account",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/rsw-reference"
+}

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { TableEmptyDisplay, TableNoMatchDisplay } from '@aws/workbench-core-swb-common-ui';
+import { TableEmptyDisplay, TableNoMatchDisplay } from '@aws/workbench-core-rsw-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   CollectionPreferences,

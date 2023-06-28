@@ -22,20 +22,20 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: cdk synth swb-reference
+      - name: cdk synth rsw-reference
         env:
           STAGE: testEnv
         run: |
-          cd solutions/swb-reference
+          cd solutions/rsw-reference
           node ../../common/scripts/install-run-rushx.js cdk-synth:noBuild
 
-      # - name: cdk synth swb-ui
+      # - name: cdk synth rsw-ui
       #   env:
       #     STAGE: testEnv
       #     SYNTH_REGION_SHORTNAME: va
       #     SYNTH_REGION: us-east-1
       #   run: |
-      #     cd solutions/swb-ui/infrastructure
+      #     cd solutions/rsw-ui/infrastructure
       #     node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: cdk synth example

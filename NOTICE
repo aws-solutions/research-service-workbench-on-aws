@@ -13,14 +13,14 @@ authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@aws/swb-app
+@aws/rsw-app
 2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@aws/swb-reference
+@aws/rsw-reference
 2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>

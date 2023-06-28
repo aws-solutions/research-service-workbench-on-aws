@@ -29,7 +29,7 @@
     "test": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-swb-common-ui": "workspace:*",
+    "@aws/workbench-core-rsw-common-ui": "workspace:*",
     "react": "17.0.2",
     "swr": "^1.3.0",
     "typescript": "^4.5.2"

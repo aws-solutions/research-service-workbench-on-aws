@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/rsw-app",
+      "comment": "allowing multiple App clientIds for Cognito",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/rsw-app"
+}

@@ -10,8 +10,8 @@ import { EnvironmentTypeConfigStatus } from '../../constants/environmentTypeConf
 export const EnvironmentTypeConfigParser = z.object({
   id: z.string().etcId().required(),
   type: z.string(),
-  description: z.string().swbDescription().optional(),
-  name: z.string().swbName().optionalNonEmpty(),
+  description: z.string().rswDescription().optional(),
+  name: z.string().rswName().optionalNonEmpty(),
   createdAt: z.string(),
   updatedAt: z.string(),
   estimatedCost: z.string().optional(),

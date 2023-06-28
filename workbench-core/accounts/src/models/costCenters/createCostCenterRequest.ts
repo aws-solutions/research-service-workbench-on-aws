@@ -7,9 +7,9 @@ import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateCostCenterRequestParser = z.object({
-  name: z.string().swbName().required(),
+  name: z.string().rswName().required(),
   accountId: z.string().accountId().required(),
-  description: z.string().swbDescription().required()
+  description: z.string().rswDescription().required()
 });
 
 export type CreateCostCenterRequest = z.infer<typeof CreateCostCenterRequestParser>;

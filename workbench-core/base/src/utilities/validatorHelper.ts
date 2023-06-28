@@ -8,15 +8,15 @@ import { z, ZodString, ZodTypeAny, ZodOptional } from 'zod';
 import {
   nonHTMLMessage,
   nonHtmlRegExp,
-  swbNameMessage,
-  swbNameRegExp,
+  rswNameMessage,
+  rswNameRegExp,
   personNameRegExp,
   personNameMessage,
   personNameMaxLength,
-  swbDescriptionRegExp,
-  swbDescriptionMessage,
-  swbDescriptionMaxLength,
-  swbNameMaxLength,
+  rswDescriptionRegExp,
+  rswDescriptionMessage,
+  rswDescriptionMaxLength,
+  rswNameMaxLength,
   uuidWithLowercasePrefixRegExp,
   etIdRegex,
   awsAccountIdRegExp,
@@ -53,11 +53,11 @@ interface ZodPagination {
 declare module 'zod' {
   export interface ZodString {
     required: () => ZodString;
-    swbId: (prefix: string) => ZodString;
+    rswId: (prefix: string) => ZodString;
     nonHTML: () => ZodString;
-    swbName: () => ZodString;
+    rswName: () => ZodString;
     personName: () => ZodString;
-    swbDescription: () => ZodString;
+    rswDescription: () => ZodString;
     etId: () => ZodString;
     etcId: () => ZodString;
     projId: () => ZodString;
@@ -83,7 +83,7 @@ z.ZodString.prototype.required = function (): ZodString {
   return this.min(1, { message: requiredMessage });
 };
 
-z.ZodString.prototype.swbId = function (prefix: string): ZodString {
+z.ZodString.prototype.rswId = function (prefix: string): ZodString {
   return this.regex(uuidWithLowercasePrefixRegExp(prefix), { message: invalidIdMessage });
 };
 
@@ -91,10 +91,10 @@ z.ZodString.prototype.nonHTML = function (): ZodString {
   return this.regex(nonHtmlRegExp(), { message: nonHTMLMessage });
 };
 
-z.ZodString.prototype.swbName = function (): ZodString {
-  return this.max(swbNameMaxLength, {
-    message: lengthValidationMessage(swbNameMaxLength)
-  }).regex(swbNameRegExp(), { message: swbNameMessage });
+z.ZodString.prototype.rswName = function (): ZodString {
+  return this.max(rswNameMaxLength, {
+    message: lengthValidationMessage(rswNameMaxLength)
+  }).regex(rswNameRegExp(), { message: rswNameMessage });
 };
 
 z.ZodString.prototype.personName = function (): ZodString {
@@ -103,10 +103,10 @@ z.ZodString.prototype.personName = function (): ZodString {
   }).regex(personNameRegExp(), { message: personNameMessage });
 };
 
-z.ZodString.prototype.swbDescription = function (): ZodString {
-  return this.max(swbDescriptionMaxLength, {
-    message: lengthValidationMessage(swbDescriptionMaxLength)
-  }).regex(swbDescriptionRegExp(), { message: swbDescriptionMessage });
+z.ZodString.prototype.rswDescription = function (): ZodString {
+  return this.max(rswDescriptionMaxLength, {
+    message: lengthValidationMessage(rswDescriptionMaxLength)
+  }).regex(rswDescriptionRegExp(), { message: rswDescriptionMessage });
 };
 
 z.ZodString.prototype.etId = function (): ZodString {

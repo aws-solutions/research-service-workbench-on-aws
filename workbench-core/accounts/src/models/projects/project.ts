@@ -9,8 +9,8 @@ import { ProjectStatus } from '../../constants/projectStatus';
 // eslint-disable-next-line @rushstack/typedef-var
 export const ProjectParser = z.object({
   id: z.string().projId().required(),
-  name: z.string().swbName().required(),
-  description: z.string().swbDescription().required(),
+  name: z.string().rswName().required(),
+  description: z.string().rswDescription().required(),
   costCenterId: z.string().costCenterId().required(),
   status: z.nativeEnum(ProjectStatus),
   createdAt: z.string(),

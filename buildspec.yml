@@ -15,7 +15,7 @@ phases:
       - echo "Installing dependencies and executing unit tests completed `date`"
   build:
     commands:
-      - cd ./../solutions/swb-reference
+      - cd ./../solutions/rsw-reference
       - node ./../../common/scripts/install-run-rushx.js compile
       - echo "Starting build `date` `pwd`"
       - cd ../../deployment

@@ -19,10 +19,10 @@ The following example is a snapshot from the [research-service-workbench-on-aws 
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
-| [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
-| [solutions/swb-reference](./solutions/swb-reference/) | [@aws/swb-reference] | [README](./solutions/swb-reference/README.md)
-| [solutions/swb-ui](./solutions/swb-ui/) | [@aws/swb-ui] | [README](./solutions/swb-ui/README.md)
-| [solutions/swb-ui/infrastructure](./solutions/swb-ui/infrastructure/) | [@aws/swb-ui-infrastructure] | [README](./solutions/swb-ui/infrastructure/README.md)
+| [solutions/rsw-app](./solutions/rsw-app/) | [@aws/rsw-app] | [README](./solutions/rsw-app/README.md)
+| [solutions/rsw-reference](./solutions/rsw-reference/) | [@aws/rsw-reference] | [README](./solutions/rsw-reference/README.md)
+| [solutions/rsw-ui](./solutions/rsw-ui/) | [@aws/rsw-ui] | [README](./solutions/rsw-ui/README.md)
+| [solutions/rsw-ui/infrastructure](./solutions/rsw-ui/infrastructure/) | [@aws/rsw-ui-infrastructure] | [README](./solutions/rsw-ui/infrastructure/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/authorization](./workbench-core/authorization/) | [@aws/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)

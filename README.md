@@ -36,8 +36,8 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
-| [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
-| [solutions/swb-reference](./solutions/swb-reference/) | [@aws/swb-reference] | [README](./solutions/swb-reference/README.md)
+| [solutions/rsw-app](./solutions/rsw-app/) | [@aws/rsw-app] | [README](./solutions/rsw-app/README.md)
+| [solutions/rsw-reference](./solutions/rsw-reference/) | [@aws/rsw-reference] | [README](./solutions/rsw-reference/README.md)
 | [workbench-core/accounts](./workbench-core/accounts/) | [@aws/workbench-core-accounts] | [README](./workbench-core/accounts/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)

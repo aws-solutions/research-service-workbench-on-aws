@@ -5,14 +5,14 @@ coverage:
         target: 90% #overall project/ repo coverage
         flags:
           - root
-      swb-app:
+      rsw-app:
         target: 78%
         flags:
-          - swb-app
-      swb-reference:
+          - rsw-app
+      rsw-reference:
         target: 90%
         flags:
-          - swb-reference
+          - rsw-reference
       workbench-core-accounts:
         target: 90%
         flags:
@@ -61,22 +61,22 @@ coverage:
         target: 90%
         flags:
           - workbench-core-logging
-      workbench-core-swb-common-ui:
+      workbench-core-rsw-common-ui:
         target: 90%
         flags:
-          - workbench-core-swb-common-ui
+          - workbench-core-rsw-common-ui
       workbench-core-user-management:
         target: 90%
         flags:
           - workbench-core-user-management
 
 flags:
-  swb-app:
+  rsw-app:
     paths:
-      - solutions/swb-app
-  swb-reference:
+      - solutions/rsw-app
+  rsw-reference:
     paths:
-      - solutions/swb-reference
+      - solutions/rsw-reference
   workbench-core-accounts:
     paths:
       - workbench-core/accounts
@@ -113,9 +113,9 @@ flags:
   workbench-core-logging:
     paths:
       - workbench-core/logging
-  workbench-core-swb-common-ui:
+  workbench-core-rsw-common-ui:
     paths:
-      - workbench-core/swb-common-ui
+      - workbench-core/rsw-common-ui
   workbench-core-user-management:
     paths:
       - workbench-core/user-management

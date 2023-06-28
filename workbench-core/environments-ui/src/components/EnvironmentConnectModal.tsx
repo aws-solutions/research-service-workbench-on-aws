@@ -4,7 +4,7 @@
  */
 
 import { EnvironmentConnectionLinkPlaceholder } from '@aws/workbench-core-environments';
-import { useNotifications } from '@aws/workbench-core-swb-common-ui';
+import { useNotifications } from '@aws/workbench-core-rsw-common-ui';
 import { Modal, SpaceBetween, Link, Box, Button } from '@cloudscape-design/components';
 import React from 'react';
 

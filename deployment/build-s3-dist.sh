@@ -277,7 +277,7 @@ STAGE=dev
 echo Stage set to $STAGE
 
 # Remove dev.yaml if it exists, we'll start with a known config that works
-do_cmd rm -f $source_dir/swb-reference/src/config/dev.yaml
+do_cmd rm -f $source_dir/rsw-reference/src/config/dev.yaml
 
 cognitoDomainRandomString=$(xxd -l 5 -c 5 -p < /dev/urandom)
 
@@ -295,7 +295,7 @@ albInternetFacing: true
 
 # Auditing
 fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
-" >> $source_dir/swb-reference/src/config/dev.yaml
+" >> $source_dir/rsw-reference/src/config/dev.yaml
 
 # Add local install to PATH
 export PATH=$(npm bin):$PATH
@@ -315,7 +315,7 @@ echo "--------------------------------------------------------------------------
 echo "${bold}[Create] Templates${normal}"
 echo "------------------------------------------------------------------------------"
 
-do_cmd cd $source_dir/swb-reference
+do_cmd cd $source_dir/rsw-reference
 
 if fn_exists create_template_${template_format}; then
     create_template_${template_format}

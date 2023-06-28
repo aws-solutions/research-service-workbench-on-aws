@@ -16,7 +16,7 @@ const ErrorParser = z.object({
 // eslint-disable-next-line @rushstack/typedef-var
 export const AccountParser = z.object({
   id: z.string().accountId().required(),
-  name: z.string().swbName().required(),
+  name: z.string().rswName().required(),
   awsAccountId: z.string().awsAccountId().required(),
   envMgmtRoleArn: z.string(),
   error: ErrorParser.optional(),

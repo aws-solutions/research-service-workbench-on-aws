@@ -7,8 +7,8 @@ import { z } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateProjectRequestParser = z
   .object({
-    name: z.string().swbName().required(),
-    description: z.string().swbDescription().required(),
+    name: z.string().rswName().required(),
+    description: z.string().rswDescription().required(),
     costCenterId: z.string().costCenterId().required()
   })
   .strict();

@@ -13,9 +13,9 @@ import {
   envIdRegex,
   lengthValidationMessage,
   nonHtmlRegExp,
-  swbDescriptionRegExp,
+  rswDescriptionRegExp,
   awsAccountIdRegExp,
-  swbNameRegExp,
+  rswNameRegExp,
   personNameRegExp,
   uuidRegExp,
   uuidWithLowercasePrefix,
@@ -68,17 +68,17 @@ describe('textUtil', () => {
       expect(`<script>function(){while(true)}</script>`.match(nonHtmlRegExp())).toEqual(null);
     });
   });
-  describe('swbNameRegExp', () => {
-    test('valid swbName valid char', () => {
-      expect('name.name-1'.match(swbNameRegExp())).toEqual(expect.arrayContaining([`name.name-1`]));
+  describe('rswNameRegExp', () => {
+    test('valid rswName valid char', () => {
+      expect('name.name-1'.match(rswNameRegExp())).toEqual(expect.arrayContaining([`name.name-1`]));
     });
 
-    test('valid swbName empty string', () => {
-      expect(''.match(swbNameRegExp())).toEqual(expect.arrayContaining([``]));
+    test('valid rswName empty string', () => {
+      expect(''.match(rswNameRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
-    test('invalid swbName', () => {
-      expect(`invalid name$`.match(swbNameRegExp())).toEqual(null);
+    test('invalid rswName', () => {
+      expect(`invalid name$`.match(rswNameRegExp())).toEqual(null);
     });
   });
   describe('personNameRegExp', () => {
@@ -98,19 +98,19 @@ describe('textUtil', () => {
       expect(`invalid name$`.match(personNameRegExp())).toEqual(null);
     });
   });
-  describe('swbDescriptionRegExp', () => {
-    test('valid swbDescription valid char', () => {
-      expect('description- desc'.match(swbDescriptionRegExp())).toEqual(
+  describe('rswDescriptionRegExp', () => {
+    test('valid rswDescription valid char', () => {
+      expect('description- desc'.match(rswDescriptionRegExp())).toEqual(
         expect.arrayContaining([`description- desc`])
       );
     });
 
-    test('valid swbDescription empty string', () => {
-      expect(''.match(swbDescriptionRegExp())).toEqual(expect.arrayContaining([``]));
+    test('valid rswDescription empty string', () => {
+      expect(''.match(rswDescriptionRegExp())).toEqual(expect.arrayContaining([``]));
     });
 
-    test('invalid swbDescription', () => {
-      expect(`%$<>`.match(swbDescriptionRegExp())).toEqual(null);
+    test('invalid rswDescription', () => {
+      expect(`%$<>`.match(rswDescriptionRegExp())).toEqual(null);
     });
   });
 

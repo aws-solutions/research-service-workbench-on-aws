@@ -16,18 +16,18 @@ const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 const nonHTMLMessage: string = 'must not contain any of <>{}';
 const nonHtmlRegExpAsString: string = '^([^<>{}]*)$';
 
-const swbNameMessage: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
-const swbNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
-const swbNameMaxLength: number = 112;
+const rswNameMessage: string = 'must contain only letters, numbers, hyphens, underscores, and periods';
+const rswNameRegExpAsString: string = ['^[A-Za-z0-9-_.]+$', emtpyStringAsString].join('|');
+const rswNameMaxLength: number = 112;
 
 const personNameMessage: string = 'must contain only letters, spaces, numbers, hyphens, and periods';
 const personNameRegExpAsString: string = '^[A-Za-z0-9-. ]+$';
 const personNameMaxLength: number = 50;
 
-const swbDescriptionMessage: string =
+const rswDescriptionMessage: string =
   'must contain only letters, numbers, hyphens, underscores, periods, and spaces';
-const swbDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
-const swbDescriptionMaxLength: number = 400;
+const rswDescriptionRegExpAsString: string = ['^[A-Za-z0-9-_. ]+$', emtpyStringAsString].join('|');
+const rswDescriptionMaxLength: number = 400;
 
 const externalIdMessage: string =
   'must contain only letters, numbers, hyphens, underscores, plus, equal, comma, period, at (@), colon (:), and forward slash (/). String length must be between 2 and 400 characters inclusively';
@@ -89,9 +89,9 @@ function nonHtmlRegExp(): RegExp {
   return new RegExp(nonHtmlRegExpAsString);
 }
 
-function swbNameRegExp(): RegExp {
+function rswNameRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(swbNameRegExpAsString);
+  return new RegExp(rswNameRegExpAsString);
 }
 
 function personNameRegExp(): RegExp {
@@ -99,9 +99,9 @@ function personNameRegExp(): RegExp {
   return new RegExp(personNameRegExpAsString);
 }
 
-function swbDescriptionRegExp(): RegExp {
+function rswDescriptionRegExp(): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-  return new RegExp(swbDescriptionRegExpAsString);
+  return new RegExp(rswDescriptionRegExpAsString);
 }
 
 function etIdRegex(): RegExp {
@@ -182,15 +182,15 @@ export {
   uuidWithLowercasePrefixRegExp,
   nonHTMLMessage,
   nonHtmlRegExp,
-  swbNameMessage,
-  swbNameRegExp,
-  swbNameMaxLength,
+  rswNameMessage,
+  rswNameRegExp,
+  rswNameMaxLength,
   personNameMessage,
   personNameRegExp,
   personNameMaxLength,
-  swbDescriptionMessage,
-  swbDescriptionRegExp,
-  swbDescriptionMaxLength,
+  rswDescriptionMessage,
+  rswDescriptionRegExp,
+  rswDescriptionMaxLength,
   uuidRegExpAsString,
   productIdRegExpString,
   provisionArtifactIdRegExpString,

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/rsw-app",
+      "comment": "remove id from error message",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/rsw-app"
+}

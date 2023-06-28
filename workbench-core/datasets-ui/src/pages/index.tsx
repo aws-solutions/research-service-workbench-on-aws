@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useNotifications, BaseLayout } from '@aws/workbench-core-swb-common-ui';
+import { useNotifications, BaseLayout } from '@aws/workbench-core-rsw-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import { Box, BreadcrumbGroupProps, Header, SpaceBetween, Table } from '@cloudscape-design/components';
 import { FlashbarProps } from '@cloudscape-design/components/flashbar';

@@ -6,10 +6,10 @@
 import JSONValue from '../types/json';
 import {
   nonHTMLMessage,
-  swbNameMaxLength,
-  swbNameMessage,
-  swbDescriptionMaxLength,
-  swbDescriptionMessage,
+  rswNameMaxLength,
+  rswNameMessage,
+  rswDescriptionMaxLength,
+  rswDescriptionMessage,
   awsAccountIdMessage,
   nonEmptyMessage,
   invalidIdMessage
@@ -145,12 +145,12 @@ describe('validateAndParse', () => {
   });
 });
 
-describe('zod.swbId', () => {
+describe('zod.rswId', () => {
   const zodParser = z.object({
-    id: z.string().swbId('prefix')
+    id: z.string().rswId('prefix')
   });
-  type SWBIdType = z.infer<typeof zodParser>;
-  const invalidObjects: SWBIdType[] = [
+  type RSWIdType = z.infer<typeof zodParser>;
+  const invalidObjects: RSWIdType[] = [
     { id: 'prefix1-12345678-1234-1234-123f-1234567890ab' }, //invalid prefix
     { id: 'prefix-1234567g-1234-1234-123f-1234567890ab' }, //invalid out of range g in 1st uuid section
     { id: 'prefix-12345678f-1234-1234-123f-1234567890ab' }, //invalid extra char in 1st uuid section
@@ -168,13 +168,13 @@ describe('zod.swbId', () => {
   describe('is valid', () => {
     const validObject = { id: 'prefix-12345678-1234-1234-123f-1234567890ab' };
     test('returns valid Id', () => {
-      expect(validateAndParse<SWBIdType>(zodParser, validObject)).toEqual(validObject);
+      expect(validateAndParse<RSWIdType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
   describe('is not valid', () => {
     test.each(invalidObjects)('returns invalid Id message', (invalidId) => {
-      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
+      expect(() => validateAndParse<RSWIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
     });
   });
 });
@@ -245,16 +245,16 @@ describe('tests for zod.nonHTML', () => {
   });
 });
 
-describe('tests for zod.swbName', () => {
+describe('tests for zod.rswName', () => {
   const zodParser = z.object({
-    id: z.string().swbName()
+    id: z.string().rswName()
   });
-  type SwbNameType = z.infer<typeof zodParser>;
+  type RswNameType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
     const validObjects = [{ id: 'ABCabc123-_.' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
-      expect(validateAndParse<SwbNameType>(zodParser, validObject)).toEqual(validObject);
+      expect(validateAndParse<RswNameType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
@@ -262,11 +262,11 @@ describe('tests for zod.swbName', () => {
     describe('when length exceed maximum', () => {
       const invalidObjects = [
         // String exceeds max length
-        { id: 'A'.repeat(swbNameMaxLength + 1) }
+        { id: 'A'.repeat(rswNameMaxLength + 1) }
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
-        expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          `id: Input must be ${swbNameMaxLength} characters or less`
+        expect(() => validateAndParse<RswNameType>(zodParser, invalidObject)).toThrowError(
+          `id: Input must be ${rswNameMaxLength} characters or less`
         );
       });
     });
@@ -279,24 +279,24 @@ describe('tests for zod.swbName', () => {
         { id: 'aaa&123' }
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
-        expect(() => validateAndParse<SwbNameType>(zodParser, invalidObject)).toThrowError(
-          `${swbNameMessage}`
+        expect(() => validateAndParse<RswNameType>(zodParser, invalidObject)).toThrowError(
+          `${rswNameMessage}`
         );
       });
     });
   });
 });
 
-describe('tests for zod.swbDescription', () => {
+describe('tests for zod.rswDescription', () => {
   const zodParser = z.object({
-    id: z.string().swbDescription()
+    id: z.string().rswDescription()
   });
-  type SwbDescriptionType = z.infer<typeof zodParser>;
+  type RswDescriptionType = z.infer<typeof zodParser>;
 
   describe('when input is valid', () => {
     const validObjects = [{ id: 'ABCabc123-_. ' }, { id: '' }];
     test.each(validObjects)('returns valid Id', (validObject) => {
-      expect(validateAndParse<SwbDescriptionType>(zodParser, validObject)).toEqual(validObject);
+      expect(validateAndParse<RswDescriptionType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
@@ -304,11 +304,11 @@ describe('tests for zod.swbDescription', () => {
     describe('when length exceed maximum', () => {
       const invalidObjects = [
         // String exceeds max length
-        { id: 'A'.repeat(swbDescriptionMaxLength + 1) }
+        { id: 'A'.repeat(rswDescriptionMaxLength + 1) }
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
-        expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          `id: Input must be ${swbDescriptionMaxLength} characters or less`
+        expect(() => validateAndParse<RswDescriptionType>(zodParser, invalidObject)).toThrowError(
+          `id: Input must be ${rswDescriptionMaxLength} characters or less`
         );
       });
     });
@@ -320,8 +320,8 @@ describe('tests for zod.swbDescription', () => {
         { id: 'aaa&123' }
       ];
       test.each(invalidObjects)('returns required message', (invalidObject) => {
-        expect(() => validateAndParse<SwbDescriptionType>(zodParser, invalidObject)).toThrowError(
-          `${swbDescriptionMessage}`
+        expect(() => validateAndParse<RswDescriptionType>(zodParser, invalidObject)).toThrowError(
+          `${rswDescriptionMessage}`
         );
       });
     });
@@ -370,8 +370,8 @@ describe('zod.etId', () => {
   const zodParser = z.object({
     id: z.string().etId()
   });
-  type SWBIdType = z.infer<typeof zodParser>;
-  const invalidObjects: SWBIdType[] = [
+  type RSWIdType = z.infer<typeof zodParser>;
+  const invalidObjects: RSWIdType[] = [
     { id: 'et1-prod-1234567890123,pa-1234567890123' }, //invalid prefix
     { id: 'et-prod1-1234567890123,pa-1234567890123' }, //invalid product prefix
     { id: 'et-prod-12345678901234,pa-1234567890123' }, //invalid product length
@@ -385,13 +385,13 @@ describe('zod.etId', () => {
   describe('is valid', () => {
     const validObject = { id: 'et-prod-1234567890123,pa-1234567890123' };
     test('returns valid Id', () => {
-      expect(validateAndParse<SWBIdType>(zodParser, validObject)).toEqual(validObject);
+      expect(validateAndParse<RSWIdType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
   describe('is not valid', () => {
     test.each(invalidObjects)('returns invalid et Id message', (invalidId) => {
-      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
+      expect(() => validateAndParse<RSWIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
     });
   });
 });
@@ -493,9 +493,9 @@ describe('zod.etcId', () => {
   const zodParser = z.object({
     id: z.string().etcId()
   });
-  type SWBIdType = z.infer<typeof zodParser>;
+  type RSWIdType = z.infer<typeof zodParser>;
   const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
-  const invalidObjects: SWBIdType[] = [
+  const invalidObjects: RSWIdType[] = [
     { id: `invalid-${randomUuid}` }, //invalid prefix
     { id: 'etc-invalid-uuid' }, //invalid uuid format
     { id: '' } //empty value
@@ -504,13 +504,13 @@ describe('zod.etcId', () => {
   describe('is valid', () => {
     const validObject = { id: `etc-${randomUuid}` };
     test('returns valid Id', () => {
-      expect(validateAndParse<SWBIdType>(zodParser, validObject)).toEqual(validObject);
+      expect(validateAndParse<RSWIdType>(zodParser, validObject)).toEqual(validObject);
     });
   });
 
   describe('is not valid', () => {
     test.each(invalidObjects)('returns invalid et Id message', (invalidId) => {
-      expect(() => validateAndParse<SWBIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
+      expect(() => validateAndParse<RSWIdType>(zodParser, invalidId)).toThrowError('id: Invalid ID');
     });
   });
 });

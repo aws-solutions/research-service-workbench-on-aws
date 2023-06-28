@@ -15,7 +15,7 @@ import {
   paginationLables,
   useNotifications,
   BaseLayout
-} from '@aws/workbench-core-swb-common-ui';
+} from '@aws/workbench-core-rsw-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,

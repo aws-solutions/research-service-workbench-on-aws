@@ -8,7 +8,7 @@ import { z } from '@aws/workbench-core-base';
 // eslint-disable-next-line @rushstack/typedef-var
 export const UpdateAccountRequestParser = z.object({
   id: z.string().accountId().required(),
-  name: z.string().swbName().optional()
+  name: z.string().rswName().optional()
 });
 
 export type UpdateAccountRequest = z.infer<typeof UpdateAccountRequestParser>;

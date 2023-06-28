@@ -7,7 +7,7 @@ import { z } from '@aws/workbench-core-base';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateAccountRequestParser = z.object({
-  name: z.string().swbName().required(),
+  name: z.string().rswName().required(),
   awsAccountId: z.string().awsAccountId().required(),
   envMgmtRoleArn: z.string().envMgmtRoleArn().required(),
   hostingAccountHandlerRoleArn: z.string().hostingAccountHandlerRoleArn().required(),

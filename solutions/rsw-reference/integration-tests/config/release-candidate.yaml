@@ -1,0 +1,34 @@
+## Note:
+## Please deploy the rsw-reference package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
+
+# Default Env Config for launching a new environment
+envTypeId: 'et-prod-jypbcxiwiyzme,pa-h7yqoxvewekv6'
+envTypeConfigId: 'etc-b7592e94-578b-44fc-87c6-0198fe77d404'
+projectId: 'proj-c42bb869-76b9-453f-a985-5fe2e233d327'
+envType: 'sagemakerNotebook'
+
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '/swb/release-candidate/rootUser/email'
+rootPasswordParamStorePath: '/swb/release-candidate/rootUser/password'
+
+projectAdmin1UserNameParamStorePath: '/swb/release-candidate/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/release-candidate/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/release-candidate/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/release-candidate/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/release-candidate/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/release-candidate/researcher1/password'
+
+## Default external ID
+externalIdPath: '/rsw/release-candidate/externalId'
+
+## Default Hosting Account
+defaultHostingAccountId: 'acc-abb7962c-e584-4657-b8dc-2d2770b5a06d'
+
+## Hosting account used for Account Creation tests
+hostAwsAccountIdParamStorePath: '/swb/release-candidate/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/release-candidate/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/release-candidate/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/release-candidate/accountsTest/encryptionKeyArn'

@@ -5,7 +5,7 @@
 
 import { useProjects } from '@aws/workbench-core-accounts-ui';
 import { useDatasets } from '@aws/workbench-core-datasets-ui';
-import { nameRegex, BaseLayout } from '@aws/workbench-core-swb-common-ui';
+import { nameRegex, BaseLayout } from '@aws/workbench-core-rsw-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,

@@ -115,7 +115,7 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@aws/swb-app",
+      "name": "@aws/rsw-app",
       "allowedCategories": [ "production" ]
     },
     {
@@ -167,7 +167,7 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@aws/workbench-core-swb-common-ui",
+      "name": "@aws/workbench-core-rsw-common-ui",
       "allowedCategories": [ "production" ]
     },
     {

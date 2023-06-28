@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { httpApiGet } from '@aws/workbench-core-swb-common-ui';
+import { httpApiGet } from '@aws/workbench-core-rsw-common-ui';
 import useSWR from 'swr';
 import { EnvTypeItem } from '../models/EnvironmentType';
 
