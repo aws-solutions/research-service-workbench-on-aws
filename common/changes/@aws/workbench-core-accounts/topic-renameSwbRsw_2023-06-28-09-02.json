@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "refactor swb to rsw",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}
