@@ -49,7 +49,7 @@ describe('get environment negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find environment ${fakeEnvId}`
+            message: `Could not find environment`
           })
         );
       }
@@ -69,7 +69,7 @@ describe('get environment negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find project ${fakeProjectId}`
+            message: `Could not find project`
           })
         );
       }
@@ -86,7 +86,7 @@ describe('get environment negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find environment ${fakeEnvId}`
+            message: `Could not find environment`
           })
         );
       }
@@ -136,7 +136,7 @@ describe('get environment negative tests', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find environment ${fakeEnvId}`
+            message: `Could not find environment`
           })
         );
       }

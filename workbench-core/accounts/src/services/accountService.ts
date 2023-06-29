@@ -178,7 +178,7 @@ export default class AccountService {
       .execute()) as GetItemCommandOutput;
 
     if (!accountEntry.Item) {
-      throw Boom.notFound(`Could not find account ${accountId}`);
+      throw Boom.notFound(`Could not find account`);
     }
 
     return AccountParser.parse(accountEntry.Item);
@@ -190,7 +190,7 @@ export default class AccountService {
     const data = await this._dynamoDBService.query({ key: { name: 'pk', value: pk } }).execute();
 
     if (data.Count === 0) {
-      throw Boom.notFound(`Could not find account ${accountId}`);
+      throw Boom.notFound(`Could not find account`);
     }
 
     const items = data.Items!.map((item) => {

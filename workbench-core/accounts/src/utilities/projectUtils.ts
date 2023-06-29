@@ -47,7 +47,7 @@ export function manualSortProjects(sort: SortRequest, projects: Project[]): Proj
 
 function order(sortKey: string, selectedDirection: string, project1: Project, project2: Project): number {
   if (!project1.hasOwnProperty(sortKey) || !project2.hasOwnProperty(sortKey)) {
-    throw Boom.badRequest(`No ${sortKey} on Project. Please sort by another attribute.`);
+    throw Boom.badRequest(`Requested sort key does not exist on Project. Please sort by another attribute.`);
   }
   const project1Value = project1[sortKey as keyof Project];
   const project2Value = project2[sortKey as keyof Project];
@@ -99,7 +99,7 @@ function compare(
   if (project.hasOwnProperty(selectedFilter)) {
     projectValue = project[selectedFilter as keyof Project];
   } else {
-    throw Boom.badRequest(`No ${selectedFilter} on Project. Please filter by another attribute.`);
+    throw Boom.badRequest(`Requested filter does not exist on Project. Please filter by another attribute.`);
   }
   switch (selectedQualifier) {
     case 'eq':

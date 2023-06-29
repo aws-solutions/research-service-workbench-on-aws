@@ -100,7 +100,7 @@ describe('environmentTypeConfigService', () => {
 
       // OPERATE & CHECK
       await expect(envTypeConfigService.getEnvironmentTypeConfig(invalidId, invalidId)).rejects.toThrow(
-        `Could not find environment type config ${invalidId}`
+        `Could not find environment type config`
       );
     });
   });
@@ -152,7 +152,7 @@ describe('environmentTypeConfigService', () => {
           paginationToken: 'invalidPaginationToken',
           envTypeId
         })
-      ).rejects.toThrow('Invalid Pagination Token: invalidPaginationToken');
+      ).rejects.toThrow('Invalid Pagination Token');
     });
   });
 
@@ -205,9 +205,7 @@ describe('environmentTypeConfigService', () => {
           envTypeId: invalidEnvTypeId,
           envTypeConfigId: invalidEnvTypeConfigId
         })
-      ).rejects.toThrow(
-        `Could not find envType ${invalidEnvTypeId} with envTypeConfig ${invalidEnvTypeConfigId} to update`
-      );
+      ).rejects.toThrow(`Could not find requested envType with requested envTypeConfig to update`);
     });
   });
 
@@ -248,9 +246,7 @@ describe('environmentTypeConfigService', () => {
       // OPERATE & CHECK
       await expect(
         envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, ...createParams })
-      ).rejects.toThrow(
-        `Could not create environment type config because environment type ${envTypeId} is not approved`
-      );
+      ).rejects.toThrow(`Could not create environment type config because environment type is not approved`);
     });
 
     test('failed to create envTypeConfig', async () => {
@@ -262,9 +258,7 @@ describe('environmentTypeConfigService', () => {
       // OPERATE & CHECK
       await expect(
         envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, ...createParams })
-      ).rejects.toThrow(
-        `Unable to create environment type with params: ${JSON.stringify({ envTypeId, ...createParams })}`
-      );
+      ).rejects.toThrow(`Unable to create environment type`);
     });
   });
 

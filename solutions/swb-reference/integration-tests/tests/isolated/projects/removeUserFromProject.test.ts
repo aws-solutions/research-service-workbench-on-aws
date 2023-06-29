@@ -40,7 +40,7 @@ describe('remove user from project negative tests', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find user ${fakeUserId}`
+          message: `Could not find user`
         })
       );
     }
@@ -57,7 +57,7 @@ describe('remove user from project negative tests', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find project ${projectId}`
+          message: `Could not find project`
         })
       );
     }

@@ -18,6 +18,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import * as Boom from '@hapi/boom';
 import { CostCenterStatus } from '../constants/costCenterStatus';
+import { InvalidAccountStateError } from '../errors/InvalidAccountStateError';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { CreateCostCenterRequest } from '../models/costCenters/createCostCenterRequest';
@@ -82,12 +83,12 @@ export default class CostCenterService {
       });
     } catch (e) {
       console.error('Unable to update cost center', request);
-      throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+      throw Boom.internal(`Unable to update CostCenter`);
     }
     if (response.Attributes) {
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
-    throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to update CostCenter`);
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
@@ -123,7 +124,7 @@ export default class CostCenterService {
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
-      throw Boom.notFound(`Could not find cost center ${costCenterId}`);
+      throw Boom.notFound(`Could not find cost center`);
     }
 
     return this._mapDDBItemToCostCenter(response.Item);
@@ -131,7 +132,20 @@ export default class CostCenterService {
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
-    const account = await this._getAccount(request.accountId);
+    let account: Account;
+
+    const accountService = new AccountService(this._dynamoDbService);
+    try {
+      account = await accountService.getAccount(request.accountId);
+    } catch (e) {
+      console.error(`Failed to get account for cost center creation: ${e.message}`);
+      throw Boom.badRequest(`Failed to get account for cost center creation.`);
+    }
+
+    if (account.status !== 'CURRENT') {
+      throw new InvalidAccountStateError("Account status must be 'CURRENT' to create a Cost Center");
+    }
+
     const currentDateTime = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
@@ -172,7 +186,7 @@ export default class CostCenterService {
     if (response.Attributes) {
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
-    throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
+    throw Boom.internal(`Unable to create CostCenter`);
   }
 
   private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
@@ -187,7 +201,7 @@ export default class CostCenterService {
       return await accountService.getAccount(accountId);
     } catch (e) {
       console.error(`Failed to get account for cost center creation: ${e}`);
-      throw Boom.badRequest(`Failed to get account for cost center creation ${accountId}`);
+      throw Boom.badRequest(`Failed to get account for cost center creation`);
     }
   }
 }

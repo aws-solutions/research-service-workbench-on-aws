@@ -57,7 +57,7 @@ describe('multiStep environment type and environment type config test', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `Could not create environment type config because environment type ${envType.id} is not approved`
+          message: `Could not create environment type config because environment type is not approved`
         })
       );
     }
@@ -314,7 +314,7 @@ describe('multiStep environment type and environment type config test', () => {
         e,
         new HttpError(409, {
           error: 'Conflict',
-          message: `Unable to reovke environment type: ${envType.id}, Environment Type has active configurations`
+          message: `Unable to reovke environment type, Environment Type has active configurations`
         })
       );
     }

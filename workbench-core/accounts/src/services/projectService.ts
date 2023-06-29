@@ -59,7 +59,7 @@ export default class ProjectService {
     });
 
     if (response === undefined) {
-      throw Boom.notFound(`Could not find project ${request.projectId}`);
+      throw Boom.notFound(`Could not find project`);
     }
 
     return this._mapDDBItemToProject(response);
@@ -389,9 +389,7 @@ export default class ProjectService {
 
     // If anything is responded, name is in use so error
     if (response.data.length !== 0) {
-      throw Boom.badRequest(
-        `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
-      );
+      throw Boom.badRequest(`Project name is in use by a non deleted project. Please use another name.`);
     }
     // no error so do not do anything
   }
@@ -401,11 +399,11 @@ export default class ProjectService {
     try {
       costCenter = await this._costCenterService.getCostCenter(costCenterId);
     } catch (e) {
-      throw Boom.badRequest(`Could not find cost center ${costCenterId}`);
+      throw Boom.badRequest(`Could not find cost center`);
     }
 
     if (costCenter.status !== CostCenterStatus.AVAILABLE) {
-      throw Boom.badRequest(`Cost center ${costCenterId} was deleted`);
+      throw Boom.badRequest(`Cost center was deleted`);
     }
 
     return costCenter;
