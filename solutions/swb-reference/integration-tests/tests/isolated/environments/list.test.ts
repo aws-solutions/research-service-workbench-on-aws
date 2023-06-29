@@ -150,6 +150,25 @@ describe('list environments', () => {
       }
     });
 
+    describe('page size too large', () => {
+      const pageSize = '101';
+      const queryParams = { pageSize };
+
+      test('it throws 400 error', async () => {
+        try {
+          await itAdminSession.resources.environments.get(queryParams);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              error: 'Bad Request',
+              message: `pageSize: Must be Between 1 and 100`
+            })
+          );
+        }
+      });
+    });
+
     test('list project environments when project does not exist', async () => {
       const fakeProjectId: string = 'proj-12345678-1234-1234-1234-123456789012';
       try {
@@ -210,6 +229,28 @@ describe('list environments', () => {
           e,
           new HttpError(403, {
             error: 'User is not authorized'
+          })
+        );
+      }
+    });
+  });
+
+  describe('page size too large', () => {
+    const pageSize = '101';
+    const queryParams = { pageSize };
+
+    test('it throws 400 error', async () => {
+      try {
+        await itAdminSession.resources.projects
+          .project(projectId2)
+          .environments()
+          .listProjectEnvironments(queryParams);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            error: 'Bad Request',
+            message: `pageSize: Must be Between 1 and 100`
           })
         );
       }
