@@ -53,4 +53,4 @@ jobs:
       - name: pnpm-audit
         run: |
           cd common/temp
-          pnpm audit --prod --audit-level moderate
+          pnpm audit --prod

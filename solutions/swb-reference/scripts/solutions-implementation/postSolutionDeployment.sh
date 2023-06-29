@@ -1,6 +1,7 @@
 #!/bin/bash
 
 read -p "Please enter your email address: " EMAIL
+export regionShortName=release
 export region=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`awsRegion`].OutputValue')
 export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
 export cognitoProgrammaticAccessUserPoolClientId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoProgrammaticAccessUserPoolClientId`].OutputValue')
