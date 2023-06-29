@@ -77,6 +77,7 @@ Metadata:
 
 Conditions:
   enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
+  hostNotEqualToMain: !Not [!Equals [!Ref MainAccountId, !Ref AWS::AccountId]]
 
 Mappings:
   Solution:
@@ -546,6 +547,7 @@ Resources:
       TargetKeyId: !Ref EncryptionKey
 
   StateChangeEventRuleMainRouting:
+    Condition: hostNotEqualToMain
     Type: 'AWS::Events::Rule'
     Properties:
       Description: Routes environment state changes to the main event bus
@@ -570,6 +572,7 @@ Resources:
             - Arn
 
   StateChangeEventBridgeIAMrole:
+    Condition: hostNotEqualToMain
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
