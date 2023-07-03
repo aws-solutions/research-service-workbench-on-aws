@@ -8,9 +8,13 @@ import {
   DynamoDBService,
   buildDynamoDbKey,
   ListUsersForRoleRequest,
-  PaginatedResponse
+  PaginatedResponse,
+  QueryParams,
+  addPaginationToken
 } from '@aws/workbench-core-base';
 import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
+import { BatchWriteItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import _ from 'lodash';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -24,7 +28,12 @@ import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 import { ListUsersRequest } from '../users/listUsersRequest';
 import { ListUsersResponse } from '../users/listUsersResponse';
-import { AccessType, TempRoleAccessEntry, TempRoleAccessEntryParser } from './tempRoleAccessEntry';
+import {
+  AccessType,
+  TempRoleAccessEntry,
+  TempRoleAccessEntryParser,
+  TempRoleAccessItemParser
+} from './tempRoleAccessEntry';
 
 /**
  * A CognitoUserManagementPlugin instance that interfaces with Cognito to provide user management services.
@@ -722,6 +731,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async deleteRole(role: string): Promise<void> {
     try {
+      await this._clearAllTempRoleAccessByRole({
+        roleId: role
+      });
       await this._aws.clients.cognito.deleteGroup({
         UserPoolId: this._userPoolId,
         GroupName: role
@@ -782,6 +794,48 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     return Array.from(setOfRoleIds.values());
   }
 
+  private async _clearAllTempRoleAccessByRole(params: { roleId: string }): Promise<void> {
+    if (!this._tempRoleAccessSettings) return;
+    const { roleId } = params;
+    const allTempRoleAccessKeys: { pk: string; sk: string }[] = [];
+    let paginationToken = undefined;
+    const identity = buildDynamoDbKey(roleId, this._tempRoleAccessEntryPrefix);
+    let queryParams: QueryParams = {
+      //Leveraging GSI that currently exists
+      index: 'getIdentityPermissionsByIdentity',
+      key: {
+        name: 'identity',
+        value: identity
+      }
+    };
+    do {
+      queryParams = addPaginationToken(paginationToken, queryParams);
+      const roleTempAcesssValuResponse = await this._tempRoleAccessSettings.ddbService.getPaginatedItems(
+        queryParams
+      );
+
+      const data = roleTempAcesssValuResponse.data;
+      data.forEach((item) => {
+        const tempRoleAccessItem = TempRoleAccessItemParser.parse(item);
+        const { pk, sk } = tempRoleAccessItem;
+        allTempRoleAccessKeys.push({
+          pk,
+          sk
+        });
+      });
+      paginationToken = roleTempAcesssValuResponse.paginationToken;
+    } while (paginationToken);
+
+    const batchDeletePromises: Promise<BatchWriteItemCommandOutput>[] = [];
+    _.chunk(allTempRoleAccessKeys, 25).forEach((tempRoleAccessKeys) => {
+      const batchDeletePromise = this._tempRoleAccessSettings!.ddbService.batchEdit({
+        addDeleteRequests: tempRoleAccessKeys
+      }).execute();
+      batchDeletePromises.push(batchDeletePromise);
+    });
+    await Promise.all(batchDeletePromises);
+  }
+
   private async _modifyTempRoleAccess(params: {
     userId: string;
     roleId: string;
@@ -791,14 +845,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     if (!this._tempRoleAccessSettings) return;
     const { userId, roleId, access } = params;
     //add the roles permissions to the ddb service
+    const pk = buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix);
+    const sk = buildDynamoDbKey(roleId, this._tempRoleAccessEntryPrefix);
     const tempRoleAccessEntryKey = {
-      pk: buildDynamoDbKey(userId, this._tempRoleAccessEntryPrefix),
-      sk: buildDynamoDbKey(roleId, this._tempRoleAccessEntryPrefix)
+      pk,
+      sk
     };
     const ttl = this._tempRoleAccessSettings.ttl ?? this._defaultTempRoleAccesssTTL;
     const tempRoleAccessEntry: TempRoleAccessEntry = {
       roleId: roleId,
       access: access,
+      identity: sk,
       expirationTime: Math.round(Date.now() / 1000) + ttl
     };
 
