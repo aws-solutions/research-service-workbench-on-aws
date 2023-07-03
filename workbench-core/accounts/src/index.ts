@@ -4,6 +4,7 @@
  */
 
 import { ProjectStatus } from './constants/projectStatus';
+import { InvalidAccountStateError, isInvalidAccountStateError } from './errors/InvalidAccountStateError';
 import { isInvalidAwsAccountIdError } from './errors/InvalidAwsAccountIdError';
 import AccountHandler from './handlers/accountHandler';
 import {
@@ -88,5 +89,7 @@ export {
   AssignUserToProjectRequest,
   Project,
   ProjectStatus,
-  isInvalidAwsAccountIdError
+  isInvalidAwsAccountIdError,
+  InvalidAccountStateError,
+  isInvalidAccountStateError
 };

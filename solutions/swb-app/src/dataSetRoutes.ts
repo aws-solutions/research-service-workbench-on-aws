@@ -75,9 +75,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.badRequest(e.message);
         }
         console.error(e);
-        throw Boom.badImplementation(
-          `There was a problem creating new dataset for request ${validatedRequest}`
-        );
+        throw Boom.badImplementation(`There was a problem creating new dataset for request`);
       }
     })
   );
@@ -154,9 +152,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem listing datasets for project ${validatedRequest.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem listing datasets for project`);
       }
     })
   );
@@ -179,7 +175,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.notFound(e.message);
         }
         console.error(e);
-        throw Boom.badImplementation(`There was a problem getting dataset ${dataSetId}`);
+        throw Boom.badImplementation(`There was a problem getting dataset`);
       }
     })
   );
@@ -230,7 +226,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.conflict(e.message);
         }
 
-        throw Boom.badImplementation(`There was a problem removing access to ${req.params.datasetId}`);
+        throw Boom.badImplementation(`There was a problem removing access to`);
       }
 
       res.status(204).send();
@@ -259,9 +255,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem listing permission for dataset ${validatedRequest.dataSetId}`
-        );
+        throw Boom.badImplementation(`There was a problem listing permission for dataset`);
       }
     })
   );
@@ -289,7 +283,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(`There was a problem deleting ${req.params.datasetId}`);
+        throw Boom.badImplementation(`There was a problem deleting`);
       }
     })
   );

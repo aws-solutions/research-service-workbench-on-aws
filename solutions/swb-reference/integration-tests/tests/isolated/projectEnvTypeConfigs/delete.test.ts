@@ -125,7 +125,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find project ${nonExistentProjectId}`
+          message: `Could not find project`
         })
       );
     }
@@ -165,7 +165,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }
@@ -205,7 +205,7 @@ describe('Disassociate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${nonExistentEnvTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }

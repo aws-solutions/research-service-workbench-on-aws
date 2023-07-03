@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "remove id from error message",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

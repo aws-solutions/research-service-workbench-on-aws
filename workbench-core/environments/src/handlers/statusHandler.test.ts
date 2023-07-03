@@ -65,7 +65,7 @@ describe('StatusHandler', () => {
         vpcId: 'vpc-0b0bc7ae01d82e7b3',
         name: 'Example project',
         encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
-        externalId: 'workbench',
+        externalId: 'sampleExternalId',
         updatedAt: '2022-05-18T20:33:42.608Z',
         id: 'id',
         envMgmtRoleArn: 'sampleEnvMgmtRoleArn'
