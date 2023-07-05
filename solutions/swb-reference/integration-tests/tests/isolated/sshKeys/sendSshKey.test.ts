@@ -89,7 +89,7 @@ describe('Cannot send SSH Key', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Requested Project ID ${projectId} does not match environment Project ID ${project2Id}`
+            message: `Requested Project ID does not match environment Project ID`
           })
         );
       }
@@ -115,7 +115,7 @@ describe('Cannot send SSH Key', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Instance Id is not defined for environment ${project1EnvId} yet. Try again later.`
+            message: `Instance Id is not defined for environment yet. Try again later.`
           })
         );
       }
@@ -151,7 +151,7 @@ describe('Cannot send SSH Key', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `The environment ${project1EnvId} is not available yet. Try again later.`
+            message: `The environment is not available yet. Try again later.`
           })
         );
       }
