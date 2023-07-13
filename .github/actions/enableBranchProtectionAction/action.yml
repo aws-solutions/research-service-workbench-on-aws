@@ -21,7 +21,7 @@ runs:
         { "require_code_owner_reviews": true, "dismiss_stale_reviews": true, "required_approving_review_count": 1 }
         EOF
         )"
-        echo "::set-output name=required_pr_reviews::${required_pr_reviews_json}"
+        echo "required_pr_reviews=${required_pr_reviews_json}"
 
     - name: 'Construct required_status_checks object'
       id: status_check
@@ -31,7 +31,7 @@ runs:
         { "strict": true, "contexts": ['Only create PR against develop/release branch, not main branch', 'Only create PR against develop/release branch, not stage branch', 'Scan for secrets', 'Run cfn-nag scan', 'Validate PR title', 'build-and-test', 'license-checker', 'pnpm-audit', 'run-rush-change-verify', 'check-license-header', 'Viperlight scan'] }
         EOF
         )"
-        echo "::set-output name=require_status_check::${require_status_check_json}"
+        echo "require_status_check=${require_status_check_json}"
 
     - name: 'Construct restrictions object'
       id: gh_restrictions
@@ -41,7 +41,7 @@ runs:
         null
         EOF
         )"
-        echo "::set-output name=restrictions::${restrictions_json}"
+        echo "restrictions=${restrictions_json}"
 
     - name: Enable branch protection on ${{ github.ref_name }}
       uses: octokit/request-action@v2.x
