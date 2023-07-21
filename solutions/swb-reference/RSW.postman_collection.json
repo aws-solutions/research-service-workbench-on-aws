@@ -26,7 +26,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"cost center name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
+              "raw": "{\n    \"name\": \"cost-center-name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -987,7 +987,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config-1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1168,54 +1168,6 @@
                 }
               ],
               "variable": [
-                {
-                  "key": "envTypeId",
-                  "value": "",
-                  "description": "ID of environment type associated with this config"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "List envTypeConfigs for Project",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
-              "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
-              "query": [
-                {
-                  "key": "paginationToken",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "pageSize",
-                  "value": "1",
-                  "disabled": true
-                }
-              ],
-              "variable": [
-                {
-                  "key": "projectId",
-                  "value": "",
-                  "description": "ID of project to associate"
-                },
                 {
                   "key": "envTypeId",
                   "value": "",
@@ -1457,7 +1409,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
+              "raw": "{\n    \"name\": \"Example-Project-1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1521,7 +1473,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"New name\",\n    \"description\": \"New description\"\n}",
+              "raw": "{\n    \"name\": \"New-name\",\n    \"description\": \"New description\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

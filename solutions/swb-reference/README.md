@@ -588,7 +588,7 @@ POST `{{API_URL}}/projects/:projectId/users/:userId/relationships`
 
 ```json
 {
-    "role": ["Researcher"]
+    "role": "Researcher"
 }
 ```
 

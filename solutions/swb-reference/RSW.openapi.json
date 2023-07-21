@@ -46,7 +46,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "example": "cost center name"
+                    "example": "cost-center-name"
                   }
                 }
               },
@@ -1262,7 +1262,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "example": "Jupyter Notebook"
+                    "example": "JupyterNotebook"
                   },
                   "status": {
                     "type": "string",
@@ -1272,7 +1272,7 @@
               },
               "example": {
                 "description": "An Amazon SageMaker Jupyter Notebook",
-                "name": "Jupyter Notebook",
+                "name": "JupyterNotebook",
                 "status": "APPROVED"
               }
             }
@@ -1407,7 +1407,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "example": "config 1"
+                    "example": "config-1"
                   },
                   "params": {
                     "type": "array",
@@ -1863,13 +1863,13 @@
                   },
                   "name": {
                     "type": "string",
-                    "example": "New name"
+                    "example": "New-name"
                   }
                 }
               },
               "example": {
                 "description": "New description",
-                "name": "New name"
+                "name": "New-name"
               }
             }
           }
@@ -2045,14 +2045,14 @@
                   },
                   "name": {
                     "type": "string",
-                    "example": "Example Project 1"
+                    "example": "Example-Project-1"
                   }
                 }
               },
               "example": {
                 "costCenterId": "cc-exampleCostCenterId",
                 "description": "Example Project 1",
-                "name": "Example Project 1"
+                "name": "Example-Project-1"
               }
             }
           }
