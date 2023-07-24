@@ -8,11 +8,11 @@ read -p "Enter the EnvMgmtRoleArn output from the hosting account stack: " envMg
 read -p "Enter the HostingAccountHandlerRoleArn output from the hosting account stack: " hostingAccountHandlerRoleArn
 read -p "Enter the ExternalId value from the hosting account stack parameters: " externalId
 
-export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
-export swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-dev-test --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
+export cognitoUserPoolId=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`cognitoUserPoolId`].OutputValue')
+export swbDomainName=$(aws cloudformation describe-stacks --stack-name rsw-prod-release --output text --query 'Stacks[0].Outputs[?OutputKey==`SwbDomainNameOutput`].OutputValue')
 aws cognito-idp admin-set-user-password --user-pool-id $cognitoUserPoolId --username $EMAIL --password $newPassword --permanent > /dev/null
 
-STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
+STAGE=prod node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
 accessToken=$(grep 'accessToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 csrfCookie=$(grep 'csrfCookie' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 csrfToken=$(grep 'csrfToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
@@ -72,7 +72,7 @@ aws cognito-idp admin-add-user-to-group --user-pool-id $cognitoUserPoolId --user
 
 # Recreate credentials
 rm -rf ./tempCreds
-STAGE=dev node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
+STAGE=prod node ./scripts/generateCognitoTokens.js $EMAIL $newPassword > tempCreds
 export accessToken=$(grep 'accessToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 export csrfCookie=$(grep 'csrfCookie' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
 export csrfToken=$(grep 'csrfToken' tempCreds | sed -r 's/^[^:]*:(.*)$/\1/' | sed 's/^.\(.*\).$/\1/' | cut -d "'" -f 2)
@@ -127,7 +127,7 @@ echo "
 -------------------------------------------------------------------------
 Summary:
 -------------------------------------------------------------------------
-Stage Name                          : dev
+Stage Name                          : prod
 Account Id                          : $accountId
 Project Id                          : $projectId
 Env Type ID                         : $envTypeId
