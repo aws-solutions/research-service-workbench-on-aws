@@ -70,7 +70,7 @@ describe('WinstonPlugin tests', () => {
 
       logger.setDefaultMetadata(metadata as LogMessageObject);
 
-      expect(logger['_logger'].defaultMeta).toMatchObject({ meta: metadata }); // nosemgrep
+      expect(logger['_logger'].defaultMeta).toStrictEqual({ meta: metadata }); // nosemgrep
     }
   );
 

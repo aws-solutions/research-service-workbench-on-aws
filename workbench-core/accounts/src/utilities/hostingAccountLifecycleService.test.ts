@@ -365,6 +365,27 @@ describe('HostingAccountLifecycleService', () => {
 
     hostingAccountLifecycleService.cloneRole = jest.fn();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getSsmDocsSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_getSSMDocuments'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareSsmDocsSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareSSMDocument'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareAmisSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareAMIs'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareScPortfolioSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareAndAcceptScPortfolio'
+    );
+
     const mockDDB = mockClient(DynamoDBClient);
     mockDDB.on(UpdateItemCommand).resolves({
       Attributes: marshall(accountMetadata)
@@ -385,6 +406,111 @@ describe('HostingAccountLifecycleService', () => {
     ).resolves.not.toThrowError();
 
     expect(hostingAccountLifecycleService.cloneRole).toBeCalled();
+    expect(getSsmDocsSpy).toBeCalled();
+    expect(shareSsmDocsSpy).toBeCalled();
+    expect(shareAmisSpy).toBeCalled();
+    expect(shareScPortfolioSpy).toBeCalled();
+    expect(writeAccountStatusSpy).toHaveBeenCalledWith({
+      status: 'CURRENT',
+      ddbAccountId: 'abc-xyz',
+      vpcId: 'fakeVPC',
+      subnetId: 'FakeSubnet',
+      encryptionKeyArn: 'FakeEncryptionKeyArn'
+    });
+  });
+
+  test('updateHostingAccountData when main account equal to hosting', async () => {
+    const commonAcctId = '0123456789012';
+    process.env.MAIN_ACCT_ID = commonAcctId;
+    const cfnMock = mockClient(CloudFormationClient);
+
+    // Mock for getting SSM Documents, VPC, and VpcSubnet
+    mockCloudformationOutputs(cfnMock);
+
+    //Mock comparing hosting account template
+    const readableStreamWithIncorrectTemplateBody = new Readable({ read() {} });
+    readableStreamWithIncorrectTemplateBody.push('XYZ');
+    readableStreamWithIncorrectTemplateBody.push(null);
+    const readableStreamWithCorrectTemplateBody = new Readable({ read() {} });
+    readableStreamWithCorrectTemplateBody.push('ABC');
+    readableStreamWithCorrectTemplateBody.push(null);
+
+    const s3Mock = mockClient(S3Client);
+    // Mocking expected template pulled from S3
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithIncorrectTemplateBody as SdkStream<Readable>
+      });
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'artifactBucket',
+        Key: 'onboard-account-byon.cfn.yaml'
+      })
+      .resolves({
+        Body: readableStreamWithCorrectTemplateBody as SdkStream<Readable>
+      });
+
+    // Mocking actual template pulled from CFN Stack
+    cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const writeAccountStatusSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_writeAccountStatusToDDB'
+    );
+
+    hostingAccountLifecycleService.cloneRole = jest.fn();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getSsmDocsSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_getSSMDocuments'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareSsmDocsSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareSSMDocument'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareAmisSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareAMIs'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shareScPortfolioSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_shareAndAcceptScPortfolio'
+    );
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
+
+    await expect(
+      hostingAccountLifecycleService.updateHostingAccountData({
+        targetAccountId: commonAcctId,
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
+        targetAccountStackName: 'swb-dev-va-hosting-account',
+        portfolioId: 'port-1234',
+        ssmDocNameSuffix: 'SSMDocOutput',
+        principalArnForScPortfolio: 'arn:aws:iam::0123456789012:role/swb-dev-va-hosting-account-env-mgmt',
+        roleToCopyToTargetAccount: 'swb-dev-va-LaunchConstraint',
+        s3ArtifactBucketName: 'artifactBucket',
+        ddbAccountId: 'abc-xyz'
+      })
+    ).resolves.not.toThrowError();
+
+    expect(hostingAccountLifecycleService.cloneRole).not.toBeCalled();
+    expect(getSsmDocsSpy).not.toBeCalled();
+    expect(shareSsmDocsSpy).not.toBeCalled();
+    expect(shareAmisSpy).not.toBeCalled();
+    expect(shareScPortfolioSpy).not.toBeCalled();
+
     expect(writeAccountStatusSpy).toHaveBeenCalledWith({
       status: 'CURRENT',
       ddbAccountId: 'abc-xyz',

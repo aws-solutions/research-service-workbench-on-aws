@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "feat: main account can be hosting",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}

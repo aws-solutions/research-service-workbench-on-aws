@@ -6,7 +6,7 @@ export class CognitoHelper {
   private _userPoolId: string;
   public constructor() {
     const setup = new Setup();
-    this._awsSdk = setup.getMainAwsClient('ExampleDataSetDDBTableName');
+    this._awsSdk = setup.getMainAwsClient();
     this._userPoolId = setup.getSettings().get('ExampleCognitoUserPoolId');
   }
 

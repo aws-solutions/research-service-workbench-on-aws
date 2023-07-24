@@ -51,9 +51,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw Boom.badImplementation(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem listing keys in project ${validatedResult.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem listing keys in project`);
       }
     })
   );
@@ -88,7 +86,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw Boom.forbidden(e.message);
         }
 
-        throw Boom.badImplementation(`There was a problem deleting ${validatedResult.sshKeyId}`);
+        throw Boom.badImplementation(`There was a problem deleting SSH key`);
       }
     })
   );
@@ -119,9 +117,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw Boom.badRequest(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem creating a SSH Key for user ${validatedResult.userId} and project ${validatedResult.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem creating a SSH Key for user in project`);
       }
     })
   );
@@ -157,9 +153,7 @@ export function setUpSshKeyRoutes(router: Router, sshKeyService: SshKeyPlugin): 
           throw Boom.notFound(e.message);
         }
 
-        throw Boom.badImplementation(
-          `There was a problem sending the SSH Public Key to environment ${validatedResult.environmentId}`
-        );
+        throw Boom.badImplementation(`There was a problem sending the SSH Public Key to environment`);
       }
     })
   );

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "remove id from error message",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}

@@ -127,7 +127,7 @@ describe('Associate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find project ${nonExistentProjectId}`
+          message: `Could not find project`
         })
       );
     }
@@ -167,7 +167,7 @@ describe('Associate Project with EnvTypeConfig', () => {
         e,
         new HttpError(400, {
           error: 'Bad Request',
-          message: `Project ${projectId} was deleted`
+          message: `Project was deleted`
         })
       );
     }
@@ -207,7 +207,7 @@ describe('Associate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${envTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }
@@ -247,7 +247,7 @@ describe('Associate Project with EnvTypeConfig', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type config ${nonExistentEnvTypeConfigId}`
+          message: `Could not find environment type config`
         })
       );
     }

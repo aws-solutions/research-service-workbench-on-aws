@@ -58,9 +58,7 @@ export function setUpProjectEnvTypeConfigRoutes(
           throw Boom.badRequest(e.message);
         }
         console.error(e);
-        throw Boom.badImplementation(
-          `There was a problem associating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
-        );
+        throw Boom.badImplementation(`There was a problem associating project with etc`);
       }
       res.status(204).send();
     })
@@ -89,9 +87,7 @@ export function setUpProjectEnvTypeConfigRoutes(
           throw Boom.conflict(e.message);
         }
         console.error(e);
-        throw Boom.badImplementation(
-          `There was a problem disassociating project ${req.body.projectId} with etc ${req.params.environmentTypeConfigId}`
-        );
+        throw Boom.badImplementation(`There was a problem disassociating project with etc`);
       }
     })
   );
@@ -116,9 +112,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         }
 
         console.error(e);
-        throw Boom.badImplementation(
-          `There was a problem list ETCs associated with project ${req.body.projectId}`
-        );
+        throw Boom.badImplementation(`There was a problem list ETCs associated with project`);
       }
     })
   );
@@ -162,7 +156,7 @@ export function setUpProjectEnvTypeConfigRoutes(
         }
 
         throw Boom.badImplementation(
-          `There was a problem listing projects for environment type configuration ${request.envTypeConfigId}`
+          `There was a problem listing projects for environment type configuration`
         );
       }
     })

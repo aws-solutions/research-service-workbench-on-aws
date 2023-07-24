@@ -17,6 +17,12 @@ on:
         required: true
       aws-account-region:
         required: true
+      aws-test-hosting-account-id:
+        required: true
+      aws-test-hosting-account-region:
+        required: true
+      external_id:
+        required: true
       slack_webhook_url:
         required: true
 
@@ -46,12 +52,27 @@ jobs:
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-account-region }} -v
-          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:main
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+
+      - name: Deploy example package to Hosting environment
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy:hosting
+        env:
+          HOSTING_ACCOUNT_ID: ${{ secrets.aws-test-hosting-account-id }}
+          HOSTING_ACCOUNT_REGION: ${{ secrets.aws-test-hosting-account-region }}
 
       - name: Example package integration test
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
+
+      - name: Example package end to end test
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cypress run
 
       - name: Slack Failure Notification
         if: failure()
