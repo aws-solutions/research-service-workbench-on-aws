@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "delete protection",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}

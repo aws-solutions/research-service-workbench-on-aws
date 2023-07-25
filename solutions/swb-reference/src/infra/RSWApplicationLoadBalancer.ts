@@ -27,7 +27,8 @@ export class RSWApplicationLoadBalancer extends Construct {
     this.applicationLoadBalancer = new ApplicationLoadBalancer(this, id, {
       vpc,
       vpcSubnets: subnets,
-      internetFacing
+      internetFacing,
+      deletionProtection: true
     });
     // logAccessLogs() depends on region being specified on the stack, which is only possible during non-Solutions deployment
     if (!isSolutionsBuild()) {
