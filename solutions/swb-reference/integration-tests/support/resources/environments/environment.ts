@@ -37,6 +37,10 @@ export default class Environment extends Resource {
     return this._axiosInstance.put(`${this._api}/terminate`);
   }
 
+  public async sshKeys(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/sshKeys`);
+  }
+
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     const { data: resource } = await defAdminSession.resources.projects

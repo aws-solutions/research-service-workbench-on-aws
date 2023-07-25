@@ -119,6 +119,7 @@ solutions/swb-reference/src/environment-files/offline-packages/sagemaker/fuse-2.
 # example package
 workbench-core/example/infrastructure/build
 workbench-core/example/infrastructure/src/config/testEnv.json
+workbench-core/example/infrastructure/src/config/hostingEnv.json
 
 #next static export
 solutions/swb-ui/ui/out
@@ -136,3 +137,8 @@ solutions/swb-ui/ui/end-to-end-tests/config/*.yaml
 solutions/swb-ui/ui/end-to-end-tests/cypress/screenshots
 solutions/swb-ui/ui/end-to-end-tests/cypress/videos
 solutions/swb-ui/ui/end-to-end-tests/cypress/downloads
+
+#workbench ccore end to end tests
+workbench-core/example/infrastructure/test-results.xml
+workbench-core/example/infrastructure/cypress/videos
+workbench-core/example/infrastructure/cypress/screenshots

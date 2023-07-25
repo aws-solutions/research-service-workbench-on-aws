@@ -80,7 +80,7 @@ describe('transactEdit', () => {
         }
       ]
     };
-    expect(response).toMatchObject(expectedResponse);
+    expect(response).toStrictEqual(expectedResponse);
   });
 
   test('addPutRequests', async () => {
@@ -166,7 +166,7 @@ describe('transactEdit', () => {
         }
       ]
     };
-    expect(response).toMatchObject(expectedResponse);
+    expect(response).toStrictEqual(expectedResponse);
   });
 
   test('addDeleteRequest', async () => {
@@ -215,6 +215,6 @@ describe('transactEdit', () => {
         }
       ]
     };
-    expect(response).toMatchObject(expectedResponse);
+    expect(response).toStrictEqual(expectedResponse);
   });
 });

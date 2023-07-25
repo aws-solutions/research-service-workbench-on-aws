@@ -111,7 +111,7 @@ describe('multiStep users integration test', () => {
           e,
           new HttpError(404, {
             error: 'Not Found',
-            message: `Could not find user ${mockUserId}`
+            message: `Could not find user`
           })
         );
       }

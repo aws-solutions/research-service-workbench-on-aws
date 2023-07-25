@@ -84,6 +84,7 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
       HOSTED_ZONE_ID: ${{ secrets.HOSTED_ZONE_ID_DEMO }}
       DOMAIN_NAME: ${{ secrets.DOMAIN_NAME_DEMO }}
+
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04

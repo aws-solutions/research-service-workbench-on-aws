@@ -56,7 +56,7 @@ describe('get environment type', () => {
         e,
         new HttpError(404, {
           error: 'Not Found',
-          message: `Could not find environment type ${testEnvTypeId}`
+          message: `Could not find environment type`
         })
       );
     }

@@ -19,11 +19,12 @@ interface Setting {
   projectAdmin1PasswordParamStorePath: string;
   projectAdmin2UserNameParamStorePath: string;
   projectAdmin2PasswordParamStorePath: string;
+  externalIdPath: string;
   costCenterId: string;
   projectName: string;
 
   // Main CFN template outputs
-  cognitoUserPoolClientId: string;
+  cognitoProgrammaticAccessUserPoolClientId: string;
   S3DatasetsEncryptionKeyOutput05C7794D: string;
   S3ArtifactEncryptionKeyOutputCC25B0CD: string;
   SagemakerNotebookTerminateSSMDocOutput: string;

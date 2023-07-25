@@ -31,7 +31,7 @@ describe('BaseAuditPlugin', () => {
     test('Prepare audit entry', async () => {
       await baseAuditPlugin.prepare(metadata, auditEntry);
 
-      expect(auditEntry).toMatchObject({
+      expect(auditEntry).toStrictEqual({
         statusCode: 200,
         action: 'GET /user',
         source: { ip: 'sampleIP' },
@@ -46,7 +46,7 @@ describe('BaseAuditPlugin', () => {
       metadata.moreInfo = moreInfo;
       await baseAuditPlugin.prepare(metadata, auditEntry);
 
-      expect(auditEntry).toMatchObject({
+      expect(auditEntry).toStrictEqual({
         statusCode: 200,
         action: 'GET /user',
         source: { ip: 'sampleIP' },

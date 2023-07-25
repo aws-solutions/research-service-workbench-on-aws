@@ -27,12 +27,6 @@ jobs:
       - name: Rush test
         run: node common/scripts/install-run-rush.js test --verbose
 
-      - name: Generate Codecov for @aws/example-ui-app
-        uses: codecov/codecov-action@v3
-        with:
-          files: solutions/example-ui-app/temp/coverage/coverage-final.json
-          flags: example-ui-app
-
       - name: Generate Codecov for @aws/swb-app
         uses: codecov/codecov-action@v3
         with:

@@ -22,7 +22,7 @@ userPoolId: $cognitoUserPoolId
 echo "
 {\"rsw-prod-release\": 
    {\"dynamicAuthDDBTableName\": \"$dynamicAuthDDBTableName\",
-   \"cognitoUserPoolClientId\": \"$cognitoUserPoolClientId\",
+   \"cognitoProgrammaticAccessUserPoolClientId\": \"$cognitoProgrammaticAccessUserPoolClientId\",
     \"cognitoUserPoolId\": \"$cognitoUserPoolId\",
     \"awsRegion\": \"$region\"
    }

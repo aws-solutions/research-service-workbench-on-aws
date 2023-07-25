@@ -160,7 +160,7 @@ describe('create environment type configs', () => {
           e,
           new HttpError(400, {
             error: 'Bad Request',
-            message: `Could not create environment type config because environment type et-prod-0123456789012,pa-0123456789012 does not exist`
+            message: `Could not create environment type config because environment type does not exist`
           })
         );
       }

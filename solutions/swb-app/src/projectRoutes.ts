@@ -138,20 +138,16 @@ export function setUpProjectRoutes(
         ]);
 
         if (hasEnvironments) {
-          throw Boom.conflict(
-            `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
-          );
+          throw Boom.conflict(`Project cannot be deleted because it has environments(s) associated with it`);
         }
 
         if (datasets.length) {
-          throw Boom.conflict(
-            `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
-          );
+          throw Boom.conflict(`Project cannot be deleted because it has dataset(s) associated with it`);
         }
 
         if (envTypeConfigs.length) {
           throw Boom.conflict(
-            `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+            `Project cannot be deleted because it has environment type config(s) associated with it`
           );
         }
       }
@@ -199,9 +195,7 @@ export function setUpProjectRoutes(
 
         const isITAdmin = existingUser.roles.some((role: string) => role === 'ITAdmin');
         if (isITAdmin) {
-          throw Boom.badRequest(
-            `IT Admin ${validatedRequest.userId} cannot be assigned to the project ${validatedRequest.projectId}`
-          );
+          throw Boom.badRequest(`IT Admin cannot be assigned to the project`);
         }
 
         // this call is needed to validate that project and ensure group exists.
@@ -217,16 +211,14 @@ export function setUpProjectRoutes(
         const project = projectResponse.value;
         if (project.status !== ProjectStatus.AVAILABLE) {
           console.warn(`Cannot list users for project ${project.id} because status is ${project.status}`);
-          throw Boom.notFound(`Could not find project ${project.id}`);
+          throw Boom.notFound(`Could not find project`);
         }
 
         const groups = await userService.getUserRoles(validatedRequest.userId);
 
         const isUserAssignedToProject = groups.some((id) => id === groupId);
         if (isUserAssignedToProject) {
-          throw Boom.badRequest(
-            `User ${validatedRequest.userId} is already assigned to the project ${validatedRequest.projectId}`
-          );
+          throw Boom.badRequest(`User is already assigned to the project`);
         }
 
         await userService.addUserToRole(validatedRequest.userId, groupId);
@@ -234,7 +226,7 @@ export function setUpProjectRoutes(
         res.status(204).send();
       } catch (err) {
         if (isUserNotFoundError(err)) {
-          throw Boom.notFound(`Could not find user ${validatedRequest.userId}`);
+          throw Boom.notFound(`Could not find user`);
         }
 
         if (isUserRolesExceedLimitError(err)) {
@@ -245,9 +237,7 @@ export function setUpProjectRoutes(
           throw err;
         }
 
-        throw Boom.badImplementation(
-          `Could not add user ${validatedRequest.userId} to the project ${validatedRequest.projectId}`
-        );
+        throw Boom.badImplementation(`Could not add user to the project`);
       }
     })
   );
@@ -277,14 +267,14 @@ export function setUpProjectRoutes(
         res.status(204).send();
       } catch (err) {
         if (isUserNotFoundError(err)) {
-          throw Boom.notFound(`Could not find user ${userId}`);
+          throw Boom.notFound(`Could not find user`);
         }
 
         if (Boom.isBoom(err)) {
           throw err;
         }
 
-        throw Boom.badImplementation(`Could not remove user ${userId} from the project ${projectId}`);
+        throw Boom.badImplementation(`Could not remove user from the project`);
       }
     })
   );
@@ -303,7 +293,7 @@ export function setUpProjectRoutes(
         const project = await projectService.getProject({ projectId });
         if (project.status !== ProjectStatus.AVAILABLE) {
           console.warn(`Cannot list users for project ${projectId} because status is ${project.status}`);
-          throw Boom.notFound(`Could not find project ${projectId}`);
+          throw Boom.notFound(`Could not find project`);
         }
 
         try {
@@ -335,8 +325,7 @@ export function setUpProjectRoutes(
           throw err;
         }
 
-        const groupId = `${projectId}#${validatedRequest.role}`;
-        throw Boom.badImplementation(`Could not list users for role ${groupId} for the project ${projectId}`);
+        throw Boom.badImplementation(`Could not list users for role in the project`);
       }
     })
   );
