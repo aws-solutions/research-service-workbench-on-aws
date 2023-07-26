@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "solution renaming",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}

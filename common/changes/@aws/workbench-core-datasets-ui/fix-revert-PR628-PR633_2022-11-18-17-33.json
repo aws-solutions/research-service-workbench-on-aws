@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "revert to 2ae2a9a",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}

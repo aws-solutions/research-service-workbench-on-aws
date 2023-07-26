@@ -1,0 +1,149 @@
+{
+  "name": "@aws/workbench-core-infrastructure",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "tag": "@aws/workbench-core-infrastructure_v1.0.0",
+      "date": "Wed, 07 Jun 2023 21:47:22 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix app-registry construct"
+          },
+          {
+            "comment": "Add AppInsightsConfiguration"
+          },
+          {
+            "comment": "Add AppRegistry Construct"
+          },
+          {
+            "comment": "Added optional parameter to override default access token expiration time"
+          },
+          {
+            "comment": "codecov update"
+          },
+          {
+            "comment": "Updated doc for WorkbenchCognito construct"
+          },
+          {
+            "comment": "dynamicAuth infrastructure update"
+          },
+          {
+            "comment": "add new cdk constructs"
+          },
+          {
+            "comment": "add license-check-and-add to package.json"
+          },
+          {
+            "comment": "Add Multi Step Environments Integration Test"
+          },
+          {
+            "comment": "add license-checker"
+          },
+          {
+            "comment": "change github owner to aws-solutions"
+          },
+          {
+            "comment": "fix dependencies"
+          },
+          {
+            "comment": "revert to 2ae2a9a"
+          },
+          {
+            "comment": "fix s3 bucket object ownership"
+          },
+          {
+            "comment": "update key"
+          },
+          {
+            "comment": "node18 update"
+          },
+          {
+            "comment": "eslint fixes"
+          },
+          {
+            "comment": "swb dynamic authorization infrastructure update"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Integrating AuthZ with Projects"
+          },
+          {
+            "comment": "Parameterize user inputs for Solutions"
+          },
+          {
+            "comment": "Added default token validity length (15 minutes for id and access, 30 days for refresh)"
+          },
+          {
+            "comment": "enable 'ALLOW_USER_PASSWORD_AUTH'"
+          },
+          {
+            "comment": "solution renaming"
+          },
+          {
+            "comment": "replace with authorized fictitious data"
+          },
+          {
+            "comment": "revert commit"
+          },
+          {
+            "comment": "revert"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "cdk and nodejs version update"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Renamed `websiteUrl` to `websiteUrls` and changed type to string array to allow one backend API to serve multiple UI clients"
+          },
+          {
+            "comment": "Updates for separating UI packages"
+          },
+          {
+            "comment": "Adding support for user pool advanced security mode"
+          }
+        ],
+        "major": [
+          {
+            "comment": "BREAKING CHANGE: changed MFA default to OPTIONAL, changed default accessTokenValidity to 7 days, added optional parameters to change these values"
+          },
+          {
+            "comment": "Add new Template getting API, upgrade packages"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.1",
+      "tag": "@aws/workbench-core-infrastructure_v0.1.1",
+      "date": "Wed, 10 Aug 2022 17:48:12 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "get cognito access_token programmatically"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.0",
+      "tag": "@aws/workbench-core-infrastructure_v0.1.0",
+      "date": "Fri, 29 Jul 2022 16:54:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Initial release"
+          }
+        ]
+      }
+    }
+  ]
+}

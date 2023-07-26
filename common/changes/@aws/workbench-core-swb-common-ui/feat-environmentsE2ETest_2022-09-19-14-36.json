@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "add e2e testing attributes",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

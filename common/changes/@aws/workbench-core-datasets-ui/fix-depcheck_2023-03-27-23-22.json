@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "fix dependencies",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}

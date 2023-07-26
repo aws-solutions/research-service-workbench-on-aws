@@ -1,0 +1,14 @@
+# Stage Name
+stage: testEnv
+awsRegion: us-east-1
+awsRegionShortName: va
+rootUserEmailParamStorePath: '/swb/testEnv/rootUser/email'
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+cognitoDomain: 'chamonix-dev-test-domain'
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']

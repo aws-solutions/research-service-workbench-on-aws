@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "nodejs version update",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

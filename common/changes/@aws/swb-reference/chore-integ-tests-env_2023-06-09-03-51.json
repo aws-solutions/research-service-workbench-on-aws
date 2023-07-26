@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-reference",
+      "comment": "test: adding integ tests for env reads",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-reference"
+}

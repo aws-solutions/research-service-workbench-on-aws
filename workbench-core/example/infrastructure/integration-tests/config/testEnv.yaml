@@ -1,0 +1,7 @@
+## Note:
+## Please deploy the example/infrastructure package before running the integration test suite.
+## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
+
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '/maf/exampleApp/rootUser/email'
+rootPasswordParamStorePath: '/maf/exampleApp/rootUser/password'

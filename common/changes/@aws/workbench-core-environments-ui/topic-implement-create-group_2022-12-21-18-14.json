@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

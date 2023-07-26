@@ -1,0 +1,270 @@
+{
+  "name": "@aws/workbench-core-datasets",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "tag": "@aws/workbench-core-datasets_v1.0.0",
+      "date": "Wed, 07 Jun 2023 21:47:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update project and dataset relationship management"
+          },
+          {
+            "comment": "Updating params for account creation and updating"
+          },
+          {
+            "comment": "added Remove Dataset functionality"
+          },
+          {
+            "comment": "Updated type being used for authenticatedUser"
+          },
+          {
+            "comment": "Integrating AuthZ with Projects"
+          },
+          {
+            "comment": "added ListDataSetAccessPermission functionality"
+          },
+          {
+            "comment": "Adding pagination to ListDataSets"
+          },
+          {
+            "comment": "update datasets integration test"
+          },
+          {
+            "comment": "refactor ddb.update()"
+          },
+          {
+            "comment": "Added VPC compatibility to S3 access points"
+          },
+          {
+            "comment": "fix: use aws cdk lib for iam"
+          },
+          {
+            "comment": "Removed AuthenticatedUser from Datasets DDB entries."
+          },
+          {
+            "comment": "Reverted accidental change to CreateDataSet schema object."
+          },
+          {
+            "comment": "solution renaming"
+          },
+          {
+            "comment": "add prefixes to resource ids to allow easier resource identification"
+          },
+          {
+            "comment": "revert"
+          },
+          {
+            "comment": "revert"
+          },
+          {
+            "comment": "add optional checkDependency function to dataset"
+          },
+          {
+            "comment": "add check to ensure dataset has no external endpoints before removal"
+          },
+          {
+            "comment": "Updated @aws-sdk/* dependencies to ^3.186.0"
+          },
+          {
+            "comment": "update create/import dataset to favor owner for read-only permissions over authenticated user"
+          },
+          {
+            "comment": "add a group fallback to AddExternalEndpointForUser"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "update rush dependencies"
+          },
+          {
+            "comment": "nodejs version update"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Exposed getPaginationToken API."
+          },
+          {
+            "comment": "Implemented removeDataset API"
+          },
+          {
+            "comment": "Updates for separating UI packages"
+          },
+          {
+            "comment": "Added functions to generate/update datasets IAM role CFN template"
+          },
+          {
+            "comment": "Implement AddAccessPermission"
+          },
+          {
+            "comment": "Add addDataSetAccessPermissions to DataSetService"
+          },
+          {
+            "comment": "Expand auditing and correctly include 'actor'"
+          },
+          {
+            "comment": "add dataSetsAuthorizationPlugin interface and associated objects"
+          },
+          {
+            "comment": "add getDataSetAccessPermissions and GetAllDataSetAccessPermissions"
+          },
+          {
+            "comment": "Added JSON schema objects for `addDatasetPermissionsToRole()` and `createRegisterExternalBucketRole()` functions."
+          },
+          {
+            "comment": "add removeDataSetAccessPermission"
+          },
+          {
+            "comment": "update removeDataSet to also remove dataSet permissions"
+          },
+          {
+            "comment": "implement access permission update on dataset creation"
+          },
+          {
+            "comment": "create authorization plugin and pull into DataSetsService"
+          },
+          {
+            "comment": "Added `addDataSetExternalEndpointForGroup` API."
+          },
+          {
+            "comment": "Added the listStorageLocations API to DatasetsService."
+          },
+          {
+            "comment": "Implemented presignedSinglePartUploadUrl endpoint."
+          },
+          {
+            "comment": "enabled pageSize for getAllDataSetAccessPermissions"
+          },
+          {
+            "comment": "Added optional `owner`, `type`, and `description` fields to `DataSet` interface."
+          }
+        ],
+        "none": [
+          {
+            "comment": "codecov update"
+          },
+          {
+            "comment": "add license-check-and-add to package.json"
+          },
+          {
+            "comment": "add license-checker"
+          },
+          {
+            "comment": "change github owner to aws-solutions"
+          },
+          {
+            "comment": "fix dependencies"
+          },
+          {
+            "comment": "revert to 2ae2a9a"
+          },
+          {
+            "comment": "eslint fixes"
+          },
+          {
+            "comment": "test: add accounts integ test"
+          },
+          {
+            "comment": "update error message"
+          },
+          {
+            "comment": "add expected bucket owner to S3 call"
+          }
+        ],
+        "major": [
+          {
+            "comment": "Optimized listStorageLocations to query storageLocation ddb entry."
+          },
+          {
+            "comment": "Renamed AddExternalEndpoint to AddExternalEndpointForUser and updated for AuthZ."
+          },
+          {
+            "comment": "Added authorization to `getDataSetMountObject` API."
+          },
+          {
+            "comment": "Updated `listDataSets` to only return the DataSets the `AuthorizedUser` has access to."
+          },
+          {
+            "comment": "Add new Template getting API, upgrade packages"
+          },
+          {
+            "comment": "Added `fileName` parameter to `createPresignedUploadUrl` function"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-authorization\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-user-management\" to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.2",
+      "tag": "@aws/workbench-core-datasets_v0.1.2",
+      "date": "Wed, 10 Aug 2022 17:48:12 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `0.1.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.1",
+      "tag": "@aws/workbench-core-datasets_v0.1.1",
+      "date": "Fri, 29 Jul 2022 19:02:48 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `0.1.1`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `0.1.1`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `0.1.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.0",
+      "tag": "@aws/workbench-core-datasets_v0.1.0",
+      "date": "Fri, 29 Jul 2022 16:54:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Initial release"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

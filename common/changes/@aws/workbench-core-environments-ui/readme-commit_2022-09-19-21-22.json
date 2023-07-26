@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "chore: package.json sort",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

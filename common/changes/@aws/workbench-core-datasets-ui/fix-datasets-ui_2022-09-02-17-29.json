@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "remove unnecessary code from base DS list page",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}
