@@ -7,3 +7,7 @@
 
 # example package
 workbench-core/example/infrastructure/build/buildLambda.js
+
+common/scripts/*
+
+DEVELOPING.md

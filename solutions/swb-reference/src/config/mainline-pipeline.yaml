@@ -1,0 +1,17 @@
+stage: mainline-pipeline # Stage Name
+awsRegion: us-east-1
+awsRegionShortName: va #two or three letter abbreviation for the region. You can choose your own abbreviation
+rootUserEmailParamStorePath: '/rsw/mainline-pipeline/rootUser/email' # Log into your AWS account and store root user email in SSM Param store
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002'] # SWB API will allow this domains to make requests.
+cognitoDomain: 'rsw-mainline-pipeline' # Must be globally unique
+
+vpcId: ''
+albSubnetIds: []
+ecsSubnetIds: []
+
+# internet-facing ALB
+# If you want internet-facing put value `true` else `false`
+albInternetFacing: true
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
