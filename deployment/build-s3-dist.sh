@@ -263,7 +263,7 @@ echo "${bold}[Init] Install dependencies for the cdk-solution-helper${normal}"
 echo "------------------------------------------------------------------------------"
 
 do_cmd cd $template_dir/cdk-solution-helper
-do_cmd rush cinstall
+do_cmd rush install
 
 echo "------------------------------------------------------------------------------"
 echo "${bold}[Synth] CDK Project${normal}"
@@ -408,7 +408,7 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
         cd $fname
         echo "Clean and rebuild artifacts"
         rush purge
-        rush cinstall
+        rush install
         cd $staging_dist_dir
         # Zip the artifact
         echo "zip -r $fname.zip $fname"
