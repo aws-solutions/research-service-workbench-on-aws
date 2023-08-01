@@ -19,7 +19,6 @@ researcher1PasswordParamStorePath: '/rsw/mainline-pipeline/researcher1/password'
 
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-e3efef9d-780b-41fa-8a3c-49763fead317'
-
 ## Pre-requisite for running aws-accounts integration test
 ## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
-awsAccountIdParamStorePath: '/rsw/mainline-pipeline/accountsTest/awsAccountId'
+# awsAccountIdParamStorePath: '/rsw/mainline-pipeline/accountsTest/awsAccountId'
