@@ -251,21 +251,21 @@
       "summary": "Prepare conventional commit messages",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "commitizen",
-      "shellCommand": "bash .github/workflows/scripts/commitizen.sh"
+      "shellCommand": "bash common/scripts/commitizen.sh"
     },
     {
       "name": "git-secrets-scan",
       "commandKind": "global",
       "summary": "Used to perform a git-secrets scan on the packages",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "bash .github/workflows/scripts/git-secrets-scan.sh"
+      "shellCommand": "bash common/scripts/git-secrets-scan.sh"
     },
     {
       "name": "viperlight-scan",
       "commandKind": "global",
       "summary": "Used to perform a viperlight scan on the packages",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
+      "shellCommand": "bash common/scripts/viperlight-scan.sh"
     },
     {
       "name": "prettier",
