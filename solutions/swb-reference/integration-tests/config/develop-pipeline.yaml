@@ -17,9 +17,10 @@ projectAdmin2PasswordParamStorePath: '/swb/develop-pipeline/pa2/password'
 researcher1UserNameParamStorePath: '/swb/develop-pipeline/researcher1/email'
 researcher1PasswordParamStorePath: '/swb/develop-pipeline/researcher1/password'
 
+externalIdPath: '/swb/develop-pipeline/externalId'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-eabd675f-02d1-4856-ac10-9487f4d9fa2a'
 ## Pre-requisite for running aws-accounts integration test
 ## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
-# awsAccountIdParamStorePath: '/swb/develop-pipeline/accountsTest/awsAccountId'
-
+awsAccountIdParamStorePath: '/swb/develop-pipeline/accountsTest/awsAccountId'
