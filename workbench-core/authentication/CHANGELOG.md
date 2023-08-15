@@ -1,6 +1,12 @@
 # Change Log - @aws/workbench-core-authentication
 
-This log was last generated on Wed, 07 Jun 2023 21:47:22 GMT and should not be manually modified.
+## 1.0.1
+Wed, 16 Aug 2023
+
+### Patches
+
+- Replacing toMatchObject with toStrictEqual
+- Allowing multiple App ClientIds for Cognito
 
 ## 1.0.0
 Wed, 07 Jun 2023 21:47:22 GMT

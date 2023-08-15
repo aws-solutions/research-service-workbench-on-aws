@@ -4,5 +4,10 @@
   "private": true,
   "dependencies": {
     "commitizen": "^4.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "minimist": "1.2.6"
+    }
   }
 }
