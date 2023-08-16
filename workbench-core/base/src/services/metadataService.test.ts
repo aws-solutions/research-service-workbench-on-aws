@@ -82,7 +82,7 @@ describe('metadata service', () => {
       ]
     };
 
-    expect(metadataService.getMetadataItems(entityA, [entityB], mapperA, mapperB)).toMatchObject(result);
+    expect(metadataService.getMetadataItems(entityA, [entityB], mapperA, mapperB)).toStrictEqual(result);
   });
 
   test('should list dependent entity metadata', async () => {

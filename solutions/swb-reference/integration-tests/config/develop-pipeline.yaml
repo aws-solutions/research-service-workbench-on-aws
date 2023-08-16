@@ -1,0 +1,26 @@
+# Default Env Config for launching a new environment
+envTypeId: 'et-prod-shffpaexkevqq,pa-2lc2gv3qswcnk'
+envTypeConfigId: 'etc-cd44dc76-9c59-46d5-b533-f14b875bc57a'
+projectId: 'proj-79a9227c-c96f-4fff-95dc-455f17e34bba'
+envType: 'sagemakerNotebook'
+
+#Cognito Integ Test Client
+rootUserNameParamStorePath: '/swb/develop-pipeline/rootUser/email'
+rootPasswordParamStorePath: '/swb/develop-pipeline/rootUser/password'
+
+projectAdmin1UserNameParamStorePath: '/swb/develop-pipeline/pa1/email'
+projectAdmin1PasswordParamStorePath: '/swb/develop-pipeline/pa1/password'
+
+projectAdmin2UserNameParamStorePath: '/swb/develop-pipeline/pa2/email'
+projectAdmin2PasswordParamStorePath: '/swb/develop-pipeline/pa2/password'
+
+researcher1UserNameParamStorePath: '/swb/develop-pipeline/researcher1/email'
+researcher1PasswordParamStorePath: '/swb/develop-pipeline/researcher1/password'
+
+externalIdPath: '/swb/develop-pipeline/externalId'
+
+## Default Hosting Account
+defaultHostingAccountId: 'acc-eabd675f-02d1-4856-ac10-9487f4d9fa2a'
+## Pre-requisite for running aws-accounts integration test
+## Store an AWS Account ID that is not your main or hosting account ID in SSM and provide path here
+awsAccountIdParamStorePath: '/swb/develop-pipeline/accountsTest/awsAccountId'

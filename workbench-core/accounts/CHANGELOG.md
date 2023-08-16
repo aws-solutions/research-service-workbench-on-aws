@@ -1,6 +1,13 @@
 # Change Log - @aws/workbench-core-accounts
 
-This log was last generated on Wed, 07 Jun 2023 21:47:22 GMT and should not be manually modified.
+## 1.0.1
+Wed, 16 Aug 2023
+
+### Patches
+
+- Cost Centers require a CURRENT account
+- Main account can be hosting
+- Remove ID from error message
 
 ## 1.0.0
 Wed, 07 Jun 2023 21:47:22 GMT

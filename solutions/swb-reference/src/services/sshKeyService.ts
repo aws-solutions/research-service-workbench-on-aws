@@ -232,21 +232,15 @@ export default class SshKeyService implements SshKeyPlugin {
     // get environment instanceId and projectId
     const { instanceId, projectId, status } = await this._environmentService.getEnvironment(environmentId);
     if (reqProjectId !== projectId) {
-      throw new ConflictError(
-        `Requested Project ID ${reqProjectId} does not match environment Project ID ${projectId}`
-      );
+      throw new ConflictError(`Requested Project ID does not match environment Project ID`);
     }
     if (!instanceId) {
       // getEnvironment could return an environment before the instance is spun up
-      throw new NoInstanceFoundError(
-        `Instance Id is not defined for environment ${environmentId} yet. Try again later.`
-      );
+      throw new NoInstanceFoundError(`Instance Id is not defined for environment yet. Try again later.`);
     }
     if (status !== 'COMPLETED') {
       // getEnvironment could return an environment before the instance is available
-      throw new ConnectionInfoNotDefinedError(
-        `The environment ${environmentId} is not available yet. Try again later.`
-      );
+      throw new ConnectionInfoNotDefinedError(`The environment is not available yet. Try again later.`);
     }
 
     // get the key for the user and given project
@@ -280,7 +274,7 @@ export default class SshKeyService implements SshKeyPlugin {
         SSHPublicKey: key.PublicKey
       });
       if (!success) {
-        throw new Ec2Error(`Could not send SSH Public Key to environment ${environmentId}`);
+        throw new Ec2Error(`Could not send SSH Public Key to environment`);
       }
     } catch (e) {
       throw new Ec2Error(e.message);
@@ -322,10 +316,10 @@ export default class SshKeyService implements SshKeyPlugin {
       throw new Ec2Error(e);
     }
     if (keys.length === 0) {
-      throw new NoKeyExistsError(`Key ${sshKeyId} does not exist`);
+      throw new NoKeyExistsError(`Key does not exist`);
     }
     if (keys.length > 1) {
-      throw new NonUniqueKeyError(`More than one key exists with ${sshKeyId}.`);
+      throw new NonUniqueKeyError(`More than one key exists with requested ID.`);
     }
     // must only be 1 key
     return keys[0];

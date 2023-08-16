@@ -149,9 +149,7 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.update(accountMetadata)).rejects.toThrow(
-      `Could not find account ${accountMetadata.id}`
-    );
+    await expect(accountService.update(accountMetadata)).rejects.toThrow(`Could not find account`);
   });
 
   test('create throws error when create process finds a duplicate entry', async () => {
@@ -376,16 +374,14 @@ describe('AccountService', () => {
           Item: undefined
         });
         const noMatchId = 'noMatchId';
-        await expect(accountService.getAccount(noMatchId)).rejects.toThrowError(
-          `Could not find account ${noMatchId}`
-        );
+        await expect(accountService.getAccount(noMatchId)).rejects.toThrowError(`Could not find account`);
       });
 
       test('throws an error when there is no Item associated with the accountId with metadata', async () => {
         mockDDB.on(QueryCommand).resolves({ Count: 0 });
         const noMatchId = 'noMatchId';
         await expect(accountService.getAccount(noMatchId, true)).rejects.toThrowError(
-          `Could not find account ${noMatchId}`
+          `Could not find account`
         );
       });
     });

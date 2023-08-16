@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-authentication",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package to handle server-side authentication",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

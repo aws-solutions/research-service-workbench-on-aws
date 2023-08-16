@@ -65,7 +65,7 @@ describe('Delete Key Pair negative tests', () => {
             e,
             new HttpError(404, {
               error: 'Not Found',
-              message: `Key ${invalidSshKeyId} does not exist`
+              message: `Key does not exist`
             })
           );
         }

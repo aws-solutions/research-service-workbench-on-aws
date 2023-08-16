@@ -118,7 +118,7 @@ describe('environmentTypeService', () => {
 
       // OPERATE & CHECK
       await expect(envTypeService.getEnvironmentType(invalidId)).rejects.toThrow(
-        `Could not find environment type ${invalidId}`
+        `Could not find environment type`
       );
     });
   });
@@ -160,7 +160,7 @@ describe('environmentTypeService', () => {
       // BUILD & OPERATE & CHECK
       await expect(
         envTypeService.listEnvironmentTypes({ pageSize: 1, paginationToken: 'invalidPaginationToken' })
-      ).rejects.toThrow('Invalid Pagination Token: invalidPaginationToken');
+      ).rejects.toThrow('Invalid Pagination Token');
     });
 
     test('filters by name successfully with an eq function ', async () => {
@@ -341,7 +341,7 @@ describe('environmentTypeService', () => {
       // OPERATE & CHECK
       await expect(
         envTypeService.updateEnvironmentType({ envTypeId: invalidId, name: 'FakeName' })
-      ).rejects.toThrow(`Could not find environment type ${invalidId} to update`);
+      ).rejects.toThrow(`Could not find environment type to update`);
     });
 
     test('should throw exception when revoking environment type with dependencies', async () => {
@@ -358,9 +358,7 @@ describe('environmentTypeService', () => {
       ddbMock.on(QueryCommand, listEnvTypeConfigCommandParams).resolves(configsItemResponse);
       await expect(
         envTypeService.updateEnvironmentType({ envTypeId, status: 'NOT_APPROVED' })
-      ).rejects.toThrow(
-        `Unable to reovke environment type: ${envTypeId}, Environment Type has active configurations`
-      );
+      ).rejects.toThrow(`Unable to reovke environment type, Environment Type has active configurations`);
     });
   });
 
@@ -395,7 +393,7 @@ describe('environmentTypeService', () => {
 
       // OPERATE & CHECK
       await expect(envTypeService.createNewEnvironmentType(createParams)).rejects.toThrow(
-        `Unable to create environment type with params: ${JSON.stringify(createParams)}`
+        `Unable to create environment type`
       );
     });
   });

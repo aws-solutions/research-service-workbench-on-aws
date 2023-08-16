@@ -33,7 +33,7 @@ describe('RSWApplicationLoadBalancer tests', () => {
       LoadBalancerAttributes: [
         {
           Key: 'deletion_protection.enabled',
-          Value: 'false'
+          Value: 'true'
         }
       ],
       Scheme: 'internet-facing',
@@ -72,7 +72,7 @@ describe('RSWApplicationLoadBalancer tests', () => {
       LoadBalancerAttributes: [
         {
           Key: 'deletion_protection.enabled',
-          Value: 'false'
+          Value: 'true'
         }
       ],
       Scheme: 'internet-facing',
@@ -111,7 +111,7 @@ describe('RSWApplicationLoadBalancer tests', () => {
       LoadBalancerAttributes: [
         {
           Key: 'deletion_protection.enabled',
-          Value: 'false'
+          Value: 'true'
         }
       ],
       Scheme: 'internal',

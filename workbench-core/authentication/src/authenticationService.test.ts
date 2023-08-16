@@ -10,8 +10,10 @@ import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticati
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
-  clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret'
+  webUiClient: {
+    clientId: 'fake-client-id',
+    clientSecret: 'fake-client-secret'
+  }
 } as const;
 
 describe('AuthenticationService tests', () => {
@@ -37,7 +39,7 @@ describe('AuthenticationService tests', () => {
   it('validateToken should return the decoded passed in token', async () => {
     const result = await service.validateToken('valid token');
 
-    expect(result).toMatchObject({
+    expect(result).toStrictEqual({
       token_use: 'access',
       sub: 'sub',
       iss: 'iss',
@@ -72,7 +74,7 @@ describe('AuthenticationService tests', () => {
   it('getUserRolesFromToken should return the tokens roles', () => {
     const result = service.getUserRolesFromToken({});
 
-    expect(result).toMatchObject(['role']);
+    expect(result).toStrictEqual(['role']);
   });
 
   it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens and their expiration (in seconds)', async () => {
@@ -82,7 +84,7 @@ describe('AuthenticationService tests', () => {
       'https://www.fakewebsite.com'
     );
 
-    expect(result).toMatchObject({
+    expect(result).toStrictEqual({
       idToken: {
         token: 'id token',
         expiresIn: 1234
@@ -112,7 +114,7 @@ describe('AuthenticationService tests', () => {
   it('refreshAccessToken should return a Promise that contains the id and access tokens and their expiration (in seconds)', async () => {
     const result = await service.refreshAccessToken('refresh token');
 
-    expect(result).toMatchObject({
+    expect(result).toStrictEqual({
       idToken: {
         token: 'id token',
         expiresIn: 1234

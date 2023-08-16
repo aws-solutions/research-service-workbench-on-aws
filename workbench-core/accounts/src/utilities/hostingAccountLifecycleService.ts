@@ -321,22 +321,26 @@ export default class HostingAccountLifecycleService {
       roleToCopyToTargetAccount,
       s3ArtifactBucketName
     } = params;
-    const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
-    await this._shareSSMDocument(ssmDocuments, targetAccountId);
-    await this._shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
-    await this._shareAndAcceptScPortfolio(
-      targetAccountAwsService,
-      targetAccountId as string,
-      portfolioId as string
-    );
 
+    // SSM documents, SC products and AMIs do not need to be shared since hosting account is same as main account
+    if (targetAccountId !== process.env.MAIN_ACCT_ID!) {
+      const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
+      await this._shareSSMDocument(ssmDocuments, targetAccountId);
+      await this._shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
+      await this._shareAndAcceptScPortfolio(
+        targetAccountAwsService,
+        targetAccountId as string,
+        portfolioId as string
+      );
+      await this.cloneRole(targetAccountAwsService, roleToCopyToTargetAccount);
+    }
+
+    // This step are needed regardless of the hosting account being same or different w.r.t main account
     await this._associatePrincipalIamRoleWithPortfolio(
       targetAccountAwsService,
       principalArnForScPortfolio,
       portfolioId as string
     );
-
-    await this.cloneRole(targetAccountAwsService, roleToCopyToTargetAccount);
 
     await this._updateHostingAccountStatus(
       ddbAccountId,

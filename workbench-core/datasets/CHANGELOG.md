@@ -1,6 +1,11 @@
 # Change Log - @aws/workbench-core-datasets
 
-This log was last generated on Wed, 07 Jun 2023 21:47:22 GMT and should not be manually modified.
+## 1.0.1
+Wed, 16 Aug 2023
+
+### Patches
+
+- Replacing toMatchObject with toStrictEqual
 
 ## 1.0.0
 Wed, 07 Jun 2023 21:47:22 GMT

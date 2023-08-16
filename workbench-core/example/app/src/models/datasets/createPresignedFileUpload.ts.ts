@@ -8,7 +8,9 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreatePresignedSinglePartFileUploadUrlParser = z
   .object({
-    fileName: z.string()
+    fileName: z.string(),
+    region: z.string().optional(),
+    roleToAssume: z.string().optional()
   })
   .strict();
 

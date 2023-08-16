@@ -1,6 +1,6 @@
 {
   "name": "@aws/swb-reference",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Example implementation of SWB. This package has a dependency on swb-app and workbench-core packages. No other package should depend on this package.",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
