@@ -1,6 +1,6 @@
 {
   "name": "@aws/swb-app",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "This package sets up API routes for SWB",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -27,7 +27,10 @@
     "serve": "node lib/dev-launch.js",
     "sort-package-json": "sort-package-json package.json",
     "start": "heft start --clean",
-    "test": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "jest": {
     "moduleFileExtensions": [

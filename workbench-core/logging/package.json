@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-logging",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Package to handle server-side logging",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -26,7 +26,10 @@
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only",
     "test:only": "heft test --clean --no-build --silent",
-    "test:verbose": "heft test --clean --no-build"
+    "test:verbose": "heft test --clean --no-build",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "dependencies": {
     "@types/triple-beam": "^1.3.2",

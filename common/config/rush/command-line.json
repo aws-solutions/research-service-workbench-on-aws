@@ -289,6 +289,33 @@
       "summary": "Run rush update with bypass-policy and perform custom git-hook install",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy --max-install-attempts 1 && node common/scripts/install-hooks"
+    },
+    {
+      "name": "version:patch",
+      "commandKind": "bulk",
+      "summary": "Bump all package.json versions by a patch increment",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true,
+      "incremental": true
+    },
+    {
+      "name": "version:minor",
+      "commandKind": "bulk",
+      "summary": "Bump all package.json versions by a minor increment",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true,
+      "incremental": true
+    },
+    {
+      "name": "version:major",
+      "commandKind": "bulk",
+      "summary": "Bump all package.json versions by a major increment",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true,
+      "incremental": true
     }
   ],
 

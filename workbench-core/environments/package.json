@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-environments",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Implementation of environment APIs and resources.",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -25,7 +25,10 @@
     "lint:fix": "eslint . --fix",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-example-infrastructure",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Example infrastructure to deploy express app",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -37,7 +37,10 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "heft test -u --clean --no-build",
-    "test-cdk-deploy": "rush build -t @aws/workbench-core-example-infrastructure && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json"
+    "test-cdk-deploy": "rush build -t @aws/workbench-core-example-infrastructure && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "dependencies": {
     "@aws-sdk/client-s3-control": "^3.212.0",
