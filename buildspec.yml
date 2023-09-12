@@ -9,7 +9,7 @@ phases:
     commands:
       - echo "Installing dependencies and executing unit tests - `pwd`"
       - echo Update npm to latest
-      - npm install -g npm@latest
+      - npm install -g npm@9.6.7
       - n 18
       - cd deployment && chmod +x ./run-unit-tests.sh && ./run-unit-tests.sh
       - echo "Installing dependencies and executing unit tests completed `date`"
