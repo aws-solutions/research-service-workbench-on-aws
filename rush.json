@@ -122,18 +122,6 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@aws/workbench-core-example-app",
-      "projectFolder": "workbench-core/example/app",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@aws/workbench-core-example-infrastructure",
-      "projectFolder": "workbench-core/example/infrastructure",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
       "packageName": "@aws/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
