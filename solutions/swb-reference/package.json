@@ -57,7 +57,7 @@
     "@aws/workbench-core-user-management": "workspace:*",
     "@vendia/serverless-express": "^4.5.4",
     "aws-sdk-client-mock": "^0.6.2",
-    "axios": "^0.27.1",
+    "axios": "^1.6.0",
     "csrf": "^3.1.0",
     "express": "^4.17.3",
     "js-yaml": "^4.1.0",

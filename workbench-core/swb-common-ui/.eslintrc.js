@@ -17,6 +17,6 @@ module.exports = {
     react: {
       version: 'detect'
     },
-    'import/ignore': ['@cloudscape-design']
+    'import/ignore': ['@cloudscape-design', 'axios', 'uuid']
   }
 };

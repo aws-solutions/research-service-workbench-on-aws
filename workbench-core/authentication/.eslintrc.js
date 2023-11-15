@@ -5,6 +5,6 @@ module.exports = {
   extends: ['@aws/eslint-config-workbench-core-eslint-custom'],
   parserOptions: { tsconfigRootDir: __dirname },
   settings: {
-    'import/ignore': ['aws-jwt-verify']
+    'import/ignore': ['aws-jwt-verify', 'axios']
   }
 };

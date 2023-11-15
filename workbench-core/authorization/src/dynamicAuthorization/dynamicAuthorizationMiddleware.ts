@@ -44,7 +44,7 @@ export default function withDynamicAuth(
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Check for rate limiter
     try {
-      await rateLimiter.consume(req.ip);
+      await rateLimiter.consume(req.ip as string | number);
     } catch (rejRes) {
       res.status(429).json({ error: 'Too Many Requests' });
       return;
