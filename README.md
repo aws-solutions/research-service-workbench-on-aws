@@ -1,3 +1,16 @@
+# **End of Life Notice**
+
+[AWS Solution Retirement Notice] Research Service Workbench on AWS will be retired on 2024-11-30.
+ 
+The AWS Solutions team would like to inform you that the functionality provided by Research Service Workbench on AWS has been superseded with functionality in Research and Engineering Studio.
+
+Research and Engineering Studio (RES) is an AWS supported, open source product that enables IT administrators to provide a web portal for scientists and engineers to run technical computing workloads on AWS. RES provides a single pane of glass for users to launch secure virtual desktops to conduct scientific research, product design, engineering simulations, or data analysis workloads.
+RES offers similar functionality to manage data access for researchers by projects and Virtual desktops to access the data. RES offers additional new capabilities such as file systems and integration with High Performance computing services. More information is available via Research and Engineering Studio documentation here.
+
+On 2024-11-30, AWS support for Research Service Workbench on AWS will end, and the GitHub repository will be archived. You will no longer be able to deploy Research Service Workbench on AWS via Cloudformation template within the AWS Console after this date.
+
+Existing deployments will continue to run. If you have deployed Research Service Workbench on AWS via cloning GitHub open source code, you may continue to use the solution. If underlying service APIs change after solution support ends, deployments may error or may not be possible to stop / start.
+
 # Overview
 
 Research Service Workbench on AWS is a backend API designed to empower AWS partners to more easily build self-service portals for research institutions, allowing their researchers to create and manage secure research computing environments. RSW builds on AWS services including Amazon S3, Service Catalog, and AWS Systems Manager to deliver comprehensive, cutting-edge capabilities in less time while meeting the high bar for security and governance demanded by regulators and funding agencies.
