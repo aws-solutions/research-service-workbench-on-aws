@@ -20,7 +20,6 @@ import {
   NoSuchBucket,
   S3ServiceException
 } from '@aws-sdk/client-s3';
-import { ModifyDocumentPermissionCommandInput } from '@aws-sdk/client-ssm';
 import * as Boom from '@hapi/boom';
 import { PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import _ from 'lodash';
@@ -439,7 +438,6 @@ export default class HostingAccountLifecycleService {
           encryptionKeyArn
         });
       }
-      // @ts-ignore
     } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
       await this._writeAccountStatusToDDB({ ddbAccountId, status: 'ERRORED' });
     }
@@ -589,11 +587,7 @@ export default class HostingAccountLifecycleService {
   private async _shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
     console.log(`Sharing SSM documents: [${ssmDocuments}]`);
     for (const ssmDoc of ssmDocuments) {
-      const params: ModifyDocumentPermissionCommandInput = {
-        Name: ssmDoc,
-        PermissionType: 'Share',
-        AccountIdsToAdd: [accountId]
-      };
+      const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
       await this._aws.clients.ssm.modifyDocumentPermission(params);
     }
   }

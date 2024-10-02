@@ -6,7 +6,7 @@
 import { AwsService } from '@aws/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { UsernameExistsException } from '@aws-sdk/client-cognito-identity-provider';
-import { generate } from 'generate-password';
+import passwordGenerator from 'generate-password';
 
 export default class CognitoSetup {
   private _aws: AwsService;
@@ -132,7 +132,7 @@ export default class CognitoSetup {
    * @returns password
    */
   private _generatePassword(): string {
-    return generate({
+    return passwordGenerator.generate({
       length: 12, // 12 characters in password
       numbers: true, // Include numbers in password
       symbols: true, // Include symbols

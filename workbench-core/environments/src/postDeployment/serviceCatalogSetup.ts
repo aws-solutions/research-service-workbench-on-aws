@@ -12,12 +12,7 @@ import { join, basename } from 'path';
 import { Readable } from 'stream';
 import { AwsService } from '@aws/workbench-core-base';
 import { _Object } from '@aws-sdk/client-s3';
-import {
-  InvalidParametersException,
-  ProductViewDetail,
-  CreateProvisioningArtifactCommandInput,
-  CreateProductCommandInput
-} from '@aws-sdk/client-service-catalog';
+import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
 
 import md5File from 'md5-file';
 
@@ -283,9 +278,7 @@ export default class ServiceCatalogSetup {
         }
       };
 
-      await this._aws.clients.serviceCatalog.createProvisioningArtifact(
-        provisioningArtifactParam as CreateProvisioningArtifactCommandInput
-      );
+      await this._aws.clients.serviceCatalog.createProvisioningArtifact(provisioningArtifactParam);
       console.log('Successfully created new version of product');
     }
   }
@@ -337,9 +330,7 @@ export default class ServiceCatalogSetup {
         Description: 'Auto-created by post deployment script'
       }
     };
-    const response = await this._aws.clients.serviceCatalog.createProduct(
-      productToCreateParam as CreateProductCommandInput
-    );
+    const response = await this._aws.clients.serviceCatalog.createProduct(productToCreateParam);
     await this._associateProductWithPortfolio(
       response.ProductViewDetail!.ProductViewSummary!.ProductId!,
       portfolioId

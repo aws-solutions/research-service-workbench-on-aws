@@ -10,8 +10,7 @@ import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
-  GetTemplateCommand,
-  StackStatus
+  GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
 import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
@@ -112,7 +111,7 @@ describe('HostingAccountLifecycleService', () => {
   function mockCloudformationOutputs(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cfMock: AwsStub<any, any>,
-    stackStatus: StackStatus = 'CREATE_COMPLETE',
+    stackStatus: string = 'CREATE_COMPLETE',
     artifactBucketArnCfn: string = artifactBucketArn
   ): void {
     cfMock.on(DescribeStacksCommand).resolves({
@@ -526,7 +525,6 @@ describe('HostingAccountLifecycleService', () => {
     const cfnMock = mockClient(CloudFormationClient);
 
     // Mock for getting SSM Documents, VPC, and VpcSubnet
-    // @ts-ignore
     mockCloudformationOutputs(cfnMock, 'FAILED');
 
     // Mock sharing SSM Documents
