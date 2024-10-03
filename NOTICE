@@ -7,91 +7,91 @@ THIRD PARTY COMPONENTS
 This software includes third party software subject to the following copyrights:
 
 @aws/eslint-config-workbench-core-eslint-custom
-0.0.1 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+0.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/swb-app
-2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+2.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/swb-reference
-2.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+2.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-accounts
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-audit
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-authentication
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-authorization
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-base
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-datasets
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-environments
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-infrastructure
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-logging
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-user-management
-1.0.0 <https://github.com/aws-solutions/research-service-workbench-on-aws>
+1.0.2 <https://github.com/aws-solutions/research-service-workbench-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
