@@ -6,7 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 This solution consist of multiple packages. Please click the links in each version release for the CHANGELOG in each updated package.
 
-## [2.0.2]
+## [2.0.2] - 2024-10-04
+
+### Changed
+- Added End of Life Notice to `./README.md`.
+- Created `./SECURITY.md`.
+
+### Patches
+- Pinned npm version number in `./buildspec.yml`.
+
+### Removed
+- Removed `./workbench-core/example`.
 
 ## [2.0.1] - 2023-08-16
 
