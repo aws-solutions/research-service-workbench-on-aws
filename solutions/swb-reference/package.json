@@ -1,6 +1,6 @@
 {
   "name": "@aws/swb-reference",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Example implementation of SWB. This package has a dependency on swb-app and workbench-core packages. No other package should depend on this package.",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "author": {
     "name": "Amazon Web Services",
-    "url": "http://aws.amazon.com"
+    "url": "https://aws.amazon.com/solutions"
   },
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
@@ -33,7 +33,10 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "run-postDeployment": "rush build && node lib/src/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
-    "test": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.212.0",

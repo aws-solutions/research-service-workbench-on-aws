@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-datasets",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Access and management of data files for the purpose of connecting to various AWS environments.",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "author": {
     "name": "Amazon Web Services",
-    "url": "http://aws.amazon.com"
+    "url": "https://aws.amazon.com/solutions"
   },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -24,7 +24,10 @@
     "lint:fix": "eslint . --fix",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "heft test --clean --no-build"
+    "test": "heft test --clean --no-build",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "jest": {
     "moduleFileExtensions": [
