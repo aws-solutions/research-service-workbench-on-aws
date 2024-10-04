@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-repo-toolbox",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Package to update repo's README.md file with package information",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

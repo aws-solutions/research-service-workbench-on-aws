@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-infrastructure",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Package containing CDK constructs used in workbench core",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "@aws/eslint-config-workbench-core-eslint-custom",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Custom eslint rules",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

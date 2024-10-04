@@ -61,7 +61,7 @@ interface SecretConstants {
 
 const SolutionId: string = 'SO0231'; //TODO: retrieve value dynamically
 const SolutionName: string = 'Research Service Workbench on AWS'; //TODO: retrieve value dynamically
-const SolutionVersion: string = '2.0.2'; //TODO: retrieve value dynamically
+const SolutionVersion: string = '2.0.3'; //TODO: retrieve value dynamically
 const ApplicationType: string = 'AWS-Solutions'; //TODO: retrieve value dynamically
 const customUserAgentString: string = `AwsSolution/${SolutionId}/${SolutionVersion}`;
 
