@@ -30,7 +30,7 @@ Currently Research Service Workbench (RSW) contains some steps that can only be 
 ```shell
 git clone https://github.com/aws-solutions/research-service-workbench-on-aws.git
 cd research-service-workbench-on-aws
-git checkout release/v2.0.2
+git checkout release/v2.0.3
 . ./solutions/swb-reference/scripts/solutions-implementation/postSolutionDeployment.sh
 ```
 ----

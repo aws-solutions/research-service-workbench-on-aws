@@ -83,7 +83,7 @@ Mappings:
   Solution:
     Data:
       ID: "SO0231"
-      Version: "2.0.2"
+      Version: "2.0.3"
       AppRegistryApplicationName: 'RSWAppReg'
       SolutionName: 'Research Service Workbench'
       ApplicationType: 'AWS-Solutions'

@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-accounts-ui",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Package that contains UI components for Projects",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

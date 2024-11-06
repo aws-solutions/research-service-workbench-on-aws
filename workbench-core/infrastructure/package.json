@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-infrastructure",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Package containing CDK constructs used in workbench core",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.61.0-alpha.0",
-    "aws-cdk-lib": "^2.72.1",
+    "aws-cdk-lib": "^2.149.0",
     "constructs": "^10.0.0",
     "lodash": "^4.17.21"
   },

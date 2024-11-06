@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-audit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Package containing an audit service with reference implementation",
   "homepage": "https://github.com/aws-solutions/research-service-workbench-on-aws",
   "repository": {

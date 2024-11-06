@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 This solution consist of multiple packages. Please click the links in each version release for the CHANGELOG in each updated package.
 
+## [2.0.3] - 2024-11-05
+
+### Patches
+- Upgraded `aws-cdk` package to `^2.149.0`.
+
 ## [2.0.2] - 2024-10-04
 
 ### Changed
